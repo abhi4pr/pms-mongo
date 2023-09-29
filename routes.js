@@ -3,6 +3,7 @@ const router = express.Router();
 const insta = require('./controllers/insta.js');
 const exe = require('./controllers/execution.js');
 const sim = require('./controllers/sim.js');
+const logoBrand = require('./controllers/logoBrand.js');
 
   router.get("/", (req, res) => {
     res.send({ message: "Welcome to my application." });
@@ -38,5 +39,12 @@ const sim = require('./controllers/sim.js');
   router.get("/get_allocations", sim.getAllocations);
   router.put("/edit_allocation_sim", sim.editAllocation);
   router.delete("/delete_allocation/:id", sim.deleteAllocation);
+
+  /* logo brand */
+  router.post("/delete_sim/:id", logoBrand.addLogoBrand);
+  router.get("/get_logo_brands", logoBrand.getLogoBrands);
+  router.get("/get_single_logobrand", logoBrand.getSingleLogoBrand);
+  router.put("/edit_logo_brand", logoBrand.editLogoBrand);
+  router.delete("/delete_logo_brand/:id", logoBrand.deleteLogoBrand);
 
 module.exports = router;

@@ -74,38 +74,57 @@ exports.getExeInventory = async (req, res) => {
 
 exports.exeSumPost = async(req, res) => {
     try{
-        const creators = new exeSum({
-            sale_booking_execution_id: req.body.sale_booking_execution_id,
-            sale_booking_id: req.body.sale_booking_id,
-            start_date_: req.body.start_date_,
-            end_date: req.body.end_date,
-            summary: req.body.summary,
-            remarks: req.body.remarks,
-            created_by: req.body.created_by,
-            last_updated_by: req.body.last_updated_by,
-            creation_date: req.body.creation_date,
-            last_updated_date: req.body.last_updated_date,
-            sale_booking_date: req.body.sale_booking_date,
-            campaign_amount: req.body.campaign_amount,
-            execution_date: req.body.execution_date,
-            execution_remark: req.body.execution_remark,
-            execution_done_by: req.body.execution_done_by,
-            cust_name: req.body.cust_name,
-            loggedin_user_id: req.body.loggedin_user_id,
-            execution_status: req.body.execution_status,
-            payment_update_id: req.body.payment_update_id,
-            payment_type: req.body.payment_type,
-            status_desc: req.body.status_desc,
-            invoice_creation_status: req.body.invoice_creation_status,
-            manager_approval: req.body.manager_approval,
-            invoice_particular: req.body.invoice_particular,
-            payment_status_show: req.body.payment_status_show
-        })
-        const instav = await creators.save();
-        res.send({instav,status:200})
+        const loggedin_user_id = req.body.loggedin_user_id;
+        const response = await axios.post(
+            'https://sales.creativefuel.io/webservices/RestController.php?view=executionSummaryList',{
+                loggedin_user_id: loggedin_user_id
+            }
+        )
+        const responseData = response.data.body;
+        for(const data of responseData){
+            const existingData = await checkIfDataExists(data.sale_booking_execution_id)
+            if(!existingData){
+
+                const creators = new exeSum({
+                    sale_booking_execution_id: data.sale_booking_execution_id,
+                    sale_booking_id: data.sale_booking_id,
+                    start_date_: data.start_date_,
+                    end_date: data.end_date,
+                    summary: data.summary,
+                    remarks: data.remarks,
+                    created_by: data.created_by,
+                    last_updated_by: data.last_updated_by,
+                    creation_date: data.creation_date,
+                    last_updated_date: data.last_updated_date,
+                    sale_booking_date: data.sale_booking_date,
+                    campaign_amount: data.campaign_amount,
+                    execution_date: data.execution_date,
+                    execution_remark: data.execution_remark,
+                    execution_done_by: data.execution_done_by,
+                    cust_name: data.cust_name,
+                    loggedin_user_id: data.loggedin_user_id,
+                    execution_status: data.execution_status,
+                    payment_update_id: data.payment_update_id,
+                    payment_type: data.payment_type,
+                    status_desc: data.status_desc,
+                    invoice_creation_status: data.invoice_creation_status,
+                    manager_approval: data.manager_approval,
+                    invoice_particular: data.invoice_particular,
+                    payment_status_show: data.payment_status_show
+                })
+                const instav = await creators.save();
+                res.send({instav,status:200})
+            }
+        }
     }catch(error){
         res.status(500).send({error:error, sms:'error while adding data'})
     }
+}
+
+async function checkIfDataExists(sale_booking_execution_id){
+    const query = {sale_booking_execution_id: sale_booking_execution_id};
+    const result = await exeSum.findOne(query);
+    return result !== null;
 }
 
 exports.getExeSum = async (req, res) => {
