@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('PASS_SALT_KEY');
-const jwt = require('jsonwebtoken');
-const variable = require('../variables.js');
 const AutoIncrement = require('mongoose-auto-increment');
 
-const simSchema = new mongoose.Schema({
+const simModel = new mongoose.Schema({
     sim_id: { 
         type: Number,
         required: true,
@@ -62,9 +58,9 @@ const simSchema = new mongoose.Schema({
 });
 
 AutoIncrement.initialize(mongoose.connection);
-simSchema.plugin(
+simModel.plugin(
     AutoIncrement.plugin, 
-    { model: 'sim', field: 'sim_id', startAt: 1, incrementBy: 1 }
+    { model: 'simModels', field: 'sim_id', startAt: 1, incrementBy: 1 }
 );
 
-module.exports = mongoose.model('sim', simSchema);
+module.exports = mongoose.model('simModel', simModel);

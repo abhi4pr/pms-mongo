@@ -1,6 +1,7 @@
 module.exports = {
-    PORT: 8000,
-    API_URL: 'http://localhost:8000/',
+    PORT: 8080,
+    API_URL: 'http://localhost:8080/',
     JWT: 'secret',
-    MONGODB: 'mongodb+srv://Vijayant:Vijayant@cluster0.jzyoah4.mongodb.net/FullStackProject?retryWrites=true&w=majority',
+    MONGODB: 'mongodb+srv://root:MongoDBPassword123@atlascluster.dhgrrgb.mongodb.net/instaDB?retryWrites=true&w=majority',
+    // MONGODB: 'mongodb://35.200.234.121:27017/'
 };

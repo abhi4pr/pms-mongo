@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('PASS_SALT_KEY');
-const jwt = require('jsonwebtoken');
-const variable = require('../variables.js');
 const AutoIncrement = require('mongoose-auto-increment');
 
-const simAllocationSchema = new mongoose.Schema({
+const simAlloModel = new mongoose.Schema({
     allo_id:{
         type: Number,
         required: true
@@ -57,9 +53,9 @@ const simAllocationSchema = new mongoose.Schema({
 });
 
 AutoIncrement.initialize(mongoose.connection);
-simAllocationSchema.plugin(
+simAlloModel.plugin(
     AutoIncrement.plugin,
-    {model: 'simAllocation', field: 'allo_id', startAt: 1, incrementBy: 1}
+    {model: 'simAlloModels', field: 'allo_id', startAt: 1, incrementBy: 1}
 );
 
-module.exports = mongoose.model('simAllocation', simAllocationSchema);
+module.exports = mongoose.model('simAlloModel', simAlloModel);

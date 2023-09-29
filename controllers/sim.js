@@ -1,13 +1,9 @@
-const simSchema = require('../models/sim.js');
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('PASS_SALT_KEY');
-const jwt = require('jsonwebtoken');
-const variable = require('../variables.js');
-const simAllocationSchema = require('../models/simAllocation.js')
+const simModel = require('../models/simModel.js');
+const simAlloModel = require('../models/simAlloModel.js')
 
 exports.addSim = async (req, res) =>{
     try{
-        const simc = new simSchema({
+        const simc = new simModel({
             sim_no: req.body.sim_no,
             provider: req.body.provider,
             Remarks: req.body.Remarks,
@@ -29,7 +25,7 @@ exports.addSim = async (req, res) =>{
 
 exports.getSims = async (req, res) => {
     try{
-        const simc = await simSchema.find();
+        const simc = await simModel.find();
         if(!simc){
             res.status(500).send({success:false})
         }
@@ -41,7 +37,7 @@ exports.getSims = async (req, res) => {
 
 exports.getSingleSim = async (req, res) => {
     try{
-        const singlesim = await simSchema.findById(req.params.sim_id);
+        const singlesim = await simModel.findById(req.params.sim_id);
         if(!singlesim){
             return res.status(500).send({success:false})
         }
@@ -53,7 +49,7 @@ exports.getSingleSim = async (req, res) => {
 
 exports.editSim = async (req, res) => {
     try{
-        const editsim = await simSchema.findByIdAndUpdate(req.body.sim_id,{
+        const editsim = await simModel.findByIdAndUpdate(req.body.sim_id,{
             sim_no: req.body.sim_no,
             provider: req.body.provider,
             Remarks: req.body.Remarks,
@@ -76,7 +72,7 @@ exports.editSim = async (req, res) => {
 };
 
 exports.deleteSim = async (req, res) =>{
-    simSchema.findByIdAndRemove(req.params.sim_id).then(item =>{
+    simModel.findByIdAndRemove(req.params.sim_id).then(item =>{
         if(item){
             return res.status(200).json({success:true, message:'sim deleted'})
         }else{
@@ -89,7 +85,7 @@ exports.deleteSim = async (req, res) =>{
 
 exports.addAllocation = async (req, res) =>{
     try{
-        const simc = new simAllocationSchema({
+        const simc = new simAlloModel({
             user_id: req.body.user_id,
             sim_id: req.body.sim_id,
             Remarks: req.body.Remarks,
@@ -109,7 +105,7 @@ exports.addAllocation = async (req, res) =>{
 
 exports.getAllocations = async (req, res) => {
     try{
-        const simc = await simAllocationSchema.find();
+        const simc = await simAlloModel.find();
         if(!simc){
             res.status(500).send({success:false})
         }
@@ -121,7 +117,7 @@ exports.getAllocations = async (req, res) => {
 
 exports.editAllocation = async (req, res) => {
     try{
-        const editsim = await simAllocationSchema.findByIdAndUpdate(req.body.allo_id,{
+        const editsim = await simAlloModel.findByIdAndUpdate(req.body.allo_id,{
             user_id: req.body.user_id,
             sim_id: req.body.sim_id,
             Remarks: req.body.Remarks,
@@ -142,7 +138,7 @@ exports.editAllocation = async (req, res) => {
 };
 
 exports.deleteAllocation = async (req, res) =>{
-    simAllocationSchema.findByIdAndRemove(req.params.allo_id).then(item =>{
+    simAlloModel.findByIdAndRemove(req.params.allo_id).then(item =>{
         if(item){
             return res.status(200).json({success:true, message:'sim allocation deleted'})
         }else{
