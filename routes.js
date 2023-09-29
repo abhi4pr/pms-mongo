@@ -4,6 +4,8 @@ const insta = require('./controllers/insta.js');
 const exe = require('./controllers/execution.js');
 const sim = require('./controllers/sim.js');
 const logoBrand = require('./controllers/logoBrand.js');
+const brand = require("./controllers/brand.js");
+const campagin = require("./controllers/campaign.js");
 
   router.get("/", (req, res) => {
     res.send({ message: "Welcome to my application." });
@@ -46,5 +48,19 @@ const logoBrand = require('./controllers/logoBrand.js');
   router.get("/get_single_logobrand", logoBrand.getSingleLogoBrand);
   router.put("/edit_logo_brand", logoBrand.editLogoBrand);
   router.delete("/delete_logo_brand/:id", logoBrand.deleteLogoBrand);
+
+  //brand routes
+  router.post("/add_brand", brand.addBrand);
+  router.get("/get_brands", brand.getBrands);
+  router.get("/get_brand/:id", brand.getBrandById);
+  router.put("/edit_brand", brand.editBrand);
+  router.delete("/delete_brand/:id", brand.deleteBrand);
+
+  //Campaign routes
+  router.post("/campaign", campagin.addCampaign);
+  router.get("/campaign", campagin.getCampaigns);
+  router.get("/campaign/:id", campagin.getCampaignById);
+  router.put("/campaign", campagin.editCampaign);
+  router.delete("/campaign/:id", campagin.deleteCampaign);
 
 module.exports = router;
