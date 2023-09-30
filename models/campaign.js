@@ -13,13 +13,11 @@ const campaignSchema = new mongoose.Schema({
   },
   hash_tag: {
     type: String,
-    required: true,
+    default: "",
   },
 
   user_id: {
     type: Number,
-    required: true,
-    default: 0,
   },
 
   agency_id: {
@@ -27,20 +25,12 @@ const campaignSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  status: {
-    type: String,
-    default: "",
-  },
-  updated_at: {
+  updated_date: {
     type: Date,
   },
-  created_at: {
+  created_date: {
     type: Date,
     default: Date.now,
-  },
-  created_by: {
-    type: Number,
-    required: true,
   },
   updated_by: {
     type: Number,

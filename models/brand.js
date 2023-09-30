@@ -19,29 +19,22 @@ const brandSchema = new mongoose.Schema({
   sub_category_id: {
     type: Number,
     required: true,
-    default: 0,
   },
   igusername: {
     type: String,
-    required: "",
+    default: "",
   },
   whatsapp: {
     type: String,
-    required: "",
+    default: "",
   },
   major_category: {
-    type: Number,
-    required: true,
-    default: 0,
+    type: String,
+    default: "",
   },
   user_id: {
     type: Number,
     required: true,
-    default: 0,
-  },
-  status: {
-    type: String,
-    default: "",
   },
   updated_at: {
     type: Date,
@@ -49,14 +42,6 @@ const brandSchema = new mongoose.Schema({
   created_at: {
     type: Date,
     default: Date.now,
-  },
-  created_by: {
-    type: Number,
-    required: true,
-  },
-  updated_by: {
-    type: Number,
-    required: true,
   },
 });
 

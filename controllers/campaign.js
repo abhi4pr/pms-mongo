@@ -20,13 +20,13 @@ exports.getCampaigns = async (req, res) => {
 
 exports.addCampaign = async (req, res) => {
   try {
+    const { campaign_name, hash_tag, user_id, agency_id } = req.body;
+
     const campaignObj = new campaginSchema({
-      campaign_name: req.body.campaign_name,
-      hash_tag: req.body.hash_tag,
-      user_id: req.body.user_id,
-      agency_id: req.body.agency_id,
-      status: req.body.status,
-      created_by: req.body.created_by,
+      campaign_name,
+      hash_tag,
+      user_id,
+      agency_id,
     });
     const savedcampaign = await campaignObj.save();
     res.send({ data: savedcampaign, status: 200 });
@@ -39,13 +39,15 @@ exports.addCampaign = async (req, res) => {
 
 exports.getCampaignById = async (req, res) => {
   try {
-    const campaign = await campaginSchema.findById(req.params.id);
+    const campaign = await campaginSchema.findOne({
+      campaign_id: parseInt(req.params.id),
+    });
     if (!campaign) {
-      res
+      return res
         .status(200)
-        .send({ success: true, data: {}, message: "No Record found" });
+        .send({ success: false, data: {}, message: "No Record found" });
     } else {
-      res.status(200).send({ success: true, data: campaign });
+      res.status(200).send({ data: campaign });
     }
   } catch (err) {
     res
@@ -56,24 +58,35 @@ exports.getCampaignById = async (req, res) => {
 
 exports.editCampaign = async (req, res) => {
   try {
-    const editCampaignObj = await campaginSchema.findByIdAndUpdate(
-      req.body.campaign_id,
+    const {
+      campaign_id,
+      campaign_name,
+      hash_tag,
+      user_id,
+      agency_id,
+      updated_by,
+    } = req.body;
+
+    const editCampaignObj = await campaginSchema.findOneAndUpdate(
+      { campaign_id: parseInt(campaign_id) }, // Filter condition
       {
-        campaign_name: req.body.campaign_name,
-        hash_tag: req.body.hash_tag,
-        user_id: req.body.user_id,
-        agency_id: req.body.agency_id,
-        status: req.body.status,
-        updated_by: req.body.updated_by,
-        updated_at: Date.now(),
-      }
+        campaign_name,
+        hash_tag,
+        user_id,
+        agency_id,
+        updated_by,
+        updated_date: Date.now(),
+      },
+      { new: true }
     );
 
     if (!editCampaignObj) {
-      res.status(500).send({ success: false });
-    } else {
-      res.status(200).send({ success: true });
+      return res
+        .status(200)
+        .send({ success: false, message: "Campaign not found" });
     }
+
+    return res.status(200).send({ success: true, data: editCampaignObj });
   } catch (err) {
     res
       .status(500)
@@ -82,21 +95,22 @@ exports.editCampaign = async (req, res) => {
 };
 
 exports.deleteCampaign = async (req, res) => {
-  campaginSchema
-    .findByIdAndRemove(req.params.id)
-    .then((item) => {
-      if (item) {
-        return res
-          .status(200)
-          .json({ success: true, message: "campaign deleted" });
-      } else {
-        return res
-          .status(404)
-          .json({ success: false, message: "campaign not found" });
-      }
-    })
-    .catch((err) => {
-      return res.status(400).json({ success: false, message: err });
-    });
+  const id = parseInt(req.params.id);
+  const condition = { campaign_id: id };
+  try {
+    const result = await campaginSchema.deleteOne(condition);
+    if (result.deletedCount === 1) {
+      return res.status(200).json({
+        success: true,
+        message: `Campaign with ID ${id} deleted successfully`,
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: `Campaign with ID ${id} not found`,
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({ success: false, message: err });
+  }
 };
-

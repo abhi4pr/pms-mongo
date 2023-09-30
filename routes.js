@@ -6,6 +6,8 @@ const sim = require('./controllers/sim.js');
 const logoBrand = require('./controllers/logoBrand.js');
 const brand = require("./controllers/brand.js");
 const campagin = require("./controllers/campaign.js");
+const projectxPageCategory = require("./controllers/projectxPageCategory.js");
+const projectxSubCategory = require("./controllers/projectxSubCategory.js");
 
   router.get("/", (req, res) => {
     res.send({ message: "Welcome to my application." });
@@ -62,5 +64,19 @@ const campagin = require("./controllers/campaign.js");
   router.get("/campaign/:id", campagin.getCampaignById);
   router.put("/campaign", campagin.editCampaign);
   router.delete("/campaign/:id", campagin.deleteCampaign);
+
+  //ProjectxPageCategory
+  router.post("/projectxpagecategory",projectxPageCategory.addProjectxPageCategory)
+  router.get("/projectxpagecategory",projectxPageCategory.getProjectxPageCategory)
+  router.get("/projectxpagecategory/:id",projectxPageCategory.getProjectxPageCategoryById)
+  router.put("/projectxpagecategory",projectxPageCategory.editProjectxPageCategory)
+  router.delete("/projectxpagecategory/:id",projectxPageCategory.deleteProjectxPageCategory)
+
+  //ProjectxSubCategory
+  router.post("/projectxSubCategory",projectxSubCategory.addProjectxSubCategory)
+  router.get("/projectxSubCategory",projectxSubCategory.getProjectxSubCategory)
+  router.get("/projectxSubCategory/:id",projectxSubCategory.getProjectxSubCategoryById)
+  router.put("/projectxSubCategory",projectxSubCategory.editProjectxSubCategory)
+  router.delete("/projectxSubCategory/:id",projectxSubCategory.deleteProjectxSubCategory)
 
 module.exports = router;
