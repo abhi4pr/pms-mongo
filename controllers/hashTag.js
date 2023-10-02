@@ -1,0 +1,87 @@
+const hashTagSchema = require("../models/hashTag");
+
+exports.addHashTag = async (req, res) => {
+  try {
+    const { hash_tag, tag, keyword } = req.body;
+
+    const hashTagObj = new hashTagSchema({
+      hash_tag,
+      tag,
+      keyword,
+    });
+
+    const savedHashTag = await hashTagObj.save();
+    res.send({ data: savedHashTag, status: 200 });
+  } catch (err) {
+    res.status(500).send({
+      erroradd_hashTag: err,
+      message: "This hashTag cannot be created",
+    });
+  }
+};
+
+exports.getHashTags = async (req, res) => {
+  try {
+    const hashTags = await hashTagSchema.find();
+    if (hashTags.length === 0) {
+      res
+        .status(200)
+        .send({ success: true, data: [], message: "No Record found" });
+    } else {
+      res.status(200).send({ data: hashTags });
+    }
+  } catch (err) {
+    res.status(500).send({ error: err, message: "Error getting all hashTags" });
+  }
+};
+
+exports.editHashTag = async (req, res) => {
+  try {
+    const { hash_tag_id, hash_tag, tag, keyword } = req.body;
+
+    const editHashTagObj = await hashTagSchema.findOneAndUpdate(
+      { hashTag_id: parseInt(hash_tag_id) }, // Filter condition
+      {
+        $set: {
+          hash_tag,
+          tag,
+          keyword,
+        },
+      },
+      { new: true }
+    );
+
+    if (!editHashTagObj) {
+      return res
+        .status(200)
+        .send({ success: false, message: "HashTag not found" });
+    }
+
+    return res.status(200).send({ success: true, data: editHashTagObj });
+  } catch (err) {
+    res
+      .status(500)
+      .send({ error: err, message: "Error updating hashTag details" });
+  }
+};
+
+exports.deleteHashTag = async (req, res) => {
+  const id = parseInt(req.params.id);
+  const condition = { hash_tag_id: id };
+  try {
+    const result = await hashTagSchema.deleteOne(condition);
+    if (result.deletedCount === 1) {
+      return res.status(200).json({
+        success: true,
+        message: `HashTag with ID ${id} deleted successfully`,
+      });
+    } else {
+      return res.status(200).json({
+        success: false,
+        message: `HashTag with ID ${id} not found`,
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({ success: false, message: err });
+  }
+};

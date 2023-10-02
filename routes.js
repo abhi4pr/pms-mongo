@@ -9,6 +9,7 @@ const brand = require("./controllers/brand.js");
 const campagin = require("./controllers/campaign.js");
 const projectxPageCategory = require("./controllers/projectxPageCategory.js");
 const projectxSubCategory = require("./controllers/projectxSubCategory.js");
+const hashTag = require("./controllers/hashTag.js");
 const registerCampaign = require("./controllers/registerCampaign.js");
 const { upload } = require("./common/uploadFile.js");
 
@@ -127,5 +128,11 @@ const { upload } = require("./common/uploadFile.js");
     "/register_campaign",
     registerCampaign.getRegisterCampaigns
   );
+
+//Hash Tag
+router.post("/hash_tag",hashTag.addHashTag)
+router.get("/hash_tag",hashTag.getHashTags)
+router.put("/hash_tag_edit",hashTag.editHashTag)
+router.delete("/hash_tag/:id",hashTag.deleteHashTag)
 
 module.exports = router;
