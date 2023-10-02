@@ -1,26 +1,26 @@
 const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-auto-increment');
 
-const logoBrandModel = new mongoose.Schema({
-    id:{
+const departmentModel = new mongoose.Schema({
+    dept_id:{
         type: Number,
         required: true
     },
-    cat_name: { 
+    dept_name: { 
         type: String,
         required: false,
         default: "",
     },
-    remark: {
+    Remarks: {
         type: String,
         required: false,
         default: ""
     },
-    created_at: {
+    Created_date: {
         type: Date,
         default: Date.now
     },
-    created_by: {
+    Created_by: {
         type: Number,
         required: false,
         default: 0
@@ -28,9 +28,9 @@ const logoBrandModel = new mongoose.Schema({
 });
 
 AutoIncrement.initialize(mongoose.connection);
-logoBrandModel.plugin(
+departmentModel.plugin(
     AutoIncrement.plugin, 
-    { model: 'logoBrandModels', field: 'id', startAt: 1, incrementBy: 1 }
+    { model: 'departmentModels', field: 'dept_id', startAt: 1, incrementBy: 1 }
 );
 
-module.exports = mongoose.model('logoBrandModel', logoBrandModel);
+module.exports = mongoose.model('departmentModel', departmentModel);
