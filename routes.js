@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const insta = require('./controllers/insta.js');
 const exe = require('./controllers/execution.js');
@@ -9,6 +9,8 @@ const brand = require("./controllers/brand.js");
 const campagin = require("./controllers/campaign.js");
 const projectxPageCategory = require("./controllers/projectxPageCategory.js");
 const projectxSubCategory = require("./controllers/projectxSubCategory.js");
+const registerCampaign = require("./controllers/registerCampaign.js");
+const { upload } = require("./common/uploadFile.js");
 
   router.get("/", (req, res) => {
     res.send({ message: "Welcome to my application." });
@@ -26,7 +28,7 @@ const projectxSubCategory = require("./controllers/projectxSubCategory.js");
   router.get("/post_type_dec_count", insta.postTypeDecCount);
   router.get("/creator_name_count", insta.creatorNameCount);
   router.post("/get_posts_from_name", insta.getPostsFromName);
-  
+
   /*execution api*/
   router.post("/exe_inven_post", exe.exeInvenPost);
   router.get("/get_exe_inventory", exe.getExeInventory);
@@ -79,17 +81,49 @@ const projectxSubCategory = require("./controllers/projectxSubCategory.js");
   router.delete("/campaign/:id", campagin.deleteCampaign);
 
   //ProjectxPageCategory
-  router.post("/projectxpagecategory",projectxPageCategory.addProjectxPageCategory)
-  router.get("/projectxpagecategory",projectxPageCategory.getProjectxPageCategory)
-  router.get("/projectxpagecategory/:id",projectxPageCategory.getProjectxPageCategoryById)
-  router.put("/projectxpagecategory",projectxPageCategory.editProjectxPageCategory)
-  router.delete("/projectxpagecategory/:id",projectxPageCategory.deleteProjectxPageCategory)
+  router.post(
+    "/projectxpagecategory",
+    projectxPageCategory.addProjectxPageCategory
+  );
+  router.get(
+    "/projectxpagecategory",
+    projectxPageCategory.getProjectxPageCategory
+  );
+  router.get(
+    "/projectxpagecategory/:id",
+    projectxPageCategory.getProjectxPageCategoryById
+  );
+  router.put(
+    "/projectxpagecategory",
+    projectxPageCategory.editProjectxPageCategory
+  );
+  router.delete(
+    "/projectxpagecategory/:id",
+    projectxPageCategory.deleteProjectxPageCategory
+  );
 
   //ProjectxSubCategory
-  router.post("/projectxSubCategory",projectxSubCategory.addProjectxSubCategory)
-  router.get("/projectxSubCategory",projectxSubCategory.getProjectxSubCategory)
-  router.get("/projectxSubCategory/:id",projectxSubCategory.getProjectxSubCategoryById)
-  router.put("/projectxSubCategory",projectxSubCategory.editProjectxSubCategory)
-  router.delete("/projectxSubCategory/:id",projectxSubCategory.deleteProjectxSubCategory)
+  router.post("/projectxSubCategory", projectxSubCategory.addProjectxSubCategory);
+  router.get("/projectxSubCategory", projectxSubCategory.getProjectxSubCategory);
+  router.get(
+    "/projectxSubCategory/:id",
+    projectxSubCategory.getProjectxSubCategoryById
+  );
+  router.put("/projectxSubCategory", projectxSubCategory.editProjectxSubCategory);
+  router.delete(
+    "/projectxSubCategory/:id",
+    projectxSubCategory.deleteProjectxSubCategory
+  );
+
+  //Register Campaign
+  router.post(
+    "/register_campaign",
+    upload.single("excel_file"),
+    registerCampaign.addRegisterCampaign
+  );
+  router.get(
+    "/register_campaign",
+    registerCampaign.getRegisterCampaigns
+  );
 
 module.exports = router;
