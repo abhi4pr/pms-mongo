@@ -114,3 +114,81 @@ exports.deleteSubDepartment = async (req, res) =>{
         return res.status(400).json({success:false, message:err})
     })
 };
+
+exports.getSubDepartmentsFromDeptId = async (req, res) => {
+    try {
+        const deptId = req.params.dept_id;
+        
+        const singlesim = await subDepartmentModel.aggregate([
+            {
+                $match: { dept_id: deptId } 
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: '$department'
+            },
+            {
+                $project: {
+                    _id: 1,
+                    dept_name: '$department.dept_name',
+                    sub_dept_name: '$sub_dept_name',
+                    dept_id: "$dept_id",
+                    id: "$id"
+                }
+            }
+        ]).exec();
+
+        if (!singlesim || singlesim.length === 0) {
+            return res.status(500).send({ success: false,sms:'no data available' });
+        }
+        res.status(200).send(singlesim);
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error getting department details' });
+    }
+};
+
+exports.getSubDepartmentsFromId = async (req, res) => {
+    try {
+        const Id = req.params.id;
+        
+        const singlesim = await subDepartmentModel.aggregate([
+            {
+                $match: { id: Id } 
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: '$department'
+            },
+            {
+                $project: {
+                    _id: 1,
+                    dept_name: '$department.dept_name',
+                    sub_dept_name: '$sub_dept_name',
+                    dept_id: "$dept_id",
+                    id: "$id"
+                }
+            }
+        ]).exec();
+
+        if (!singlesim || singlesim.length === 0) {
+            return res.status(500).send({ success: false,sms:'no data available' });
+        }
+        res.status(200).send(singlesim);
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error getting department details' });
+    }
+};

@@ -65,6 +65,8 @@ const { upload } = require("./common/uploadFile.js");
   router.post("/add_sub_department", department.addSubDepartment);
   router.put("/edit_sub_department", department.editSubDepartment);
   router.delete("/delete_sub_department/:id", department.deleteSubDepartment);
+  router.get("/get_subdept_from_dept/:id", department.getSubDepartmentsFromDeptId);
+  router.get("/get_subdept_from_id/:id", department.getSubDepartmentsFromId);
 
   //brand routes
   router.post("/add_brand", brand.addBrand);
