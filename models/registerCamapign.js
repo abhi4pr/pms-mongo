@@ -11,7 +11,7 @@ const registerCampaignSchema = new mongoose.Schema({
     type: Number,
   },
   brnad_dt: {
-    type: Date,
+    type: String,
     default: "",
   },
   excel_path: {

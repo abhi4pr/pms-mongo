@@ -3,7 +3,7 @@ const constant = require("../common/constant.js");
 exports.addRegisterCampaign = async (req, res) => {
   try {
     const { brand_id, brnad_dt, commitment } = req.body;
-    const excel_file = req.file.filename;
+    const excel_file = req.file.filename ?? '';
     let parsedCommitment = JSON.parse(commitment);
     const Obj = new registerCamapign({
       brand_id,
@@ -15,6 +15,7 @@ exports.addRegisterCampaign = async (req, res) => {
     const savedRegisterCampaign = await Obj.save();
     res.send({ data: savedRegisterCampaign, status: 200 });
   } catch (err) {
+    console.log(err)
     res
       .status(500)
       .send({ error: err, message: "This campaign cannot be created" });
