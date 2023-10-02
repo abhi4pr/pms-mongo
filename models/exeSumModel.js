@@ -127,6 +127,26 @@ const exeSumModel = new mongoose.Schema({
         required: false,
         default: ""
     },
+    sales_executive_name: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    page_ids: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    service_id: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    service_name: {
+        type: String,
+        required: false,
+        default: ""
+    },
 });
 
 // AutoIncrement.initialize(mongoose.connection);

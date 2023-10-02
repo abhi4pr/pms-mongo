@@ -4,6 +4,7 @@ const insta = require('./controllers/insta.js');
 const exe = require('./controllers/execution.js');
 const sim = require('./controllers/sim.js');
 const logoBrand = require('./controllers/logoBrand.js');
+const department = require('./controllers/department.js');
 const brand = require("./controllers/brand.js");
 const campagin = require("./controllers/campaign.js");
 const projectxPageCategory = require("./controllers/projectxPageCategory.js");
@@ -45,11 +46,23 @@ const projectxSubCategory = require("./controllers/projectxSubCategory.js");
   router.delete("/delete_allocation/:id", sim.deleteAllocation);
 
   /* logo brand */
-  router.post("/delete_sim/:id", logoBrand.addLogoBrand);
+  router.post("/add_logo_brand", logoBrand.addLogoBrand);
   router.get("/get_logo_brands", logoBrand.getLogoBrands);
-  router.get("/get_single_logobrand", logoBrand.getSingleLogoBrand);
+  router.get("/get_single_logobrand/:id", logoBrand.getSingleLogoBrand);
   router.put("/edit_logo_brand", logoBrand.editLogoBrand);
   router.delete("/delete_logo_brand/:id", logoBrand.deleteLogoBrand);
+
+  /* department */
+  router.post("/add_department", department.addDepartment);
+  router.get("/get_department", department.getDepartments);
+  router.get("/get_single_department/:id", department.getSingleDepartment);
+  router.put("/edit_department", department.editDepartment);
+  router.delete("/delete_department/:id", department.deleteDepartment);
+
+  /* sub department */
+  router.post("/add_sub_department", department.addSubDepartment);
+  router.put("/edit_sub_department", department.editSubDepartment);
+  router.delete("/delete_sub_department/:id", department.deleteSubDepartment);
 
   //brand routes
   router.post("/add_brand", brand.addBrand);

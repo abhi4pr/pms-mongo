@@ -110,7 +110,11 @@ exports.exeSumPost = async(req, res) => {
                     invoice_creation_status: data.invoice_creation_status,
                     manager_approval: data.manager_approval,
                     invoice_particular: data.invoice_particular,
-                    payment_status_show: data.payment_status_show
+                    payment_status_show: data.payment_status_show,
+                    sales_executive_name: data.sales_executive_name,
+                    page_ids: data.page_ids,
+                    service_id: data.service_id,
+                    service_name: data.service_name
                 })
                 const instav = await creators.save();
                 res.send({instav,status:200})
@@ -141,7 +145,7 @@ exports.getExeSum = async (req, res) => {
 
 exports.editExeSum = async (req, res) => {
     try{
-        const editinsta = await exeSum.findByIdAndUpdate(req.body.sale_booking_execution_id,{
+        const editinsta = await exeSum.findOneAndUpdate(req.body.sale_booking_execution_id,{
             sale_booking_execution_id: req.body.sale_booking_execution_id,
             loggedin_user_id: req.body.loggedin_user_id,
             sale_booking_id: req.body.sale_booking_id,
