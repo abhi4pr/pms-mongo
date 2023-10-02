@@ -131,13 +131,28 @@ exports.trackPostY = async (req, res) =>{
 
 exports.getPosts = async (req, res) => {
     try {
-        const getcreators = await instaP.find().sort({ postedOn: -1 });
-        if (!getcreators) {
-            res.status(500).send({ success: false });
+        const distinctPosts = await instaP.aggregate([
+            {
+                $sort: { postedOn: -1 } 
+            },
+            {
+                $group: {
+                    _id: '$postUrl', 
+                    data: { $first: '$$ROOT' } 
+                }
+            },
+            {
+                $replaceRoot: { newRoot: '$data' } 
+            }
+        ]);
+
+        if (!distinctPosts || distinctPosts.length === 0) {
+            res.status(404).send({ success: false, message: 'No posts found' });
+        } else {
+            res.status(200).send(distinctPosts);
         }
-        res.status(200).send(getcreators);
     } catch (err) {
-        res.status(500).send({ error: err, sms: 'Error getting all posts' });
+        res.status(500).send({ error: err, message: 'Error getting posts' });
     }
 };
 
@@ -226,7 +241,9 @@ exports.getPostsFromName = async(req, res) => {
         if (!getPosts || getPosts.length == 0) {
             res.status(404).send({ success: false, message: 'No posts found from this creatorName' });
         } else {
-            res.status(200).send(getPosts);
+            const newMap = new Map();
+            getPosts.forEach((item) => newMap.set(item.postUrl, item));
+            res.status(200).send([...newMap.values()]);
         }
     }catch(error){
         res.status(500).send({error:error, sms:'error getting posts from name'})
