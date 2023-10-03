@@ -13,6 +13,7 @@ const hashTag = require("./controllers/hashTag.js");
 const projectxCategory = require("./controllers/projectxCategory.js");
 const registerCampaign = require("./controllers/registerCampaign.js");
 const { upload } = require("./common/uploadFile.js");
+const designation = require('./controllers/designation.js');
 
   router.get("/", (req, res) => {
     res.send({ message: "Welcome to my application." });
@@ -69,6 +70,12 @@ const { upload } = require("./common/uploadFile.js");
   router.delete("/delete_sub_department/:id", department.deleteSubDepartment);
   router.get("/get_subdept_from_dept/:id", department.getSubDepartmentsFromDeptId);
   router.get("/get_subdept_from_id/:id", department.getSubDepartmentsFromId);
+
+  /* designation */
+  router.post("/add_designation", designation.addDesignation);
+  router.put("/edit_designation", designation.editDesignation);
+  router.delete("/delete_designation/:id", designation.deleteDesignation);
+  router.get("/get_designations", designation.getDesignations);
 
   //brand routes
   router.post("/add_brand", brand.addBrand);

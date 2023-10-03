@@ -234,6 +234,7 @@ exports.creatorNameCount = async (req, res) => {
         //         }
         //     }
         // ]).exec();
+        const sortOrder = req.body.sortOrder;
         const distinctPosts = await instaP.aggregate([
             {
                 $group: {
@@ -275,6 +276,21 @@ exports.creatorNameCount = async (req, res) => {
         });
 
         const finalResult = Object.values(result);
+
+        switch (sortOrder) {
+            case 0:
+                finalResult.sort((a, b) => b.decision_0_count - a.decision_0_count);
+                break;
+            case 1:
+                finalResult.sort((a, b) => b.decision_1_count - a.decision_1_count);
+                break;
+            case 2:
+                finalResult.sort((a, b) => b.decision_2_count - a.decision_2_count);
+                break;
+            default:
+                break;
+        }
+
         res.status(200).send({ success: true, data: finalResult });
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "something went wrong" });
