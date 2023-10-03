@@ -33,7 +33,47 @@ exports.addBrand = async (req, res) => {
 
 exports.getBrands = async (req, res) => {
   try {
-    const brands = await brandSchema.find();
+    const brands = await brandSchema.aggregate([
+      {
+        $lookup: {
+          from: "projectx_category_masts",
+          localField: "category_id",
+          foreignField: "category_id",
+          as: "data1",
+        },
+      },
+      {
+        $lookup: {
+          from: "projectx_subcategory_masts",
+          localField: "sub_category_id",
+          foreignField: "sub_category_id",
+          as: "data2",
+        },
+      },
+      {
+        $unwind: "$data1",
+      },
+      {
+        $unwind: "$data2",
+      },
+      {
+        $project: {
+          _id: 1,
+          brand_id: 1,
+          brand_name: 1,
+          category_id: 1,
+          sub_category_id: 1,
+          igusername: 1,
+          whatsapp: 1,
+          major_category: 1,
+          user_id: 1,
+          updated_at: 1,
+          created_at: 1,
+          projectx_category_name: "$data1.category_name",
+          projectx_subcategory_name: "$data2.sub_category_name",
+        },
+      },
+    ]);
     if (brands.length === 0) {
       res
         .status(200)
@@ -48,15 +88,62 @@ exports.getBrands = async (req, res) => {
 
 exports.getBrandById = async (req, res) => {
   try {
-    const brand = await brandSchema.findOne({
+    // const brand = await brandSchema.findOne({
+    //   brand_id: parseInt(req.params.id),
+    // });
+    let match_condition = {
       brand_id: parseInt(req.params.id),
-    });
-    if (!brand) {
+    };
+    let brand = await brandSchema.aggregate([
+      {
+        $match: match_condition,
+      },
+      {
+        $lookup: {
+          from: "projectx_category_masts",
+          localField: "category_id",
+          foreignField: "category_id",
+          as: "data1",
+        },
+      },
+      {
+        $lookup: {
+          from: "projectx_subcategory_masts",
+          localField: "sub_category_id",
+          foreignField: "sub_category_id",
+          as: "data2",
+        },
+      },
+      {
+        $unwind: "$data1",
+      },
+      {
+        $unwind: "$data2",
+      },
+      {
+        $project: {
+          _id: 1,
+          brand_id: 1,
+          brand_name: 1,
+          category_id: 1,
+          sub_category_id: 1,
+          igusername: 1,
+          whatsapp: 1,
+          major_category: 1,
+          user_id: 1,
+          updated_at: 1,
+          created_at: 1,
+          projectx_category_name: "$data1.category_name",
+          projectx_subcategory_name: "$data2.sub_category_name",
+        },
+      },
+    ]);
+    if (brand.length === 0) {
       return res
         .status(200)
         .send({ success: false, data: {}, message: "No Record found" });
     } else {
-      res.status(200).send({ data: brand });
+      res.status(200).send({ data: brand[0] });
     }
   } catch (err) {
     res
