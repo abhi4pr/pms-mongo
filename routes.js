@@ -12,6 +12,7 @@ const projectxSubCategory = require("./controllers/projectxSubCategory.js");
 const hashTag = require("./controllers/hashTag.js");
 const projectxCategory = require("./controllers/projectxCategory.js");
 const registerCampaign = require("./controllers/registerCampaign.js");
+const projectx = require("./controllers/projectx.js");
 const { upload } = require("./common/uploadFile.js");
 
   router.get("/", (req, res) => {
@@ -142,6 +143,13 @@ router.get("/projectxCategory",projectxCategory.getProjectxCategory)
 router.get("/projectxCategory/:id",projectxCategory.getProjectxCategoryById)
 router.put("/projectxCategory",projectxCategory.editProjectxCategory)
 router.delete("/projectxCategory/:id",projectxCategory.deleteProjectxCategory)
+
+//Projectx 
+router.post("/projectxpost",projectx.addProjectx)
+router.get("/getallprojectx",projectx.getProjectx)
+router.get("/getprojectx/:id",projectx.getProjectxById)
+router.put("/projectxupdate",projectx.editProjectx)
+router.delete("/projectxdelete/:id",projectx.deleteProjectx)
 
 
 module.exports = router;
