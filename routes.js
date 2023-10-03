@@ -11,6 +11,7 @@ const projectxPageCategory = require("./controllers/projectxPageCategory.js");
 const projectxSubCategory = require("./controllers/projectxSubCategory.js");
 const hashTag = require("./controllers/hashTag.js");
 const projectxCategory = require("./controllers/projectxCategory.js");
+const projectxRecord = require("./controllers/projectxRecord.js");
 const registerCampaign = require("./controllers/registerCampaign.js");
 const projectx = require("./controllers/projectx.js");
 const { upload } = require("./common/uploadFile.js");
@@ -30,7 +31,7 @@ const designation = require('./controllers/designation.js');
   router.post("/track_story_post", insta.trackStory);
   router.put("/instaupdate", insta.editInsta);
   router.get("/post_type_dec_count", insta.postTypeDecCount);
-  router.get("/creator_name_count", insta.creatorNameCount);
+  router.post("/creator_name_count", insta.creatorNameCount);
   router.post("/get_posts_from_name", insta.getPostsFromName);
   router.get("/creator_insights", insta.creatorInsights);
   /*execution api*/
@@ -158,5 +159,8 @@ router.get("/getprojectx/:id",projectx.getProjectxById)
 router.put("/projectxupdate",projectx.editProjectx)
 router.delete("/projectxdelete/:id",projectx.deleteProjectx)
 
+//Projectx Record
+router.post("/projectxRecord",projectxRecord.addProjectxRecord)
+router.get("/projectxRecord",projectxRecord.getProjectxRecords)
 
 module.exports = router;
