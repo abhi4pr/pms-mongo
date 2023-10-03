@@ -205,30 +205,71 @@ exports.postTypeDecCount = async (req, res) => {
 
 exports.creatorNameCount = async (req, res) => {
     try {
-        const query = await instaP.aggregate([
+        // const query = await instaP.aggregate([
+        //     {
+        //         $group: {
+        //             _id: "$creatorName",
+        //             index: { $first: "$_id" },
+        //             decision_2_count: {
+        //                 $sum: {
+        //                     $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}
+        //                 }
+        //             },
+        //             decision_1_count: {
+        //                 $sum: {
+        //                     $cond: { if: { $eq: ["$posttype_decision", 1] }, then: 1, else: 0 }
+        //                 }
+        //             },
+        //             decision_0_count: {
+        //                 $sum: {
+        //                     $cond: { if: { $eq: ["$posttype_decision", 0] }, then: 1, else: 0 }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // ]).exec();
+        const distinctPosts = await instaP.aggregate([
             {
                 $group: {
-                    _id: "$creatorName",
-                    index: { $first: "$_id" },
-                    decision_2_count: {
-                        $sum: {
-                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}
-                        }
-                    },
-                    decision_1_count: {
-                        $sum: {
-                            $cond: { if: { $eq: ["$posttype_decision", 1] }, then: 1, else: 0 }
-                        }
-                    },
-                    decision_0_count: {
-                        $sum: {
-                            $cond: { if: { $eq: ["$posttype_decision", 0] }, then: 1, else: 0 }
-                        }
-                    }
+                    _id: '$postUrl', 
+                    data: { $first: '$$ROOT' } 
                 }
+            },
+            {
+                $replaceRoot: { newRoot: '$data' } 
             }
-        ]).exec();
-        res.status(200).send({ success: true, data: query });
+        ]);
+        
+        const result = {};
+        distinctPosts.forEach((item) => {
+            const { creatorName, posttype_decision } = item;
+
+            if (!result[creatorName]) {
+                result[creatorName] = {
+                    "_id": creatorName,
+                    "decision_2_count": 0,
+                    "decision_1_count": 0,
+                    "decision_0_count": 0,
+                };
+            }
+
+            switch (posttype_decision) {
+                case 0:
+                    result[creatorName]["decision_0_count"]++;
+                    break;
+                case 1:
+                    result[creatorName]["decision_1_count"]++;
+                    break;
+                case 2:
+                    result[creatorName]["decision_2_count"]++;
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        const finalResult = Object.values(result);
+        res.status(200).send({ success: true, data: finalResult });
     } catch (error) {
         res.status(500).send({ error: error.message, sms: 'something went wrong' });
     }
