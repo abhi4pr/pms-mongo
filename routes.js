@@ -30,7 +30,7 @@ const { upload } = require("./common/uploadFile.js");
   router.get("/post_type_dec_count", insta.postTypeDecCount);
   router.get("/creator_name_count", insta.creatorNameCount);
   router.post("/get_posts_from_name", insta.getPostsFromName);
-
+  router.get("/creator_insights", insta.creatorInsights);
   /*execution api*/
   router.post("/exe_inven_post", exe.exeInvenPost);
   router.get("/get_exe_inventory", exe.getExeInventory);
