@@ -13,6 +13,8 @@ const hashTag = require("./controllers/hashTag.js");
 const projectxCategory = require("./controllers/projectxCategory.js");
 const projectxRecord = require("./controllers/projectxRecord.js");
 const registerCampaign = require("./controllers/registerCampaign.js");
+const contentSectionReg = require("./controllers/contentSectionRegCmp.js");
+const contentType = require("./controllers/contentType.js");
 const projectx = require("./controllers/projectx.js");
 const { upload } = require("./common/uploadFile.js");
 const designation = require('./controllers/designation.js');
@@ -34,6 +36,7 @@ const designation = require('./controllers/designation.js');
   router.post("/creator_name_count", insta.creatorNameCount);
   router.post("/get_posts_from_name", insta.getPostsFromName);
   router.get("/creator_insights", insta.creatorInsights);
+  router.get("/cfinstaapi", insta.cfInstaApi);
   /*execution api*/
   router.post("/exe_inven_post", exe.exeInvenPost);
   router.get("/get_exe_inventory", exe.getExeInventory);
@@ -162,5 +165,16 @@ router.delete("/projectxdelete/:id",projectx.deleteProjectx)
 //Projectx Record
 router.post("/projectxRecord",projectxRecord.addProjectxRecord)
 router.get("/projectxRecord",projectxRecord.getProjectxRecords)
+
+//Register Campaign Content Section
+router.post("/contentSectionReg",contentSectionReg.addContentSectionReg)
+router.get("/contentSectionReg",contentSectionReg.getContentSectionReg)
+
+// Content Type
+router.post("/content",contentType.addContentType)
+router.get("/content",contentType.getContentTypes)
+router.get("/content/:id",contentType.getContentTypeById)
+router.put("/content",contentType.editContentType)
+router.delete("/content/:id",contentType.deleteContentType)
 
 module.exports = router;
