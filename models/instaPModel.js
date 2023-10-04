@@ -76,7 +76,8 @@ const instaPModel = new mongoose.Schema({
     postUrl:{
         type: String,
         required: false,
-        default: ""
+        default: "",
+        unique: true
     },
     postImage:{
         type: String,
