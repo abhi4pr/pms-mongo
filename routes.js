@@ -141,6 +141,10 @@ const designation = require('./controllers/designation.js');
     "/register_campaign",
     registerCampaign.getRegisterCampaigns
   );
+  router.put(
+    "/register_campaign",
+    registerCampaign.editRegisterCampaign
+  );
 
 //Hash Tag
 router.post("/hash_tag",hashTag.addHashTag)

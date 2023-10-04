@@ -19,6 +19,9 @@ const registerCampaignSchema = new mongoose.Schema({
     default: "",
   },
   //   commitment: [String],
+  status: {
+    type: Number,
+  },
   commitment: [mongoose.Schema.Types.Mixed],
 });
 
