@@ -18,6 +18,7 @@ const contentType = require("./controllers/contentType.js");
 const projectx = require("./controllers/projectx.js");
 const { upload } = require("./common/uploadFile.js");
 const designation = require('./controllers/designation.js');
+const finance = require('./controllers/finance.js');
 
   router.get("/", (req, res) => {
     res.send({ message: "Welcome to my application." });
@@ -141,6 +142,10 @@ const designation = require('./controllers/designation.js');
     "/register_campaign",
     registerCampaign.getRegisterCampaigns
   );
+  router.put(
+    "/register_campaign",
+    registerCampaign.editRegisterCampaign
+  );
 
 //Hash Tag
 router.post("/hash_tag",hashTag.addHashTag)
@@ -176,5 +181,10 @@ router.get("/content",contentType.getContentTypes)
 router.get("/content/:id",contentType.getContentTypeById)
 router.put("/content",contentType.editContentType)
 router.delete("/content/:id",contentType.deleteContentType)
+
+/* finance */
+router.post("/add_finance",upload.single("screenshot"),finance.addFinance)
+router.get("/get_finances",finance.getFinances)
+router.put("/edit_finance",upload.single("screenshot"),finance.editFinance)
 
 module.exports = router;

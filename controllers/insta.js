@@ -287,6 +287,9 @@ exports.creatorNameCount = async (req, res) => {
             case 2:
                 finalResult.sort((a, b) => b.decision_2_count - a.decision_2_count);
                 break;
+            case 3:
+                finalResult.sort((a, b) => b.decision_0_count - a.decision_0_count);
+                break;
             default:
                 break;
         }
