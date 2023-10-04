@@ -346,12 +346,37 @@ exports.creatorInsights = async (req, res) => {
         );
         const resObj = {
             status: response.status,
-            data: response.data.insights.creator_insights.creators,
+            data: response.data?.insights?.creator_insights?.creators,
             message: "Success",
         };
         res.status(response.status).json(resObj);
     } catch (err) {
         console.error(err);
         res.status(500).send({ error: err, sms: "These creators cant be sent" });
+    }
+};
+exports.cfInstaApi = async (req, res) => {
+    try {
+        const response = await axios.get(
+            constant.CF_INSTA_API,
+            {
+                headers: {
+                    Authorization: `Bearer ${req.headers.authorization}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        const dataobj = {
+            biography: response.data?.graphql?.user?.biography
+        }
+        const resObj = {
+            status: response.status,
+            data: dataobj,
+            message: "Success",
+        };
+        res.status(response.status).json(resObj);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: err, sms: "Something went wrong..." });
     }
 };
