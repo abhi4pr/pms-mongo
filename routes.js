@@ -23,6 +23,8 @@ const finance = require('./controllers/finance.js');
 const sitting = require("./controllers/sitting.js");
 const agency = require("./controllers/agency.js");
 
+const role = require('./controllers/role.js');
+
   router.get("/", (req, res) => {
     res.send({ message: "Welcome to my application." });
   });
@@ -210,5 +212,12 @@ router.delete("/agency/:id",agency.deleteAgency);
 router.post("/obj",objectMast.addObjectMast)
 router.get("/allobj",objectMast.getObjectMasts)
 router.get("/objdata/:id",objectMast.getObjectMastById)
+
+module.exports = router;
+/* role */
+router.post("/add_role",role.addRole)
+router.get("/get_roles",role.getRoles)
+router.put("/edit_role", role.editRole)
+router.delete("/delete_role/:id",role.deleteRole)
 
 module.exports = router;
