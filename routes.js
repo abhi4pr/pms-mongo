@@ -19,6 +19,8 @@ const projectx = require("./controllers/projectx.js");
 const { upload } = require("./common/uploadFile.js");
 const designation = require('./controllers/designation.js');
 const finance = require('./controllers/finance.js');
+const sitting = require("./controllers/sitting.js");
+const agency = require("./controllers/agency.js");
 
   router.get("/", (req, res) => {
     res.send({ message: "Welcome to my application." });
@@ -186,5 +188,21 @@ router.delete("/content/:id",contentType.deleteContentType)
 router.post("/add_finance",upload.single("screenshot"),finance.addFinance)
 router.get("/get_finances",finance.getFinances)
 router.put("/edit_finance",upload.single("screenshot"),finance.editFinance)
+
+
+/* Sitting Routes */
+router.post("/sitting",sitting.addSitting);
+router.get("/sitting",sitting.getSittings);
+router.get("/sitting/:id",sitting.getSingleSitting);
+router.put("/sitting",sitting.editSitting);
+router.delete("/sitting/:id",sitting.deleteSitting);
+
+
+/* Agency Routes */
+router.post("/agency",agency.addAgency);
+router.get("/agency",agency.getAgencys);
+router.get("/agency/:id",agency.getAgencyById);
+router.put("/agency",agency.editAgency);
+router.delete("/agency/:id",agency.deleteAgency);
 
 module.exports = router;
