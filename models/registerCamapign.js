@@ -22,6 +22,10 @@ const registerCampaignSchema = new mongoose.Schema({
   status: {
     type: Number,
   },
+  stage: {
+    type: Number,
+  },
+  
   commitment: [mongoose.Schema.Types.Mixed],
 });
 

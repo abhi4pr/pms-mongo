@@ -349,7 +349,8 @@ exports.creatorInsights = async (req, res) => {
         );
         const resObj = {
             status: response.status,
-            data: response.data?.insights?.creator_insights?.creators,
+            data: { ...response.data?.insights?.creator_insights?.creators, posts: response.data?.insights?.post_insights?.posts },
+            // data: response.data?.insights?.creator_insights?.creators,
             message: "Success",
         };
         res.status(response.status).json(resObj);
@@ -378,6 +379,32 @@ exports.cfInstaApi = async (req, res) => {
             message: "Success",
         };
         res.status(response.status).json(resObj);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: err, sms: "Something went wrong..." });
+    }
+};
+
+exports.countInstaCPModels = async (req, res) => {
+    try {
+        const flag = req.body.flag
+        let resObj = { status: 200 }
+        if (parseInt(flag) === constant.INSTA_C_MODELS) {
+            const response = await instaC.countDocuments({})
+            resObj.data = {
+                instac_count: response
+            }
+        } else if (parseInt(flag) === constant.INSTA_P_MODELS) {
+            const response = await instaP.countDocuments({})
+            resObj.data = {
+                instap_count: response
+            }
+        }else{
+            resObj.message = "Provide valid flag"
+            return res.status(200).json(resObj); 
+        }
+        return res.status(200).json(resObj);
+
     } catch (err) {
         console.error(err);
         res.status(500).send({ error: err, sms: "Something went wrong..." });
