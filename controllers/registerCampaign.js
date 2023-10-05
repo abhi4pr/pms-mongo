@@ -38,7 +38,6 @@ exports.getRegisterCampaigns = async (req, res) => {
         ...item.toObject(),
         download_excel_file: item.excel_path ? url + item.excel_path : "",
       }));
-
       return res.status(200).send({ success: true, data: dataWithFileUrls });
     }
   } catch (err) {
