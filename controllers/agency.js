@@ -1,4 +1,4 @@
-const agencyModel = require("../models/agency.js");
+const agencyModel = require("../models/agencyModel.js");
 
 exports.addAgency = async (req, res) => {
   const { agency_name } = req.body;
