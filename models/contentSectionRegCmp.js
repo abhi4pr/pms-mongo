@@ -11,16 +11,39 @@ const contentSectionRegSchema = new mongoose.Schema({
     type: Number,
     ref: "register_campaigns",
   },
-  content_count: {
+  content_type_id: {
     type: Number,
   },
   content_brief: {
     type: String,
   },
+  campaign_brief: {
+    type: String,
+  },
+  campaign_dt: {
+    type: String,
+  },
+  creator_dt: {
+    type: String,
+  },
+  admin_remark: {
+    type: String,
+  },
+  creator_remark: {
+    type: String,
+  },
   est_static_vedio: {
     type: Number,
   },
-  content_type: [mongoose.Schema.Types.Mixed],
+  status: {
+    type: Number,
+  },
+  stage: {
+    type: Number,
+  },
+  assign_to:{
+    type: Number,
+   },
 });
 
 AutoIncrement.initialize(mongoose.connection);

@@ -16,6 +16,7 @@ const registerCampaign = require("./controllers/registerCampaign.js");
 const contentSectionReg = require("./controllers/contentSectionRegCmp.js");
 const contentType = require("./controllers/contentType.js");
 const projectx = require("./controllers/projectx.js");
+const objectMast = require("./controllers/objmast.js");
 const { upload } = require("./common/uploadFile.js");
 const designation = require('./controllers/designation.js');
 const finance = require('./controllers/finance.js');
@@ -38,6 +39,7 @@ const finance = require('./controllers/finance.js');
   router.post("/get_posts_from_name", insta.getPostsFromName);
   router.get("/creator_insights", insta.creatorInsights);
   router.get("/cfinstaapi", insta.cfInstaApi);
+  router.get("/countinstacp", insta.countInstaCPModels);
   /*execution api*/
   router.post("/exe_inven_post", exe.exeInvenPost);
   router.get("/get_exe_inventory", exe.getExeInventory);
@@ -174,6 +176,7 @@ router.get("/projectxRecord",projectxRecord.getProjectxRecords)
 //Register Campaign Content Section
 router.post("/contentSectionReg",contentSectionReg.addContentSectionReg)
 router.get("/contentSectionReg",contentSectionReg.getContentSectionReg)
+router.put("/contentSectionReg",contentSectionReg.editContentSectionReg)
 
 // Content Type
 router.post("/content",contentType.addContentType)
@@ -186,5 +189,10 @@ router.delete("/content/:id",contentType.deleteContentType)
 router.post("/add_finance",upload.single("screenshot"),finance.addFinance)
 router.get("/get_finances",finance.getFinances)
 router.put("/edit_finance",upload.single("screenshot"),finance.editFinance)
+
+/* Object Mast */
+router.post("/obj",objectMast.addObjectMast)
+router.get("/allobj",objectMast.getObjectMasts)
+router.get("/objdata/:id",objectMast.getObjectMastById)
 
 module.exports = router;

@@ -2,14 +2,16 @@ const registerCamapign = require("../models/registerCamapign");
 const constant = require("../common/constant.js");
 exports.addRegisterCampaign = async (req, res) => {
   try {
-    const { brand_id, brnad_dt, commitment } = req.body;
-    const excel_file = req.file.filename ?? "";
+    const { brand_id, brnad_dt, commitment, status, stage } = req.body;
+    const excel_file = req.file?.filename ?? "";
     let parsedCommitment = JSON.parse(commitment);
     const Obj = new registerCamapign({
       brand_id,
       brnad_dt,
+      status,
       excel_path: excel_file,
       commitment: parsedCommitment,
+      stage,
     });
 
     const savedRegisterCampaign = await Obj.save();
@@ -49,14 +51,10 @@ exports.getRegisterCampaigns = async (req, res) => {
 
 exports.editRegisterCampaign = async (req, res) => {
   try {
-    const { status, register_campaign_id } = req.body;
-
     const editRegisterCampaignObj = await registerCamapign.findOneAndUpdate(
-      { register_campaign_id: parseInt(register_campaign_id) }, // Filter condition
+      { register_campaign_id: parseInt(req.body.register_campaign_id) }, // Filter condition
       {
-        $set: {
-          status,
-        },
+        $set: req.body,
       },
       { new: true }
     );
@@ -67,8 +65,11 @@ exports.editRegisterCampaign = async (req, res) => {
         .send({ success: false, message: "RegisterCampaign not found" });
     }
 
-    return res.status(200).send({ success: true, data: editRegisterCampaignObj });
+    return res
+      .status(200)
+      .send({ success: true, data: editRegisterCampaignObj });
   } catch (err) {
+    console.log(err);
     res
       .status(500)
       .send({ error: err, message: "Error updating RegisterCampaign details" });
