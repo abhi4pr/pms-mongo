@@ -169,7 +169,7 @@ router.delete("/projectxCategory/:id",projectxCategory.deleteProjectxCategory)
 //Projectx 
 router.post("/projectxpost",projectx.addProjectx)
 router.get("/getallprojectx",projectx.getProjectx)
-router.get("/getprojectx/:id",projectx.getProjectxById)
+router.get("/getprojectx",projectx.getProjectxByPageName)
 router.put("/projectxupdate",projectx.editProjectx)
 router.delete("/projectxdelete/:id",projectx.deleteProjectx)
 
