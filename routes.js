@@ -23,6 +23,7 @@ const finance = require('./controllers/finance.js');
 const sitting = require("./controllers/sitting.js");
 const agency = require("./controllers/agency.js");
 const responsibility = require("./controllers/responsibility.js");
+const contentM = require("./controllers/contentManagement.js");
 
 const role = require('./controllers/role.js');
 
@@ -232,5 +233,12 @@ router.get("/get_responsibility",responsibility.getResposibilities)
 router.get("/get_single_responsibility/:id",responsibility.getSingleResposibility)
 router.put("/edit_responsibility/:id", responsibility.editResponsibility)
 router.delete("/delete_responsibility/:id",responsibility.deleteResponsibility)
+
+/* Content Management Routes */
+router.post("/contentMgnt",contentM.addcontentManagement);
+router.get("/contentMgnt",contentM.getcontentManagements);
+router.get("/contentMgnt/:id",contentM.getContentManagementById);
+router.put("/contentMgnt",contentM.editcontentManagement);
+router.delete("/contentMgnt/:id",contentM.deletecontentManagement);
 
 module.exports = router;
