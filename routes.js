@@ -23,6 +23,8 @@ const designation = require('./controllers/designation.js');
 const finance = require('./controllers/finance.js');
 const sitting = require("./controllers/sitting.js");
 const agency = require("./controllers/agency.js");
+const responsibility = require("./controllers/responsibility.js");
+const contentM = require("./controllers/contentManagement.js");
 
 const role = require('./controllers/role.js');
 
@@ -170,7 +172,7 @@ router.delete("/projectxCategory/:id",projectxCategory.deleteProjectxCategory)
 //Projectx 
 router.post("/projectxpost",projectx.addProjectx)
 router.get("/getallprojectx",projectx.getProjectx)
-router.get("/getprojectx",projectx.getProjectxByPageName)
+router.post("/getprojectx",projectx.getProjectxByPageName)
 router.put("/projectxupdate",projectx.editProjectx)
 router.delete("/projectxdelete/:id",projectx.deleteProjectx)
 
@@ -214,7 +216,6 @@ router.post("/obj",objectMast.addObjectMast)
 router.get("/allobj",objectMast.getObjectMasts)
 router.get("/objdata/:id",objectMast.getObjectMastById)
 
-module.exports = router;
 /* role */
 router.post("/add_role",role.addRole)
 router.get("/get_roles",role.getRoles)
@@ -227,5 +228,25 @@ router.get("/allannouncementdata",announcement.getAnnouncements)
 router.get("/announcement/:id",announcement.getAnnoncementById)
 router.delete("/annomastdelete/:id",announcement.deleteAnnoncement)
 router.put("/annomastput",announcement.editAnnoncement)
+=======
+/* job responsibility */
+router.post("/add_job_responsibility",responsibility.addJobResponsibility)
+router.get("/get_jobresponsibility",responsibility.getJobResposibilities)
+router.get("/get_single_jobresponsibility/:id",responsibility.getSingleJobResponsibility)
+router.put("/edit_jobresponsibility", responsibility.editJobResponsibility)
+router.delete("/delete_jobresponsibility/:id",responsibility.deleteJobResponsibility)
+
+router.post("/add_responsibility",responsibility.addResponsibility)
+router.get("/get_responsibility",responsibility.getResposibilities)
+router.get("/get_single_responsibility/:id",responsibility.getSingleResposibility)
+router.put("/edit_responsibility/:id", responsibility.editResponsibility)
+router.delete("/delete_responsibility/:id",responsibility.deleteResponsibility)
+
+/* Content Management Routes */
+router.post("/contentMgnt",contentM.addcontentManagement);
+router.get("/contentMgnt",contentM.getcontentManagements);
+router.get("/contentMgnt/:id",contentM.getContentManagementById);
+router.put("/contentMgnt",contentM.editcontentManagement);
+router.delete("/contentMgnt/:id",contentM.deletecontentManagement);
 
 module.exports = router;
