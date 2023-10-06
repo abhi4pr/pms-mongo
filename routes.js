@@ -228,7 +228,7 @@ router.get("/allannouncementdata",announcement.getAnnouncements)
 router.get("/announcement/:id",announcement.getAnnoncementById)
 router.delete("/annomastdelete/:id",announcement.deleteAnnoncement)
 router.put("/annomastput",announcement.editAnnoncement)
-=======
+
 /* job responsibility */
 router.post("/add_job_responsibility",responsibility.addJobResponsibility)
 router.get("/get_jobresponsibility",responsibility.getJobResposibilities)
