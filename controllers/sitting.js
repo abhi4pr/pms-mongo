@@ -31,7 +31,7 @@ exports.getSittings = async (req, res) => {
 
 exports.getSingleSitting = async (req, res) => {
     try{
-        const singlesitting = await sittingModel.findById(req.params.sitting_id);
+        const singlesitting = await sittingModel.findOne({sitting_id:req.params.sitting_id});
         if(!singlesitting){
             return res.status(500).send({success:false})
         }
