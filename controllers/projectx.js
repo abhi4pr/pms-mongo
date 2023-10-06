@@ -62,10 +62,12 @@ exports.getProjectx = async (req, res) => {
   }
 };
 
-exports.getProjectxById = async (req, res) => {
+exports.getProjectxByPageName = async (req, res) => {
+
   try {
     const fetchedData = await projectxSchema.findOne({
-      id: parseInt(req.params.id),
+      page_name: req.body.page_name,
+      // page_name: parseInt(req.params.id),
     });
     if (!fetchedData) {
       return res
