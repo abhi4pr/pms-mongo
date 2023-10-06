@@ -22,11 +22,11 @@ exports.addcontentManagement = async (req, res) =>{
 
 exports.getcontentManagements = async (req, res) => {
     try{
-        const simc = await contentManagementModel.find();
-        if(!simc){
+        const contentManagementc = await contentManagementModel.find();
+        if(!contentManagementc){
             res.status(500).send({success:false})
         }
-        res.status(200).send(simc)
+        res.status(200).send(contentManagementc)
     } catch(err){
         res.status(500).send({error:err,sms:'Error getting all contentManagements'})
     }
@@ -55,7 +55,7 @@ exports.getContentManagementById = async (req, res) => {
 
 exports.editcontentManagement = async (req, res) => {
     try{
-        const editcontentmanagement = await contentManagementModel.findOneAndUpdate(req.body.id,{
+        const editcontentmanagement = await contentManagementModel.findOneAndUpdate({ contentM_id: req.body.contentM_id },{
             page_name: req.body.page_name,
             content_name: req.body.content_name,
             category: req.body.category,
@@ -76,14 +76,27 @@ exports.editcontentManagement = async (req, res) => {
 };
 
 
-exports.deletecontentManagement = async (req, res) =>{
-    contentManagementModel.findByIdAndRemove(req.params.contentm_id).then(item =>{
-        if(item){
-            return res.status(200).json({success:true, message:'contentManagement deleted'})
-        }else{
-            return res.status(404).json({success:false, message:'contentManagement not found'})
+exports.deletecontentManagement = async (req, res) => {
+    const id = req.params.id;
+    const condition = { contentM_id: id };
+    try {
+        const result = await contentManagementModel.deleteOne(condition);
+        if (result.deletedCount === 1) {
+            return res.status(200).json({
+                success: true,
+                message: `contentManagement with ID ${id} deleted successfully`,
+            });
+        } else {
+            return res.status(200).json({
+                success: false,
+                message: `contentManagement with ID ${id} not found`,
+            });
         }
-    }).catch(err=>{
-        return res.status(400).json({success:false, message:err})
-    })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while deleting the contentManagement",
+            error: error.message,
+        });
+    }
 };

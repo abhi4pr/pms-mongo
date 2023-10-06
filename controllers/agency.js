@@ -39,7 +39,7 @@ exports.getAgencys = async (req, res) => {
 exports.getAgencyById = async (req, res) => {
   try {
     const fetchedData = await agencyModel.findOne({
-      agenncy_id: parseInt(req.params.id),
+      agency_id: parseInt(req.params.id),
     });
     if (!fetchedData) {
       return res
@@ -57,17 +57,20 @@ exports.getAgencyById = async (req, res) => {
 };
 
 exports.editAgency = async (req, res) => {
-    try{
-        const editagency = await agencyModel.findByIdAndUpdate(req.body.agency_id,{
-            agency_name : req.body.agency_name
-        }, { new: true })
-        if(!editagency){
-            res.status(500).send({success:false})
-        }
-        res.status(200).send({success:true,data:editagency})
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error updating agency details'})
-    }
+  try {
+      const editagency = await agencyModel.findOneAndUpdate({ agency_id: req.body.agency_id }, {
+        agency_name : req.body.agency_name
+      }, { new: true })
+      if (!editagency) {
+          res.status(500).send({ success: false })
+      }
+      res.status(200).send({ success: true, data: editagency })
+  } catch (err) {
+      res.status(500).send({
+          error: err,
+          message: "Error updating the agency in the database",
+      });
+  }
 };
 
 exports.deleteAgency = async (req, res) => {
