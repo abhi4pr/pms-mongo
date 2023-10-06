@@ -66,7 +66,8 @@ exports.getProjectxByPageName = async (req, res) => {
 
   try {
     const fetchedData = await projectxSchema.findOne({
-      page_name: req.body.page_name,
+      // page_name: req.body.page_name,
+      page_name: { $regex: new RegExp(req.body.page_name, 'i') },
       // page_name: parseInt(req.params.id),
     });
     if (!fetchedData) {

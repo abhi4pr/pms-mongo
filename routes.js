@@ -16,6 +16,7 @@ const registerCampaign = require("./controllers/registerCampaign.js");
 const contentSectionReg = require("./controllers/contentSectionRegCmp.js");
 const contentType = require("./controllers/contentType.js");
 const projectx = require("./controllers/projectx.js");
+const announcement = require("./controllers/announcement.js");
 const objectMast = require("./controllers/objmast.js");
 const { upload } = require("./common/uploadFile.js");
 const designation = require('./controllers/designation.js');
@@ -219,5 +220,12 @@ router.post("/add_role",role.addRole)
 router.get("/get_roles",role.getRoles)
 router.put("/edit_role", role.editRole)
 router.delete("/delete_role/:id",role.deleteRole)
+
+/* Announcement */
+router.post("/annomastpost",announcement.addAnnouncement)
+router.get("/allannouncementdata",announcement.getAnnouncements)
+router.get("/announcement/:id",announcement.getAnnoncementById)
+router.delete("/annomastdelete/:id",announcement.deleteAnnoncement)
+router.put("/annomastput",announcement.editAnnoncement)
 
 module.exports = router;
