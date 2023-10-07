@@ -63,6 +63,7 @@ exports.getContentSectionReg = async (req, res) => {
       {
         $project: {
           _id: 1,
+          content_section_id : 1,
           register_campaign_id :1,
           content_type_id :1,
           content_brief :1,
