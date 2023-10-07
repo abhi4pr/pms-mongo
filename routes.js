@@ -25,6 +25,7 @@ const sitting = require("./controllers/sitting.js");
 const agency = require("./controllers/agency.js");
 const responsibility = require("./controllers/responsibility.js");
 const contentM = require("./controllers/contentManagement.js");
+const billingheader = require("./controllers/billingheader.js");
 
 const role = require('./controllers/role.js');
 
@@ -179,6 +180,8 @@ router.delete("/projectxdelete/:id",projectx.deleteProjectx)
 //Projectx Record
 router.post("/projectxRecord",projectxRecord.addProjectxRecord)
 router.get("/projectxRecord",projectxRecord.getProjectxRecords)
+router.put("/projectxRecord",projectxRecord.editProjectxRecord)
+router.delete("/projectxRecord/:id",projectxRecord.deleteProjectxRecord)
 
 //Register Campaign Content Section
 router.post("/contentSectionReg",contentSectionReg.addContentSectionReg)
@@ -248,5 +251,12 @@ router.get("/contentMgnt",contentM.getcontentManagements);
 router.get("/contentMgnt/:id",contentM.getContentManagementById);
 router.put("/contentMgnt",contentM.editcontentManagement);
 router.delete("/contentMgnt/:id",contentM.deletecontentManagement);
+
+/* BillingHeader Routes */
+router.post("/billingheader",billingheader.addBillingHeader);
+router.get("/billingheader",billingheader.getBillingHeaders);
+router.get("/billingheader/:id",billingheader.getBillingHeaderById);
+router.put("/billingheader",billingheader.editBillingHeader);
+router.delete("/billingheader/:id",billingheader.deleteBillingHeader);
 
 module.exports = router;
