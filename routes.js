@@ -26,6 +26,9 @@ const agency = require("./controllers/agency.js");
 const responsibility = require("./controllers/responsibility.js");
 const contentM = require("./controllers/contentManagement.js");
 const billingheader = require("./controllers/billingheader.js");
+const brandCategory = require("./controllers/brandCategory.js");
+const brandSubCategory = require("./controllers/brandSubCategory.js");
+const brandMajorCategory = require("./controllers/brandMajorCategory.js");
 
 const role = require('./controllers/role.js');
 
@@ -258,5 +261,18 @@ router.get("/billingheader",billingheader.getBillingHeaders);
 router.get("/billingheader/:id",billingheader.getBillingHeaderById);
 router.put("/billingheader",billingheader.editBillingHeader);
 router.delete("/billingheader/:id",billingheader.deleteBillingHeader);
+
+/* Brand Category */
+router.post("/brandCategory",brandCategory.addBrandCategory);
+router.get("/brandCategory",brandCategory.getBrandCategorys);
+
+/* Brand Sub Category */
+router.post("/brandSubCategory",brandSubCategory.addBrandSubCategory);
+router.get("/brandSubCategory",brandSubCategory.getBrandSubCategorys);
+
+/* Brand Major Category */
+router.post("/brandMajorCategory",brandMajorCategory.addBrandMajorCategory);
+router.get("/brandMajorCategory",brandMajorCategory.getBrandMajorCategorys);
+
 
 module.exports = router;
