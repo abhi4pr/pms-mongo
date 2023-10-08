@@ -7,7 +7,7 @@ const brandSubCategoryModel = new mongoose.Schema({
         required: true,
     },
     brandSubCategory_name: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
     },

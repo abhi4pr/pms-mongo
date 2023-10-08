@@ -7,7 +7,7 @@ const brandMajorCategoryModel = new mongoose.Schema({
         required: true,
     },
     brandMajorCategory_name: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
     },
