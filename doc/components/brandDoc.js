@@ -27,17 +27,7 @@ const getBrand = {
       },
     },
   },
-//   // the security property is used to specify the security requirements for an API endpoint. It's an array of objects, where each object is a map of security schemes, keyed by security scheme name.
-//   security: [
-//     {
-//       // bearerAuth: [],          //The empty array [] indicates that there are no scopes required for this security scheme.
-//       bearerAuth: {
-//         type: "http",
-//         scheme: "bearer",
-//         bearerFormat: "JWT",
-//       },
-//     },
-//   ],
+
 };
 
 const BrandRouteDoc = {

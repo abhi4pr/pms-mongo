@@ -1,3 +1,4 @@
+const response = require("../common/response");
 const brandSchema = require("../models/brand");
 
 exports.addBrand = async (req, res) => {
@@ -10,9 +11,20 @@ exports.addBrand = async (req, res) => {
       whatsapp,
       user_id,
       major_category,
-      website
+      website,
     } = req.body;
-
+    let check = await brandSchema.findOne({
+      brand_name: brand_name.toLowerCase().trim(),
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Brand name must be unique",
+        {}
+      );
+    }
     const brandObj = new brandSchema({
       brand_name,
       category_id,
@@ -21,7 +33,7 @@ exports.addBrand = async (req, res) => {
       whatsapp,
       user_id,
       major_category,
-      website
+      website,
     });
 
     const savedBrand = await brandObj.save();
@@ -66,7 +78,7 @@ exports.getBrands = async (req, res) => {
           category_id: 1,
           sub_category_id: 1,
           igusername: 1,
-          website:1,
+          website: 1,
           whatsapp: 1,
           major_category: 1,
           user_id: 1,
@@ -132,7 +144,7 @@ exports.getBrandById = async (req, res) => {
           sub_category_id: 1,
           igusername: 1,
           whatsapp: 1,
-          website:1,
+          website: 1,
           major_category: 1,
           user_id: 1,
           updated_at: 1,
@@ -167,9 +179,21 @@ exports.editBrand = async (req, res) => {
       whatsapp,
       user_id,
       major_category,
-      website
+      website,
     } = req.body;
-
+    let check = await brandSchema.findOne({
+      brand_name: brand_name.toLowerCase().trim(),
+      brand_id: { $ne: brand_id },
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Brand name must be unique",
+        {}
+      );
+    }
     const editBrandObj = await brandSchema.findOneAndUpdate(
       { brand_id: parseInt(brand_id) }, // Filter condition
       {
@@ -220,5 +244,33 @@ exports.deleteBrand = async (req, res) => {
     }
   } catch (err) {
     return res.status(400).json({ success: false, message: err });
+  }
+};
+
+exports.checkSubCatAndCat = async (req, res) => {
+  try {
+    const check = await brandSchema.findOne({
+      sub_category_id: parseInt(req.body.sub_category_id),
+      category_id: parseInt(req.body.category_id),
+    });
+    if (!check) {
+      return response.returnTrue(
+        200,
+        req,
+        res,
+        "You can proceed with this combination..",
+        {}
+      );
+    } else {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "This combination should be unique.",
+        {}
+      );
+    }
+  } catch (err) {
+    return response.returnTrue(500, req, res, err.message, {});
   }
 };

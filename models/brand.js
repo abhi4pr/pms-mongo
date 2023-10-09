@@ -9,7 +9,8 @@ const brandSchema = new mongoose.Schema({
   },
   brand_name: {
     type: String,
-    required: true,
+    lowercase: true,
+    trim: true,
   },
   category_id: {
     type: Number,
@@ -38,7 +39,6 @@ const brandSchema = new mongoose.Schema({
   },
   user_id: {
     type: Number,
-    required: true,
   },
   updated_at: {
     type: Date,
