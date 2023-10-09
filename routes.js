@@ -30,6 +30,7 @@ const brandCategory = require("./controllers/brandCategory.js");
 const brandSubCategory = require("./controllers/brandSubCategory.js");
 const brandMajorCategory = require("./controllers/brandMajorCategory.js");
 const instaBrand = require("./controllers/instaBrand.js");
+const user = require("./controllers/user.js");
 
 const role = require("./controllers/role.js");
 
@@ -296,5 +297,12 @@ router.get("/insta_brand/:id",instaBrand.getInstaBrandById);
 router.put("/insta_brand",instaBrand.editInstaBrand);
 router.delete("/insta_brand/:id",instaBrand.deleteInstaBrand);
 
+/* user */
+router.post("/add_user",user.addUser);
+router.put("/update_user",user.updateUser);
+router.get("/get_wfh_user", user.getWFHUsers);
+router.get("/all_users", user.getAllUsers)
+router.get("/get_single_user/:id", user.getSingleUser)
+router.delete("/delete_user/:id", user.deleteUser)
 
 module.exports = router;
