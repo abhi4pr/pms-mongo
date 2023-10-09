@@ -29,6 +29,7 @@ const billingheader = require("./controllers/billingheader.js");
 const brandCategory = require("./controllers/brandCategory.js");
 const brandSubCategory = require("./controllers/brandSubCategory.js");
 const brandMajorCategory = require("./controllers/brandMajorCategory.js");
+const instaBrand = require("./controllers/instaBrand.js");
 
 const role = require("./controllers/role.js");
 
@@ -287,6 +288,13 @@ router.get("/brandMajorCategory",brandMajorCategory.getBrandMajorCategorys);
 router.get("/brandMajorCategory/:id",brandMajorCategory.getBrandMajorCategoryById);
 router.put("/brandMajorCategory",brandMajorCategory.editBrandMajorCategory);
 router.delete("/brandMajorCategory/:id",brandMajorCategory.deleteBrandMajorCategory);
+
+/* Insta Brand */
+router.post("/insta_brand",instaBrand.addInstaBrand);
+router.get("/insta_brand",instaBrand.getInstaBrands);
+router.get("/insta_brand/:id",instaBrand.getInstaBrandById);
+router.put("/insta_brand",instaBrand.editInstaBrand);
+router.delete("/insta_brand/:id",instaBrand.deleteInstaBrand);
 
 
 module.exports = router;
