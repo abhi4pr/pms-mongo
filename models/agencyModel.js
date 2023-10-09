@@ -7,7 +7,7 @@ const agencyModel = new mongoose.Schema({
     required: true,
   },
   agency_name: {
-    type: Number,
+    type: String,
     required: true,
     unique: true,
   },

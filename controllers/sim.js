@@ -37,7 +37,7 @@ exports.getSims = async (req, res) => {
 
 exports.getSingleSim = async (req, res) => {
     try{
-        const singlesim = await simModel.findById(req.params.sim_id);
+        const singlesim = await simModel.findOne({sim_id:req.params.sim_id});
         if(!singlesim){
             return res.status(500).send({success:false})
         }
@@ -49,7 +49,7 @@ exports.getSingleSim = async (req, res) => {
 
 exports.editSim = async (req, res) => {
     try{
-        const editsim = await simModel.findByIdAndUpdate(req.body.sim_id,{
+        const editsim = await simModel.findOneAndUpdate({sim_id:req.body.sim_id},{
             sim_no: req.body.sim_no,
             provider: req.body.provider,
             Remarks: req.body.Remarks,
@@ -72,7 +72,7 @@ exports.editSim = async (req, res) => {
 };
 
 exports.deleteSim = async (req, res) =>{
-    simModel.findByIdAndRemove(req.params.sim_id).then(item =>{
+    simModel.deleteOne({sim_id:req.params.sim_id}).then(item =>{
         if(item){
             return res.status(200).json({success:true, message:'sim deleted'})
         }else{
@@ -117,7 +117,7 @@ exports.getAllocations = async (req, res) => {
 
 exports.editAllocation = async (req, res) => {
     try{
-        const editsim = await simAlloModel.findByIdAndUpdate(req.body.allo_id,{
+        const editsim = await simAlloModel.findOneAndUpdate(req.body.allo_id,{
             user_id: req.body.user_id,
             sim_id: req.body.sim_id,
             Remarks: req.body.Remarks,
@@ -138,7 +138,7 @@ exports.editAllocation = async (req, res) => {
 };
 
 exports.deleteAllocation = async (req, res) =>{
-    simAlloModel.findByIdAndRemove(req.params.allo_id).then(item =>{
+    simAlloModel.deleteOne(req.params.allo_id).then(item =>{
         if(item){
             return res.status(200).json({success:true, message:'sim allocation deleted'})
         }else{
