@@ -4,6 +4,8 @@ const cors = require('cors');
 const routes = require('./routes.js');
 const vari = require('./variables.js');
 const bodyParser = require('body-parser');
+const  swaggerUi = require("swagger-ui-express");
+const swaggerDocumantion = require('./doc/swaggerDoc.js');
 
 const app = express();
 // app.use(express.json());
@@ -12,6 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cors());
 app.use('/uploads', express.static(__dirname+'/uploads'));
 app.use('/api', routes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocumantion));
 
 mongoose.connect(vari.MONGODB,{
   useNewUrlParser:true,

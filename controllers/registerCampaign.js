@@ -2,7 +2,7 @@ const registerCamapign = require("../models/registerCamapign");
 const constant = require("../common/constant.js");
 exports.addRegisterCampaign = async (req, res) => {
   try {
-    const { brand_id, brnad_dt, commitment, status, stage } = req.body;
+    const { brand_id, brnad_dt, commitment, status, stage,detailing } = req.body;
     const excel_file = req.file?.filename ?? "";
     let parsedCommitment = JSON.parse(commitment);
     const Obj = new registerCamapign({
@@ -12,6 +12,7 @@ exports.addRegisterCampaign = async (req, res) => {
       excel_path: excel_file,
       commitment: parsedCommitment,
       stage,
+      detailing
     });
 
     const savedRegisterCampaign = await Obj.save();
