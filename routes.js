@@ -29,6 +29,8 @@ const billingheader = require("./controllers/billingheader.js");
 const brandCategory = require("./controllers/brandCategory.js");
 const brandSubCategory = require("./controllers/brandSubCategory.js");
 const brandMajorCategory = require("./controllers/brandMajorCategory.js");
+const cmtController = require("./controllers/commitmentMast.js");
+const exeCampaign = require("./controllers/exeCampaign.js");
 const instaBrand = require("./controllers/instaBrand.js");
 const user = require("./controllers/user.js");
 
@@ -104,6 +106,7 @@ router.get("/get_designations", designation.getDesignations);
 //brand routes
 router.post("/add_brand", brand.addBrand);
 router.get("/get_brands", brand.getBrands);
+router.get("/check_unique_brand", brand.checkSubCatAndCat);
 router.get("/get_brand/:id", brand.getBrandById);
 router.put("/edit_brand", brand.editBrand);
 router.delete("/delete_brand/:id", brand.deleteBrand);
@@ -114,6 +117,13 @@ router.get("/campaign", campagin.getCampaigns);
 router.get("/campaign/:id", campagin.getCampaignById);
 router.put("/campaign", campagin.editCampaign);
 router.delete("/campaign/:id", campagin.deleteCampaign);
+
+//Execution Campaign routes
+router.post("/exe_campaign", exeCampaign.addExeCampaign);
+router.get("/exe_campaign", exeCampaign.getExeCampaigns);
+router.get("/exe_campaign/:id", exeCampaign.getExeCampaignById);
+router.put("/exe_campaign", exeCampaign.editExeCampaign);
+router.delete("/exe_campaign/:id", exeCampaign.deleteExeCampaign);
 
 //ProjectxPageCategory
 router.post(
@@ -172,18 +182,18 @@ router.get("/projectxCategory/:id", projectxCategory.getProjectxCategoryById);
 router.put("/projectxCategory", projectxCategory.editProjectxCategory);
 router.delete("/projectxCategory/:id", projectxCategory.deleteProjectxCategory);
 
-//Projectx 
-router.post("/projectxpost",projectx.addProjectx)
-router.get("/getallprojectx",projectx.getProjectx)
-router.post("/getprojectx",projectx.getProjectxByPageName)
-router.put("/projectxupdate",projectx.editProjectx)
-router.delete("/projectxdelete/:id",projectx.deleteProjectx)
+//Projectx
+router.post("/projectxpost", projectx.addProjectx);
+router.get("/getallprojectx", projectx.getProjectx);
+router.post("/getprojectx", projectx.getProjectxByPageName);
+router.put("/projectxupdate", projectx.editProjectx);
+router.delete("/projectxdelete/:id", projectx.deleteProjectx);
 
 //Projectx Record
-router.post("/projectxRecord",projectxRecord.addProjectxRecord)
-router.get("/projectxRecord",projectxRecord.getProjectxRecords)
-router.put("/projectxRecord",projectxRecord.editProjectxRecord)
-router.delete("/projectxRecord/:id",projectxRecord.deleteProjectxRecord)
+router.post("/projectxRecord", projectxRecord.addProjectxRecord);
+router.get("/projectxRecord", projectxRecord.getProjectxRecords);
+router.put("/projectxRecord", projectxRecord.editProjectxRecord);
+router.delete("/projectxRecord/:id", projectxRecord.deleteProjectxRecord);
 
 //Register Campaign Content Section
 router.post(
@@ -243,66 +253,91 @@ router.delete("/annomastdelete/:id", announcement.deleteAnnoncement);
 router.put("/annomastput", announcement.editAnnoncement);
 
 /* job responsibility */
-router.post("/add_job_responsibility",responsibility.addJobResponsibility)
-router.get("/get_jobresponsibility",responsibility.getJobResposibilities)
-router.get("/get_single_jobresponsibility/:id",responsibility.getSingleJobResponsibility)
-router.put("/edit_jobresponsibility", responsibility.editJobResponsibility)
-router.delete("/delete_jobresponsibility/:id",responsibility.deleteJobResponsibility)
+router.post("/add_job_responsibility", responsibility.addJobResponsibility);
+router.get("/get_jobresponsibility", responsibility.getJobResposibilities);
+router.get(
+  "/get_single_jobresponsibility/:id",
+  responsibility.getSingleJobResponsibility
+);
+router.put("/edit_jobresponsibility", responsibility.editJobResponsibility);
+router.delete(
+  "/delete_jobresponsibility/:id",
+  responsibility.deleteJobResponsibility
+);
 
-router.post("/add_responsibility",responsibility.addResponsibility)
-router.get("/get_responsibility",responsibility.getResposibilities)
-router.get("/get_single_responsibility/:id",responsibility.getSingleResposibility)
-router.put("/edit_responsibility/:id", responsibility.editResponsibility)
-router.delete("/delete_responsibility/:id",responsibility.deleteResponsibility)
+router.post("/add_responsibility", responsibility.addResponsibility);
+router.get("/get_responsibility", responsibility.getResposibilities);
+router.get(
+  "/get_single_responsibility/:id",
+  responsibility.getSingleResposibility
+);
+router.put("/edit_responsibility/:id", responsibility.editResponsibility);
+router.delete(
+  "/delete_responsibility/:id",
+  responsibility.deleteResponsibility
+);
 
 /* Content Management Routes */
-router.post("/contentMgnt",contentM.addcontentManagement);
-router.get("/contentMgnt",contentM.getcontentManagements);
-router.get("/contentMgnt/:id",contentM.getContentManagementById);
-router.put("/contentMgnt",contentM.editcontentManagement);
-router.delete("/contentMgnt/:id",contentM.deletecontentManagement);
+router.post("/contentMgnt", contentM.addcontentManagement);
+router.get("/contentMgnt", contentM.getcontentManagements);
+router.get("/contentMgnt/:id", contentM.getContentManagementById);
+router.put("/contentMgnt", contentM.editcontentManagement);
+router.delete("/contentMgnt/:id", contentM.deletecontentManagement);
 
 /* BillingHeader Routes */
-router.post("/billingheader",billingheader.addBillingHeader);
-router.get("/billingheader",billingheader.getBillingHeaders);
-router.get("/billingheader/:id",billingheader.getBillingHeaderById);
-router.put("/billingheader",billingheader.editBillingHeader);
-router.delete("/billingheader/:id",billingheader.deleteBillingHeader);
+router.post("/billingheader", billingheader.addBillingHeader);
+router.get("/billingheader", billingheader.getBillingHeaders);
+router.get("/billingheader/:id", billingheader.getBillingHeaderById);
+router.put("/billingheader", billingheader.editBillingHeader);
+router.delete("/billingheader/:id", billingheader.deleteBillingHeader);
 
 /* Brand Category */
-router.post("/brandCategory",brandCategory.addBrandCategory);
-router.get("/brandCategory",brandCategory.getBrandCategorys);
-router.get("/brandCategory/:id",brandCategory.getBrandCategoryById);
-router.put("/brandCategory",brandCategory.editBrandCategory);
-router.delete("/brandCategory/:id",brandCategory.deleteBrandCategory);
+router.post("/brandCategory", brandCategory.addBrandCategory);
+router.get("/brandCategory", brandCategory.getBrandCategorys);
+router.get("/brandCategory/:id", brandCategory.getBrandCategoryById);
+router.put("/brandCategory", brandCategory.editBrandCategory);
+router.delete("/brandCategory/:id", brandCategory.deleteBrandCategory);
 
 /* Brand Sub Category */
-router.post("/brandSubCategory",brandSubCategory.addBrandSubCategory);
-router.get("/brandSubCategory",brandSubCategory.getBrandSubCategorys);
-router.get("/brandSubCategory/:id",brandSubCategory.getBrandSubCategoryById);
-router.put("/brandSubCategory",brandSubCategory.editBrandSubCategory);
-router.delete("/brandSubCategory/:id",brandSubCategory.deleteBrandSubCategory);
+router.post("/brandSubCategory", brandSubCategory.addBrandSubCategory);
+router.get("/brandSubCategory", brandSubCategory.getBrandSubCategorys);
+router.get("/brandSubCategory/:id", brandSubCategory.getBrandSubCategoryById);
+router.put("/brandSubCategory", brandSubCategory.editBrandSubCategory);
+router.delete("/brandSubCategory/:id", brandSubCategory.deleteBrandSubCategory);
 
 /* Brand Major Category */
-router.post("/brandMajorCategory",brandMajorCategory.addBrandMajorCategory);
-router.get("/brandMajorCategory",brandMajorCategory.getBrandMajorCategorys);
-router.get("/brandMajorCategory/:id",brandMajorCategory.getBrandMajorCategoryById);
-router.put("/brandMajorCategory",brandMajorCategory.editBrandMajorCategory);
-router.delete("/brandMajorCategory/:id",brandMajorCategory.deleteBrandMajorCategory);
+router.post("/brandMajorCategory", brandMajorCategory.addBrandMajorCategory);
+router.get("/brandMajorCategory", brandMajorCategory.getBrandMajorCategorys);
+router.get(
+  "/brandMajorCategory/:id",
+  brandMajorCategory.getBrandMajorCategoryById
+);
+router.put("/brandMajorCategory", brandMajorCategory.editBrandMajorCategory);
+router.delete(
+  "/brandMajorCategory/:id",
+  brandMajorCategory.deleteBrandMajorCategory
+);
 
 /* Insta Brand */
-router.post("/insta_brand",instaBrand.addInstaBrand);
-router.get("/insta_brand",instaBrand.getInstaBrands);
-router.get("/insta_brand/:id",instaBrand.getInstaBrandById);
-router.put("/insta_brand",instaBrand.editInstaBrand);
-router.delete("/insta_brand/:id",instaBrand.deleteInstaBrand);
+router.post("/insta_brand", instaBrand.addInstaBrand);
+router.get("/insta_brand", instaBrand.getInstaBrands);
+router.get("/insta_brand/:id", instaBrand.getInstaBrandById);
+router.put("/insta_brand", instaBrand.editInstaBrand);
+router.delete("/insta_brand/:id", instaBrand.deleteInstaBrand);
 
 /* user */
-router.post("/add_user",user.addUser);
-router.put("/update_user",user.updateUser);
+router.post("/add_user", user.addUser);
+router.put("/update_user", user.updateUser);
 router.get("/get_wfh_user", user.getWFHUsers);
-router.get("/all_users", user.getAllUsers)
-router.get("/get_single_user/:id", user.getSingleUser)
-router.delete("/delete_user/:id", user.deleteUser)
+router.get("/all_users", user.getAllUsers);
+router.get("/get_single_user/:id", user.getSingleUser);
+router.delete("/delete_user/:id", user.deleteUser);
+
+/* commitement */
+router.post("/commitment", cmtController.addCmt);
+router.put("/commitment", cmtController.editCmt);
+router.get("/commitment", cmtController.getCmt);
+router.get("/commitment/:id", cmtController.getCmtById);
+router.delete("/commitment/:id", cmtController.deleteCmt);
 
 module.exports = router;
