@@ -20,13 +20,14 @@ exports.getCampaigns = async (req, res) => {
 
 exports.addCampaign = async (req, res) => {
   try {
-    const { campaign_name, hash_tag, user_id, agency_id } = req.body;
+    const { campaign_name, hash_tag, user_id, agency_id,brand_id } = req.body;
 
     const campaignObj = new campaginSchema({
       campaign_name,
       hash_tag,
       user_id,
       agency_id,
+      brand_id
     });
     const savedcampaign = await campaignObj.save();
     res.send({ data: savedcampaign, status: 200 });
@@ -65,6 +66,7 @@ exports.editCampaign = async (req, res) => {
       user_id,
       agency_id,
       updated_by,
+      brand_id
     } = req.body;
 
     const editCampaignObj = await campaginSchema.findOneAndUpdate(
@@ -76,6 +78,7 @@ exports.editCampaign = async (req, res) => {
         agency_id,
         updated_by,
         updated_date: Date.now(),
+        brand_id
       },
       { new: true }
     );

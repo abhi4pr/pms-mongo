@@ -35,6 +35,9 @@ const campaignSchema = new mongoose.Schema({
   updated_by: {
     type: Number,
   },
+  brand_id: {
+    type: Number,
+  }
 });
 
 AutoIncrement.initialize(mongoose.connection);
