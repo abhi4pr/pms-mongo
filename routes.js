@@ -265,14 +265,23 @@ router.delete("/billingheader/:id",billingheader.deleteBillingHeader);
 /* Brand Category */
 router.post("/brandCategory",brandCategory.addBrandCategory);
 router.get("/brandCategory",brandCategory.getBrandCategorys);
+router.get("/brandCategory/:id",brandCategory.getBrandCategoryById);
+router.put("/brandCategory",brandCategory.editBrandCategory);
+router.delete("/brandCategory/:id",brandCategory.deleteBrandCategory);
 
 /* Brand Sub Category */
 router.post("/brandSubCategory",brandSubCategory.addBrandSubCategory);
 router.get("/brandSubCategory",brandSubCategory.getBrandSubCategorys);
+router.get("/brandSubCategory/:id",brandSubCategory.getBrandSubCategoryById);
+router.put("/brandSubCategory",brandSubCategory.editBrandSubCategory);
+router.delete("/brandSubCategory/:id",brandSubCategory.deleteBrandSubCategory);
 
 /* Brand Major Category */
 router.post("/brandMajorCategory",brandMajorCategory.addBrandMajorCategory);
 router.get("/brandMajorCategory",brandMajorCategory.getBrandMajorCategorys);
+router.get("/brandMajorCategory/:id",brandMajorCategory.getBrandMajorCategoryById);
+router.put("/brandMajorCategory",brandMajorCategory.editBrandMajorCategory);
+router.delete("/brandMajorCategory/:id",brandMajorCategory.deleteBrandMajorCategory);
 
 
 module.exports = router;
