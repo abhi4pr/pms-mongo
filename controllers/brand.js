@@ -10,6 +10,7 @@ exports.addBrand = async (req, res) => {
       whatsapp,
       user_id,
       major_category,
+      website
     } = req.body;
 
     const brandObj = new brandSchema({
@@ -20,6 +21,7 @@ exports.addBrand = async (req, res) => {
       whatsapp,
       user_id,
       major_category,
+      website
     });
 
     const savedBrand = await brandObj.save();
@@ -64,6 +66,7 @@ exports.getBrands = async (req, res) => {
           category_id: 1,
           sub_category_id: 1,
           igusername: 1,
+          website:1,
           whatsapp: 1,
           major_category: 1,
           user_id: 1,
@@ -129,6 +132,7 @@ exports.getBrandById = async (req, res) => {
           sub_category_id: 1,
           igusername: 1,
           whatsapp: 1,
+          website:1,
           major_category: 1,
           user_id: 1,
           updated_at: 1,
@@ -163,6 +167,7 @@ exports.editBrand = async (req, res) => {
       whatsapp,
       user_id,
       major_category,
+      website
     } = req.body;
 
     const editBrandObj = await brandSchema.findOneAndUpdate(
@@ -176,6 +181,7 @@ exports.editBrand = async (req, res) => {
           whatsapp,
           user_id,
           major_category,
+          website,
           updated_at: Date.now(),
         },
       },

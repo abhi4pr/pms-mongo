@@ -32,6 +32,9 @@ const contentSectionRegSchema = new mongoose.Schema({
   creator_remark: {
     type: String,
   },
+  content_sec_file: {
+    type: String,
+  },
   est_static_vedio: {
     type: Number,
   },

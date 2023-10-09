@@ -18,6 +18,10 @@ const registerCampaignSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  detailing: {
+    type: String,
+    default: "",
+  },
   //   commitment: [String],
   status: {
     type: Number,

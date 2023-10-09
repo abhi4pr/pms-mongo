@@ -28,6 +28,10 @@ const brandSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  website: {
+    type: String,
+    default: "",
+  },
   major_category: {
     type: String,
     default: "",
