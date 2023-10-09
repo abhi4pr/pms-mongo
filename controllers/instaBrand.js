@@ -10,7 +10,7 @@ exports.addInstaBrand = async (req, res) => {
             brandSubCategoryName,
             igUserName,
             whatsApp,
-            userd,
+            userId,
             majorCategory,
             website
         } = req.body;
@@ -23,7 +23,7 @@ exports.addInstaBrand = async (req, res) => {
             brandSubCategoryName,
             igUserName,
             whatsApp,
-            userd,
+            userId,
             majorCategory,
             website
         });
@@ -85,7 +85,7 @@ exports.editInstaBrand = async (req, res) => {
             brandSubCategoryName,
             igUserName,
             whatsApp,
-            userd,
+            userId,
             majorCategory,
             website
         } = req.body;
@@ -101,7 +101,7 @@ exports.editInstaBrand = async (req, res) => {
                     brandSubCategoryName,
                     igUserName,
                     whatsApp,
-                    userd,
+                    userId,
                     majorCategory,
                     website,
                     updated_at: Date.now(),
