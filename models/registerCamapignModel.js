@@ -22,12 +22,7 @@ const registerCampaignSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  cmpAdminDemoLink : {
-    type: String
-  },
-  cmpAdminDemoFile : {
-    type: String
-  },
+
   //   commitment: [String],
   status: {
     type: Number,

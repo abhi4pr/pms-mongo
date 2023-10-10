@@ -47,6 +47,12 @@ const contentSectionRegSchema = new mongoose.Schema({
   assign_to:{
     type: Number,
    },
+   cmpAdminDemoLink : {
+    type: String
+  },
+  cmpAdminDemoFile : {
+    type: String
+  },
 });
 
 AutoIncrement.initialize(mongoose.connection);

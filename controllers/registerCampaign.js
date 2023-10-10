@@ -3,10 +3,10 @@ const constant = require("../common/constant.js");
 const response = require("../common/response");
 exports.addRegisterCampaign = async (req, res) => {
   try {
-    const { brand_id, brnad_dt, commitment, status, stage,detailing,cmpAdminDemoLink } = req.body;
-    const excel_file = req.files.excel_file[0].filename ?? "";
-    const cmpAdminDemoFile = req.files.cmpAdminDemoFile[0].filename ?? "";
- 
+    const { brand_id, brnad_dt, commitment, status, stage, detailing } =
+      req.body;
+    const excel_file = req.file.filename ?? "";
+
     let parsedCommitment = JSON.parse(commitment);
     const Obj = new registerCamapign({
       brand_id,
@@ -14,10 +14,8 @@ exports.addRegisterCampaign = async (req, res) => {
       status,
       excel_path: excel_file,
       commitment: parsedCommitment,
-      cmpAdminDemoFile,
-      cmpAdminDemoLink,
       stage,
-      detailing
+      detailing,
     });
 
     const savedRegisterCampaign = await Obj.save();
@@ -43,7 +41,6 @@ exports.getRegisterCampaigns = async (req, res) => {
       const dataWithFileUrls = campaigns.map((item) => ({
         ...item.toObject(),
         download_excel_file: item.excel_path ? url + item.excel_path : "",
-        downloadCmpAdminDemoFile: item.cmpAdminDemoFile ? url + item.cmpAdminDemoFile : "",
       }));
       return res.status(200).send({ success: true, data: dataWithFileUrls });
     }
@@ -68,7 +65,7 @@ exports.editRegisterCampaign = async (req, res) => {
     if (!editRegisterCampaignObj) {
       return res
         .status(204)
-        .send({ success: false, message: constant.NO_RECORD_FOUND  });
+        .send({ success: false, message: constant.NO_RECORD_FOUND });
     }
 
     return res
@@ -78,7 +75,10 @@ exports.editRegisterCampaign = async (req, res) => {
     console.log(err);
     res
       .status(500)
-      .send({ error: err.message, message: "Error updating RegisterCampaign details" });
+      .send({
+        error: err.message,
+        message: "Error updating RegisterCampaign details",
+      });
   }
 };
 
