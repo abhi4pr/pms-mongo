@@ -1,4 +1,4 @@
-const campaginSchema = require("../models/campaign.js");
+const campaginSchema = require("../models/campaignModel.js");
 
 exports.getCampaigns = async (req, res) => {
   try {

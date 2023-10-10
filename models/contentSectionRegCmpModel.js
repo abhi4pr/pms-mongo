@@ -51,12 +51,12 @@ const contentSectionRegSchema = new mongoose.Schema({
 
 AutoIncrement.initialize(mongoose.connection);
 contentSectionRegSchema.plugin(AutoIncrement.plugin, {
-  model: "content_section_reg_cmp",
+  model: "contentSectionRegCmpModel",
   field: "content_section_id",
   startAt: 1,
   incrementBy: 1,
 });
 module.exports = mongoose.model(
-  "content_section_reg_cmp",
+  "contentSectionRegCmpModel",
   contentSectionRegSchema
 );

@@ -1,5 +1,5 @@
 const response = require("../common/response");
-const brandSchema = require("../models/brand");
+const brandSchema = require("../models/brandModel");
 
 exports.addBrand = async (req, res) => {
   try {
@@ -50,7 +50,7 @@ exports.getBrands = async (req, res) => {
     const brands = await brandSchema.aggregate([
       {
         $lookup: {
-          from: "projectx_category_masts",
+          from: "projectxcategorymodels",
           localField: "category_id",
           foreignField: "category_id",
           as: "data1",
@@ -58,7 +58,7 @@ exports.getBrands = async (req, res) => {
       },
       {
         $lookup: {
-          from: "projectx_subcategory_masts",
+          from: "projectxsubcategorymodels",
           localField: "sub_category_id",
           foreignField: "sub_category_id",
           as: "data2",
@@ -115,7 +115,7 @@ exports.getBrandById = async (req, res) => {
       },
       {
         $lookup: {
-          from: "projectx_category_masts",
+          from: "projectxcategorymodels",
           localField: "category_id",
           foreignField: "category_id",
           as: "data1",
@@ -123,7 +123,7 @@ exports.getBrandById = async (req, res) => {
       },
       {
         $lookup: {
-          from: "projectx_subcategory_masts",
+          from: "projectxsubcategorymodels",
           localField: "sub_category_id",
           foreignField: "sub_category_id",
           as: "data2",

@@ -1,4 +1,4 @@
-const projectxPageCategorySchema = require("../models/projectxPageCategory.js");
+const projectxPageCategorySchema = require("../models/projectxPageCategoryModel.js");
 
 exports.addProjectxPageCategory = async (req, res) => {
   try {

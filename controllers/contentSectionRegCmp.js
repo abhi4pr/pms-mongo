@@ -1,5 +1,5 @@
 const constant = require("../common/constant.js");
-const contentSectionRegSchema = require("../models/contentSectionRegCmp.js");
+const contentSectionRegSchema = require("../models/contentSectionRegCmpModel.js");
 
 exports.addContentSectionReg = async (req, res) => {
   try {
@@ -50,7 +50,7 @@ exports.getContentSectionReg = async (req, res) => {
     const ContentSectionReg = await contentSectionRegSchema.aggregate([
       {
         $lookup: {
-          from: "register_campaigns",
+          from: "registercampaignmodels",
           localField: "register_campaign_id",
           foreignField: "register_campaign_id",
           as: "data",

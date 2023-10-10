@@ -1,4 +1,4 @@
-const projectxCategorySchema = require("../models/projectxCategory.js");
+const projectxCategorySchema = require("../models/projectxCategoryModel.js");
 
 exports.addProjectxCategory = async (req, res) => {
   const { category_name, brand_id } = req.body;

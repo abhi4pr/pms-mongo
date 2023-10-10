@@ -163,11 +163,16 @@ router.delete(
 //Register Campaign
 router.post(
   "/register_campaign",
-  upload.single("excel_file"),
+  upload.fields([
+    { name: 'excel_file', maxCount: 1},
+    { name: 'cmpAdminDemoFile', maxCount: 1},
+   
+]),
   registerCampaign.addRegisterCampaign
 );
 router.get("/register_campaign", registerCampaign.getRegisterCampaigns);
 router.put("/register_campaign", registerCampaign.editRegisterCampaign);
+router.delete("/register_campaign/:id", registerCampaign.deleteRegisterCmp);
 
 //Hash Tag
 router.post("/hash_tag", hashTag.addHashTag);

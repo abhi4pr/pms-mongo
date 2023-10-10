@@ -1,4 +1,4 @@
-const announcementSchema = require("../models/announcement.js");
+const announcementSchema = require("../models/announcementModel.js");
 
 exports.addAnnouncement = async (req, res) => {
   try {

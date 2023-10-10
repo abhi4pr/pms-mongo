@@ -1,50 +1,46 @@
 const { default: mongoose } = require("mongoose");
 const AutoIncrement = require("mongoose-auto-increment");
 
-const campaignSchema = new mongoose.Schema({
-  campaign_id: {
+const objMastSchema = new mongoose.Schema({
+  obj_id: {
     type: Number,
     required: true,
     unique: true,
   },
-  campaign_name: {
-    type: String,
-    required: true,
-  },
-  hash_tag: {
+  obj_name: {
     type: String,
     default: "",
   },
-
-  user_id: {
-    type: Number,
+  soft_name: {
+    type: String,
+    default: "",
   },
-
-  agency_id: {
+  Dept_id: {
     type: Number,
-    required: true,
     default: 0,
   },
-  updated_date: {
+
+  Created_by: {
+    type: Number,
+    default: 0,
+  },
+  Last_updated_by: {
+    type: Number,
+  },
+  Last_updated_date: {
     type: Date,
   },
-  created_date: {
+  Creation_date: {
     type: Date,
     default: Date.now,
   },
-  updated_by: {
-    type: Number,
-  },
-  brand_id: {
-    type: Number,
-  }
 });
 
 AutoIncrement.initialize(mongoose.connection);
-campaignSchema.plugin(AutoIncrement.plugin, {
-  model: "campaign",
-  field: "campaign_id",
+objMastSchema.plugin(AutoIncrement.plugin, {
+  model: "objectModel",
+  field: "obj_id",
   startAt: 1,
   incrementBy: 1,
 });
-module.exports = mongoose.model("campaign", campaignSchema);
+module.exports = mongoose.model("objectModel", objMastSchema);

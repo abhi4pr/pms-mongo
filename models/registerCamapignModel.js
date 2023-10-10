@@ -22,6 +22,12 @@ const registerCampaignSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  cmpAdminDemoLink : {
+    type: String
+  },
+  cmpAdminDemoFile : {
+    type: String
+  },
   //   commitment: [String],
   status: {
     type: Number,
@@ -35,9 +41,9 @@ const registerCampaignSchema = new mongoose.Schema({
 
 AutoIncrement.initialize(mongoose.connection);
 registerCampaignSchema.plugin(AutoIncrement.plugin, {
-  model: "register_campaign",
+  model: "registerCampaignModel",
   field: "register_campaign_id",
   startAt: 1,
   incrementBy: 1,
 });
-module.exports = mongoose.model("register_campaign", registerCampaignSchema);
+module.exports = mongoose.model("registerCampaignModel", registerCampaignSchema);

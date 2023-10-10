@@ -1,5 +1,5 @@
 const response = require("../common/response.js");
-const exeCampaignSchema = require("../models/executionCampaign.js");
+const exeCampaignSchema = require("../models/executionCampaignModel.js");
 
 exports.getExeCampaigns = async (req, res) => {
   try {
