@@ -16,8 +16,11 @@ exports.addContentSectionReg = async (req, res) => {
       status,
       stage,
       assign_to,
+      cmpAdminDemoLink
     } = req.body;
 
+    const content_sec_file = req.files?.content_sec_file?.[0]?.filename ?? "";
+    const cmpAdminDemoFile = req.files?.cmpAdminDemoFile?.[0]?.filename ?? "";
     const ContentSectionRegObj = new contentSectionRegSchema({
       register_campaign_id,
       content_type_id,
@@ -26,7 +29,9 @@ exports.addContentSectionReg = async (req, res) => {
       campaign_dt,
       creator_dt,
       admin_remark,
-      content_sec_file: req.file?.filename ?? "",
+      content_sec_file,
+      cmpAdminDemoFile,
+      cmpAdminDemoLink,
       creator_remark,
       est_static_vedio,
       status,
@@ -75,6 +80,8 @@ exports.getContentSectionReg = async (req, res) => {
           creator_remark: 1,
           content_sec_file: 1,
           est_static_vedio: 1,
+          cmpAdminDemoLink: 1,
+          cmpAdminDemoFile: 1,
           status: 1,
           stage: 1,
           assign_to: 1,
@@ -96,6 +103,7 @@ exports.getContentSectionReg = async (req, res) => {
         ...item,
         download_excel_file: item.excel_path ? url + item.excel_path : "",
         download_content_sec_file: item.content_sec_file ? url + item.content_sec_file : "",
+        downloadCmpAdminDemoFile: item.cmpAdminDemoFile ? url + item.cmpAdminDemoFile : "",
       }));
       res.status(200).send({ data: dataWithFileUrls });
     }
@@ -111,7 +119,8 @@ exports.editContentSectionReg = async (req, res) => {
   try {
     let updateObj = {
       ...req.body,
-      content_sec_file: req.file?.filename,
+      content_sec_file: req.files?.content_sec_file?.[0]?.filename,
+      cmpAdminDemoFile: req.files?.cmpAdminDemoFile?.[0]?.filename,
     };
 
     const editContentSectionRegObj =

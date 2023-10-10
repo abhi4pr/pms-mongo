@@ -163,11 +163,7 @@ router.delete(
 //Register Campaign
 router.post(
   "/register_campaign",
-  upload.fields([
-    { name: 'excel_file', maxCount: 1},
-    { name: 'cmpAdminDemoFile', maxCount: 1},
-   
-]),
+  upload.single("excel_file"),
   registerCampaign.addRegisterCampaign
 );
 router.get("/register_campaign", registerCampaign.getRegisterCampaigns);
@@ -203,13 +199,20 @@ router.delete("/projectxRecord/:id", projectxRecord.deleteProjectxRecord);
 //Register Campaign Content Section
 router.post(
   "/contentSectionReg",
-  upload.single("content_sec_file"),
+  upload.fields([
+    { name: "content_sec_file", maxCount: 1 },
+    { name: "cmpAdminDemoFile", maxCount: 1 },
+  ]),
+
   contentSectionReg.addContentSectionReg
 );
 router.get("/contentSectionReg", contentSectionReg.getContentSectionReg);
 router.put(
   "/contentSectionReg",
-  upload.single("content_sec_file"),
+  upload.fields([
+    { name: "content_sec_file", maxCount: 1 },
+    { name: "cmpAdminDemoFile", maxCount: 1 },
+  ]),
   contentSectionReg.editContentSectionReg
 );
 
