@@ -136,6 +136,5 @@ let registerCmp = {
   ...getAllRegisterCmp,
   ...editRegisterCampaign,
 };
-console.log(getAllRegisterCmp)
-console.log(registerCmp)
+
 module.exports = registerCmp;

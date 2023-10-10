@@ -2,6 +2,8 @@ const userModel = require('../models/userModel.js');
 const multer = require("multer");
 const jwt = require("jsonwebtoken");
 const userAuthModel = require('../models/userAuthModel.js');
+const path = require("path");
+const jobResponsibilityModel = require('../models/jobResponsibilityModel.js');
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "image", maxCount: 1 },
@@ -1022,9 +1024,205 @@ exports.getSingleUserAuthDetail = async (req, res) => {
 }
 
 exports.userObjectAuth = async (req, res) =>{
-   try {
-    
-   } catch (error) {
-    
-   }
+    try{
+        const delv = await userAuthModel.aggregate([
+            {
+                $match:{
+                    Juser_id: req.body.Juser_id,
+                    user_id: req.body.user_id
+                }
+            },
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'Juser_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $lookup: {
+                    from: 'objectmodels',
+                    localField: 'obj_id',
+                    foreignField: 'obj_id',
+                    as: 'object'
+                }
+            },
+            {
+                $unwind: '$object'
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: '$department'
+            },
+            {
+                $project: {
+                    user_name: '$user.user_name',
+                    department_name: '$department.dept_name',
+                    obj_name: "$object.obj_name",
+                    id: "$_id",
+                    Juser_id: '$Juser_id',
+                    obj_id: '$obj_id',
+                    insert: '$insert',
+                    view: '$view',
+                    update: '$update',
+                    delete_flag: '$delete_flag',
+                }
+            }
+        ]).exec();
+        if(!delv){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(delv)
+    } catch(err){
+        res.status(500).send({error:err, sms:'error getting user object auth details'})
+    }
 };
+
+exports.sendUserMail = async (req, res) => {
+    try {
+        const { email, subject, name, password, login_id, status, text } = req.body;
+        const attachment = req.file;
+        if (status == "onboarded") {
+          const templatePath = path.join(__dirname, "template.ejs");
+          const template = await fs.promises.readFile(templatePath, "utf-8");
+    
+          const html = ejs.render(template, {
+            email,
+            password,
+            name,
+            login_id,
+            text,
+          });
+    
+          let mailTransporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: "vijayanttrivedi1500@gmail.com", 
+              pass: "odovpikkjvkprrjv",
+            },
+          });
+    
+          let mailOptions = {
+            from: "vijayanttrivedi1500@gmail.com",
+            to: email,
+            subject: subject,
+            html: html,
+            attachments: attachment
+              ? [
+                {
+                  filename: attachment.originalname,
+                  path: attachment.path,
+                },
+              ]
+              : [],
+          };
+    
+          await mailTransporter.sendMail(mailOptions);
+          res.sendStatus(200);
+        } else {
+          const templatePath = path.join(__dirname, "template.ejs");
+          const template = await fs.promises.readFile(templatePath, "utf-8");
+          const html = ejs.render(template, {
+            email,
+            password,
+            name,
+            login_id,
+            text,
+          });
+    
+          let mailTransporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: "vijayanttrivedi1500@gmail.com", 
+              pass: "odovpikkjvkprrjv", 
+            },
+          });
+    
+          let mailOptions = {
+            from: "vijayanttrivedi1500@gmail.com",
+            to: email,
+            subject: subject,
+            html: html,
+            attachments: attachment
+              ? [
+                {
+                  filename: attachment.originalname,
+                  path: attachment.path,
+                },
+              ]
+              : [],
+          };
+    
+          await mailTransporter.sendMail(mailOptions);
+          res.sendStatus(200);
+        }
+    } catch (error) {
+        res.sendStatus(500);
+    }
+}
+
+exports.getUserByDeptAndWFH = async (req, res) => {
+    try{
+        const delv = await userModel.find({dept_id:req.params.dept_id,job_type:'wfh'})
+        if(!delv){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(delv)
+    } catch(err){
+        res.status(500).send({error:err, sms:'error getting all whf user with dept id'})
+    }
+}
+
+exports.getUserJobResponsibility = async (req, res) => {
+    try{
+        const delv = await jobResponsibilityModel.aggregate([
+            {
+                $match:{
+                    user_id: req.body.user_id
+                }
+            },
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $project: {
+                    user_name: '$user.user_name',
+                    department_name: '$department.dept_name',
+                    obj_name: "$object.obj_name",
+                    id: "$_id",
+                    Juser_id: '$Juser_id',
+                    obj_id: '$obj_id',
+                    insert: '$insert',
+                    view: '$view',
+                    update: '$update',
+                    delete_flag: '$delete_flag',
+                }
+            }
+        ]).exec();
+        if(!delv){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(delv)
+    } catch(err){
+        res.status(500).send({error:err, sms:'error getting user job responsibility'})
+    }
+}

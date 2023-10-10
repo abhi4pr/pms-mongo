@@ -350,6 +350,8 @@ router.get("/delivery_user", user.deliveryUser)
 router.get("/delivery_boy_by_room/:id", user.deliveryBoyByRoom)
 router.get("/get_single_user_auth_detail/:id", user.getSingleUserAuthDetail)
 router.get("/user_object_auth", user.userObjectAuth)
+router.post("/send_user_mail", upload.single("attachment"), user.sendUserMail)
+router.post("/get_user_job_responsibility", user.getUserJobResponsibility)
 
 /* commitement */
 router.post("/commitment", cmtController.addCmt);

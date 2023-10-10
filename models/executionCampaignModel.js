@@ -14,7 +14,10 @@ const exeCampaignSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-
+  exeRemark: {
+    type: String,
+    default: "",
+  },
   exeUserId: {
     type: Number,
   },
