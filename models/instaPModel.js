@@ -128,6 +128,14 @@ const instaPModel = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    hashTag: {
+        type: String,
+        required: false
+    },
+    mentions: {
+        type: String,
+        required: false
+    }
 });
 
 // AutoIncrement.initialize(mongoose.connection);

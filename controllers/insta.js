@@ -170,6 +170,14 @@ exports.editInsta = async (req, res) => {
                 auditor_decision: req.body.auditor_decision,
                 interpretor_decision: req.body.interpretor_decision,
                 selector_decision: req.body.selector_decision,
+                todayComment: req.body.todayComment,
+                todayLike: req.body.todayLike,
+                todayView: req.body.todayView,
+                pastComment: req.body.pastComment,
+                pastLike: req.body.pastLike,
+                pastView: req.body.pastView,
+                hashTag: req.body.hashTag,
+                mentions: req.body.mentions
             },
             { new: true }
         );

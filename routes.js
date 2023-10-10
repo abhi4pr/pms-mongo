@@ -332,6 +332,16 @@ router.get("/get_wfh_user", user.getWFHUsers);
 router.get("/all_users", user.getAllUsers);
 router.get("/get_single_user/:id", user.getSingleUser);
 router.delete("/delete_user/:id", user.deleteUser);
+router.post("/add_user_auth", user.addUserAuth);
+router.put("/update_user_auth", user.updateUserAuth);
+router.delete("/delete_user_auth", user.deleteUserAuth);
+router.get("/get_all_user_auth", user.allUserAuthDetail);
+router.post("/login_user", user.loginUser);
+router.get("/delivery_boy", user.deliveryBoy)
+router.get("/delivery_user", user.deliveryUser)
+router.get("/delivery_boy_by_room/:id", user.deliveryBoyByRoom)
+router.get("/get_single_user_auth_detail/:id", user.getSingleUserAuthDetail)
+router.get("/user_object_auth", user.userObjectAuth)
 
 /* commitement */
 router.post("/commitment", cmtController.addCmt);
