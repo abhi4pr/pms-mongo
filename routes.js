@@ -28,6 +28,7 @@ const contentM = require("./controllers/contentManagement.js");
 const billingheader = require("./controllers/billingheader.js");
 const brandCategory = require("./controllers/brandCategory.js");
 const brandSubCategory = require("./controllers/brandSubCategory.js");
+const productController = require("./controllers/product.js");
 const brandMajorCategory = require("./controllers/brandMajorCategory.js");
 const cmtController = require("./controllers/commitmentMast.js");
 const exeCampaign = require("./controllers/exeCampaign.js");
@@ -359,5 +360,9 @@ router.put("/commitment", cmtController.editCmt);
 router.get("/commitment", cmtController.getCmt);
 router.get("/commitment/:id", cmtController.getCmtById);
 router.delete("/commitment/:id", cmtController.deleteCmt);
+
+/* commitement */
+router.post("/product",upload.single("Product_image"), productController.addProduct);
+router.put("/productupdate",upload.single("Product_image"), productController.editProduct);
 
 module.exports = router;
