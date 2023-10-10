@@ -1,4 +1,4 @@
-const contentTypeSchema = require("../models/contentType.js");
+const contentTypeSchema = require("../models/contentTypeModel.js");
 
 exports.addContentType = async (req, res) => {
   try {

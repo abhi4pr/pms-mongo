@@ -34,11 +34,11 @@ const contentTypeSchema = new mongoose.Schema({
 
 AutoIncrement.initialize(mongoose.connection);
 contentTypeSchema.plugin(AutoIncrement.plugin, {
-  model: "content_type",
+  model: "contentTypeModel",
   field: "content_type_id",
   startAt: 1,
   incrementBy: 1,
 });
-module.exports = mongoose.model("content_type", contentTypeSchema);
+module.exports = mongoose.model("contentTypeModel", contentTypeSchema);
 
 

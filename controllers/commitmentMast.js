@@ -1,5 +1,5 @@
 const response = require("../common/response");
-const cmtSchema = require("../models/commitmentMast");
+const cmtSchema = require("../models/commitmentModel");
 
 exports.addCmt = async (req, res) => {
   try {

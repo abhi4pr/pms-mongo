@@ -1,4 +1,4 @@
-const projectxSchema = require("../models/projectx.js");
+const projectxSchema = require("../models/projectxModel.js");
 
 exports.addProjectx = async (req, res) => {
   const {

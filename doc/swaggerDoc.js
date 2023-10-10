@@ -1,5 +1,6 @@
 const tag = require("./components/tag");
 const BrandRouteDoc = require("./components/brandDoc");
+const registerCmp = require("./components/registerCampaignDoc");
 
 const swaggerDocumantion = {
     openapi: "3.0.0",
@@ -24,6 +25,8 @@ const swaggerDocumantion = {
     tags: [...tag],              // Create tags for seprate api's folder wise
     paths: {                      // Create api's with the help of paths
       ...BrandRouteDoc,
+      ...registerCmp
+    
      
     },
     // components: {                 //Create reusable components
@@ -54,4 +57,6 @@ const swaggerDocumantion = {
     //   },
     // },
   };
+  // console.log(registerCmp)
+ 
   module.exports = swaggerDocumantion;

@@ -17,12 +17,12 @@ const commitmentSchema = new mongoose.Schema({
 
 AutoIncrement.initialize(mongoose.connection);
 commitmentSchema.plugin(AutoIncrement.plugin, {
-  model: "commitmentMast",
+  model: "commitmentModel",
   field: "cmtId",
   startAt: 1,
   incrementBy: 1,
 });
 module.exports = mongoose.model(
-  "commitmentMast",
+  "commitmentModel",
   commitmentSchema
 );

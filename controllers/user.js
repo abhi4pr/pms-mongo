@@ -1020,3 +1020,11 @@ exports.getSingleUserAuthDetail = async (req, res) => {
         res.status(500).send({error:err, sms:'error getting user auth details'})
     }
 }
+
+exports.userObjectAuth = async (req, res) =>{
+   try {
+    
+   } catch (error) {
+    
+   }
+};

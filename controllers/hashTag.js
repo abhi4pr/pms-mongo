@@ -1,4 +1,4 @@
-const hashTagSchema = require("../models/hashTag");
+const hashTagSchema = require("../models/hashTagModel");
 
 exports.addHashTag = async (req, res) => {
   try {

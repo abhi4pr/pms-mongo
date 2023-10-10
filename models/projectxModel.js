@@ -55,9 +55,9 @@ const projectxSchema = new mongoose.Schema({
 
 AutoIncrement.initialize(mongoose.connection);
 projectxSchema.plugin(AutoIncrement.plugin, {
-  model: "projectx_new",
+  model: "projectxModel",
   field: "id",
   startAt: 1,
   incrementBy: 1,
 });
-module.exports = mongoose.model("projectx_new", projectxSchema);
+module.exports = mongoose.model("projectxModel", projectxSchema);

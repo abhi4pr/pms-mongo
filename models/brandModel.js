@@ -1,46 +1,47 @@
 const { default: mongoose } = require("mongoose");
 const AutoIncrement = require("mongoose-auto-increment");
 
-const announcementSchema = new mongoose.Schema({
-  id: {
+const brandSchema = new mongoose.Schema({
+  brand_id: {
     type: Number,
     required: true,
     unique: true,
   },
-  dept_id: {
-    type: Number,
+  brand_name: {
+    type: String,
+    lowercase: true,
+    trim: true,
   },
-  desi_id: {
+  category_id: {
     type: Number,
+    required: true,
+    default: 0,
   },
-  heading: {
+  sub_category_id: {
+    type: Number,
+    required: true,
+  },
+  igusername: {
     type: String,
     default: "",
   },
-  sub_heading: {
+  whatsapp: {
     type: String,
     default: "",
   },
-  content: {
+  website: {
     type: String,
     default: "",
   },
-  remark: {
+  major_category: {
     type: String,
     default: "",
   },
-
-  onboard_status: {
+  user_id: {
     type: Number,
   },
-  last_updated_by: {
-    type: Number,
-  },
-  last_updated_at: {
+  updated_at: {
     type: Date,
-  },
-  created_by: {
-    type: Number,
   },
   created_at: {
     type: Date,
@@ -49,10 +50,10 @@ const announcementSchema = new mongoose.Schema({
 });
 
 AutoIncrement.initialize(mongoose.connection);
-announcementSchema.plugin(AutoIncrement.plugin, {
-  model: "announcement_mast",
-  field: "id",
+brandSchema.plugin(AutoIncrement.plugin, {
+  model: "brandModel",
+  field: "brand_id",
   startAt: 1,
   incrementBy: 1,
 });
-module.exports = mongoose.model("announcement_mast", announcementSchema);
+module.exports = mongoose.model("brandModel", brandSchema);

@@ -25,9 +25,9 @@ const hashTagSchema = new mongoose.Schema({
 
 AutoIncrement.initialize(mongoose.connection);
 hashTagSchema.plugin(AutoIncrement.plugin, {
-  model: "hash_tag_mast",
+  model: "hashTagModel",
   field: "hash_tag_id",
   startAt: 1,
   incrementBy: 1,
 });
-module.exports = mongoose.model("hash_tag_mast", hashTagSchema);
+module.exports = mongoose.model("hashTagModel", hashTagSchema);

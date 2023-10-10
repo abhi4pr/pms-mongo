@@ -15,12 +15,12 @@ const projectxPageSchema = new mongoose.Schema({
 
 AutoIncrement.initialize(mongoose.connection);
 projectxPageSchema.plugin(AutoIncrement.plugin, {
-  model: "projectx_page_category_mast",
+  model: "projectxPageCategoryModel",
   field: "category_id",
   startAt: 1,
   incrementBy: 1,
 });
 module.exports = mongoose.model(
-  "projectx_page_category_mast",
+  "projectxPageCategoryModel",
   projectxPageSchema
 );

@@ -1,30 +1,32 @@
 const { default: mongoose } = require("mongoose");
 const AutoIncrement = require("mongoose-auto-increment");
 
-const projectxSubCategorySchema = new mongoose.Schema({
+const projectxCategorySchema = new mongoose.Schema({
   category_id: {
-    type: Number,
-    required: true,
-  },
-  sub_category_id: {
     type: Number,
     required: true,
     unique: true,
   },
-  sub_category_name: {
+  brand_id: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  category_name: {
     type: String,
     required: true,
+    default: "",
   },
 });
 
 AutoIncrement.initialize(mongoose.connection);
-projectxSubCategorySchema.plugin(AutoIncrement.plugin, {
-  model: "projectx_subcategory_mast",
-  field: "sub_category_id",
+projectxCategorySchema.plugin(AutoIncrement.plugin, {
+  model: "projectxCategoryModel",
+  field: "category_id",
   startAt: 1,
   incrementBy: 1,
 });
 module.exports = mongoose.model(
-  "projectx_subcategory_mast",
-  projectxSubCategorySchema
+  "projectxCategoryModel",
+  projectxCategorySchema
 );

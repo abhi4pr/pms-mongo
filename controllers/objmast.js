@@ -1,4 +1,4 @@
-const objectMastSchema = require("../models/objmast.js");
+const objectMastSchema = require("../models/objModel.js");
 exports.addObjectMast = async (req, res) => {
   try {
     const { obj_name, soft_name, dept_id, created_by } = req.body;

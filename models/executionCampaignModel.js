@@ -1,46 +1,47 @@
 const { default: mongoose } = require("mongoose");
 const AutoIncrement = require("mongoose-auto-increment");
 
-const objMastSchema = new mongoose.Schema({
-  obj_id: {
+const exeCampaignSchema = new mongoose.Schema({
+  exeCmpId: {
     type: Number,
     required: true,
     unique: true,
   },
-  obj_name: {
+  exeCmpName: {
+    type: String,
+  },
+  exeHashTag: {
     type: String,
     default: "",
-  },
-  soft_name: {
-    type: String,
-    default: "",
-  },
-  Dept_id: {
-    type: Number,
-    default: 0,
   },
 
-  Created_by: {
-    type: Number,
-    default: 0,
-  },
-  Last_updated_by: {
+  exeUserId: {
     type: Number,
   },
-  Last_updated_date: {
+
+  agencyId: {
+    type: Number,
+  },
+  updatedAt: {
     type: Date,
   },
-  Creation_date: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },
+  updatedBy: {
+    type: Number,
+  },
+  brandId: {
+    type: Number,
+  }
 });
 
 AutoIncrement.initialize(mongoose.connection);
-objMastSchema.plugin(AutoIncrement.plugin, {
-  model: "object_mast",
-  field: "obj_id",
+exeCampaignSchema.plugin(AutoIncrement.plugin, {
+  model: "exeCampaignModel",
+  field: "exeCmpId",
   startAt: 1,
   incrementBy: 1,
 });
-module.exports = mongoose.model("object_mast", objMastSchema);
+module.exports = mongoose.model("exeCampaignModel", exeCampaignSchema);
