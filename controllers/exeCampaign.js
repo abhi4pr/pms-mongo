@@ -23,6 +23,18 @@ exports.getExeCampaigns = async (req, res) => {
 
 exports.addExeCampaign = async (req, res) => {
   try {
+    let check = await exeCampaignSchema.findOne({
+      exeCmpName: req.body?.exeCmpName.toLowerCase().trim(),
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Execution camapaign name must be unique",
+        {}
+      );
+    }
     const exeCampaignObj = new exeCampaignSchema({
       ...req.body,
     });
@@ -62,6 +74,19 @@ exports.getExeCampaignById = async (req, res) => {
 
 exports.editExeCampaign = async (req, res) => {
   try {
+    let check = await exeCampaignSchema.findOne({
+      exeCmpName:  req.body?.exeCmpName.toLowerCase().trim(),
+      exeCmpName: { $ne: req.body?.exeCmpName },
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Execution camapaign name must be unique",
+        {}
+      );
+    }
     const editExeCampaignObj = await exeCampaignSchema.findOneAndUpdate(
       { exeCmpId: parseInt(req.body.exeCmpId) }, // Filter condition
       {

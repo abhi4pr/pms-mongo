@@ -4,6 +4,11 @@ const jwt = require("jsonwebtoken");
 const userAuthModel = require('../models/userAuthModel.js');
 const path = require("path");
 const jobResponsibilityModel = require('../models/jobResponsibilityModel.js');
+const userOtherFieldModel = require('../models/userOtherFieldModel.js');
+const reasonModel = require('../models/reasonModel.js');
+const separationModel = require('../models/separationModel.js');
+const attendanceModel = require('../models/attendanceModel.js');
+const objModel = require('../models/objModel.js');
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "image", maxCount: 1 },
@@ -123,6 +128,75 @@ exports.addUser = [upload, async (req, res) =>{
             joining_extend_document: req.file ? req.files.joining_extend_document[0].filename : ''
         })
         const simv = await simc.save();
+
+        const joining = joining_date;
+        const convertDate = new Date(joining);
+        const extractDate = convertDate.getDate();
+        const joiningMonth = new Intl.DateTimeFormat('en-US',{ month : 'long' }).format(convertDate);
+        const joiningYear = String(convertDate.getUTCFullYear());
+        const work_days = 30 - extractDate;
+        const bonus = 0;
+        const presentDays = work_days - 0;
+        const perdaysal = salary / 30;
+        const totalSalary = perdaysal * presentDays;
+        const netSalary = totalSalary + bonus;
+        const tdsDeduction = netSalary * (tds_per) / 100;
+        const ToPay = netSalary - tdsDeduction;
+
+        const lastInserted = new attendanceModel({
+            dept: req.body.dept_id,
+            user_id: simv.user_id,
+            user_name: req.body.user_name,
+            noOfabsent: 0,
+            month: joiningMonth,
+            year: joiningYear,
+            bonus: 0,
+            total_salary: req.body.salary,
+            tds_deduction: tdsDeduction,
+            net_salary: netSalary,
+            toPay: ToPay,
+            remark: "",
+            created_by: 99
+        })
+        await lastInserted.save();
+
+        const objectData = objModel.find();
+        const objects = objectData[0];     
+
+        for (const object of objects) {
+            const objectId = object.obj_id;
+            let insertValue = 0;
+            let viewValue = 0;
+            let updateValue = 0;
+            let deleteValue = 0;
+    
+            if (roleId === 1) {
+            insertValue = 1;
+            viewValue = 1;
+            updateValue = 1;
+            deleteValue = 1;
+            }
+    
+            const userAuthDocument = {
+            Juser_id: userId,
+            obj_id: objectId,
+            insert_value: insertValue,
+            view_value: viewValue,
+            update_value: updateValue,
+            delete_flag_value: deleteValue,
+            creation_date: new Date(),
+            created_by: created_by || 0,
+            last_updated_by: created_by || 0,
+            last_updated_date: new Date(),
+        };
+  
+        await userAuthModel.updateOne(
+          { Juser_id: userId, obj_id: objectId },
+          { $set: userAuthDocument },
+          { upsert: true }
+        );
+      }
+
         res.send({simv,status:200});
     } catch(err){
         res.status(500).send({error:err,sms:'This user cannot be created'})
@@ -238,7 +312,7 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-exports.getWFHUsers = async (req, res) => {
+exports.getWFHUsersByDept = async (req, res) => {
     try{
         const simc = await userModel.find({dept_id:req.body.dept_id,job_type:'WFH'});
         if(!simc){
@@ -1226,3 +1300,346 @@ exports.getUserJobResponsibility = async (req, res) => {
         res.status(500).send({error:err, sms:'error getting user job responsibility'})
     }
 }
+
+exports.getUserByDeptId = async (req, res) => {
+    try{
+        const delv = await userModel.find({dept_id:req.params.id})
+        if(!delv){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(delv)
+    } catch(err){
+        res.status(500).send({error:err, sms:'error getting all users by dept id'})
+    }
+}
+
+exports.getUserOtherFields = async (req, res) => {
+    try{
+        const delv = await userOtherFieldModel.aggregate([
+            {
+                $match:{
+                    user_id: req.params.user_id
+                }
+            },
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $project: {
+                    user_name: '$user.user_name',
+                    created_by_name: '$user.user_name',
+                    id: "$_id",
+                    user_id: '$user_id',
+                    field_name: '$field_name',
+                    field_value: '$field_value',
+                    remark: '$remark',
+                    created_at: '$created_at',
+                    created_by: '$created_by',
+                    lastupdated_by: '$lastupdated_by'
+                }
+            }
+        ]).exec();
+        if(!delv){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(delv)
+    } catch(err){
+        res.status(500).send({error:err, sms:'error getting user other fields'})
+    }
+}
+
+exports.addUserOtherField = async (req, res) => {
+    try{
+        const simc = new userOtherFieldModel({
+            user_id: req.body.user_id,
+            field_name: req.body.field_name,
+            field_value: req.file,
+            remark: req.body.remark,
+            created_by: req.body.created_at
+        })
+        const simv = await simc.save();
+        res.send({simv,status:200});
+    } catch(err){
+        res.status(500).send({error:err,sms:'This users other fields cannot be created'})
+    }
+}
+
+exports.updateUserOtherField = async (req, res) => {
+    try{
+        const editsim = await userOtherFieldModel.findOneAndUpdate({user_id:req.params.user_id},{
+            field_name: req.body.field_name,
+            field_value: req.file,
+            remark: req.body.remark
+        }, { new: true })
+        if(!editsim){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send({success:true,data:editsim})
+    } catch(err){
+        res.status(500).send({error:err,sms:'Error updating user other fields'})
+    }
+};
+
+exports.addReason = async (req, res) => {
+    try{
+        const simc = new reasonModel({
+            remark: req.body.remark,
+            reason: req.body.reason
+        })
+        const simv = await simc.save();
+        res.send({simv,status:200});
+    } catch(err){
+        res.status(500).send({error:err,sms:'This reason cannot be created'})
+    }
+}
+
+exports.getAllReasons = async (req, res) => {
+    try{
+        const delv = await reasonModel.aggregate([
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'created_by',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $project: {
+                    createdBY_name: '$user.user_name',
+                    id: "$_id",
+                    reason: '$reason',
+                    remark: '$remark',
+                    created_by: '$created_by'
+                }
+            }
+        ]).exec();
+        if(!delv){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(delv)
+    } catch(err){
+        res.status(500).send({error:err, sms:'error getting all reasons'})
+    }
+}
+
+exports.addSeparation = async (req, res) => {
+    try{
+        const simc = new separationModel({
+            user_id: req.body.user_id,
+            status: req.body.status,
+            created_by: req.body.created_by,
+            resignation_date: req.body.resignation_date,
+            last_working_day: req.body.last_working_day,
+            remark: req.body.remark,
+            reason: req.body.reason,
+            reinstate_date: req.body.reinstate_date
+        })
+        const simv = await simc.save();
+        res.send({simv,status:200});
+    } catch(err){
+        res.status(500).send({error:err,sms:'This separation cannot be created'})
+    }
+}
+
+exports.getAllSeparations = async (req, res) => {
+    try{
+        const delv = await separationModel.aggregate([
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $lookup: {
+                    from: 'reasonmodels',
+                    localField: 'id',
+                    foreignField: 'reason',
+                    as: 'reason'
+                }
+            },
+            {
+                $unwind: '$reason'
+            },
+            {
+                $project: {
+                    createdBY_name: '$user.user_name',
+                    reasonValue: '$reason.reason',
+                    id: "$_id",
+                    reason: '$reason',
+                    remark: '$remark',
+                    status: '$status',
+                    user_id: '$user_id',
+                    resignation_date: '$resignation_date',
+                    last_working_date: '$last_working_date',
+                    reinstate_date: '$reinstate_date'
+                }
+            }
+        ]).exec();
+        if(!delv){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(delv)
+    } catch(err){
+        res.status(500).send({error:err, sms:'error getting all separations'})
+    }
+}
+
+exports.getSingleSeparation = async (req, res) => {
+    try{
+        const delv = await separationModel.aggregate([
+            {
+                $match:{
+                    user_id: req.params.user_id
+                }
+            }, 
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $lookup: {
+                    from: 'reasonmodels',
+                    localField: 'id',
+                    foreignField: 'reason',
+                    as: 'reason'
+                }
+            },
+            {
+                $unwind: '$reason'
+            },
+            {
+                $project: {
+                    createdBY_name: '$user.user_name',
+                    reasonValue: '$reason.reason',
+                    id: "$_id",
+                    reason: '$reason',
+                    remark: '$remark',
+                    status: '$status',
+                    user_id: '$user_id',
+                    resignation_date: '$resignation_date',
+                    last_working_date: '$last_working_date',
+                    reinstate_date: '$reinstate_date'
+                }
+            }
+        ]).exec();
+        if(!delv){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(delv)
+    } catch(err){
+        res.status(500).send({error:err, sms:'error getting single separation details'})
+    }
+}
+
+exports.updateSeparation = async (req, res) => {
+    try{
+        const editsim = await separationModel.findOneAndUpdate({id:req.body.id},{
+            user_id: req.body.user_id,
+            status: req.body.status,
+            resignation_date: req.body.resignation_date,
+            last_working_day: req.body.last_working_day,
+            remark: req.body.remark,
+            reason: req.body.reason,
+            reinstate_date: req.body.reinstate_date
+        }, { new: true })
+        if(!editsim){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send({success:true,data:editsim})
+    } catch(err){
+        res.status(500).send({error:err,sms:'Error updating user separation'})
+    }
+};
+
+exports.sendMailAllWfoUser = async (req, res) => {
+    try{
+        const { subject, text } = req.body;
+        const attachment = req.file;
+
+        const templatePath = path.join(__dirname, "template2.ejs");
+        const template = await fs.promises.readFile(templatePath, "utf-8");
+
+        const results = await userModel.find({job_type:'WFO'})
+
+        results.forEach((user) => {
+            const userName = user.user_name;
+            const emailId = user.user_email_id;
+
+            const html = ejs.render(template, {
+                emailId,
+                userName,
+                text,
+            });
+
+            let mailTransporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                user: "vijayanttrivedi1500@gmail.com",
+                pass: "odovpikkjvkprrjv",
+                },
+            });
+
+            let mailOptions = {
+                from: "vijayanttrivedi1500@gmail.com",
+                to: emailId,
+                subject: subject,
+                html: html,
+                attachments: attachment
+                ? [
+                    {
+                    filename: attachment.originalname,
+                    path: attachment.path,
+                    },
+                ]
+                : [],
+            };
+
+            mailTransporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                return error;
+                } else {
+                res.send("Email sent successfully to:", emailId);
+                }
+            });
+        })    
+    } catch(err){
+        res.status(500).send({error:err,sms:'Error sending email'})
+    }
+}
+
+exports.getAllWfhUsers = async (req, res) => {
+    try{
+        const simc = await userModel.find({job_type:'WFH'});
+        if(!simc){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(simc)
+    } catch(err){
+        res.status(500).send({error:err,sms:'Error getting all wfh users'})
+    }
+};
