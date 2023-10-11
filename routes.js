@@ -18,7 +18,7 @@ const contentType = require("./controllers/contentType.js");
 const projectx = require("./controllers/projectx.js");
 const announcement = require("./controllers/announcement.js");
 const objectMast = require("./controllers/objmast.js");
-const { upload } = require("./common/uploadFile.js");
+const { upload, upload1 } = require("./common/uploadFile.js");
 const designation = require("./controllers/designation.js");
 const finance = require("./controllers/finance.js");
 const sitting = require("./controllers/sitting.js");
@@ -374,8 +374,17 @@ router.get("/commitment", cmtController.getCmt);
 router.get("/commitment/:id", cmtController.getCmtById);
 router.delete("/commitment/:id", cmtController.deleteCmt);
 
-/* commitement */
-router.post("/product",upload.single("Product_image"), productController.addProduct);
-router.put("/productupdate",upload.single("Product_image"), productController.editProduct);
+/* Product */
+
+//Product
+router.post("/product",upload1.single("Product_image"), productController.addProduct);
+router.put("/productupdate",upload1.single("Product_image"), productController.editProduct);
+router.get("/productdata/:id", productController.getProductById);
+router.delete("/productdelete/:id", productController.deleteProductById);
+//Product props
+router.post("/proppost", productController.addProductProps);
+router.get("/propsdata/:product_id", productController.getProductPropsByProductId);
+router.put("/propsdataupdate/:id", productController.editProductProps);
+router.delete("/propdelete/:id", productController.deleteProductProp);
 
 module.exports = router;

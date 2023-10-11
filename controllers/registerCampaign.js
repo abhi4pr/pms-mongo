@@ -3,7 +3,7 @@ const constant = require("../common/constant.js");
 const response = require("../common/response");
 exports.addRegisterCampaign = async (req, res) => {
   try {
-    const { brand_id, brnad_dt, commitment, status, stage, detailing } =
+    const { brand_id, brnad_dt, commitment, status, stage, detailing, exeCmpId } =
       req.body;
     const excel_file = req.file.filename ?? "";
 
@@ -16,6 +16,7 @@ exports.addRegisterCampaign = async (req, res) => {
       commitment: parsedCommitment,
       stage,
       detailing,
+      exeCmpId
     });
 
     const savedRegisterCampaign = await Obj.save();

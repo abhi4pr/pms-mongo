@@ -90,6 +90,7 @@ exports.getContentSectionReg = async (req, res) => {
           excel_path: "$data.excel_path",
           commitment: "$data.commitment",
           detailing: "$data.detailing",
+          exeCmpId: "$data.exeCmpId",
         },
       },
     ]);

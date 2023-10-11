@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cors());
 app.use('/uploads', express.static(__dirname + '/uploads'));
+app.use('/uploads/productImage', express.static(__dirname + '/uploads/productImage'));
 app.use('/api', routes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocumantion));
 
