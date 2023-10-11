@@ -27,7 +27,7 @@ app.post("/chat", async (req, res) => {
   const completion = await openai.completions.create({
     model: "text-davinci-003",
     prompt: prompt,
-    max_tokens: 30,
+    max_tokens: 4000,
   });
   res.status(200).send(completion.choices[0].text);
 });

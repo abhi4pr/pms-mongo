@@ -337,7 +337,7 @@ router.delete("/insta_brand/:id", instaBrand.deleteInstaBrand);
 /* user */
 router.post("/add_user", user.addUser);
 router.put("/update_user", user.updateUser);
-router.get("/get_wfh_user", user.getWFHUsers);
+router.get("/get_wfh_user", user.getWFHUsersByDept);
 router.get("/all_users", user.getAllUsers);
 router.get("/get_single_user/:id", user.getSingleUser);
 router.delete("/delete_user/:id", user.deleteUser);
@@ -353,6 +353,18 @@ router.get("/get_single_user_auth_detail/:id", user.getSingleUserAuthDetail)
 router.get("/user_object_auth", user.userObjectAuth)
 router.post("/send_user_mail", upload.single("attachment"), user.sendUserMail)
 router.post("/get_user_job_responsibility", user.getUserJobResponsibility)
+router.get("/get_user_by_deptid/:id", user.getUserByDeptId)
+router.get("/get_user_other_fields/:id", user.getUserOtherFields)
+router.post("/add_user_other_field", upload.single("field_value"), user.addUserOtherField)
+router.put("/update_user_other_fields/:id", upload.single("field_value"), user.getUserOtherFields)
+router.post("/add_reason", user.addReason);
+router.get("/get_all_reasons", user.getAllReasons)
+router.post("/add_separation", user.addSeparation);
+router.get("/get_all_separations", user.getAllSeparations)
+router.get("/get_single_separation/:id", user.getSingleSeparation);
+router.put("/update_separation", user.updateSeparation);
+router.post("/send_mail_all_wfo_user", upload.single("attachment"), user.sendMailAllWfoUser)
+router.get("/get_all_wfh_users", user.getAllWfhUsers)
 
 /* commitement */
 router.post("/commitment", cmtController.addCmt);
