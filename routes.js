@@ -18,7 +18,7 @@ const contentType = require("./controllers/contentType.js");
 const projectx = require("./controllers/projectx.js");
 const announcement = require("./controllers/announcement.js");
 const objectMast = require("./controllers/objmast.js");
-const { upload } = require("./common/uploadFile.js");
+const { upload, upload1 } = require("./common/uploadFile.js");
 const designation = require("./controllers/designation.js");
 const finance = require("./controllers/finance.js");
 const sitting = require("./controllers/sitting.js");
@@ -28,6 +28,7 @@ const contentM = require("./controllers/contentManagement.js");
 const billingheader = require("./controllers/billingheader.js");
 const brandCategory = require("./controllers/brandCategory.js");
 const brandSubCategory = require("./controllers/brandSubCategory.js");
+const productController = require("./controllers/product.js");
 const brandMajorCategory = require("./controllers/brandMajorCategory.js");
 const cmtController = require("./controllers/commitmentMast.js");
 const exeCampaign = require("./controllers/exeCampaign.js");
@@ -372,5 +373,18 @@ router.put("/commitment", cmtController.editCmt);
 router.get("/commitment", cmtController.getCmt);
 router.get("/commitment/:id", cmtController.getCmtById);
 router.delete("/commitment/:id", cmtController.deleteCmt);
+
+/* Product */
+
+//Product
+router.post("/product",upload1.single("Product_image"), productController.addProduct);
+router.put("/productupdate",upload1.single("Product_image"), productController.editProduct);
+router.get("/productdata/:id", productController.getProductById);
+router.delete("/productdelete/:id", productController.deleteProductById);
+//Product props
+router.post("/proppost", productController.addProductProps);
+router.get("/propsdata/:product_id", productController.getProductPropsByProductId);
+router.put("/propsdataupdate/:id", productController.editProductProps);
+router.delete("/propdelete/:id", productController.deleteProductProp);
 
 module.exports = router;

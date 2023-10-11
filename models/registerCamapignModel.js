@@ -27,10 +27,14 @@ const registerCampaignSchema = new mongoose.Schema({
   status: {
     type: Number,
   },
+  exeCmpId: {
+    type: Number,
+    ref: "exeCampaignModel",
+  },
   stage: {
     type: Number,
   },
-  
+
   commitment: [mongoose.Schema.Types.Mixed],
 });
 
@@ -41,4 +45,7 @@ registerCampaignSchema.plugin(AutoIncrement.plugin, {
   startAt: 1,
   incrementBy: 1,
 });
-module.exports = mongoose.model("registerCampaignModel", registerCampaignSchema);
+module.exports = mongoose.model(
+  "registerCampaignModel",
+  registerCampaignSchema
+);
