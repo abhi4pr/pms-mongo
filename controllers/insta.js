@@ -59,6 +59,32 @@ exports.trackCreatorY = async (req, res) => {
     }
 };
 
+exports.trackCreatorPutY = async (req, res) => {
+    try {
+        const trackCreatorParams = {
+            cron_expression: req.body.cron_expression,
+            tracking_expiry_at: req.body.tracking_expiry_at,
+            tracking: true,
+        };
+
+        const response = await axios.put(
+            `https://app.ylytic.com/ylytic/api/v1/rt_tracking/creators/${req.params.pagename}`,
+            trackCreatorParams,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        res.status(response.status).json(response.data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: err, sms: "These creators cron expression cant be edited" });
+    }
+};
+
 exports.getCreators = async (req, res) => {
     try {
         const getcreators = await instaC.find();

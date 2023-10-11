@@ -44,6 +44,7 @@ router.get("/", (req, res) => {
 router.post("/track_creator_post", insta.trackCreator);
 router.get("/instagetcreators", insta.getCreators);
 router.post("/track_creator_posty", insta.trackCreatorY);
+router.put("/track_creator_puty/:pagename", insta.trackCreatorPutY)
 router.post("/track_post_post", insta.trackPost);
 router.get("/instagetposts", insta.getPosts);
 router.post("/track_post_posty", insta.trackPostY);

@@ -29,7 +29,7 @@ app.post("/chat", async (req, res) => {
     prompt: prompt,
     max_tokens: 30,
   });
-  console.log(completion.choices[0].text);
+  res.status(200).send(completion.choices[0].text);
 });
 
 mongoose.connect(vari.MONGODB, {

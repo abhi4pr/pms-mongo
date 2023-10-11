@@ -9,6 +9,8 @@ const exeCampaignSchema = new mongoose.Schema({
   },
   exeCmpName: {
     type: String,
+    lowercase: true,
+    trim: true,
   },
   exeHashTag: {
     type: String,
