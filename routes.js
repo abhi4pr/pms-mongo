@@ -37,6 +37,7 @@ const user = require("./controllers/user.js");
 const attendance = require("./controllers/attendance.js");
 
 const role = require("./controllers/role.js");
+const kra = require("./controllers/kra.js")
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -396,5 +397,10 @@ router.post("/proppost", productController.addProductProps);
 router.get("/propsdata/:product_id", productController.getProductPropsByProductId);
 router.put("/propsdataupdate/:id", productController.editProductProps);
 router.delete("/propdelete/:id", productController.deleteProductProp);
+
+/* KRA Routes */
+router.post("/kra", kra.addKra);
+router.get("/kra/:user_id", kra.getJobResponById);
+router.get("/kra", productController.getKras);
 
 module.exports = router;
