@@ -77,7 +77,7 @@ const editRegisterCampaign = {
             },
           },
         },
-        204: {
+        200: {
           description: "No Record Found",
           content: {
             "application/json": {
@@ -121,8 +121,8 @@ const getAllRegisterCmp = {
             },
           },
         },
-        204: {
-          //A 204 status code is used when the server successfully processes the request, but there is no content to return to the client.
+        200: {
+          //A 200 status code is used when the server successfully processes the request, but there is no content to return to the client.
           description: "No Records Found",
         },
         500: {

@@ -25,6 +25,11 @@ const userModel = new mongoose.Schema({
         required: false,
         default: ""
     },
+    user_name:{
+        type: String,
+        required: true,
+        default: ""
+    },
     user_report_to_id:{
         type: Number,
         required: false,
