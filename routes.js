@@ -441,6 +441,6 @@ router.get("/allorderreqdata", productController.allOrderReqData);
 /* KRA Routes */
 router.post("/kra", kra.addKra);
 router.get("/kra/:user_id", kra.getJobResponById);
-router.get("/kra", productController.getKras);
+router.get("/kra", kra.getKras);
 
 module.exports = router;
