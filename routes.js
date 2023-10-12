@@ -34,6 +34,7 @@ const cmtController = require("./controllers/commitmentMast.js");
 const exeCampaign = require("./controllers/exeCampaign.js");
 const instaBrand = require("./controllers/instaBrand.js");
 const user = require("./controllers/user.js");
+const attendance = require("./controllers/attendance.js");
 
 const role = require("./controllers/role.js");
 
@@ -366,6 +367,15 @@ router.get("/get_single_separation/:id", user.getSingleSeparation);
 router.put("/update_separation", user.updateSeparation);
 router.post("/send_mail_all_wfo_user", upload.single("attachment"), user.sendMailAllWfoUser)
 router.get("/get_all_wfh_users", user.getAllWfhUsers)
+
+/* attendance */
+router.post("/add_attendance", attendance.addAttendance)
+router.post("/get_salary_by_id_month_year", attendance.getSalaryByDeptIdMonthYear);
+router.post("/get_salary_by_filter", attendance.getSalaryByFilter);
+router.post("/get_attendance_by_userid", attendance.getSalaryByUserId)
+router.get("/get_wfh_user_count", attendance.countWfhUsers)
+router.post("/get_salary_count_by_dept_year", attendance.getSalaryCountByDeptYear)
+router.get("/get_salary_count_by_year", attendance.getSalaryCountByYear)
 
 /* commitement */
 router.post("/commitment", cmtController.addCmt);

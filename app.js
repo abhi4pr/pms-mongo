@@ -19,7 +19,7 @@ app.use('/api', routes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocumantion));
 
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: "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",
 });
 
 app.post("/chat", async (req, res) => {
