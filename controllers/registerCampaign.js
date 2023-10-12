@@ -35,7 +35,7 @@ exports.getRegisterCampaigns = async (req, res) => {
 
     if (campaigns.length === 0) {
       res
-        .status(204)
+        .status(200)
         .send({ success: true, data: [], message: constant.NO_RECORD_FOUND });
     } else {
       const url = `${constant.base_url}/uploads/`;
@@ -65,7 +65,7 @@ exports.editRegisterCampaign = async (req, res) => {
 
     if (!editRegisterCampaignObj) {
       return res
-        .status(204)
+        .status(200)
         .send({ success: false, message: constant.NO_RECORD_FOUND });
     }
 
