@@ -37,6 +37,7 @@ const user = require("./controllers/user.js");
 const attendance = require("./controllers/attendance.js");
 
 const role = require("./controllers/role.js");
+const kra = require("./controllers/kra.js")
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -419,6 +420,7 @@ router.get(
 );
 router.put("/propsdataupdate/:id", productController.editProductProps);
 router.delete("/propdelete/:id", productController.deleteProductProp);
+
 // Order Delivery api's
 router.post("/orderdelivery", productController.addOrderDelivery);
 router.get("/allorderdelivery", productController.getAllOrderDeliveries);
@@ -435,5 +437,10 @@ router.get("/deliveredorders/:id", productController.delivereOrdersById);
 router.get("/pendingorders/:id", productController.pendingOrdersById);
 router.post("/userorderrequest", productController.orderRequestsForUser);
 router.get("/allorderreqdata", productController.allOrderReqData);
+
+/* KRA Routes */
+router.post("/kra", kra.addKra);
+router.get("/kra/:user_id", kra.getJobResponById);
+router.get("/kra", productController.getKras);
 
 module.exports = router;
