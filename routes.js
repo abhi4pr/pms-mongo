@@ -35,6 +35,7 @@ const exeCampaign = require("./controllers/exeCampaign.js");
 const instaBrand = require("./controllers/instaBrand.js");
 const user = require("./controllers/user.js");
 const attendance = require("./controllers/attendance.js");
+const instapage = require("./controllers/instaPage.js");
 
 const role = require("./controllers/role.js");
 const kra = require("./controllers/kra.js")
@@ -49,6 +50,7 @@ router.get("/instagetcreators", insta.getCreators);
 router.post("/track_creator_posty", insta.trackCreatorY);
 router.put("/track_creator_puty/:pagename", insta.trackCreatorPutY);
 router.post("/track_post_post", insta.trackPost);
+router.post("/track_status_post", insta.trackStory);
 router.get("/instagetposts", insta.getPosts);
 router.post("/track_post_posty", insta.trackPostY);
 router.post("/track_story_post", insta.trackStory);
@@ -442,5 +444,26 @@ router.get("/allorderreqdata", productController.allOrderReqData);
 router.post("/kra", kra.addKra);
 router.get("/kra/:user_id", kra.getJobResponById);
 router.get("/kra", kra.getKras);
+
+/* instapage routes */
+router.post("/add_instapage", instapage.addIp);
+router.put("/update_instapage", instapage.updateIp);
+router.delete("/delete_instapage/:id", instapage.deleteInstaPage);
+router.post("/add_platform", instapage.addPlatform);
+router.get("/get_all_platforms", instapage.getAllPlatforms);
+router.put("/update_platform", instapage.updatePlatform);
+router.delete("/delete_platform/:id", instapage.deletePlatform);
+router.post("/add_iptype", instapage.addIpType);
+router.get("/get_all_iptypes", instapage.getAllIpTypes);
+router.post("/add_ipstats", instapage.addIpStats);
+router.get("/get_stats", instapage.getStats);
+router.get("/get_insta_count_history/:id", instapage.getInstaCountHistory);
+router.get("/get_last_insta_count/:id", instapage.getLastInstaCount);
+router.post("/add_insta_page_count", instapage.addInstaPageCount);
+router.put("/update_iptype", instapage.updateIpType);
+router.delete("/delete_iptype/:id", instapage.deleteIpType);
+router.get("/get_iptype_byid/:id", instapage.getIpTypeById);
+router.get("/get_platform_byid/:id", instapage.getPlatformById);
+router.get("/get_instapage_byid/:id", instapage.getInstaPageById);
 
 module.exports = router;

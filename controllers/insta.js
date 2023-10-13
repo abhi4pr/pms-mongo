@@ -1,5 +1,6 @@
 const instaC = require("../models/instaCModel.js");
 const instaP = require("../models/instaPModel.js");
+const instaS = require("../models/instaSModel.js");
 // const instaPNew = require('../models/instaPModelNew.js');
 // const instaCNew = require('../models/instaPModelNew.js');
 const jwt = require("jsonwebtoken");
@@ -359,12 +360,20 @@ exports.getPostsFromName = async (req, res) => {
 
 exports.trackStory = async (req, res) => {
     try {
-        console.log("story api", req.body);
-        // const creators = new instaP({
-        //     creatorName : req.body.data.creator.username
-        // })
-        // const instav = await creators.save();
-        // res.send({instav,status:200})
+        // console.log("story api", req.body);
+        const creators = new instaS({
+            mediaCount : req.body.media_count,
+            expiredAt: req.body.expiry_at,
+            savedOn: req.body.taken_at,
+            shortCode: req.body.shortcode,
+            links: req.body.links,
+            hashtags: req.body.hashtags,
+            mentions: req.body.mentions,
+            locations: req.body.locations,
+            music: req.body.music
+        })
+        const instav = await creators.save();
+        res.send({instav,status:200})
     } catch (error) {
         res.status(500).send({ error: error, sms: "error while adding data" });
     }
