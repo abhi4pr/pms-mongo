@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-auto-increment');
+const Schema = mongoose.Schema;
 
 const financeModel = new mongoose.Schema({
     id:{
@@ -28,6 +29,20 @@ const financeModel = new mongoose.Schema({
     screenshot:{
         type: String,
         required: false
+    },
+    attendence_id:{
+        type: Number,
+        required: true
+    },
+    reference_no:{
+        type: Number,
+        required: true
+    },
+    amount:{
+        type: Schema.Types.Decimal128,
+    },
+    pay_date:{
+        type: Date
     }
 });
 

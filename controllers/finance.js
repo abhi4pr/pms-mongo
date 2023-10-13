@@ -6,7 +6,11 @@ exports.addFinance = async (req, res) =>{
             status_: req.body.status_,
             reason: req.body.reason,
             remark: req.body.remark,
-            screenshot: req.file.filename
+            screenshot: req.file.filename,
+            attendence_id: req.body.attendence_id,
+            reference_no: req.body.reference_no,
+            amount: req.body.amount,
+            pay_date: req.body.pay_date
         })
         const simv = await simc.save();
         res.send({simv,status:200});
@@ -33,7 +37,10 @@ exports.editFinance = async (req, res) => {
             status_: req.body.status_,
             reason: req.body.reason,
             remark: req.body.remark,
-            screenshot: req.file.filename
+            screenshot: req.file.filename,
+            reference_no: req.body.reference_no,
+            amount: req.body.amount,
+            pay_date: req.body.pay_date
         }, { new: true })
         if(!editsim){
             res.status(500).send({success:false})
@@ -42,4 +49,17 @@ exports.editFinance = async (req, res) => {
     } catch(err){
         res.status(500).send({error:err,sms:'Error updating finance details'})
     }
+};
+
+
+exports.deleteFinance = async (req, res) =>{
+    financeModel.deleteOne({id:req.params.id}).then(item =>{
+        if(item){
+            return res.status(200).json({success:true, message:'finance deleted'})
+        }else{
+            return res.status(404).json({success:false, message:'finance not found'})
+        }
+    }).catch(err=>{
+        return res.status(400).json({success:false, message:err})
+    })
 };

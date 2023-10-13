@@ -38,7 +38,8 @@ const attendance = require("./controllers/attendance.js");
 const instapage = require("./controllers/instaPage.js");
 
 const role = require("./controllers/role.js");
-const kra = require("./controllers/kra.js")
+const kra = require("./controllers/kra.js");
+const leadremark = require("./controllers/leadRemark.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -233,6 +234,7 @@ router.delete("/content/:id", contentType.deleteContentType);
 router.post("/add_finance", upload.single("screenshot"), finance.addFinance);
 router.get("/get_finances", finance.getFinances);
 router.put("/edit_finance", upload.single("screenshot"), finance.editFinance);
+router.delete("/delete_finance",  finance.deleteFinance);
 
 /* Sitting Routes */
 router.post("/sitting", sitting.addSitting);
@@ -465,5 +467,9 @@ router.delete("/delete_iptype/:id", instapage.deleteIpType);
 router.get("/get_iptype_byid/:id", instapage.getIpTypeById);
 router.get("/get_platform_byid/:id", instapage.getPlatformById);
 router.get("/get_instapage_byid/:id", instapage.getInstaPageById);
+/* Lead Remark Route */
+router.post("/leadremark", leadremark.addLeadRemark);
+router.get("/leadremark", leadremark.getLeadRemarks);
+router.put("/leadremark", leadremark.editLeadRemark);
 
 module.exports = router;
