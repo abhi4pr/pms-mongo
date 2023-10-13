@@ -134,7 +134,7 @@ exports.addUser = [upload, async (req, res) =>{
         const extractDate = convertDate.getDate();
         const joiningMonth = new Intl.DateTimeFormat('en-US',{ month : 'long' }).format(convertDate);
         const joiningYear = String(convertDate.getUTCFullYear());
-        const work_days = 30 - extractDate;
+        const work_days = 31 - extractDate;
         const bonus = 0;
         const presentDays = work_days - 0;
         const perdaysal = salary / 30;
