@@ -35,7 +35,7 @@ const leadTypeSchema = new mongoose.Schema({
 });
 
 AutoIncrement.initialize(mongoose.connection);
-leadSchema.plugin(AutoIncrement.plugin, {
+leadTypeSchema.plugin(AutoIncrement.plugin, {
   model: "leadTypeModel",
   field: "leadtype_id",
   startAt: 1,

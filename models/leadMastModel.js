@@ -83,7 +83,7 @@ const leadMastSchema = new mongoose.Schema({
 });
 
 AutoIncrement.initialize(mongoose.connection);
-leadSchema.plugin(AutoIncrement.plugin, {
+leadMastSchema.plugin(AutoIncrement.plugin, {
   model: "leadMastModel",
   field: "leadmast_id",
   startAt: 1,
