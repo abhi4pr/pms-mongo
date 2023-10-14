@@ -44,14 +44,17 @@ const contentSectionRegSchema = new mongoose.Schema({
   stage: {
     type: Number,
   },
-  assign_to:{
+  assign_to: {
     type: Number,
-   },
-   cmpAdminDemoLink : {
-    type: String
   },
-  cmpAdminDemoFile : {
-    type: String
+  cmpAdminDemoLink: {
+    type: String,
+  },
+  cmpAdminDemoFile: {
+    type: String,
+  },
+  endDate: {
+    type: Date,
   },
 });
 

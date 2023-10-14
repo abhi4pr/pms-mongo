@@ -19,9 +19,8 @@ exports.addProjectxCategory = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err)
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "Error adding projectxcategory to database",
     });
   }
@@ -83,9 +82,8 @@ exports.editProjectxCategory = async (req, res) => {
 
     res.status(200).send({ success: true,data:editProjectxCategoryObj });
   } catch (err) {
-    console.log(err)
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "Error updating the projectxcategory in the database",
     });
   }

@@ -39,9 +39,8 @@ exports.addProjectx = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "Error adding projectx to database",
     });
   }
@@ -101,9 +100,8 @@ exports.editProjectx = async (req, res) => {
 
     res.status(200).send({ success: true, data: editProjectxObj });
   } catch (err) {
-    console.log(err);
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "Error updating the projectx in the database",
     });
   }

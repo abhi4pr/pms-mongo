@@ -13,9 +13,8 @@ exports.addContentType = async (req, res) => {
     const savedContentType = await ContentTypeObj.save();
     res.send({ data: savedContentType, status: 200 });
   } catch (err) {
-    console.log(err);
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "This ContentType cannot be created",
     });
   }
@@ -33,10 +32,9 @@ exports.getContentTypes = async (req, res) => {
       return res.status(200).send({ success: true, data: contentType });
     }
   } catch (err) {
-    console.log(err);
     res
       .status(500)
-      .send({ error: err, message: "Error getting all Content type" });
+      .send({ error: err.message, message: "Error getting all Content type" });
   }
 };
 
@@ -54,10 +52,9 @@ exports.getContentTypeById = async (req, res) => {
       return res.status(200).send({ success: true, data: contentType });
     }
   } catch (err) {
-    console.log(err);
     res
       .status(500)
-      .send({ error: err, message: "Error getting all Content type" });
+      .send({ error: err.message, message: "Error getting all Content type" });
   }
 };
 

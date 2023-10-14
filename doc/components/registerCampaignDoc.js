@@ -40,6 +40,58 @@ const updateRegisterCmpData = {
 
 const editRegisterCampaign = {
   "/api/register_campaign": {
+    post: {
+      tags: [`Register Campaign Module`],
+      description: "Edit a Register Campaign with the specified ID.",
+      consumes: [
+        "multipart/form-data"
+      ],
+      parameters: [
+        {
+          in: "formData",
+          name: "upfile",
+          type: "file",
+          description: "The file to upload."
+        }
+      ],
+      responses: {
+        200: {
+          description: "Register Campaign Created successfully.",
+          content: {
+            "application/json": {
+              example: {
+                success: true,
+                data: {
+                  // Define the structure of the response data here
+                },
+              },
+            },
+          },
+        },
+        200: {
+          description: "No Record Found",
+          content: {
+            "application/json": {
+              example: {
+                success: false,
+                message: "No record found.",
+              },
+            },
+          },
+        },
+        500: {
+          description: "Internal server error",
+          content: {
+            "application/json": {
+              example: {
+                error: "Internal server error",
+                message: "Error updating Register Campaign details.",
+              },
+            },
+          },
+        },
+      },
+    },
     put: {
       tags: [`Register Campaign Module`],
       description: "Edit a Register Campaign with the specified ID.",
@@ -101,11 +153,6 @@ const editRegisterCampaign = {
         },
       },
     },
-  },
-};
-
-const getAllRegisterCmp = {
-  "/api/register_campaign": {
     get: {
       tags: [`Register Campaign Module`],
       description: "Get All Register Campaigns data",
@@ -131,9 +178,38 @@ const getAllRegisterCmp = {
       },
     },
   },
+  "/api/register_campaign/{id}": {
+    delete: {
+      tags: [`Register Campaign Module`],
+      description: "Delete Register Campaign",
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          description: "ID of register campaign to delete",
+          required: true,
+          schema: {
+            type: "integer",
+            format: "int64",
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Register campaign with ID 1 deleted successfully",
+        },
+        200: {
+          description: "Register campaign with ID 2 not found",
+        },
+        500: {
+          description: "Error message",
+        },
+      },
+    },
+  },
 };
+
 let registerCmp = {
-  ...getAllRegisterCmp,
   ...editRegisterCampaign,
 };
 

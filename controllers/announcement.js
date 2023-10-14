@@ -105,7 +105,6 @@ exports.editAnnoncement = async (req, res) => {
 
     return res.status(200).send({ success: true, data: editAnnoncementObj });
   } catch (err) {
-    console.log(err);
     res.status(500).send({
       error: err.message,
       message: "Error updating Annoncement details",

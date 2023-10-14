@@ -22,10 +22,9 @@ exports.addRegisterCampaign = async (req, res) => {
     const savedRegisterCampaign = await Obj.save();
     res.send({ data: savedRegisterCampaign, status: 200 });
   } catch (err) {
-    console.log(err);
     res
       .status(500)
-      .send({ error: err, message: "This campaign cannot be created" });
+      .send({ error: err.message, message: "This campaign cannot be created" });
   }
 };
 
@@ -46,10 +45,9 @@ exports.getRegisterCampaigns = async (req, res) => {
       return res.status(200).send({ success: true, data: dataWithFileUrls });
     }
   } catch (err) {
-    console.log(err);
     res
       .status(500)
-      .send({ error: err, message: "Error getting all Campaigns" });
+      .send({ error: err.message, message: "Error getting all Campaigns" });
   }
 };
 
@@ -73,7 +71,6 @@ exports.editRegisterCampaign = async (req, res) => {
       .status(200)
       .send({ success: true, data: editRegisterCampaignObj });
   } catch (err) {
-    console.log(err);
     res
       .status(500)
       .send({
