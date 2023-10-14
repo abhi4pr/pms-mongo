@@ -1,5 +1,8 @@
 const constant = require("../common/constant.js");
+const helper = require("../helper/helper.js");
+const response = require("../common/response.js");
 const contentSectionRegSchema = require("../models/contentSectionRegCmpModel.js");
+const fileUploadModel = require("../models/fileUploadModel.js");
 
 exports.addContentSectionReg = async (req, res) => {
   try {
@@ -16,10 +19,9 @@ exports.addContentSectionReg = async (req, res) => {
       status,
       stage,
       assign_to,
-      cmpAdminDemoLink
+      endDate,
+      cmpAdminDemoLink,
     } = req.body;
-
-    const content_sec_file = req.files?.content_sec_file?.[0]?.filename ?? "";
     const cmpAdminDemoFile = req.files?.cmpAdminDemoFile?.[0]?.filename ?? "";
     const ContentSectionRegObj = new contentSectionRegSchema({
       register_campaign_id,
@@ -29,10 +31,10 @@ exports.addContentSectionReg = async (req, res) => {
       campaign_dt,
       creator_dt,
       admin_remark,
-      content_sec_file,
       cmpAdminDemoFile,
       cmpAdminDemoLink,
       creator_remark,
+      endDate,
       est_static_vedio,
       status,
       stage,
@@ -40,11 +42,20 @@ exports.addContentSectionReg = async (req, res) => {
     });
 
     const savedContentSectionReg = await ContentSectionRegObj.save();
+    if (savedContentSectionReg) {
+      for (const file of req.files?.content_sec_file) {
+        const fileData = new fileUploadModel({
+          contentSecRegId: savedContentSectionReg.content_section_id,
+
+          contentSecFile: file.filename,
+        });
+        await fileData.save(fileData);
+      }
+    }
     res.send({ data: savedContentSectionReg, status: 200 });
   } catch (err) {
-    console.log(err);
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "This ContentSectionReg cannot be created",
     });
   }
@@ -61,7 +72,14 @@ exports.getContentSectionReg = async (req, res) => {
           as: "data",
         },
       },
-
+      {
+        $lookup: {
+          from: "fileuploadmodels",
+          localField: "contentSecRegId",
+          foreignField: "content_section_id",
+          as: "files",
+        },
+      },
       {
         $unwind: "$data",
       },
@@ -83,6 +101,7 @@ exports.getContentSectionReg = async (req, res) => {
           cmpAdminDemoLink: 1,
           cmpAdminDemoFile: 1,
           status: 1,
+          endDate: 1,
           stage: 1,
           assign_to: 1,
           brand_id: "$data.brand_id",
@@ -91,6 +110,7 @@ exports.getContentSectionReg = async (req, res) => {
           commitment: "$data.commitment",
           detailing: "$data.detailing",
           exeCmpId: "$data.exeCmpId",
+          files: 1,
         },
       },
     ]);
@@ -100,19 +120,42 @@ exports.getContentSectionReg = async (req, res) => {
         .send({ success: true, data: [], message: "No Record found" });
     } else {
       const url = `${constant.base_url}/uploads/`;
-      const dataWithFileUrls = ContentSectionReg.map((item) => ({
-        ...item,
-        download_excel_file: item.excel_path ? url + item.excel_path : "",
-        download_content_sec_file: item.content_sec_file ? url + item.content_sec_file : "",
-        downloadCmpAdminDemoFile: item.cmpAdminDemoFile ? url + item.cmpAdminDemoFile : "",
-      }));
+      const dataWithFileUrls = ContentSectionReg.map((item) => {
+        const data = item.files?.filter(
+          //here apply filter because query not produce exact output
+          (d) => d.contentSecRegId === item.content_section_id
+        );
+        const modifiedFiles = data?.map((file) => {
+          return {
+            ...file,
+            downloadContentSecFile: file.contentSecFile
+              ? `${constant.base_url}/uploads/${file.contentSecFile}`
+              : "", // Construct the download URL
+          };
+        });
+
+        let obj = {
+          ...item,
+          files: modifiedFiles,
+          download_excel_file: item.excel_path ? url + item.excel_path : "",
+          download_content_sec_file: item.content_sec_file
+            ? url + item.content_sec_file
+            : "",
+          downloadCmpAdminDemoFile: item.cmpAdminDemoFile
+            ? url + item.cmpAdminDemoFile
+            : "",
+        };
+        return obj;
+      });
       res.status(200).send({ data: dataWithFileUrls });
     }
   } catch (err) {
-    console.log(err);
     res
       .status(500)
-      .send({ error: err, message: "Error getting all ContentSectionReg" });
+      .send({
+        error: err.message,
+        message: "Error getting all ContentSectionReg",
+      });
   }
 };
 
@@ -120,17 +163,38 @@ exports.editContentSectionReg = async (req, res) => {
   try {
     let updateObj = {
       ...req.body,
-      content_sec_file: req.files?.content_sec_file?.[0]?.filename,
       cmpAdminDemoFile: req.files?.cmpAdminDemoFile?.[0]?.filename,
     };
-
+    let fileId = req.body.fileId;
+    if (fileId) {
+      const editfile = await fileUploadModel.findOneAndUpdate(
+        { fileId: parseInt(fileId) }, // Filter condition
+        {
+          $set: {
+            contentSecFile: req.files?.content_sec_file?.[0]?.filename,
+          },
+        }
+      );
+      if (editfile?.contentSecFile) {
+        const result = helper.fileRemove(
+          editfile?.contentSecFile,
+          "../uploads"
+        );
+        if (result?.status == false) {
+          return response.returnFalse(req, res, result.msg, {});
+        }
+      } else {
+        return res
+          .status(200)
+          .send({ success: false, message: "file not found" });
+      }
+    }
     const editContentSectionRegObj =
       await contentSectionRegSchema.findOneAndUpdate(
-        { content_section_id: parseInt(req.body.content_section_id) }, // Filter condition
+        { content_section_id: parseInt(req.body.content_section_id) },
         {
           $set: updateObj,
-        },
-        { new: true }
+        }
       );
 
     if (!editContentSectionRegObj) {
@@ -138,14 +202,19 @@ exports.editContentSectionReg = async (req, res) => {
         .status(200)
         .send({ success: false, message: "ContentSectionReg not found" });
     }
-
+    const result = helper.fileRemove(
+      editContentSectionRegObj?.cmpAdminDemoFile,
+      "../uploads"
+    );
+    if (result?.status == false) {
+      return response.returnFalse(req, res, result.msg, {});
+    }
     return res
       .status(200)
       .send({ success: true, data: editContentSectionRegObj });
   } catch (err) {
-    console.log(err);
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "Error updating ContentSectionReg details",
     });
   }

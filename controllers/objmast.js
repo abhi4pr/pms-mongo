@@ -17,10 +17,9 @@ exports.addObjectMast = async (req, res) => {
       message: "Object and user_auth_detail added successfully",
     });
   } catch (err) {
-    console.log(err);
     res
       .status(500)
-      .send({ error: err, message: "This objMast cannot be created" });
+      .send({ error: err.message, message: "This objMast cannot be created" });
   }
 };
 
@@ -66,8 +65,7 @@ exports.getObjectMastById = async (req, res) => {
       return res.status(200).send({ success: true, data: objects[0] });
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).send({ error: err, message: "Error getting  Object" });
+    res.status(500).send({ error: err.message, message: "Error getting  Object" });
   }
 };
 
@@ -95,8 +93,7 @@ exports.getObjectMasts = async (req, res) => {
       return res.status(200).send({ success: true, data: objets });
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).send({ error: err, message: "Error getting all Objects" });
+    res.status(500).send({ error: err.message, message: "Error getting all Objects" });
   }
 };
 

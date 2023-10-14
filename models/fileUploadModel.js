@@ -8,9 +8,8 @@ const fileUploadSchema = new mongoose.Schema({
     unique: true,
   },
   contentSecRegId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "contentSectionRegCmpModel",
-    required:true
+    type: Number,
+    ref: "contentSectionRegCmpModel"
   },
   contentSecFile: {
     type: String,
