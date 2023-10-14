@@ -15,6 +15,7 @@ const orderDeliveryModel = require("../models/orderDeliveryModel.js");
 const orderReqModel = require("../models/orderReqModel.js");
 const userModel = require("../models/userModel.js");
 const sittingModel = require("../models/sittingModel.js");
+const transferReqModel = require("../models/transferReqModel.js");
 
 //Product Related api's
 
@@ -154,23 +155,25 @@ exports.deleteProductById = async (req, res) => {
         const imagePath = path.join(productImagesFolder, imageFileName);
         fs.unlink(imagePath, (err) => {
           if (err) {
-            return res.status(200).json({
-              success: false,
-              message: err.message,
-            });
+            return response.false(req, res, err.message, {});
           } else {
-            return res.status(200).json({
-              success: true,
-              message: `Product with ID ${id} deleted successfully`,
-            });
+            return response.returnTrue(
+              200,
+              req,
+              res,
+              `Product with ID ${id} deleted successfully`,
+              {}
+            );
           }
         });
       }
     } else {
-      return res.status(200).json({
-        success: false,
-        message: `Product with ID ${id} not found`,
-      });
+      return response.returnFalse(
+        200,
+        req,
+        `Product with ID ${id} not found`,
+        {}
+      );
     }
   } catch (err) {
     return response.returnFalse(500, req, res, err.message, {});
@@ -1208,6 +1211,403 @@ exports.allOrderReqData = async (req, res) => {
       res,
       "Order requests Fetch successfully.",
       responseData
+    );
+  } catch (error) {
+    return response.returnFalse(500, req, res, error.message, {});
+  }
+};
+
+exports.orderReqHistory = async (req, res) => {
+  try {
+    const User_id = req.params.user_id;
+
+    const orderReqHis = await orderReqModel.aggregate([
+      {
+        $match: {
+          User_id: parseInt(User_id),
+          Request_datetime: {
+            $gte: new Date(Date.now() - 48 * 60 * 60 * 1000),
+          }, // Filter by request datetime within the last 48 hours
+        },
+      },
+      {
+        $lookup: {
+          from: "usermodels",
+          localField: "user_id",
+          foreignField: "User_id",
+          as: "user_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "productmodels",
+          localField: "product_id",
+          foreignField: "Product_id",
+          as: "product_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "sittingmodels",
+          localField: "sitting_id",
+          foreignField: "Sitting_id",
+          as: "sitting_info",
+        },
+      },
+      {
+        $unwind: "$user_info",
+      },
+      {
+        $unwind: "$product_info",
+      },
+      {
+        $unwind: "$sitting_info",
+      },
+      {
+        $project: {
+          Order_req_id: 1,
+          User_id: 1,
+          User_name: 1,
+          image: "$user_info.image",
+          Product_id: 1,
+          Product_name: "$product_info.Product_name",
+          Product_image: "$product_info.Product_image",
+          Order_quantity: 1,
+          Sitting_id: 1,
+          Sitting_area: "$sitting_info.sitting_area",
+          Sitting_ref_no: "$sitting_info.sitting_ref_no",
+          Request_datetime: 1,
+          Message: 1,
+          Special_request: 1,
+        },
+      },
+      {
+        $sort: { Request_datetime: -1 },
+      },
+      {
+        $limit: 3,
+      },
+    ]);
+    const responseData = orderReqHis.map((item) => {
+      const imageUrl = item.Product_image
+        ? `${constant.base_url}/uploads/productImage/${item.Product_image}`
+        : "";
+      const userImageeUrl = item.image
+        ? `${constant.base_url}/uploads/${item.image}`
+        : "";
+
+      return {
+        ...item,
+        image: userImageeUrl,
+        Product_image: imageUrl,
+      };
+    });
+    if (!responseData?.[0]) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Order requests history not found for the user",
+        {}
+      );
+    }
+    return response.returnTrue(
+      200,
+      req,
+      res,
+      "Order request history Fetch successfully.",
+      responseData
+    );
+  } catch (error) {
+    return response.returnFalse(500, req, res, error.message, {});
+  }
+};
+
+// Get order req based on room id or Request_delivered_by And Order_req_mast.Status NOT IN ('complete', 'declined')
+
+exports.getOrderReqsBasedOnFilter = async (req, res) => {
+  try {
+    const room_id = req.body.room_id;
+    const Request_delivered_by = req.body.Request_delivered_by;
+
+    const orderReq = await orderReqModel.aggregate([
+      {
+        $match: {
+          $and: [
+            { Status: { $nin: ["complete", "declined"] } },
+            {
+              $or: [
+                { room_id: parseInt(room_id) },
+                { Request_delivered_by: parseInt(Request_delivered_by) },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "usermodels",
+          localField: "user_id",
+          foreignField: "User_id",
+          as: "userModel",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "productmodels",
+          localField: "product_id",
+          foreignField: "Product_id",
+          as: "productModel",
+        },
+      },
+      {
+        $lookup: {
+          from: "sittingmodels",
+          localField: "sitting_id",
+          foreignField: "Sitting_id",
+          as: "sittingModel",
+        },
+      },
+
+      {
+        $unwind: "$userModel",
+      },
+      {
+        $unwind: "$productModel",
+      },
+      {
+        $unwind: "$sittingModel",
+      },
+      {
+        $project: {
+          Order_req_id: 1,
+          Product_id: 1,
+          Product_category: 1,
+          Order_quantity: 1,
+          Special_request: 1,
+          User_id: 1,
+          Sitting_id: 1,
+          Request_datetime: 1,
+          Status: 1,
+          Request_delivered_by: 1,
+          Delivered_datetime: 1,
+          Message: 1,
+          Remarks: 1,
+          creation_date: 1,
+          Created_by: 1,
+          Last_updated_by: 1,
+          Last_updated_date: 1,
+          room_id: 1,
+          props1: 1,
+          props2: 1,
+          props3: 1,
+          props1Int: 1,
+          props2Int: 1,
+          props3Int: 1,
+
+          user_name: "$userModel.user_name",
+          image: "$userModel.image",
+          Sitting_ref_no: "$sittingModel.sitting_ref_no",
+          Sitting_area: "$sittingModel.sitting_area",
+          Product_name: "$productModel.Product_name",
+          Product_image: "$productModel.Product_image",
+        },
+      },
+    ]);
+
+    const responseData = orderReq.map((item) => {
+      const imageUrl = item.Product_image
+        ? `${constant.base_url}/uploads/productImage/${item.Product_image}`
+        : "";
+      const userImageeUrl = item.image
+        ? `${constant.base_url}/uploads/${item.image}`
+        : "";
+      return {
+        ...item,
+        image: userImageeUrl,
+        Product_image: imageUrl,
+      };
+    });
+
+    if (!responseData?.[0]) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Order requests not found for specific filter",
+        {}
+      );
+    }
+    return response.returnTrue(
+      200,
+      req,
+      res,
+      "Order requests Fetch successfully.",
+      responseData
+    );
+  } catch (error) {
+    return response.returnFalse(500, req, res, error.message, {});
+  }
+};
+
+exports.addTransferReq = async (req, res) => {
+  try {
+    const { from_id, to_id, reason, order_req_id } = req.body;
+
+    const transerReqObj = new transferReqModel({
+      From_id: from_id,
+      Reason: reason,
+      To_id: to_id,
+      order_req_id,
+    });
+
+    const savedTransferReq = await transerReqObj.save();
+    if (savedTransferReq) {
+      const editOrderReqObj = await orderReqModel.findOneAndUpdate(
+        { Order_req_id: parseInt(order_req_id) }, // Filter condition
+        {
+          $set: { Request_delivered_by: to_id },
+        },
+        { new: true }
+      );
+      if (!editOrderReqObj) {
+        return response.returnFalse(
+          200,
+          req,
+          res,
+          "Data Created in transfer req table but not set Request_delivered_by",
+          {}
+        );
+      } else {
+        return response.returnTrue(
+          200,
+          req,
+          res,
+          "Transfer Reuest added successful",
+          transerReqObj
+        );
+      }
+    } else {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Something went wrong in data creation for transfer req model",
+        {}
+      );
+    }
+  } catch (err) {
+    return response.returnFalse(500, req, res, err.message, {});
+  }
+};
+
+exports.getAllTransferReq = async (req, res) => {
+  try {
+    const resData = await transferReqModel.aggregate([
+      {
+        $lookup: {
+          from: "usermodels",
+          localField: "user_id",
+          foreignField: "From_id",
+          as: "userModelFrom",
+        },
+      },
+      {
+        $lookup: {
+          from: "usermodels",
+          localField: "user_id",
+          foreignField: "To_id",
+          as: "userModelTo",
+        },
+      },
+      {
+        $lookup: {
+          from: "orderreqmodels",
+          localField: "Order_req_id",
+          foreignField: "order_req_id",
+          as: "OrderReqModel",
+        },
+      },
+      {
+        $unwind: "$OrderReqModel",
+      },
+      {
+        $lookup: {
+          from: "usermodels",
+          localField: "user_id",
+          foreignField: "OrderReqModel.User_id",
+          as: "userModelORM",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "productmodels",
+          localField: "product_id",
+          foreignField: "OrderReqModel.Product_id",
+          as: "productModel",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "sittingmodels",
+          localField: "sitting_id",
+          foreignField: "OrderReqModel.Sitting_id",
+          as: "sittingModel",
+        },
+      },
+      {
+        $unwind: "$sittingModel",
+      },
+
+      {
+        $unwind: "$productModel",
+      },
+      {
+        $unwind: "$userModelORM",
+      },
+      {
+        $unwind: "$userModelTo",
+      },
+      {
+        $unwind: "$userModelFrom",
+      },
+      {
+        $project: {
+          Transfer_req_id: 1,
+          From_id: 1,
+          To_id: 1,
+          Reason: 1,
+          order_req_id: 1,
+          Order_quantity: "$OrderReqModel.Order_quantity",
+          request_transfered_by: "$userModelFrom.user_name",
+          transfer_to: "$userModelTo.user_name",
+          requested_by: "$userModelORM.user_name",
+          Sitting_ref_no: "$sittingModel.sitting_ref_no",
+          Sitting_area: "$sittingModel.sitting_area",
+          Product_name: "$productModel.Product_name",
+        },
+      },
+      
+    ]);
+
+    if (!resData?.[0]) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Transfer Request Data Not Found",
+        {}
+      );
+    }
+    return response.returnTrue(
+      200,
+      req,
+      res,
+      "Transfer Request Fetch successfully.",
+      resData
     );
   } catch (error) {
     return response.returnFalse(500, req, res, error.message, {});

@@ -207,7 +207,7 @@ router.delete("/projectxRecord/:id", projectxRecord.deleteProjectxRecord);
 router.post(
   "/contentSectionReg",
   upload.fields([
-    { name: "content_sec_file", maxCount: 1 },
+    { name: "content_sec_file", maxCount: 10 },
     { name: "cmpAdminDemoFile", maxCount: 1 },
   ]),
 
@@ -217,7 +217,7 @@ router.get("/contentSectionReg", contentSectionReg.getContentSectionReg);
 router.put(
   "/contentSectionReg",
   upload.fields([
-    { name: "content_sec_file", maxCount: 1 },
+    { name: "content_sec_file", maxCount: 5 },
     { name: "cmpAdminDemoFile", maxCount: 1 },
   ]),
   contentSectionReg.editContentSectionReg
@@ -386,13 +386,19 @@ router.post(
 router.get("/get_all_wfh_users", user.getAllWfhUsers);
 
 /* attendance */
-router.post("/add_attendance", attendance.addAttendance)
-router.post("/get_salary_by_id_month_year", attendance.getSalaryByDeptIdMonthYear);
+router.post("/add_attendance", attendance.addAttendance);
+router.post(
+  "/get_salary_by_id_month_year",
+  attendance.getSalaryByDeptIdMonthYear
+);
 router.post("/get_salary_by_filter", attendance.getSalaryByFilter);
-router.post("/get_attendance_by_userid", attendance.getSalaryByUserId)
-router.get("/get_wfh_user_count", attendance.countWfhUsers)
-router.post("/get_salary_count_by_dept_year", attendance.getSalaryCountByDeptYear)
-router.get("/get_salary_count_by_year", attendance.getSalaryCountByYear)
+router.post("/get_attendance_by_userid", attendance.getSalaryByUserId);
+router.get("/get_wfh_user_count", attendance.countWfhUsers);
+router.post(
+  "/get_salary_count_by_dept_year",
+  attendance.getSalaryCountByDeptYear
+);
+router.get("/get_salary_count_by_year", attendance.getSalaryCountByYear);
 
 /* commitement */
 router.post("/commitment", cmtController.addCmt);
@@ -472,4 +478,8 @@ router.post("/leadremark", leadremark.addLeadRemark);
 router.get("/leadremark", leadremark.getLeadRemarks);
 router.put("/leadremark", leadremark.editLeadRemark);
 
+router.get("/orderreqshistory/:user_id", productController.orderReqHistory);
+router.post("/orderreqs", productController.getOrderReqsBasedOnFilter);
+router.post("/transreq", productController.addTransferReq);
+router.get("/alltransreq", productController.getAllTransferReq);
 module.exports = router;
