@@ -514,3 +514,236 @@ exports.getInstaPageById = async (req, res) => {
         res.status(500).send({error:err, sms:'error getting insta page by id'})
     }
 }
+
+exports.dataForGraph = async (req, res) => {
+    try {
+        const requestedDate = req.body.dateFormat;
+        const requestedStartDate = req.body.start_date;
+        const requestedEndDate = req.body.end_date;
+        const bodyId = req.body.ip_id;
+        var result;
+        if (requestedDate) {
+            if (requestedDate.length === 4) {
+                result = await instaPageCountModel.find({
+                    ip_id: bodyId,
+                    last_updated_at: {
+                        $regex: new RegExp(`^${requestedDate}`)
+                    }
+                })
+                if(result.length == 0){
+                    res.status(404).send({ error: "Data not found for the requested date" });
+                }else{
+                    const followersData = result.map((result) => result.followers);
+                    if (requestedDate.length === 4 && followersData.length < 12) {
+                        const missingCount = 12 - followersData.length;
+                        const missingFollowers = Array.from(
+                        { length: missingCount },
+                        () => 0
+                        );
+                        followersData.push(...missingFollowers);
+                    }
+
+                    const postCountData = result.map((result) => result.post_count);
+                    if (requestedDate.length === 4 && postCountData.length < 12) {
+                        const missingCount = 12 - postCountData.length;
+                        const missingPostCounts = Array.from(
+                        { length: missingCount },
+                        () => 0
+                        );
+                        postCountData.push(...missingPostCounts);
+                    }
+
+                    const registerResults = await instaPageModel.aggregate([
+                        {
+                            $match: {
+                                ip_regist_id: re.body.ip_id
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "usermodels",
+                                localField: "allocated_to_primary",
+                                foreignField: "user_id",
+                                as: "allocated_to_primary_name"
+                            }
+                        },
+                        {
+                            $unwind: "$allocated_to_primary_name"
+                        },
+                        {
+                            $lookup: {
+                                from: "usermodels",
+                                localField: "report_L1",
+                                foreignField: "user_id",
+                                as: "report_L1_user_name"
+                            }
+                        },
+                        {
+                            $unwind: "$report_L1_user_name"
+                        },
+                        {
+                            $lookup: {
+                                from: "usermodels",
+                                localField: "report_L2",
+                                foreignField: "user_id",
+                                as: "report_L2_user_name"
+                            }
+                        },
+                        {
+                            $unwind: "$report_L2_user_name"
+                        },
+                        {
+                            $lookup: {
+                                from: "usermodels",
+                                localField: "report_L3",
+                                foreignField: "user_id",
+                                as: "report_L3_user_name"
+                            }
+                        },
+                        {
+                            $unwind: "$report_L3_user_name"
+                        },
+                        {
+                             $project: {
+                                _id: 1,
+                                allocated_to_primary_name: "$allocated_to_primary_name.user_name",
+                                report_L1_user_name: "$report_L1_user_name.user_name",
+                                report_L2_user_name: "$report_L2_user_name.user_name",
+                                report_L3_user_name: "$report_L3_user_name.user_name"
+                            }
+                        }
+                    ]).exec();
+
+                    const ipRegisterData = registerResults[0];
+
+                    res.send({
+                        followers: followersData,
+                        ipRegisterData,
+                        postcounts: postCountData,
+                    });
+                }
+            }else{
+                res.status(500).send({error:err, sms:'invalid date format'})
+                return
+            }
+        }else if(requestedStartDate && requestedEndDate){
+            const startDate = new Date(requestedStartDate);
+            const endDate = new Date(requestedEndDate);
+        
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+              res.status(400).json({ error: "Invalid startDate or endDate format" });
+              return;
+            }
+
+            const results = await instaPageCountModel.find({
+                ip_id: req.body.ip_id,
+                last_updated_at: {
+                  $gte: requestedStartDate,
+                  $lte: requestedEndDate
+                }
+              }, {
+                "followers": 1,
+                "post_count": 1,
+                "last_updated_at": 1,
+                "_id": 0
+            });
+
+            const followersData = {};
+            const postCountData = {};
+
+            const currentDate = new Date(startDate);
+            while (currentDate <= endDate) {
+            followersData[currentDate.toISOString().substr(0, 7)] = 0;
+            currentDate.setMonth(currentDate.getMonth() + 1);
+
+            postCountData[currentDate.toISOString().substr(0, 7)] = 0;
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+
+            results.forEach((result) => {
+            const resultDate = result.last_updated_at.toISOString().substr(0, 7);
+            followersData[resultDate] = result.followers;
+            postCountData[resultDate] = result.post_count;
+            });
+
+            const registerQuery = instaPageModel.find({ip_regist_id: req.body.ip_id});
+
+            const ipRegisterData = registerQuery[0]; 
+            res.send({
+                followers: followersData,
+                ipRegisterData,
+                postcounts: postCountData,
+            });
+        }
+    } catch (error) {
+        res.status(500).send({error:err, sms:'error getting graph data'})
+    }
+}
+
+exports.getAllInstaPages = async(req, res) =>{
+    try {
+        const delv = instaPageModel.aggregate([
+            {
+                $lookup: {
+                    from: "usermodels",
+                    localField: "allocated_to_primary",
+                    foreignField: "user_id",
+                    as: "user"
+                }
+            },
+            {
+                $lookup: {
+                    from: "instatypemodels",
+                    localField: "ip_type",
+                    foreignField: "id",
+                    as: "ip_type"
+                }
+            },
+            {
+                $lookup: {
+                    from: "instapagecountmodels",
+                    let: { ip_regist_id: "$ip_regist_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ["$ip_id", "$$ip_regist_id"] }
+                            }
+                        },
+                        {
+                            $sort: { last_updated_at: -1 }
+                        },
+                        {
+                            $group: {
+                                _id: "$ip_id",
+                                followers: { $first: "$followers" },
+                                last_updated_at: { $first: "$last_updated_at" }
+                            }
+                        }
+                    ],
+                    as: "followers"
+                }
+            },
+            {
+                $unwind: { path: "$user", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $unwind: { path: "$ip_type", preserveNullAndEmptyArrays: true }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    "ip_regist_id": "$ip_regist_id",
+                    "allocated_to_primary_name": "$user.user_email_id",
+                    "ip_type_name": "$ip_type.name",
+                    "followers1": { $ifNull: ["$followers.followers", 0] },
+                    "followers2": 0,
+                    "last_updated_at1": { $ifNull: ["$followers.last_updated_at", null] },
+                    "last_updated_at2": null
+                }
+            }
+        ]).exec();
+        res.status(200).send(delv)
+    } catch (error) {
+        res.status(500).send({error:err, sms:'error getting all insta pages'})
+    }
+}

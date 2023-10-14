@@ -51,7 +51,6 @@ router.get("/instagetcreators", insta.getCreators);
 router.post("/track_creator_posty", insta.trackCreatorY);
 router.put("/track_creator_puty/:pagename", insta.trackCreatorPutY);
 router.post("/track_post_post", insta.trackPost);
-router.post("/track_status_post", insta.trackStory);
 router.get("/instagetposts", insta.getPosts);
 router.post("/track_post_posty", insta.trackPostY);
 router.post("/track_story_post", insta.trackStory);
@@ -473,6 +472,9 @@ router.delete("/delete_iptype/:id", instapage.deleteIpType);
 router.get("/get_iptype_byid/:id", instapage.getIpTypeById);
 router.get("/get_platform_byid/:id", instapage.getPlatformById);
 router.get("/get_instapage_byid/:id", instapage.getInstaPageById);
+router.post("/dataforgraph", instapage.dataForGraph)
+router.get("/all_data_of_ipregis", instapage.getAllInstaPages)
+
 /* Lead Remark Route */
 router.post("/leadremark", leadremark.addLeadRemark);
 router.get("/leadremark", leadremark.getLeadRemarks);
