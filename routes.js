@@ -40,6 +40,9 @@ const instapage = require("./controllers/instaPage.js");
 const role = require("./controllers/role.js");
 const kra = require("./controllers/kra.js");
 const leadremark = require("./controllers/leadRemark.js");
+const lead = require("./controllers/lead.js");
+const leadtype = require("./controllers/lead.js");
+const leadmast = require("./controllers/lead.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -484,4 +487,25 @@ router.get("/orderreqshistory/:user_id", productController.orderReqHistory);
 router.post("/orderreqs", productController.getOrderReqsBasedOnFilter);
 router.post("/transreq", productController.addTransferReq);
 router.get("/alltransreq", productController.getAllTransferReq);
+
+/* Lead Route */
+router.post("/lead", lead.addLead);
+router.get("/lead", lead.getLeads);
+router.get("/lead/:lead_id", lead.getLeadById);
+router.put("/lead", lead.editLead);
+router.delete("/lead", lead.deleteLead);
+
+/* Lead Type Route */
+router.post("/leadtype", leadtype.addLeadType);
+router.get("/leadtype", leadtype.getLeadTypes);
+router.put("/leadtype", leadtype.editLeadType);
+router.delete("/leadtype", leadtype.deleteLeadType);
+
+/* Lead Mast Route */
+router.post("/leadmast", leadmast.addLeadMast);
+router.get("/leadmast", leadmast.getLeadMasts);
+router.get("/leadmast/:leadmast_id", leadmast.getLeadMastById);
+router.put("/leadmast", leadmast.editLeadMast);
+router.delete("/leadmast", leadmast.deleteLeadMast);
+
 module.exports = router;
