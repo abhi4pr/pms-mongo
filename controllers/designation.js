@@ -6,8 +6,7 @@ exports.addDesignation = async (req, res) =>{
             desi_name: req.body.desi_name,
             dept_id: req.body.dept_id,
             remark: req.body.remark,
-            created_by: req.body.created_by,
-            created_at: req.body.created_at
+            created_by: req.body.created_by
         })
         const simv = await simc.save();
         res.send({simv,status:200});
@@ -34,7 +33,7 @@ exports.getDesignations = async (req, res) => {
                 $project: {
                     _id: 1,
                     department_name: '$department.dept_name',
-                    desi_name: '$sub_dept_name',
+                    desi_name: '$desi_name',
                     dept_id: "$dept_id",
                     desi_id: "$desi_id",
                     id: "$id",

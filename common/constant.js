@@ -5,6 +5,10 @@ module.exports = Object.freeze({
   INSTA_C_MODELS: 1,
   INSTA_P_MODELS: 2,
 
+  /* JWT  */
+  SECRET_KEY_LOGIN:"thisissecret12",
+  CONST_VALIDATE_SESSION_EXPIRE: '24h',
+
   /* Response messages */ 
 
   //Common msg

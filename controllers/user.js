@@ -9,6 +9,8 @@ const reasonModel = require('../models/reasonModel.js');
 const separationModel = require('../models/separationModel.js');
 const attendanceModel = require('../models/attendanceModel.js');
 const objModel = require('../models/objModel.js');
+const constant = require('../common/constant.js');
+const bcrypt = require("bcrypt");
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "image", maxCount: 1 },
@@ -29,12 +31,13 @@ const upload = multer({ dest: "uploads/" }).fields([
 
 exports.addUser = [upload, async (req, res) =>{
     try{
+        const encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
         const simc = new userModel({
             user_name: req.body.user_name,
             user_designation: req.body.user_designation,
             user_email_id: req.body.user_email_id,
             user_login_id: req.body.user_login_id,
-            user_login_password: req.body.user_login_password,
+            user_login_password: encryptedPass,
             user_report_to_id: req.body.user_report_to_id,
             user_contact_no: req.body.user_contact_no,
             dept_id: req.body.dept_id,
@@ -129,7 +132,7 @@ exports.addUser = [upload, async (req, res) =>{
         })
         const simv = await simc.save();
 
-        const joining = joining_date;
+        const joining = simv.joining_date;
         const convertDate = new Date(joining);
         const extractDate = convertDate.getDate();
         const joiningMonth = new Intl.DateTimeFormat('en-US',{ month : 'long' }).format(convertDate);
@@ -199,18 +202,19 @@ exports.addUser = [upload, async (req, res) =>{
 
         res.send({simv,status:200});
     } catch(err){
-        res.status(500).send({error:err,sms:'This user cannot be created'})
+        res.status(500).send({error:err.message,sms:'This user cannot be created'})
     }
 }];
 
 exports.updateUser = async (req, res) => {
     try{
+        const encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
         const editsim = await userModel.findOneAndUpdate({user_id:req.body.id},{
             user_name: req.body.user_name,
             user_designation: req.body.user_designation,
             user_email_id: req.body.user_email_id,
             user_login_id: req.body.user_login_id,
-            user_login_password: req.body.user_login_password,
+            user_login_password: encryptedPass,
             user_report_to_id: req.body.user_report_to_id,
             user_contact_no: req.body.user_contact_no,
             dept_id: req.body.dept_id,
@@ -697,14 +701,14 @@ exports.loginUser = async (req, res) => {
             {
                 $match: {
                     user_login_id:req.body.user_login_id,
-                    user_login_password:req.body.user_login_password
+                    // user_login_password:req.body.user_login_password
                 }
             },
             {
                 $lookup: {
                     from: 'sittingmodels',
                     localField: 'sitting_id',
-                    foreignField: 'Sitting_id',
+                    foreignField: 'sitting_id',
                     as: 'sitting'
                 }
             },
@@ -723,35 +727,43 @@ exports.loginUser = async (req, res) => {
                     sitting_id: '$sitting_id',
                     room_id: '$room_id',
                     user_status: '$user_status',
+                    user_login_password: '$user_login_password',
                     onboard_status: '$onboard_status'
                 }
             }
         ]).exec();
 
-        const token = jwt.sign(
-            {
-              id: simc.user_id,
-              name: simc.user_name,
-              email: simc.user_email_id,
-              sitting_id: simc.sitting_id,
-              role_id: simc.role_id,
-              dept_id: simc.dept_id,
-              room_id: simc.room_id,
-              Sitting_id: simc.Sitting_id,
-              Sitting_ref_no: simc.Sitting_ref_no,
-              onboard_status: simc.onboard_status,
-              user_status: simc.user_status,
-            },
-            secretKey,
-        { expiresIn: "1h" }
-        );
+        
+ 
           
-        if(!simc){
+        if(simc.length === 0){
             res.status(500).send({success:false})
         }
-        res.status(200).send({...token,...simc})
+        if (bcrypt.compareSync(req.body.user_login_password, simc[0].user_login_password)) {
+            const token = jwt.sign(
+                {
+                  id: simc.user_id,
+                  name: simc.user_name,
+                  email: simc.user_email_id,
+                  sitting_id: simc.sitting_id,
+                  role_id: simc.role_id,
+                  dept_id: simc.dept_id,
+                  room_id: simc.room_id,
+                  Sitting_id: simc.Sitting_id,
+                  Sitting_ref_no: simc.Sitting_ref_no,
+                  onboard_status: simc.onboard_status,
+                  user_status: simc.user_status,
+                },
+                constant.SECRET_KEY_LOGIN,
+            { expiresIn:  constant.CONST_VALIDATE_SESSION_EXPIRE }
+            );
+            res.status(200).send({token,...simc})
+          } else {
+            res.status(200).send({sms:'Invalid Password'})
+          }
+       
     } catch(err){
-        res.status(500).send({error:err,sms:'Error getting user details'})
+        res.status(500).send({error:err.message,sms:'Error getting user details'})
     }
 }
 

@@ -76,7 +76,7 @@ exports.editExeCampaign = async (req, res) => {
   try {
     let check = await exeCampaignSchema.findOne({
       exeCmpName:  req.body?.exeCmpName.toLowerCase().trim(),
-      exeCmpName: { $ne: req.body?.exeCmpName },
+      exeCmpId: { $ne: req.body?.exeCmpId },
     });
     if (check) {
       return response.returnFalse(
@@ -109,7 +109,7 @@ exports.editExeCampaign = async (req, res) => {
       200,
       req,
       res,
-      "Data Fetched Successfully.",
+      "Data Update Successfully.",
       editExeCampaignObj
     );
   } catch (err) {

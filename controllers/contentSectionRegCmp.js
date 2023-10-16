@@ -43,13 +43,15 @@ exports.addContentSectionReg = async (req, res) => {
 
     const savedContentSectionReg = await ContentSectionRegObj.save();
     if (savedContentSectionReg) {
-      for (const file of req.files?.content_sec_file) {
-        const fileData = new fileUploadModel({
-          contentSecRegId: savedContentSectionReg.content_section_id,
+      if (req.files?.content_sec_file) {
+        for (const file of req.files?.content_sec_file) {
+          const fileData = new fileUploadModel({
+            contentSecRegId: savedContentSectionReg.content_section_id,
 
-          contentSecFile: file.filename,
-        });
-        await fileData.save(fileData);
+            contentSecFile: file.filename,
+          });
+          await fileData.save(fileData);
+        }
       }
     }
     res.send({ data: savedContentSectionReg, status: 200 });
@@ -150,12 +152,10 @@ exports.getContentSectionReg = async (req, res) => {
       res.status(200).send({ data: dataWithFileUrls });
     }
   } catch (err) {
-    res
-      .status(500)
-      .send({
-        error: err.message,
-        message: "Error getting all ContentSectionReg",
-      });
+    res.status(500).send({
+      error: err.message,
+      message: "Error getting all ContentSectionReg",
+    });
   }
 };
 
