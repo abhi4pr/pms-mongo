@@ -72,33 +72,33 @@ router.get("/get_exe_sum", exe.getExeSum);
 router.put("/edit_exe_sum", exe.editExeSum);
 
 /*sim api*/
-router.get("/get_sims", sim.getSims);
+router.get("/get_all_sims", sim.getSims);
 router.post("/add_sim", sim.addSim);
 router.get("/get_single_sim/:id", sim.getSingleSim);
-router.put("/edit_sim", sim.editSim);
+router.put("/update_sim", sim.editSim);
 router.delete("/delete_sim/:id", sim.deleteSim);
 router.post("/add_sim_allocation", sim.addAllocation);
-router.get("/get_allocations", sim.getAllocations);
-router.put("/edit_allocation_sim", sim.editAllocation);
+router.get("/get_all_allocations", sim.getAllocations);
+router.put("/update_allocationsim", sim.editAllocation);
 router.delete("/delete_allocation/:id", sim.deleteAllocation);
 
 /* logo brand */
 router.post("/add_logo_brand", logoBrand.addLogoBrand);
-router.get("/get_logo_brands", logoBrand.getLogoBrands);
+router.get("/get_all_logo_brands", logoBrand.getLogoBrands);
 router.get("/get_single_logobrand/:id", logoBrand.getSingleLogoBrand);
-router.put("/edit_logo_brand", logoBrand.editLogoBrand);
+router.put("/update_logo_brand", logoBrand.editLogoBrand);
 router.delete("/delete_logo_brand/:id", logoBrand.deleteLogoBrand);
 
 /* department */
 router.post("/add_department", department.addDepartment);
-router.get("/get_department", department.getDepartments);
+router.get("/get_all_departments", department.getDepartments);
 router.get("/get_single_department/:id", department.getSingleDepartment);
-router.put("/edit_department", department.editDepartment);
+router.put("/update_department", department.editDepartment);
 router.delete("/delete_department/:id", department.deleteDepartment);
 
 /* sub department */
 router.post("/add_sub_department", department.addSubDepartment);
-router.put("/edit_sub_department", department.editSubDepartment);
+router.put("/update_sub_department", department.editSubDepartment);
 router.delete("/delete_sub_department/:id", department.deleteSubDepartment);
 router.get(
   "/get_subdept_from_dept/:id",
@@ -108,9 +108,9 @@ router.get("/get_subdept_from_id/:id", department.getSubDepartmentsFromId);
 
 /* designation */
 router.post("/add_designation", designation.addDesignation);
-router.put("/edit_designation", designation.editDesignation);
+router.put("/update_designation", designation.editDesignation);
 router.delete("/delete_designation/:id", designation.deleteDesignation);
-router.get("/get_designations", designation.getDesignations);
+router.get("/get_all_designations", designation.getDesignations);
 
 //brand routes
 router.post("/add_brand", brand.addBrand);
@@ -239,45 +239,45 @@ router.put("/edit_finance", upload.single("screenshot"), finance.editFinance);
 router.delete("/delete_finance",  finance.deleteFinance);
 
 /* Sitting Routes */
-router.post("/sitting", sitting.addSitting);
-router.get("/sitting", sitting.getSittings);
-router.get("/sitting/:id", sitting.getSingleSitting);
-router.put("/sitting", sitting.editSitting);
-router.delete("/sitting/:id", sitting.deleteSitting);
+router.post("/add_sitting", sitting.addSitting);
+router.get("/get_all_sittings", sitting.getSittings);
+router.get("/get_single_sitting/:id", sitting.getSingleSitting);
+router.put("/update_sitting", sitting.editSitting);
+router.delete("/delete_sitting/:id", sitting.deleteSitting);
 
 /* Agency Routes */
-router.post("/agency", agency.addAgency);
-router.get("/agency", agency.getAgencys);
-router.get("/agency/:id", agency.getAgencyById);
-router.put("/agency", agency.editAgency);
-router.delete("/agency/:id", agency.deleteAgency);
+router.post("/add_agency", agency.addAgency);
+router.get("/get_all_agencys", agency.getAgencys);
+router.get("/get_single_agency/:id", agency.getAgencyById);
+router.put("/update_agency", agency.editAgency);
+router.delete("/delete_agency/:id", agency.deleteAgency);
 
 /* Object Mast */
-router.post("/obj", objectMast.addObjectMast);
-router.get("/allobj", objectMast.getObjectMasts);
+router.post("/add_obj", objectMast.addObjectMast);
+router.get("/get_all_objs", objectMast.getObjectMasts);
 router.get("/objdata/:id", objectMast.getObjectMastById);
 
 /* role */
 router.post("/add_role", role.addRole);
-router.get("/get_roles", role.getRoles);
-router.put("/edit_role", role.editRole);
+router.get("/get_all_roles", role.getRoles);
+router.put("/update_role", role.editRole);
 router.delete("/delete_role/:id", role.deleteRole);
 
 /* Announcement */
-router.post("/annomastpost", announcement.addAnnouncement);
-router.get("/allannouncementdata", announcement.getAnnouncements);
-router.get("/announcement/:id", announcement.getAnnoncementById);
-router.delete("/annomastdelete/:id", announcement.deleteAnnoncement);
-router.put("/annomastput", announcement.editAnnoncement);
+router.post("/add_annomastpost", announcement.addAnnouncement);
+router.get("/get_all_announcementdatas", announcement.getAnnouncements);
+router.get("/get_single_announcement/:id", announcement.getAnnoncementById);
+router.delete("/delete_annomastdelete/:id", announcement.deleteAnnoncement);
+router.put("/update_annomastput", announcement.editAnnoncement);
 
 /* job responsibility */
 router.post("/add_job_responsibility", responsibility.addJobResponsibility);
-router.get("/get_jobresponsibility", responsibility.getJobResposibilities);
+router.get("/get_all_jobresponsibilitys", responsibility.getJobResposibilities);
 router.get(
   "/get_single_jobresponsibility/:id",
   responsibility.getSingleJobResponsibility
 );
-router.put("/edit_jobresponsibility", responsibility.editJobResponsibility);
+router.put("/update_jobresponsibility", responsibility.editJobResponsibility);
 router.delete(
   "/delete_jobresponsibility/:id",
   responsibility.deleteJobResponsibility
@@ -296,18 +296,18 @@ router.delete(
 );
 
 /* Content Management Routes */
-router.post("/contentMgnt", contentM.addcontentManagement);
-router.get("/contentMgnt", contentM.getcontentManagements);
-router.get("/contentMgnt/:id", contentM.getContentManagementById);
-router.put("/contentMgnt", contentM.editcontentManagement);
-router.delete("/contentMgnt/:id", contentM.deletecontentManagement);
+router.post("/add_contentMgnt", contentM.addcontentManagement);
+router.get("/get_all_contentMgnts", contentM.getcontentManagements);
+router.get("/get_single_contentMgnt/:id", contentM.getContentManagementById);
+router.put("/update_contentMgnt", contentM.editcontentManagement);
+router.delete("/delete_contentMgnt/:id", contentM.deletecontentManagement);
 
 /* BillingHeader Routes */
-router.post("/billingheader", billingheader.addBillingHeader);
-router.get("/billingheader", billingheader.getBillingHeaders);
-router.get("/billingheader/:id", billingheader.getBillingHeaderById);
-router.put("/billingheader", billingheader.editBillingHeader);
-router.delete("/billingheader/:id", billingheader.deleteBillingHeader);
+router.post("/add_billingheader", billingheader.addBillingHeader);
+router.get("/get_all_billingheaders", billingheader.getBillingHeaders);
+router.get("/get_single_billingheader/:id", billingheader.getBillingHeaderById);
+router.put("/update_billingheader", billingheader.editBillingHeader);
+router.delete("/delete_billingheader/:id", billingheader.deleteBillingHeader);
 
 /* Brand Category */
 router.post("/brandCategory", brandCategory.addBrandCategory);
@@ -347,7 +347,7 @@ router.delete("/insta_brand/:id", instaBrand.deleteInstaBrand);
 router.post("/add_user", user.addUser);
 router.put("/update_user", user.updateUser);
 router.get("/get_wfh_user", user.getWFHUsersByDept);
-router.get("/all_users", user.getAllUsers);
+router.get("/get_all_users", user.getAllUsers);
 router.get("/get_single_user/:id", user.getSingleUser);
 router.delete("/delete_user/:id", user.deleteUser);
 router.post("/add_user_auth", user.addUserAuth);
@@ -355,12 +355,12 @@ router.put("/update_user_auth", user.updateUserAuth);
 router.delete("/delete_user_auth", user.deleteUserAuth);
 router.get("/get_all_user_auth", user.allUserAuthDetail);
 router.post("/login_user", user.loginUser);
-router.get("/delivery_boy", user.deliveryBoy);
-router.get("/delivery_user", user.deliveryUser);
-router.get("/delivery_boy_by_room/:id", user.deliveryBoyByRoom);
+router.get("/get_delivery_boy", user.deliveryBoy);
+router.get("/get_delivery_user", user.deliveryUser);
+router.get("/get_single_delivery_boy_by_room/:id", user.deliveryBoyByRoom);
 router.get("/get_single_user_auth_detail/:id", user.getSingleUserAuthDetail);
-router.get("/user_object_auth", user.userObjectAuth);
-router.post("/send_user_mail", upload.single("attachment"), user.sendUserMail);
+router.get("/get_user_object_auth", user.userObjectAuth);
+router.post("/add_send_user_mail", upload.single("attachment"), user.sendUserMail);
 router.post("/get_user_job_responsibility", user.getUserJobResponsibility);
 router.get("/get_user_by_deptid/:id", user.getUserByDeptId);
 router.get("/get_user_other_fields/:id", user.getUserOtherFields);
@@ -381,7 +381,7 @@ router.get("/get_all_separations", user.getAllSeparations);
 router.get("/get_single_separation/:id", user.getSingleSeparation);
 router.put("/update_separation", user.updateSeparation);
 router.post(
-  "/send_mail_all_wfo_user",
+  "/add_send_mail_all_wfo_user",
   upload.single("attachment"),
   user.sendMailAllWfoUser
 );
@@ -403,57 +403,61 @@ router.post(
 router.get("/get_salary_count_by_year", attendance.getSalaryCountByYear);
 
 /* commitement */
-router.post("/commitment", cmtController.addCmt);
-router.put("/commitment", cmtController.editCmt);
-router.get("/commitment", cmtController.getCmt);
-router.get("/commitment/:id", cmtController.getCmtById);
-router.delete("/commitment/:id", cmtController.deleteCmt);
+router.post("/add_commitment", cmtController.addCmt);
+router.put("/update_commitment", cmtController.editCmt);
+router.get("/get_all_commitments", cmtController.getCmt);
+router.get("/get_single_commitment/:id", cmtController.getCmtById);
+router.delete("/delete_commitment/:id", cmtController.deleteCmt);
 
 /* Product */
 
 //Product
 router.post(
-  "/product",
+  "/add_product",
   upload1.single("Product_image"),
   productController.addProduct
 );
 router.put(
-  "/productupdate",
+  "/update_productupdate",
   upload1.single("Product_image"),
   productController.editProduct
 );
-router.get("/productdata/:id", productController.getProductById);
-router.delete("/productdelete/:id", productController.deleteProductById);
+router.get("/get_single_productdata/:id", productController.getProductById);
+router.delete("/delete_productdelete/:id", productController.deleteProductById);
 //Product props
-router.post("/proppost", productController.addProductProps);
+router.post("/add_proppost", productController.addProductProps);
 router.get(
-  "/propsdata/:product_id",
+  "/get_single_propsdata/:product_id",
   productController.getProductPropsByProductId
 );
-router.put("/propsdataupdate/:id", productController.editProductProps);
-router.delete("/propdelete/:id", productController.deleteProductProp);
+router.put("/update_propsdataupdate/:id", productController.editProductProps);
+router.delete("/delete_propdelete/:id", productController.deleteProductProp);
 
 // Order Delivery api's
-router.post("/orderdelivery", productController.addOrderDelivery);
-router.get("/allorderdelivery", productController.getAllOrderDeliveries);
+router.post("/add_orderdelivery", productController.addOrderDelivery);
+router.get("/get_all_orderdelivery", productController.getAllOrderDeliveries);
 
 //Order Req api's
-router.post("/ordereq", productController.addOrderReq);
-router.post("/orderrequest", productController.getOrderReqByOrderId);
-router.put("/orderrequest", productController.editOrderReq);
-router.put("/statusupdatebymanager", productController.statusUpdateByManager);
-router.put("/orderrequesttransbyman", productController.statusUpdateByManager);
-router.delete("/orderreqdelete", productController.deleteOrderReqById);
-router.get("/getLastOrderId", productController.getLastOrderId);
-router.get("/deliveredorders/:id", productController.delivereOrdersById);
-router.get("/pendingorders/:id", productController.pendingOrdersById);
-router.post("/userorderrequest", productController.orderRequestsForUser);
-router.get("/allorderreqdata", productController.allOrderReqData);
+router.post("/add_ordereq", productController.addOrderReq);
+router.post("/add_orderrequest", productController.getOrderReqByOrderId);
+router.put("/update_orderrequest", productController.editOrderReq);
+router.put("/update_statusupdatebymanager", productController.statusUpdateByManager);
+router.put("/update_orderrequesttransbyman", productController.statusUpdateByManager);
+router.delete("/delete_orderreqdelete", productController.deleteOrderReqById);
+router.get("/get_LastOrderId", productController.getLastOrderId);
+router.get("/get_single_deliveredorders/:id", productController.delivereOrdersById);
+router.get("/get_single_pendingorders/:id", productController.pendingOrdersById);
+router.post("/add_userorderrequest", productController.orderRequestsForUser);
+router.get("/get_all_orderreqdata", productController.allOrderReqData);
+router.get("/get_single_orderreqshistory/:user_id", productController.orderReqHistory);
+router.post("/add_orderreqs", productController.getOrderReqsBasedOnFilter);
+router.post("/add_transreq", productController.addTransferReq);
+router.get("/get-all_transreq", productController.getAllTransferReq);
 
 /* KRA Routes */
-router.post("/kra", kra.addKra);
-router.get("/kra/:user_id", kra.getJobResponById);
-router.get("/kra", kra.getKras);
+router.post("/add_kra", kra.addKra);
+router.get("/get_single_kra/:user_id", kra.getJobResponById);
+router.get("/get_all_kras", kra.getKras);
 
 /* instapage routes */
 router.post("/add_instapage", instapage.addIp);
@@ -479,33 +483,28 @@ router.post("/dataforgraph", instapage.dataForGraph)
 router.get("/all_data_of_ipregis", instapage.getAllInstaPages)
 
 /* Lead Remark Route */
-router.post("/leadremark", leadremark.addLeadRemark);
-router.get("/leadremark", leadremark.getLeadRemarks);
-router.put("/leadremark", leadremark.editLeadRemark);
-
-router.get("/orderreqshistory/:user_id", productController.orderReqHistory);
-router.post("/orderreqs", productController.getOrderReqsBasedOnFilter);
-router.post("/transreq", productController.addTransferReq);
-router.get("/alltransreq", productController.getAllTransferReq);
+router.post("/add_leadremark", leadremark.addLeadRemark);
+router.get("/get_all_leadremarks", leadremark.getLeadRemarks);
+router.put("/update_leadremark", leadremark.editLeadRemark);
 
 /* Lead Route */
-router.post("/lead", lead.addLead);
-router.get("/lead", lead.getLeads);
-router.get("/lead/:lead_id", lead.getLeadById);
-router.put("/lead", lead.editLead);
-router.delete("/lead", lead.deleteLead);
+router.post("/add_lead", lead.addLead);
+router.get("/get_all_leads", lead.getLeads);
+router.get("/get_single_lead/:lead_id", lead.getLeadById);
+router.put("/update_lead", lead.editLead);
+router.delete("/delete_lead", lead.deleteLead);
 
 /* Lead Type Route */
-router.post("/leadtype", leadtype.addLeadType);
-router.get("/leadtype", leadtype.getLeadTypes);
-router.put("/leadtype", leadtype.editLeadType);
-router.delete("/leadtype", leadtype.deleteLeadType);
+router.post("/add_leadtype", leadtype.addLeadType);
+router.get("/get_all_leadtypes", leadtype.getLeadTypes);
+router.put("/update_leadtype", leadtype.editLeadType);
+router.delete("/delete_leadtype", leadtype.deleteLeadType);
 
 /* Lead Mast Route */
-router.post("/leadmast", leadmast.addLeadMast);
-router.get("/leadmast", leadmast.getLeadMasts);
-router.get("/leadmast/:leadmast_id", leadmast.getLeadMastById);
-router.put("/leadmast", leadmast.editLeadMast);
-router.delete("/leadmast", leadmast.deleteLeadMast);
+router.post("/add_leadmast", leadmast.addLeadMast);
+router.get("/get_all_leadmasts", leadmast.getLeadMasts);
+router.get("/get_single_leadmast/:leadmast_id", leadmast.getLeadMastById);
+router.put("/update_leadmast", leadmast.editLeadMast);
+router.delete("/delete_leadmast", leadmast.deleteLeadMast);
 
 module.exports = router;
