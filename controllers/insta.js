@@ -358,6 +358,17 @@ exports.getPostsFromName = async (req, res) => {
     }
 };
 
+exports.getPostsByDecNum = async (req, res) => {
+    try {
+        const getPosts = await instaP.find({ posttype_decision: parseInt(req.body.posttype_decision) });
+        res.status(200).send(getPosts);
+    } catch (error) {
+        res
+            .status(500)
+            .send({ error: error, sms: "error getting posts from name" });
+    }
+};
+
 exports.trackStory = async (req, res) => {
     try {
         // console.log("story api", req.body);

@@ -65,6 +65,7 @@ router.post("/get_posts_from_name", insta.getPostsFromName);
 router.get("/creator_insights", insta.creatorInsights);
 router.get("/cfinstaapi", insta.cfInstaApi);
 router.get("/countinstacp", insta.countInstaCPModels);
+router.post("/get_all_posts_by_id", insta.getPostsByDecNum)
 /*execution api*/
 router.post("/exe_inven_post", exe.exeInvenPost);
 router.get("/get_exe_inventory", exe.getExeInventory);
