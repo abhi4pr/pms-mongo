@@ -96,22 +96,22 @@ router.put("/update_logo_brand",  logoBrand.editLogoBrand);
 router.delete("/delete_logo_brand/:id",  logoBrand.deleteLogoBrand);
 
 /* department */
-router.post("/add_department",  department.addDepartment);
-router.get("/get_all_departments",  department.getDepartments);
+router.post("/add_department",  department.addDepartment);//Done
+router.get("/get_all_departments",  department.getDepartments);//Done
 router.get(
   "/get_single_department/:id",
   
   department.getSingleDepartment
-);
-router.put("/update_department",  department.editDepartment);
+);//not used
+router.put("/update_department",  department.editDepartment);//Done
 router.delete(
   "/delete_department/:id",
-  
   department.deleteDepartment
-);
+);//Done
 
 /* sub department */
 router.post("/add_sub_department",  department.addSubDepartment);
+router.get("/get_all_sub_departments",  department.getSubDepartments);
 router.put("/update_sub_department",  department.editSubDepartment);
 router.delete(
   "/delete_sub_department/:id",

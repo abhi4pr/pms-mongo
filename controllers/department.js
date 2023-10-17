@@ -6,7 +6,7 @@ exports.addDepartment = async (req, res) => {
   try {
     const simc = new departmentModel({
       dept_name: req.body.dept_name,
-      Remarks: req.body.Remarks,
+      Remarks: req.body.remark,
       Created_by: req.body.Created_by,
     });
     const simv = await simc.save();
@@ -28,13 +28,7 @@ exports.getDepartments = async (req, res) => {
     if (!simc) {
       return response.returnFalse(200, req, res, "No Reord Found...", []);
     }
-    return response.returnTrue(
-      200,
-      req,
-      res,
-      "Department Fetch Successfully",
-      simc
-    );
+    res.status(200).send(simc)
   } catch (err) {
     return response.returnFalse(500, req, res, err.message, {});
   }
@@ -66,7 +60,7 @@ exports.editDepartment = async (req, res) => {
       { dept_id: parseInt(req.body.dept_id) },
       {
         dept_name: req.body.dept_name,
-        Remarks: req.body.Remarks,
+        Remarks: req.body.remark,
         Created_by: req.body.Created_by,
         Last_updated_by: req.body.Last_updated_by,
         Last_updated_date: req.body.Last_updated_date,
@@ -88,25 +82,16 @@ exports.editDepartment = async (req, res) => {
   }
 };
 
-exports.deleteDepartment = async (req, res) => {
-  departmentModel
-    .deleteOne({ dept_id: req.params.dept_id })
-    .then((item) => {
-      if (item) {
-        return response.returnTrue(200, req, res, "Deleted Successfully", {});
-      } else {
-        return response.returnFalse(
-          200,
-          req,
-          res,
-          "Department Not Found...",
-          {}
-        );
+exports.deleteDepartment = async (req, res) =>{
+  departmentModel.deleteOne({id:req.params.dept_id}).then(item =>{
+      if(item){
+          return res.status(200).json({success:true, message:'Department deleted'})
+      }else{
+          return res.status(404).json({success:false, message:'Department not found'})
       }
-    })
-    .catch((err) => {
-      return response.returnFalse(500, req, res, err.message, {});
-    });
+  }).catch(err=>{
+      return res.status(400).json({success:false, message:err})
+  })
 };
 
 exports.addSubDepartment = async (req, res) => {
@@ -234,6 +219,46 @@ exports.getSubDepartmentsFromDeptId = async (req, res) => {
       "Data Fetch Successfully",
       singlesim
     );
+  } catch (err) {
+    return response.returnFalse(500, req, res, err.message, {});
+  }
+};
+
+exports.getSubDepartments = async (req, res) => {
+  try {
+    const simc = await subDepartmentModel
+      .aggregate([
+        {
+          $lookup: {
+            from: "departmentmodels",
+            localField: "dept_id",
+            foreignField: "dept_id",
+            as: "department",
+          },
+        },
+        {
+          $unwind: "$department",
+        },
+        {
+          $project: {
+            _id: 1,
+            dept_name: "$department.dept_name",
+            sub_dept_name: "$sub_dept_name",
+            remark:"$remark",
+            created_by:"$created_by",
+            created_date:"$created_at",
+            last_updated_by:"$last_updated_by",
+            last_updated_at:"$last_updated_at",
+            dept_id: "$dept_id",
+            id: "$id",
+          },
+        },
+      ])
+      .exec();
+    if (!simc) {
+      return response.returnFalse(200, req, res, "No Reord Found...", []);
+    }
+    res.status(200).send(simc)
   } catch (err) {
     return response.returnFalse(500, req, res, err.message, {});
   }

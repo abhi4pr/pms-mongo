@@ -27,9 +27,11 @@ const departmentModel = new mongoose.Schema({
   },
   Last_updated_by: {
     type: Number,
+    default:0
   },
   Last_updated_date: {
     type: Date,
+    default:0
   },
 });
 
