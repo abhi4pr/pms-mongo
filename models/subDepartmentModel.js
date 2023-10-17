@@ -30,13 +30,10 @@ const subDepartmentModel = new mongoose.Schema({
         default: 0
     },
     last_updated_at: {
-        type: Date,
-        default: Date.now
+        type: Date
     },
     last_updated_by: {
-        type: Number,
-        required: false,
-        default: 0
+        type: Number
     }
 });
 

@@ -138,6 +138,45 @@ exports.getProductById = async (req, res) => {
     return response.returnFalse(500, req, res, error.message, {});
   }
 };
+exports.getProduct = async (req, res) => {
+  try {
+    
+    let product = await productModel.aggregate([
+      
+      {
+        $lookup: {
+          from: "productpropsmodels",
+          localField: "product_id",
+          foreignField: "product_id",
+          as: "Product_Prop",
+        },
+      },
+    ]);
+    if (!product?.[0]) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "No Record Found with this Product id.",
+        {}
+      );
+    }
+    const url = `${constant.base_url}/uploads/productImage/`;
+    const dataWithFileUrls = product.map((item) => ({
+      ...item,
+      imageUrl: item.Product_image ? url + item.Product_image : "",
+    }));
+    return response.returnTrue(
+      200,
+      req,
+      res,
+      "Product Fetch successfully.",
+      dataWithFileUrls
+    );
+  } catch (error) {
+    return response.returnFalse(500, req, res, error.message, {});
+  }
+};
 
 exports.deleteProductById = async (req, res) => {
   const id = parseInt(req.params.id);

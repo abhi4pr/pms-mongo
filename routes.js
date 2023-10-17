@@ -564,6 +564,11 @@ router.get(
   
   productController.getProductById
 );
+router.get(
+  "/get_all_products",
+  
+  productController.getProduct
+);
 router.delete(
   "/delete_productdelete/:id",
   
