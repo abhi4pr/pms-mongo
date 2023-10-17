@@ -43,17 +43,52 @@ const editRegisterCampaign = {
     post: {
       tags: [`Register Campaign Module`],
       description: "Edit a Register Campaign with the specified ID.",
-      consumes: [
-        "multipart/form-data"
-      ],
-      parameters: [
-        {
-          in: "formData",
-          name: "upfile",
-          type: "file",
-          description: "The file to upload."
-        }
-      ],
+      requestBody: {
+        content: {
+          "multipart/form-data": {
+            schema: {
+              type: "object",
+              properties: {
+                excel_file: {
+                  type: "file",
+                  format: "binary",
+                  description: "This is excel for register campaign",
+                },
+                brand_id: {
+                  type: "string",
+                  format: "integer",
+                  description: "Provide Brand model identification id",
+                },
+                exeCmpId: {
+                  type: "integer",
+                  format: "integer",
+                  description: "Provide exeCampaignModel identification id",
+                },
+                brnad_dt: {
+                  type: "Date",
+                  format: "Date",
+                  description: "Provide Date",
+                },
+                detailing: {
+                  type: "string",
+                  format: "string",
+                  description: "Provide detailing",
+                },
+                commitment: {
+                  type: "string",
+                  format: "string",
+                  description: "Provide Array of object",
+                },
+                status: {
+                  type: "integer",
+                  format: "integer",
+                  description: "Provide status",
+                },
+              },
+            },
+          },
+        },
+      },
       responses: {
         200: {
           description: "Register Campaign Created successfully.",
@@ -95,26 +130,58 @@ const editRegisterCampaign = {
     put: {
       tags: [`Register Campaign Module`],
       description: "Edit a Register Campaign with the specified ID.",
-      parameters: [
-        {
-          in: "body",
-          name: "request body",
-          description:
-            "The request body containing the updated Register Campaign data.",
-          required: true,
-          schema: {
-            type: "object",
-            properties: {
-              register_campaign_id: {
-                type: "integer",
-                description: "The ID of the Register Campaign to update.",
+      requestBody: {
+        content: {
+          "multipart/form-data": {
+            schema: {
+              type: "object",
+              properties: {
+               
+                excel_file: {
+                  type: "file",
+                  format: "binary",
+                  description: "This is excel for register campaign",
+                },
+                brand_id: {
+                  type: "string",
+                  format: "integer",
+                  description: "Provide Brand model identification id",
+                },
+                register_campaign_id: {
+                  type: "string",
+                  format: "integer",
+                  description: "Provide register campaign model id which is you want to update.",
+                },
+                exeCmpId: {
+                  type: "integer",
+                  format: "integer",
+                  description: "Provide exeCampaignModel identification id",
+                },
+                brnad_dt: {
+                  type: "Date",
+                  format: "Date",
+                  description: "Provide Date",
+                },
+                detailing: {
+                  type: "string",
+                  format: "string",
+                  description: "Provide detailing",
+                },
+                commitment: {
+                  type: "string",
+                  format: "string",
+                  description: "Provide Array of object",
+                },
+                status: {
+                  type: "integer",
+                  format: "integer",
+                  description: "Provide status",
+                },
               },
-              // Add other properties of the request body here
             },
-            example: updateRegisterCmpData,
           },
         },
-      ],
+      },
       responses: {
         200: {
           description: "Register Campaign updated successfully.",
