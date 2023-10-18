@@ -110,34 +110,37 @@ router.delete(
 );//Done
 
 /* sub department */
-router.post("/add_sub_department",  department.addSubDepartment);
-router.get("/get_all_sub_departments",  department.getSubDepartments);
-router.put("/update_sub_department",  department.editSubDepartment);
+router.post("/add_sub_department",  department.addSubDepartment);//Done
+router.get("/get_all_sub_departments",  department.getSubDepartments);//Done
+router.put("/update_sub_department",  department.editSubDepartment);//Done
 router.delete(
   "/delete_sub_department/:id",
   
   department.deleteSubDepartment
-);
+);//Done
 router.get(
-  "/get_subdept_from_dept/:id",
+  "/get_subdept_from_dept/:dept_id",
   
   department.getSubDepartmentsFromDeptId
-);
+);//Done
 router.get(
   "/get_subdept_from_id/:id",
   
   department.getSubDepartmentsFromId
-);
+);//Done
 
 /* designation */
-router.post("/add_designation",  designation.addDesignation);
-router.put("/update_designation",  designation.editDesignation);
+router.post("/add_designation",  designation.addDesignation);//Done
+router.put("/update_designation",  designation.editDesignation);//Done
+router.get(
+  "/get_single_designation/:desi_id",
+  designation.getSingleDesignation
+);//Done
 router.delete(
-  "/delete_designation/:id",
-  
+  "/delete_designation/:desi_id",
   designation.deleteDesignation
-);
-router.get("/get_all_designations",  designation.getDesignations);
+);//Done
+router.get("/get_all_designations",  designation.getDesignations);//Done
 
 //brand routes
 router.post("/add_brand", brand.addBrand);
@@ -298,7 +301,7 @@ router.get("/objdata/:id",  objectMast.getObjectMastById);
 router.post("/add_role",  role.addRole);
 router.get("/get_all_roles",  role.getRoles);
 router.put("/update_role",  role.editRole);
-router.delete("/delete_role/:id",  role.deleteRole);
+router.delete("/delete_role/:role_id",  role.deleteRole);
 
 /* Announcement */
 router.post("/add_annomastpost",  announcement.addAnnouncement);

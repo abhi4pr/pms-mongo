@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-auto-increment');
 
 const roleModel = new mongoose.Schema({
-    Role_id:{
+    role_id:{
         type: Number,
         required: true
     },
@@ -28,13 +28,18 @@ const roleModel = new mongoose.Schema({
         type: Number,
         required: false,
         default: 0
+    },
+    Last_updated_by: {
+        type: Number,
+        required: false,
+        default: 0
     }
 });
 
 AutoIncrement.initialize(mongoose.connection);
 roleModel.plugin(
     AutoIncrement.plugin, 
-    { model: 'roleModels', field: 'Role_id', startAt: 1, incrementBy: 1 }
+    { model: 'roleModels', field: 'role_id', startAt: 1, incrementBy: 1 }
 );
 
 module.exports = mongoose.model('roleModel', roleModel);

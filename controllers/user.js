@@ -1415,28 +1415,29 @@ exports.addReason = async (req, res) => {
 
 exports.getAllReasons = async (req, res) => {
     try{
-        const delv = await reasonModel.aggregate([
-            {
-                $lookup: {
-                    from: 'usermodels',
-                    localField: 'user_id',
-                    foreignField: 'created_by',
-                    as: 'user'
-                }
-            },
-            {
-                $unwind: '$user'
-            },
-            {
-                $project: {
-                    createdBY_name: '$user.user_name',
-                    id: "$_id",
-                    reason: '$reason',
-                    remark: '$remark',
-                    created_by: '$created_by'
-                }
-            }
-        ]).exec();
+        // const delv = await reasonModel.aggregate([
+        //     {
+        //         $lookup: {
+        //             from: 'usermodels',
+        //             localField: 'user_id',
+        //             foreignField: 'created_by',
+        //             as: 'user'
+        //         }
+        //     },
+        //     {
+        //         $unwind: '$user'
+        //     },
+        //     {
+        //         $project: {
+        //             createdBY_name: '$user.user_name',
+        //             id: "$id",
+        //             reason: '$reason',
+        //             remark: '$remark',
+        //             created_by: '$created_by'
+        //         }
+        //     }
+        // ]).exec();
+        const delv = await reasonModel.find();
         if(!delv){
             res.status(500).send({success:false})
         }

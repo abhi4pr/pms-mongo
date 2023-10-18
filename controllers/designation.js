@@ -1,4 +1,5 @@
 const designationModel = require('../models/designationModel.js');
+const response = require("../common/response.js");
 
 exports.addDesignation = async (req, res) =>{
     try{
@@ -50,23 +51,53 @@ exports.getDesignations = async (req, res) => {
     }
 };
 
+exports.getSingleDesignation = async (req, res) => {
+    try {
+      const singlesim = await designationModel.findOne({
+        desi_id: parseInt(req.params.desi_id),
+      });
+      if (!singlesim) {
+        return response.returnFalse(200, req, res, "No Reord Found...", {});
+      }
+      return response.returnTrue(
+        200,
+        req,
+        res,
+        "Designation Data Fetch Successfully",
+        singlesim
+      );
+    } catch (err) {
+      return response.returnFalse(500, req, res, err.message, {});
+    }
+  };
+
 exports.editDesignation = async (req, res) => {
-    try{
-        const editsim = await designationModel.findOneAndUpdate({desi_id:req.body.desi_id},{
+    try {
+      const editsim = await designationModel.findOneAndUpdate(
+        { desi_id: parseInt(req.body.desi_id) },
+        {
             desi_name: req.body.desi_name,
             dept_id: req.body.dept_id,
             remark: req.body.remark,
             last_updated_by: req.body.last_updated_by,
             last_updated_at: req.body.last_updated_at
-        }, { new: true })
-        if(!editsim){
-            res.status(500).send({success:false})
-        }
-        res.status(200).send({success:true,data:editsim})
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error updating designation details'})
+        },
+        { new: true }
+      );
+      if (!editsim) {
+        return response.returnFalse(
+          200,
+          req,
+          res,
+          "No Reord Found With This Designation Id",
+          {}
+        );
+      }
+      return response.returnTrue(200, req, res, "Updation Successfully", editsim);
+    } catch (err) {
+      return response.returnFalse(500, req, res, err.message, {});
     }
-};
+  };
 
 exports.deleteDesignation = async (req, res) =>{
     designationModel.deleteOne({desi_id:req.params.desi_id}).then(item =>{

@@ -70,27 +70,27 @@ const userModel = new mongoose.Schema({
         required: false,
         default: ""
     },
-    personal_number:{
+    PersonalNumber:{
         type: Number,
         required: false,
         default: 0
     },
-    report_L1:{
+    Report_L1:{
         type: Number,
         required: false,
         default: 0
     },
-    report_L2:{
+    Report_L2:{
         type: Number,
         required: false,
         default: 0
     },
-    report_L3:{
+    Report_L3:{
         type: Number,
         required: false,
         default: 0
     },
-    Personal_email:{
+    PersonalEmail:{
         type: String,
         required: false,
         default: ""
@@ -142,12 +142,12 @@ const userModel = new mongoose.Schema({
         required: false,
         default: 0
     },
-    FatherName:{
+    fatherName:{
         type: String,
         required: false,
         default: ""
     },
-    MotherName: {
+    motherName: {
         type: String,
         required: false,
         default: ""
@@ -167,7 +167,7 @@ const userModel = new mongoose.Schema({
         required: false,
         default: ""
     },
-    DateofMarriage: {
+    DateOfMarriage: {
         type: Date,
         default: Date.now
     },
