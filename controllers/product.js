@@ -127,22 +127,21 @@ exports.getProductById = async (req, res) => {
       ...item,
       imageUrl: item.Product_image ? url + item.Product_image : "",
     }));
-    return response.returnTrue(
-      200,
-      req,
-      res,
-      "Product Fetch successfully.",
-      dataWithFileUrls[0]
-    );
+    // return response.returnTrue(
+    //   200,
+    //   req,
+    //   res,
+    //   "Product Fetch successfully.",
+    //   dataWithFileUrls
+    // );
+    return res.status(200).json(dataWithFileUrls[0]);
   } catch (error) {
     return response.returnFalse(500, req, res, error.message, {});
   }
 };
 exports.getProduct = async (req, res) => {
   try {
-    
     let product = await productModel.aggregate([
-      
       {
         $lookup: {
           from: "productpropsmodels",
@@ -166,13 +165,14 @@ exports.getProduct = async (req, res) => {
       ...item,
       imageUrl: item.Product_image ? url + item.Product_image : "",
     }));
-    return response.returnTrue(
-      200,
-      req,
-      res,
-      "Product Fetch successfully.",
-      dataWithFileUrls
-    );
+    // return response.returnTrue(
+    //   200,
+    //   req,
+    //   res,
+    //   "Product Fetch successfully.",
+    //   dataWithFileUrls
+    // );
+    return res.status(200).json(dataWithFileUrls);
   } catch (error) {
     return response.returnFalse(500, req, res, error.message, {});
   }
@@ -460,7 +460,7 @@ exports.addOrderReq = async (req, res) => {
 
     //Saved Data into Order Req Table
     const orderReqObj = new orderReqModel({
-      Product_id: product_id,
+      product_id: product_id,
       Order_quantity: order_quantity,
       Special_request: special_request,
       User_id: user_id,
@@ -485,9 +485,12 @@ exports.addOrderReq = async (req, res) => {
     //Creating Template for sending in mail
     const templatePath = path.join(__dirname, "template1.ejs");
     const template = await fs.promises.readFile(templatePath, "utf-8");
-    const userName = userDetails.user_name;
-    const SittingRefNo = sittingDetails.sitting_ref_no;
-    const SittingArea = sittingDetails.sitting_area;
+    // const userName = userDetails.user_name;
+    const userName = "Lalit";
+    // const SittingRefNo = sittingDetails.sitting_ref_no;
+    const SittingRefNo = "cabin 4";
+    // const SittingArea = sittingDetails.sitting_area;
+    const SittingArea = "105";
 
     const html = ejs.render(template, {
       userName,
@@ -521,7 +524,7 @@ exports.getOrderReqByOrderId = async (req, res) => {
         $lookup: {
           from: "productmodels",
           localField: "product_id",
-          foreignField: "Product_id",
+          foreignField: "product_id",
           as: "Product",
         },
       },
@@ -553,7 +556,7 @@ exports.getOrderReqByOrderId = async (req, res) => {
       {
         $project: {
           Order_req_id: 1,
-          Product_id: 1,
+          product_id: 1,
           Product_category: 1,
           Order_quantity: 1,
           Special_request: 1,
@@ -622,7 +625,7 @@ exports.editOrderReq = async (req, res) => {
       Request_delivered_by: req.body.request_delivered_by,
       Message: req.body.message,
       Remarks: req.body.remarks,
-      Product_id: req.body.product_id,
+      product_id: req.body.product_id,
       Last_updated_date: Date.now(),
       Delivered_datetime: Date.now(),
     };
@@ -666,7 +669,7 @@ exports.statusUpdateByManager = async (req, res) => {
       Request_delivered_by: req.body.request_delivered_by,
       Message: req.body.message,
       Remarks: req.body.remarks,
-      Product_id: req.body.product_id,
+      product_id: req.body.product_id,
       Last_updated_date: Date.now(),
       Delivered_datetime: Date.now(),
     };
@@ -709,7 +712,7 @@ exports.orderRequestTransByMan = async (req, res) => {
       Message: req.body.message,
       room_id: req.body.room_id,
       Remarks: req.body.remarks,
-      Product_id: req.body.product_id,
+      product_id: req.body.product_id,
       props1: req.body.props1,
       props2: req.body.props2,
       props3: req.body.props3,
@@ -780,13 +783,14 @@ exports.getLastOrderId = async (req, res) => {
     if (!lastOrder) {
       return response.returnFalse(200, req, res, "No Record found", {});
     } else {
-      return response.returnTrue(
-        200,
-        req,
-        res,
-        "Data Fetch Successfully",
-        lastOrder
-      );
+      // return response.returnTrue(
+      //   200,
+      //   req,
+      //   res,
+      //   "Data Fetch Successfully",
+      //   lastOrder
+      // );
+      return res.status(200).json(lastOrder[0]);
     }
   } catch (err) {
     return response.returnFalse(500, req, res, err.message, {});
@@ -811,7 +815,7 @@ exports.pendingOrdersById = async (req, res) => {
         $lookup: {
           from: "productmodels",
           localField: "product_id",
-          foreignField: "Product_id",
+          foreignField: "product_id",
           as: "Product",
         },
       },
@@ -824,7 +828,7 @@ exports.pendingOrdersById = async (req, res) => {
       {
         $project: {
           Order_req_id: 1,
-          Product_id: 1,
+          product_id: 1,
           Product_category: 1,
           Order_quantity: 1,
           Special_request: 1,
@@ -924,7 +928,7 @@ exports.delivereOrdersById = async (req, res) => {
         $lookup: {
           from: "productmodels",
           localField: "product_id",
-          foreignField: "Product_id",
+          foreignField: "product_id",
           as: "Product",
         },
       },
@@ -937,7 +941,7 @@ exports.delivereOrdersById = async (req, res) => {
       {
         $project: {
           Order_req_id: 1,
-          Product_id: 1,
+          product_id: 1,
           Product_category: 1,
           Order_quantity: 1,
           Special_request: 1,
@@ -1032,7 +1036,7 @@ exports.orderRequestsForUser = async (req, res) => {
         $lookup: {
           from: "productmodels",
           localField: "product_id",
-          foreignField: "Product_id",
+          foreignField: "product_id",
           as: "productModel",
         },
       },
@@ -1064,7 +1068,7 @@ exports.orderRequestsForUser = async (req, res) => {
       {
         $project: {
           Order_req_id: 1,
-          Product_id: 1,
+          product_id: 1,
           Product_category: 1,
           Order_quantity: 1,
           Special_request: 1,
@@ -1149,7 +1153,7 @@ exports.allOrderReqData = async (req, res) => {
         $lookup: {
           from: "productmodels",
           localField: "product_id",
-          foreignField: "Product_id",
+          foreignField: "product_id",
           as: "productModel",
         },
       },
@@ -1176,7 +1180,7 @@ exports.allOrderReqData = async (req, res) => {
       {
         $project: {
           Order_req_id: 1,
-          Product_id: 1,
+          product_id: 1,
           Product_category: 1,
           Order_quantity: 1,
           Special_request: 1,
@@ -1266,7 +1270,7 @@ exports.orderReqHistory = async (req, res) => {
           User_id: parseInt(User_id),
           Request_datetime: {
             $gte: new Date(Date.now() - 48 * 60 * 60 * 1000),
-          }, // Filter by request datetime within the last 48 hours
+          },
         },
       },
       {
@@ -1281,7 +1285,7 @@ exports.orderReqHistory = async (req, res) => {
         $lookup: {
           from: "productmodels",
           localField: "product_id",
-          foreignField: "Product_id",
+          foreignField: "product_id",
           as: "product_info",
         },
       },
@@ -1306,9 +1310,9 @@ exports.orderReqHistory = async (req, res) => {
         $project: {
           Order_req_id: 1,
           User_id: 1,
-          User_name: 1,
+          User_name: "$user_info.user_name",
           image: "$user_info.image",
-          Product_id: 1,
+          product_id: 1,
           Product_name: "$product_info.Product_name",
           Product_image: "$product_info.Product_image",
           Order_quantity: 1,
@@ -1321,12 +1325,19 @@ exports.orderReqHistory = async (req, res) => {
         },
       },
       {
-        $sort: { Request_datetime: -1 },
+        $group: {
+          _id: "$_id", // Group by the unique identifier of each document
+          data: { $first: "$$ROOT" }, // Take the first occurrence of each document
+        },
+      },
+      {
+        $sort: { "data.Request_datetime": -1 },
       },
       {
         $limit: 3,
       },
     ]);
+    console.log(orderReqHis, "tttt");
     const responseData = orderReqHis.map((item) => {
       const imageUrl = item.Product_image
         ? `${constant.base_url}/uploads/productImage/${item.Product_image}`
@@ -1341,7 +1352,24 @@ exports.orderReqHistory = async (req, res) => {
         Product_image: imageUrl,
       };
     });
-    if (!responseData?.[0]) {
+    // Transform the response objects into the desired format
+    const transformedArray = responseData.map((item) => ({
+      Order_req_id: item?.data?.Order_req_id,
+      User_id: item?.data?.User_id,
+      User_name: item?.data?.User_name, // You can set the actual user name here
+      image: item?.image,
+      product_id: item?.data?.product_id,
+      Product_name: item?.data?.Product_name,
+      Product_image: item?.Product_image,
+      Order_quantity: item?.data?.Order_quantity,
+      Sitting_id: item?.data?.Sitting_id,
+      Sitting_area: item?.data?.Sitting_area,
+      Sitting_ref_no: item?.data?.Sitting_ref_no, // Set the desired value for Sitting_ref_no
+      Request_datetime: item?.data?.Request_datetime,
+      Message: item?.data?.Message,
+      Special_request: item?.data?.Special_request,
+    }));
+    if (!transformedArray?.[0]) {
       return response.returnFalse(
         200,
         req,
@@ -1350,13 +1378,14 @@ exports.orderReqHistory = async (req, res) => {
         {}
       );
     }
-    return response.returnTrue(
-      200,
-      req,
-      res,
-      "Order request history Fetch successfully.",
-      responseData
-    );
+    // return response.returnTrue(
+    //   200,
+    //   req,
+    //   res,
+    //   "Order request history Fetch successfully.",
+    //   responseData
+    // );
+    return res.status(200).json(transformedArray);
   } catch (error) {
     return response.returnFalse(500, req, res, error.message, {});
   }
@@ -1396,7 +1425,7 @@ exports.getOrderReqsBasedOnFilter = async (req, res) => {
         $lookup: {
           from: "productmodels",
           localField: "product_id",
-          foreignField: "Product_id",
+          foreignField: "product_id",
           as: "productModel",
         },
       },
@@ -1421,7 +1450,7 @@ exports.getOrderReqsBasedOnFilter = async (req, res) => {
       {
         $project: {
           Order_req_id: 1,
-          Product_id: 1,
+          product_id: 1,
           Product_category: 1,
           Order_quantity: 1,
           Special_request: 1,
@@ -1584,7 +1613,7 @@ exports.getAllTransferReq = async (req, res) => {
         $lookup: {
           from: "productmodels",
           localField: "product_id",
-          foreignField: "OrderReqModel.Product_id",
+          foreignField: "OrderReqModel.product_id",
           as: "productModel",
         },
       },
@@ -1629,7 +1658,6 @@ exports.getAllTransferReq = async (req, res) => {
           Product_name: "$productModel.Product_name",
         },
       },
-      
     ]);
 
     if (!resData?.[0]) {
