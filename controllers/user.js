@@ -773,7 +773,7 @@ exports.deliveryBoy = async (req, res) => {
         if(!delv){
             res.status(500).send({success:false})
         }
-        res.status(200).send(delv)
+        res.status(200).send({results:delv})
     } catch(err){
         res.status(500).send({error:err, sms:'error getting all delivery boy'})
     }

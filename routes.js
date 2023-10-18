@@ -463,7 +463,7 @@ router.put("/update_user_auth",  user.updateUserAuth);
 router.delete("/delete_user_auth",  user.deleteUserAuth);
 router.get("/get_all_user_auth",  user.allUserAuthDetail);
 router.post("/login_user", user.loginUser);
-router.get("/get_delivery_boy",  user.deliveryBoy);
+router.post("/get_delivery_boy",  user.deliveryBoy);  //done
 router.get("/get_delivery_user",  user.deliveryUser);
 router.get(
   "/get_single_delivery_boy_by_room/:id",
@@ -555,30 +555,30 @@ router.post(
   upload1.single("Product_image"),
   
   productController.addProduct
-);
+); //done
 router.put(
   "/update_productupdate",
   upload1.single("Product_image"),
   
   productController.editProduct
-);
+); //done
 router.get(
   "/get_single_productdata/:id",
   
   productController.getProductById
-);
+); //done
 router.get(
   "/get_all_products",
   
   productController.getProduct
-);
+); //done
 router.delete(
   "/delete_productdelete/:id",
   
   productController.deleteProductById
-);
+); //done
 //Product props
-router.post("/add_proppost",  productController.addProductProps);
+router.post("/add_proppost",  productController.addProductProps); //done
 router.get(
   "/get_single_propsdata/:product_id",
   
@@ -608,7 +608,7 @@ router.get(
 );
 
 //Order Req api's
-router.post("/add_ordereq",  productController.addOrderReq);
+router.post("/add_orderreq",  productController.addOrderReq); //done
 router.post(
   "/add_orderrequest",
   
@@ -660,7 +660,7 @@ router.post(
   "/add_orderreqs",
   
   productController.getOrderReqsBasedOnFilter
-);
+); //done
 router.post("/add_transreq",  productController.addTransferReq);
 router.get(
   "/get-all_transreq",
