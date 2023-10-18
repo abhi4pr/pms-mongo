@@ -16,33 +16,34 @@ exports.addRole = async (req, res) =>{
 
 exports.getRoles = async (req, res) => {
     try{
-        const simc = await roleModel.aggregate([
-            {
-                $lookup: {
-                    from: 'usermodels',
-                    localField: 'Created_by',
-                    foreignField: 'user_id',
-                    as: 'user'
-                }
-            },
-            {
-                $unwind: '$user'
-            },
-            {
-                $project: {
-                    _id: 1,
-                    created_by_name: '$user.user_name',
-                    Remarks: '$Remarks',
-                    Role_name: '$Role_name',
-                    Created_by: '$Created_by',
-                    Role_id: '$Role_id'
-                }
-            }
-        ]).exec();
+        // const simc = await roleModel.aggregate([
+        //     {
+        //         $lookup: {
+        //             from: 'usermodels',
+        //             localField: 'Created_by',
+        //             foreignField: 'user_id',
+        //             as: 'user'
+        //         }
+        //     },
+        //     {
+        //         $unwind: '$user'
+        //     },
+        //     {
+        //         $project: {
+        //             _id: 1,
+        //             created_by_name: '$user.user_name',
+        //             Remarks: '$Remarks',
+        //             Role_name: '$Role_name',
+        //             Created_by: '$Created_by',
+        //             Role_id: '$Role_id'
+        //         }
+        //     }
+        // ]).exec();
+        const simc = await roleModel.find();
         if(!simc){
             res.status(500).send({success:false})
         }
-        res.status(200).send(simc)
+        res.status(200).send({data:simc})
     } catch(err){
         res.status(500).send({error:err,sms:'Error getting all roles'})
     }
@@ -50,7 +51,7 @@ exports.getRoles = async (req, res) => {
 
 exports.editRole = async (req, res) => {
     try{
-        const editsim = await roleModel.findOneAndUpdate({Role_id:req.body.Role_id},{
+        const editsim = await roleModel.findOneAndUpdate({role_id:req.body.role_id},{
             Role_name: req.body.role_name,
             Remarks: req.body.remark
         }, { new: true })
@@ -64,7 +65,7 @@ exports.editRole = async (req, res) => {
 };
 
 exports.deleteRole = async (req, res) =>{
-    roleModel.deleteOne({Role_id:req.params.Role_id}).then(item =>{
+    roleModel.deleteOne({role_id:req.params.role_id}).then(item =>{
         if(item){
             return res.status(200).json({success:true, message:'role deleted'})
         }else{

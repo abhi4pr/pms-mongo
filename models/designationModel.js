@@ -4,7 +4,8 @@ const AutoIncrement = require('mongoose-auto-increment');
 const designationModel = new mongoose.Schema({
     desi_id:{
         type: Number,
-        required: true
+        required: true,
+        unique:true
     },
     dept_id:{
         type: Number,

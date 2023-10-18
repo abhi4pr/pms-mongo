@@ -150,41 +150,27 @@ exports.editSubDepartment = async (req, res) => {
   }
 };
 
-exports.deleteSubDepartment = async (req, res) => {
-  departmentModel
-    .deleteOne({ id: req.params.id })
-    .then((item) => {
-      if (item) {
-        return response.returnTrue(
-          200,
-          req,
-          res,
-          "Sub Department Deleted Successfully.",
-          {}
-        );
-      } else {
-        return response.returnFalse(
-          200,
-          req,
-          res,
-          "Sub Department Not Found...",
-          {}
-        );
+exports.deleteSubDepartment = async (req, res) =>{
+  subDepartmentModel.deleteOne({id:req.params.id}).then(item =>{
+      if(item){
+          return res.status(200).json({success:true, message:'Sub Department deleted'})
+      }else{
+          return res.status(404).json({success:false, message:'Sub Department not found'})
       }
-    })
-    .catch((err) => {
-      return response.returnFalse(500, req, res, err.message, {});
-    });
+  }).catch(err=>{
+      return res.status(400).json({success:false, message:err})
+  })
 };
 
 exports.getSubDepartmentsFromDeptId = async (req, res) => {
   try {
-    const deptId = req.params.dept_id;
+    const deptId = req.params.id;
+    // console.log('fffffff', req.params)
 
     const singlesim = await subDepartmentModel
       .aggregate([
         {
-          $match: { dept_id: deptId },
+          $match: { dept_id: parseInt(req.params.dept_id) },
         },
         {
           $lookup: {
@@ -209,16 +195,17 @@ exports.getSubDepartmentsFromDeptId = async (req, res) => {
       ])
       .exec();
 
-    if (!singlesim || singlesim.length === 0) {
-      return response.returnFalse(200, req, res, "No Reord Found...", {});
-    }
-    return response.returnTrue(
-      200,
-      req,
-      res,
-      "Data Fetch Successfully",
-      singlesim
-    );
+    // if (!singlesim || singlesim.length === 0) {
+    //   return response.returnFalse(200, req, res, "No Reord Found...", {});
+    // }
+    // return response.returnTrue(
+    //   200,
+    //   req,
+    //   res,
+    //   "Data Fetch Successfully",
+    //   singlesim
+    // );
+    return res.status(200).send(singlesim);
   } catch (err) {
     return response.returnFalse(500, req, res, err.message, {});
   }
@@ -266,12 +253,12 @@ exports.getSubDepartments = async (req, res) => {
 
 exports.getSubDepartmentsFromId = async (req, res) => {
   try {
-    const Id = req.params.id;
+    const id = req.params.id;
 
     const singlesim = await subDepartmentModel
       .aggregate([
         {
-          $match: { id: Id },
+          $match: { id: parseInt(req.params.id) },
         },
         {
           $lookup: {
@@ -289,6 +276,7 @@ exports.getSubDepartmentsFromId = async (req, res) => {
             _id: 1,
             dept_name: "$department.dept_name",
             sub_dept_name: "$sub_dept_name",
+            remark:"$remark",
             dept_id: "$dept_id",
             id: "$id",
           },
@@ -299,7 +287,9 @@ exports.getSubDepartmentsFromId = async (req, res) => {
     if (!singlesim || singlesim.length === 0) {
       return res.status(500).send({ success: false, sms: "no data available" });
     }
-    res.status(200).send(singlesim);
+
+    const responseObject = singlesim[0];
+    res.status(200).send(responseObject);
   } catch (err) {
     res
       .status(500)
