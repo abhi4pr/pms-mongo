@@ -14,6 +14,8 @@ const projectxCategorySchema = new mongoose.Schema({
   },
   category_name: {
     type: String,
+    lowercase: true,
+    trim: true,
     required: true,
     default: "",
   },

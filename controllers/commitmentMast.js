@@ -3,6 +3,18 @@ const cmtSchema = require("../models/commitmentModel");
 
 exports.addCmt = async (req, res) => {
   try {
+    let check = await cmtSchema.findOne({
+      cmtName: req.body?.cmtName.toLowerCase().trim(),
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Commitement name must be unique",
+        {}
+      );
+    }
     const cmtObj = new cmtSchema({
       ...req.body,
     });
@@ -12,7 +24,7 @@ exports.addCmt = async (req, res) => {
       200,
       req,
       res,
-      "Commitment created successfully",
+      "Commitment creat+ed successfully",
       savedCmt
     );
   } catch (err) {
@@ -63,7 +75,21 @@ exports.getCmtById = async (req, res) => {
 
 exports.editCmt = async (req, res) => {
   try {
-  
+   if(req.body.cmtName){
+    let check = await cmtSchema.findOne({
+      cmtName: req.body?.cmtName.toLowerCase().trim(),
+      cmtId: { $ne: req.body?.cmtId },
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Commitment name must be unique",
+        {}
+      );
+    }
+   }
     const editCmtObj = await cmtSchema.findOneAndUpdate(
       { cmtId: parseInt(req.body.cmtId) }, // Filter condition
       {

@@ -9,7 +9,9 @@ const contentTypeSchema = new mongoose.Schema({
   },
   content_type: {
     type: String,
-    default:""
+    default:"",
+    lowercase: true,
+    trim: true,
   },
   content_value: {
     type: Number,

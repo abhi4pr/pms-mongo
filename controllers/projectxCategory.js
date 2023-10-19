@@ -1,8 +1,20 @@
 const projectxCategorySchema = require("../models/projectxCategoryModel.js");
-
+const response = require("../common/response");
 exports.addProjectxCategory = async (req, res) => {
   const { category_name, brand_id } = req.body;
   try {
+    let check = await projectxCategorySchema.findOne({
+      category_name: category_name.toLowerCase().trim(),
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Category name must be unique",
+        {}
+      );
+    }
     const projectxCategoryObj = new projectxCategorySchema({
       category_name,
       brand_id,
@@ -66,7 +78,21 @@ exports.getProjectxCategoryById = async (req, res) => {
 exports.editProjectxCategory = async (req, res) => {
   try {
     const { id, category_name, brand_id } = req.body;
-
+    if(req.body.category_name){
+      let check = await projectxCategorySchema.findOne({
+        category_name: category_name.toLowerCase().trim(),
+        category_id: { $ne: id },
+      });
+      if (check) {
+        return response.returnFalse(
+          200,
+          req,
+          res,
+          "Category name must be unique",
+          {}
+        );
+      }
+    }
     const editProjectxCategoryObj =
       await projectxCategorySchema.findOneAndUpdate(
         { category_id: id },
