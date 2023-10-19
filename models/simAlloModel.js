@@ -34,7 +34,7 @@ const simAlloModel = new mongoose.Schema({
     },
     submitted_by: {
         type: Number,
-        required: true
+        required: false
     },
     reason: {
         type: String,
@@ -48,7 +48,7 @@ const simAlloModel = new mongoose.Schema({
     },
     deleted_status: {
         type: Number,
-        required: true
+        required: false
     },
 });
 
