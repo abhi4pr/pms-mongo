@@ -2,18 +2,20 @@ const { default: mongoose } = require("mongoose");
 const AutoIncrement = require("mongoose-auto-increment");
 
 const projectxSubCategorySchema = new mongoose.Schema({
-  category_id: {
-    type: Number,
-    required: true,
-  },
   sub_category_id: {
     type: Number,
     required: true,
     unique: true,
   },
+  category_id: {
+    type: Number,
+    required: true,
+  },
   sub_category_name: {
     type: String,
     required: true,
+    lowercase: true,
+    trim: true,
   },
 });
 

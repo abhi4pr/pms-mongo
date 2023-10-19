@@ -9,6 +9,8 @@ const commitmentSchema = new mongoose.Schema({
   },
   cmtName: {
     type: String,
+    lowercase: true,
+    trim: true,
   },
   cmtValue: {
     type: Number,

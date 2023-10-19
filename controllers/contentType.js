@@ -1,8 +1,22 @@
 const contentTypeSchema = require("../models/contentTypeModel.js");
+const response = require("../common/response");
 
 exports.addContentType = async (req, res) => {
   try {
     const { content_type, content_value, remarks, created_by } = req.body;
+    let check = await contentTypeSchema.findOne({
+      content_type: content_type.toLowerCase().trim(),
+      
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Content type must be unique",
+        {}
+      );
+    }
     const ContentTypeObj = new contentTypeSchema({
       content_type,
       content_value,
@@ -88,6 +102,20 @@ exports.editContentType = async (req, res) => {
       last_updated_by,
       remarks,
     } = req.body;
+
+    let check = await contentTypeSchema.findOne({
+      content_type: content_type.toLowerCase().trim(),
+      content_type_id: { $ne: content_type_id },
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Content type must be unique",
+        {}
+      );
+    }
     const editContentTypeObj = await contentTypeSchema.findOneAndUpdate(
       { content_type_id: parseInt(content_type_id) }, 
       {

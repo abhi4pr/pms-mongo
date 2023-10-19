@@ -1,8 +1,33 @@
 const projectxSubCategorySchema = require("../models/projectxSubCategoryModel.js");
-
+const response = require("../common/response");
 exports.addProjectxSubCategory = async (req, res) => {
   const { sub_category_name, category_id } = req.body;
   try {
+    let check = await projectxSubCategorySchema.findOne({
+      sub_category_name: sub_category_name?.toLowerCase().trim(),
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Sub category name must be unique",
+        {}
+      );
+    }
+    let check2 = await projectxSubCategorySchema.findOne({
+      sub_category_name: sub_category_name?.toLowerCase().trim(),
+      category_id :parseInt(category_id)
+    });
+    if (check2) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Sub category and Category combination  must be unique",
+        {}
+      );
+    }
     const projectxSubCategoryObj = new projectxSubCategorySchema({
       sub_category_name,
       category_id,
@@ -66,7 +91,33 @@ exports.getProjectxSubCategoryById = async (req, res) => {
 exports.editProjectxSubCategory = async (req, res) => {
   try {
     const { sub_category_id, category_id, sub_category_name } = req.body;
-
+    let check = await projectxSubCategorySchema.findOne({
+      sub_category_name: sub_category_name?.toLowerCase().trim(),
+      sub_category_id: { $ne: sub_category_id },
+    });
+    if (check) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Sub category name must be unique",
+        {}
+      );
+    }
+    let check2 = await projectxSubCategorySchema.findOne({
+      sub_category_name: sub_category_name?.toLowerCase().trim(),
+      category_id :parseInt(category_id),
+      sub_category_id: { $ne: sub_category_id },
+    });
+    if (check2) {
+      return response.returnFalse(
+        200,
+        req,
+        res,
+        "Sub category and Category combination  must be unique",
+        {}
+      );
+    }
     const editProjectxSubCategoryObj =
       await projectxSubCategorySchema.findOneAndUpdate(
         { sub_category_id },
@@ -83,7 +134,7 @@ exports.editProjectxSubCategory = async (req, res) => {
     res.status(200).send({ success: true });
   } catch (err) {
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "Error updating the projectxsubcategory in the database",
     });
   }
