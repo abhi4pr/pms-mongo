@@ -346,8 +346,8 @@ exports.getAllUsers = async (req, res) => {
             {
                 $lookup: {
                     from: 'designationmodels',
-                    localField: 'desi_id',
-                    foreignField: 'user_designation',
+                    localField: 'user_designation',
+                    foreignField: 'desi_id',
                     as: 'designation'
                 }
             },
@@ -357,45 +357,46 @@ exports.getAllUsers = async (req, res) => {
             {
                 $lookup: {
                     from: 'rolemodels',
-                    localField: 'Role_id',
-                    foreignField: 'role_id',
+                    localField: 'role_id',
+                    foreignField: 'Role_id',
                     as: 'role'
                 }
             },
             {
                 $unwind: '$role'
             },
-            {
-                $lookup:{
-                    from: 'usermodels',
-                    localField: 'user_report_to_id',
-                    foreignField: 'user_id',
-                    as: 'user1'
-                }
-            },
-            {
-                $unwind: '$user1'
-            },
-            {
-                $lookup:{
-                    from: 'usermodels',
-                    localField: 'Report_L1',
-                    foreignField: 'user_id',
-                    as: 'user2'
-                }
-            },
-            {
-                $unwind: '$user2'
-            },
+            // {
+            //     $lookup:{
+            //         from: 'usermodels',
+            //         localField: 'user_report_to_id',
+            //         foreignField: 'user_id',
+            //         as: 'user1'
+            //     }
+            // },
+            // {
+            //     $unwind: '$user1'
+            // },
+            // {
+            //     $lookup:{
+            //         from: 'usermodels',
+            //         localField: 'Report_L1',
+            //         foreignField: 'user_id',
+            //         as: 'user2'
+            //     }
+            // },
+            // {
+            //     $unwind: '$user2'
+            // },
             {
                 $project: {
                     dept_name: '$department.dept_name',
                     designation_name: '$designation.desi_name',
                     dept_id: "$dept_id",
-                    desi_id: '$desi_id',
-                    id: "$id",
-                    report: '$user1.user_name',
-                    report_L1_name: '$user2.user_name',
+                    desi_id: '$user_designation',
+                    id: "$user_id",
+                    _id: "$_id",
+                    // report: '$user1.user_name',
+                    // report_L1_name: '$user2.user_name',
                     user_name: '$user_name',
                     user_email_id: '$user_email_id',
                     user_login_id: '$user_login_id',
@@ -476,29 +477,24 @@ exports.getAllUsers = async (req, res) => {
                     joining_date_extend_status: '$joining_date_extend_status',
                     joining_date_extend_reason: '$joining_date_extend_reason',
                     invoice_template_no: '$invoice_template_no',
-                    image: ImageUrl+'$image',
-                    UID: ImageUrl+'$UID',
-                    pan: ImageUrl+'$pan',
-                    highest_upload: ImageUrl+'$highest_upload',
-                    other_upload: ImageUrl+'$other_upload',
-                    tenth_marksheet: ImageUrl+'$tenth_marksheet',
-                    twelveth_marksheet: ImageUrl+'$twelveth_marksheet',
-                    UG_Marksheet: ImageUrl+'$UG_Marksheet',
-                    passport: ImageUrl+'$passport',
-                    pre_off_letter: ImageUrl+'$pre_off_letter',
-                    pre_expe_letter: ImageUrl+'$pre_expe_letter',
-                    pre_relieving_letter: ImageUrl+'$pre_relieving_letter',
-                    bankPassBook_Cheque: ImageUrl+'$bankPassBook_Cheque',
-                    joining_extend_document: ImageUrl+'$joining_extend_document'
+                    image: { $concat: [ImageUrl, '$image'] },
+                    UID: { $concat: [ImageUrl, '$UID'] },
+                    pan: { $concat: [ImageUrl, '$pan'] },
+                    highest_upload: { $concat: [ImageUrl, '$highest_upload'] },
+                    other_upload: { $concat: [ImageUrl, '$other_upload'] },
+                    tenth_marksheet: { $concat: [ImageUrl, '$tenth_marksheet'] },
+                    twelveth_marksheet: { $concat: [ImageUrl, '$twelveth_marksheet'] },
+                    UG_Marksheet: { $concat: [ImageUrl, '$UG_Marksheet'] },
+                    passport: { $concat: [ImageUrl, '$passport'] },
+                    pre_off_letter: { $concat: [ImageUrl, '$pre_off_letter'] },
+                    pre_expe_letter: { $concat: [ImageUrl, '$pre_expe_letter'] },
+                    pre_relieving_letter: { $concat: [ImageUrl, '$pre_relieving_letter'] },
+                    bankPassBook_Cheque: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
+                    joining_extend_document: { $concat: [ImageUrl, '$joining_extend_document'] }
                 }
             }
-            // ,{
-            //     $replaceRoot: {
-            //         newRoot: "$$ROOT"
-            //     }
-            // }
         ]).exec();
-        res.status(200).send(singlesim)
+        res.status(200).send({data:singlesim})
     }catch(err){
         res.status(500).send({error:err,sms:'Error getting all users'})
     }

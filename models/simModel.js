@@ -38,12 +38,21 @@ const simModel = new mongoose.Schema({
         required: true,
         unique: true
     },
+    type: {
+        type: String,
+        required: false,
+        default: ""
+    },
     s_type: {
         type: String,
         required: false,
         default: ""
     },
     Creation_date: {
+        type: Date,
+        default: Date.now
+    },
+    Last_updated_date:{
         type: Date,
         default: Date.now
     },

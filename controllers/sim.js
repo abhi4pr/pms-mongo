@@ -6,15 +6,15 @@ exports.addSim = async (req, res) =>{
         const simc = new simModel({
             sim_no: req.body.sim_no,
             provider: req.body.provider,
-            Remarks: req.body.Remarks,
+            Remarks: req.body.remark,
             created_by: req.body.created_by,
             status: req.body.status,
             register: req.body.register,
             mobileNumber: req.body.mobileNumber,
             s_type: req.body.s_type,
-            // Creation_date: req.body.Creation_date,
-            desi: req.body.desi,
-            dept: req.body.dept
+            desi: req.body.desi_id,
+            dept: req.body.dept_id,
+            type: req.body.type
         })
         const simv = await simc.save();
         res.send({simv,status:200});
@@ -25,23 +25,90 @@ exports.addSim = async (req, res) =>{
 
 exports.getSims = async (req, res) => {
     try{
-        const simc = await simModel.find();
+        const simc = await simModel.aggregate([
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: '$department'
+            },
+            {
+                $lookup: {
+                    from: 'designationmodels',
+                    localField: 'desi',
+                    foreignField: 'desi_id',
+                    as: 'designation'
+                }
+            },
+            {
+                $unwind: '$designation'
+            },
+            {
+                $project: {
+                    department_name: '$department.dept_name',
+                    designation: '$designation.desi_name',
+                    _id: "$_id",
+                    sim_no: "$sim_no",
+                    provider: "$provider",
+                    Remarks: "$Remarks",
+                    created_by: "$created_by",
+                    status: "$status",
+                    register: "$register",
+                    mobileNumber: "$mobileNumber",
+                    s_type: "$s_type",
+                    desi: "$desi",
+                    dept: "$dept",
+                    sim_id: "$sim_id",
+                    type: "$type",
+                    date_difference: {
+                        $cond: [
+                          {
+                            $and: [
+                              { $eq: ["$status", "Allocated"] },
+                              { $eq: ["$allocation.submitted_at", null] }
+                            ]
+                          },
+                          {
+                            $subtract: [new Date(), "$Last_updated_date"]
+                          },
+                          null
+                        ]
+                    }
+                }
+            }
+        ]).exec();
+
+        const uniqueIds = new Set();
+        const uniqueData = simc.filter(item => {
+            const id = item._id.toString();
+            if (!uniqueIds.has(id)) {
+                uniqueIds.add(id);
+                return true;
+            }
+            return false;
+        });
+
         if(!simc){
             res.status(500).send({success:false})
         }
-        res.status(200).send(simc)
+        res.status(200).send({data:uniqueData})
     } catch(err){
-        res.status(500).send({error:err,sms:'Error getting all sim datas'})
+        res.status(500).send({error:err.message,sms:'Error getting all sim datas'})
     }
 };
 
 exports.getSingleSim = async (req, res) => {
     try{
-        const singlesim = await simModel.findOne({sim_id:req.params.sim_id});
+        const singlesim = await simModel.findOne({sim_id:parseInt(req.params.id)});
         if(!singlesim){
             return res.status(500).send({success:false})
         }
-        res.status(200).send(singlesim);
+        res.status(200).send({data:singlesim});
     } catch(err){
         res.status(500).send({error:err,sms:'Error getting sim details'})
     }
@@ -49,18 +116,18 @@ exports.getSingleSim = async (req, res) => {
 
 exports.editSim = async (req, res) => {
     try{
-        const editsim = await simModel.findOneAndUpdate({sim_id:req.body.sim_id},{
+        const editsim = await simModel.findOneAndUpdate({sim_id:req.body.id},{
             sim_no: req.body.sim_no,
             provider: req.body.provider,
-            Remarks: req.body.Remarks,
+            Remarks: req.body.remark,
             created_by: req.body.created_by,
             status: req.body.status,
             register: req.body.register,
-            mobileNumber: req.body.mobileNumber,
+            mobileNumber: req.body.mobilenumber,
             s_type: req.body.s_type,
-            // Creation_date: req.body.Creation_date,
-            desi: req.body.desi,
-            dept: req.body.dept
+            desi: req.body.desi_id,
+            dept: req.body.dept_id,
+            type: req.body.type
         }, { new: true })
         if(!editsim){
             res.status(500).send({success:false})
@@ -72,7 +139,7 @@ exports.editSim = async (req, res) => {
 };
 
 exports.deleteSim = async (req, res) =>{
-    simModel.deleteOne({sim_id:req.params.sim_id}).then(item =>{
+    simModel.deleteOne({sim_id:req.params.id}).then(item =>{
         if(item){
             return res.status(200).json({success:true, message:'sim deleted'})
         }else{

@@ -74,11 +74,11 @@ router.get("/get_exe_sum", exe.getExeSum);
 router.put("/edit_exe_sum", exe.editExeSum);
 
 /*sim api*/
-router.get("/get_all_sims",  sim.getSims);
-router.post("/add_sim",  sim.addSim);
-router.get("/get_single_sim/:id",  sim.getSingleSim);
-router.put("/update_sim",  sim.editSim);
-router.delete("/delete_sim/:id",  sim.deleteSim);
+router.get("/get_all_sims",  sim.getSims); // done
+router.post("/add_sim",  sim.addSim);  //done
+router.get("/get_single_sim/:id",  sim.getSingleSim); // done
+router.put("/update_sim",  sim.editSim); //done
+router.delete("/delete_sim/:id",  sim.deleteSim); //done
 router.post("/add_sim_allocation",  sim.addAllocation);
 router.get("/get_all_allocations",  sim.getAllocations);
 router.put("/update_allocationsim",  sim.editAllocation);
