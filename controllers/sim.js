@@ -1,5 +1,6 @@
 const simModel = require('../models/simModel.js');
 const simAlloModel = require('../models/simAlloModel.js')
+const userModel = require('../models/userModel.js');
 
 exports.addSim = async (req, res) =>{
     try{
@@ -161,7 +162,8 @@ exports.addAllocation = async (req, res) =>{
             submitted_by: req.body.submitted_by,
             reason: req.body.reason,
             status: req.body.status,
-            deleted_status: req.body.deleted_status
+            deleted_status: req.body.deleted_status,
+            submitted_at: req.body.submitted_at
         })
         const simv = await simc.save();
         res.send({simv,status:200});
@@ -172,13 +174,139 @@ exports.addAllocation = async (req, res) =>{
 
 exports.getAllocations = async (req, res) => {
     try{
-        const simc = await simAlloModel.find();
+        const simc = await simAlloModel.aggregate([
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $lookup: {
+                    from: 'simmodels',
+                    localField: 'sim_id',
+                    foreignField: 'sim_id',
+                    as: 'sim'
+                }
+            },
+            {
+                $unwind: '$sim'
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: '$department'
+            },
+            {
+                $lookup: {
+                  from: "designationmodels",
+                  localField: "user.user_designation",
+                  foreignField: "desi_id",
+                  as: "designation"
+                }
+            },
+            {
+                $unwind: "$designation"
+            },
+            {
+                $project: {
+                    dept_name: '$department.dept_name',
+                    desi_name: '$designation.desi_name',
+                    _id: "$_id",
+                    sim_no: "$sim_no",
+                    provider: "$provider",
+                    Remarks: "$Remarks",
+                    created_by: "$created_by",
+                    status: "$status",
+                    register: "$register",
+                    mobileNo: "$sim.mobileNumber",
+                    userName: "$user.user_name",
+                    s_type: "$s_type",
+                    desi: "$desi",
+                    dept: "$dept",
+                    sim_id: "$sim_id",
+                    type: "$type",
+                    allo_id: "$allo_id",
+                    submitted_at: "$submitted_at"
+                }
+            }
+        ]).exec();
         if(!simc){
             res.status(500).send({success:false})
         }
-        res.status(200).send(simc)
+        res.status(200).send({data:simc})
     } catch(err){
         res.status(500).send({error:err,sms:'Error getting all sim allocatinos'})
+    }
+};
+
+exports.getAllocationDataByAlloId = async (req, res) => {
+    try{
+        const simc = await simAlloModel.aggregate([
+            {
+                $match:{ allo_id: parseInt(req.params.id)}
+            },
+            {
+                $lookup: {
+                    from: 'simmodels',
+                    localField: 'sim_id',
+                    foreignField: 'sim_id',
+                    as: 'sim'
+                }
+            },
+            {
+                $unwind: '$sim'
+            },
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $project: {
+                    userName: '$user.user_name',
+                    _id: "$_id",
+                    // sim_no: "$sim_no",
+                    provider: "$provider",
+                    Remarks: "$Remarks",
+                    created_by: "$created_by",
+                    status: "$status",
+                    register: "$register",
+                    mobileNo: "$sim.mobileNumber",
+                    s_type: "$s_type",
+                    desi: "$desi",
+                    dept: "$dept",
+                    sim_id: "$sim_id",
+                    type: "$type",
+                    allo_id: "$allo_id",
+                    submitted_at: "$submitted_at"
+                }
+            }
+        ]).exec();
+
+        if(!simc){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send({data:simc[0]})
+    } catch(err){
+        res.status(500).send({error:err.message,sms:'Error getting all sim datas'})
     }
 };
 
@@ -193,7 +321,8 @@ exports.editAllocation = async (req, res) => {
             submitted_by: req.body.submitted_by,
             reason: req.body.reason,
             status: req.body.status,
-            deleted_status: req.body.deleted_status
+            deleted_status: req.body.deleted_status,
+            submitted_at: req.body.submitted_at
         }, { new: true })
         if(!editsim){
             res.status(500).send({success:false})

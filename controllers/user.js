@@ -391,6 +391,7 @@ exports.getAllUsers = async (req, res) => {
                 $project: {
                     department_name: '$department.dept_name',
                     designation_name: '$designation.desi_name',
+                    user_designation: '$user_designation', 
                     dept_id: "$dept_id",
                     desi_id: '$user_designation',
                     user_id: "$user_id",
