@@ -82,6 +82,7 @@ router.delete("/delete_sim/:id",  sim.deleteSim); //done
 router.post("/add_sim_allocation",  sim.addAllocation); //done
 router.get("/get_all_allocations",  sim.getAllocations);
 router.get("/get_allocation_by_alloid/:id", sim.getAllocationDataByAlloId)
+router.get("/get_allocation_data_by_id/:id", sim.getSimAllocationDataById)
 router.put("/update_allocationsim",  sim.editAllocation);
 router.delete("/delete_allocation/:id",  sim.deleteAllocation);
 

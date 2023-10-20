@@ -344,3 +344,85 @@ exports.deleteAllocation = async (req, res) =>{
         return res.status(400).json({success:false, message:err})
     })
 };
+
+exports.getSimAllocationDataById = async (req, res) => {
+    try{
+        const simc = await simModel.aggregate([
+            {
+                $match:{sim_id:req.params.id,deleted_status:0}
+            },
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $lookup: {
+                    from: 'simmodels',
+                    localField: 'sim_id',
+                    foreignField: 'sim_id',
+                    as: 'sim'
+                }
+            },
+            {
+                $unwind: '$sim'
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: '$department'
+            },
+            // {
+            //     $lookup: {
+            //       from: "designationmodels",
+            //       localField: "user.user_designation",
+            //       foreignField: "desi_id",
+            //       as: "designation"
+            //     }
+            // },
+            // {
+            //     $unwind: "$designation"
+            // },
+            {
+                $project: {
+                    dept_name: '$department.dept_name',
+                    // desi_name: '$designation.desi_name',
+                    _id: "$_id",
+                    sim_no: "$sim_no",
+                    provider: "$provider",
+                    Remarks: "$Remarks",
+                    created_by: "$created_by",
+                    status: "$status",
+                    register: "$register",
+                    mobileNo: "$sim.mobileNumber",
+                    userName: "$user.user_name",
+                    s_type: "$s_type",
+                    desi: "$desi",
+                    dept: "$dept",
+                    sim_id: "$sim_id",
+                    type: "$type",
+                    allo_id: "$allo_id",
+                    submitted_at: "$submitted_at"
+                }
+            }
+        ]).exec();
+        if(!simc){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send(simc)
+    } catch(err){
+        res.status(500).send({error:err,sms:'Error getting all sim allocatinos'})
+    }
+};
