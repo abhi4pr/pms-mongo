@@ -286,6 +286,7 @@ router.get("/get_all_sittings",  sitting.getSittings);
 router.get("/get_single_sitting/:id",  sitting.getSingleSitting);
 router.put("/update_sitting",  sitting.editSitting);
 router.delete("/delete_sitting/:id",  sitting.deleteSitting);
+router.get("/not_alloc_sitting",sitting.getNotAllocSitting);
 
 /* Agency Routes */
 router.post("/add_agency", agency.addAgency);
@@ -297,7 +298,9 @@ router.delete("/delete_agency/:id", agency.deleteAgency);
 /* Object Mast */
 router.post("/add_obj",  objectMast.addObjectMast);
 router.get("/get_all_objs",  objectMast.getObjectMasts);
-router.get("/objdata/:id",  objectMast.getObjectMastById);
+router.get("/objdata/:obj_id",  objectMast.getObjectMastById);
+router.put("/obj_update",  objectMast.editObjectMast);
+router.delete("/obj_delete/:obj_id",  objectMast.deleteObjectMast);
 
 /* role */
 router.post("/add_role",  role.addRole);

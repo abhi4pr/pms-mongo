@@ -23,11 +23,13 @@ exports.getSittings = async (req, res) => {
         if (!sittingc) {
             res.status(500).send({ success: false })
         }
-        res.status(200).send(sittingc)
+        res.status(200).send({ data: sittingc })
     } catch (err) {
         res.status(500).send({ error: err, sms: 'Error getting all sitting datas' })
     }
 };
+
+
 
 exports.getSingleSitting = async (req, res) => {
     try {
@@ -89,3 +91,46 @@ exports.deleteSitting = async (req, res) => {
     }
 };
 
+exports.getNotAllocSitting = async (req, res) => {
+    try {
+        const simc = await sittingModel.aggregate([
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'sitting_id',
+                    foreignField: 'sitting_id',
+                    as: 'users'
+                }
+            },
+            {
+                $unwind: '$users'
+            },
+            {
+                $match: {
+                    $or: [
+                        { 'users.sitting_id': null },
+                        { 'users.sitting_id': { $exists: false } }
+                    ]
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    sitting_id:"$sitting_id",
+                    sitting_ref_no: "$sitting_ref_no",
+                    sitting_area: "$sitting_area",
+                    remarks: "$remarks",
+                    created_by: "$created_by",
+                    last_updated_by: "$last_updated_by",
+                    room_id: "$room_id"
+                }
+            }
+        ]).exec();
+        if (!simc) {
+            res.status(500).send({ success: false });
+        }
+        res.status(200).send({ success: true, data: simc });
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error getting all sittings' });
+    }
+};
