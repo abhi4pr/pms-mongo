@@ -6,8 +6,8 @@ const billingheaderModel = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  billingheader_name: {
-    type: Number,
+  billing_header_name: {
+    type: String,
     required: true,
     unique: true,
   },
