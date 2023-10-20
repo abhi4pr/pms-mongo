@@ -113,8 +113,8 @@ exports.getAllPlatforms = async (req, res) => {
             {
                 $lookup: {
                     from: 'usermodels',
-                    localField: 'user_id',
-                    foreignField: 'created_by',
+                    localField: 'created_by',
+                    foreignField: 'user_id',
                     as: 'user'
                 }
             },
@@ -125,6 +125,7 @@ exports.getAllPlatforms = async (req, res) => {
                 $project: {
                     created_by_name: '$user.user_name',
                     id: "$id",
+                    _id: "$_id",
                     name: '$name',
                     remark: '$remark',
                     created_at: '$created_at'
@@ -144,6 +145,7 @@ exports.updatePlatform = async (req, res) => {
     try{
         const editsim = await platformModel.findOneAndUpdate({id:req.body.id},{
             name: req.body.name,
+            remark: req.body.remark,
             last_updated_by: req.body.last_updated_by
         }, { new: true })
         if(!editsim){
@@ -171,6 +173,7 @@ exports.addIpType = async (req, res) =>{
     try{
         const simc = new instaTypeModel({
             name: req.body.name,
+            remark: req.body.remark,
             created_by: req.body.created_by
         })
         const simv = await simc.save();
@@ -187,8 +190,8 @@ exports.getAllIpTypes = async (req, res) => {
             {
                 $lookup: {
                     from: 'usermodels',
-                    localField: 'user_id',
-                    foreignField: 'created_by',
+                    localField: 'created_by',
+                    foreignField: 'user_id',
                     as: 'user'
                 }
             },
@@ -736,7 +739,7 @@ exports.getAllInstaPages = async(req, res) =>{
                     "allocated_to_primary_name": "$user.user_email_id",
                     "ip_type_name": "$ip_type.name",
                     "followers1": { $ifNull: ["$followers.followers", 0] },
-                    "followers2": 0,
+                    // "followers2": 0,
                     "last_updated_at1": { $ifNull: ["$followers.last_updated_at", null] },
                     "last_updated_at2": null
                 }

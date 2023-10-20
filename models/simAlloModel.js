@@ -52,7 +52,8 @@ const simAlloModel = new mongoose.Schema({
     },
     deleted_status: {
         type: Number,
-        required: false
+        required: false,
+        default: 0
     },
 });
 

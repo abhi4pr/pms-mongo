@@ -676,27 +676,28 @@ router.get("/get_single_kra/:user_id",  kra.getJobResponById);
 router.get("/get_all_kras",  kra.getKras);
 
 /* instapage routes */
-router.post("/add_instapage", instapage.addIp);
+router.post("/add_instapage", instapage.addIp); //done
 router.put("/update_instapage", instapage.updateIp);
 router.delete("/delete_instapage/:id", instapage.deleteInstaPage);
-router.post("/add_platform", instapage.addPlatform);
-router.get("/get_all_platforms", instapage.getAllPlatforms);
-router.put("/update_platform", instapage.updatePlatform);
-router.delete("/delete_platform/:id", instapage.deletePlatform);
-router.post("/add_iptype", instapage.addIpType);
-router.get("/get_all_iptypes", instapage.getAllIpTypes);
+router.post("/add_platform", instapage.addPlatform); //done
+router.get("/get_all_platforms", instapage.getAllPlatforms); //done
+router.get("/get_single_platform_by_id/:id", instapage.getAllPlatforms); //done
+router.put("/update_platform", instapage.updatePlatform); //done
+router.delete("/delete_platform/:id", instapage.deletePlatform); //done
+router.post("/add_iptype", instapage.addIpType); //done
+router.get("/get_all_iptypes", instapage.getAllIpTypes); //done
 router.post("/add_ipstats", instapage.addIpStats);
 router.get("/get_stats", instapage.getStats);
 router.get("/get_insta_count_history/:id", instapage.getInstaCountHistory);
 router.get("/get_last_insta_count/:id", instapage.getLastInstaCount);
 router.post("/add_insta_page_count", instapage.addInstaPageCount);
-router.put("/update_iptype", instapage.updateIpType);
-router.delete("/delete_iptype/:id", instapage.deleteIpType);
-router.get("/get_iptype_byid/:id", instapage.getIpTypeById);
-router.get("/get_platform_byid/:id", instapage.getPlatformById);
+router.put("/update_iptype", instapage.updateIpType); //done
+router.delete("/delete_iptype/:id", instapage.deleteIpType); //done
+router.get("/get_iptype_byid/:id", instapage.getIpTypeById); //done
+router.get("/get_platform_byid/:id", instapage.getPlatformById); //done
 router.get("/get_instapage_byid/:id", instapage.getInstaPageById);
 router.post("/dataforgraph", instapage.dataForGraph);
-router.get("/all_data_of_ipregis", instapage.getAllInstaPages);
+router.get("/get_all_instapages", instapage.getAllInstaPages);
 
 /* Lead Remark Route */
 router.post("/add_leadremark",  leadremark.addLeadRemark);

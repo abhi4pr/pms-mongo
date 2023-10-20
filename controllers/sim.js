@@ -224,6 +224,7 @@ exports.getAllocations = async (req, res) => {
                     dept_name: '$department.dept_name',
                     desi_name: '$designation.desi_name',
                     _id: "$_id",
+                    user_id: "$user.user_id",
                     sim_no: "$sim_no",
                     provider: "$provider",
                     Remarks: "$Remarks",
@@ -232,6 +233,7 @@ exports.getAllocations = async (req, res) => {
                     register: "$register",
                     mobileNo: "$sim.mobileNumber",
                     userName: "$user.user_name",
+                    user_name: "$user.user_name",
                     s_type: "$s_type",
                     desi: "$desi",
                     dept: "$dept",
@@ -347,9 +349,9 @@ exports.deleteAllocation = async (req, res) =>{
 
 exports.getSimAllocationDataById = async (req, res) => {
     try{
-        const simc = await simModel.aggregate([
+        const simc = await simAlloModel.aggregate([
             {
-                $match:{sim_id:req.params.id,deleted_status:0}
+                $match:{sim_id:parseInt(req.params.id),deleted_status:0}
             },
             {
                 $lookup: {
@@ -374,47 +376,20 @@ exports.getSimAllocationDataById = async (req, res) => {
                 $unwind: '$sim'
             },
             {
-                $lookup: {
-                    from: 'departmentmodels',
-                    localField: 'dept_id',
-                    foreignField: 'dept_id',
-                    as: 'department'
-                }
-            },
-            {
-                $unwind: '$department'
-            },
-            // {
-            //     $lookup: {
-            //       from: "designationmodels",
-            //       localField: "user.user_designation",
-            //       foreignField: "desi_id",
-            //       as: "designation"
-            //     }
-            // },
-            // {
-            //     $unwind: "$designation"
-            // },
-            {
                 $project: {
-                    dept_name: '$department.dept_name',
-                    // desi_name: '$designation.desi_name',
                     _id: "$_id",
                     sim_no: "$sim_no",
-                    provider: "$provider",
                     Remarks: "$Remarks",
                     created_by: "$created_by",
+                    Creation_date: "$sim.Creation_date",
+                    Last_updated_date: "$sim.Last_updated_date",
                     status: "$status",
-                    register: "$register",
-                    mobileNo: "$sim.mobileNumber",
+                    mobile_number: "$sim.mobileNumber",
                     userName: "$user.user_name",
-                    s_type: "$s_type",
-                    desi: "$desi",
-                    dept: "$dept",
                     sim_id: "$sim_id",
-                    type: "$type",
                     allo_id: "$allo_id",
-                    submitted_at: "$submitted_at"
+                    submitted_at: "$sim.submitted_at",
+                    reason: "$reason"
                 }
             }
         ]).exec();
