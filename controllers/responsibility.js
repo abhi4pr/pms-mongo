@@ -18,32 +18,33 @@ exports.addJobResponsibility = async (req, res) =>{
 
 exports.getJobResposibilities = async (req, res) => {
     try{
-        const simc = await jobResponsibilityModel.aggregate([
-            {
-                $lookup: {
-                    from: 'usermodels',
-                    localField: 'user_id',
-                    foreignField: 'user_id',
-                    as: 'user'
-                }
-            },
-            {
-                $unwind: '$user'
-            },
-            {
-                $project: {
-                    _id: 1,
-                    created_by_name: '$user.user_name',
-                    description: '$description',
-                    sjob_responsibility: '$sjob_responsibility',
-                    user_id: '$user_id'
-                }
-            }
-        ]).exec();
+        const simc = await jobResponsibilityModel.find();
+        // const simc = await jobResponsibilityModel.aggregate([
+        //     {
+        //         $lookup: {
+        //             from: 'usermodels',
+        //             localField: 'user_id',
+        //             foreignField: 'user_id',
+        //             as: 'user'
+        //         }
+        //     },
+        //     {
+        //         $unwind: '$user'
+        //     },
+        //     {
+        //         $project: {
+        //             _id: 1,
+        //             created_by_name: '$user.user_name',
+        //             description: '$description',
+        //             sjob_responsibility: '$sjob_responsibility',
+        //             user_id: '$user_id'
+        //         }
+        //     }
+        // ]).exec();
         if(!simc){
             res.status(500).send({success:false})
         }
-        res.status(200).send(simc)
+        res.status(200).send({data : simc})
     } catch(err){
         res.status(500).send({error:err,sms:'Error getting all responsibility datas'})
     }
@@ -103,7 +104,7 @@ exports.editJobResponsibility = async (req, res) => {
 };
 
 exports.deleteJobResponsibility = async (req, res) =>{
-    jobResponsibilityModel.deleteOne({Job_res_id:req.params.Job_res_id}).then(item =>{
+    jobResponsibilityModel.deleteOne({id:req.params.Job_res_id}).then(item =>{
         if(item){
             return res.status(200).json({success:true, message:'responsibility deleted'})
         }else{
