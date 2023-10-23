@@ -31,7 +31,7 @@ const jobResponsibilityModel = new mongoose.Schema({
     },
     Last_updated_by: {
         type: Number,
-        required: true
+        required: false
     },
     Created_by: {
         type: Number,

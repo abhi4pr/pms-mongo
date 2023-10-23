@@ -360,7 +360,7 @@ router.post(
   responsibility.addResponsibility
 );
 router.get(
-  "/get_responsibility",
+  "/get_all_responsibilitys",
   
   responsibility.getResposibilities
 );
