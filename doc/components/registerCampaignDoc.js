@@ -129,53 +129,52 @@ const editRegisterCampaign = {
     },
     put: {
       tags: [`Register Campaign Module`],
-      description: "Edit a Register Campaign with the specified ID.",
+      description: "Note: Please do not any empty field if you really want to update a field please fill field otherewise 'Deselelct' the check.",
       requestBody: {
         content: {
           "multipart/form-data": {
             schema: {
               type: "object",
               properties: {
-               
                 excel_file: {
                   type: "file",
                   format: "binary",
-                  description: "This is excel for register campaign",
+                  description: "This is excel for register campaign, if you not want to update please 'Deselelct' the check.",
                 },
                 brand_id: {
                   type: "string",
                   format: "integer",
-                  description: "Provide Brand model identification id",
+                  description: "Provide Brand model identification id, if you not want to update please 'Deselelct' the check.",
                 },
                 register_campaign_id: {
                   type: "string",
                   format: "integer",
-                  description: "Provide register campaign model id which is you want to update.",
+                  description: "Provide register campaign model id which is you want to update and, if you not want to update please 'Deselelct' the check.",
                 },
                 exeCmpId: {
                   type: "integer",
                   format: "integer",
-                  description: "Provide exeCampaignModel identification id",
+                  description: "Provide exeCampaignModel identification id, if you not want to update please 'Deselelct' the check.",
                 },
                 brnad_dt: {
                   type: "Date",
                   format: "Date",
-                  description: "Provide Date",
+                  description: "Provide Date, if you not want to update please 'Deselelct' the check.",
                 },
                 detailing: {
                   type: "string",
                   format: "string",
-                  description: "Provide detailing",
+                  description: "Provide detailing, if you not want to update please 'Deselelct' the check.",
                 },
                 commitment: {
                   type: "string",
                   format: "string",
-                  description: "Provide Array of object",
+                  description: "Provide Array of object, if you not want to update please 'Deselelct' the check.",
                 },
                 status: {
                   type: "integer",
                   format: "integer",
-                  description: "Provide status",
+                  description: "Provide status, if you not want to update please 'Deselelct' the check.",
                 },
               },
             },

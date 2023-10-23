@@ -2,6 +2,7 @@ const billingheaderModel = require("../models/billingheaderModel.js");
 
 exports.addBillingHeader = async (req, res) => {
   const { billing_header_name, dept_id } = req.body;
+
   try {
     const billingheaderdata = new billingheaderModel({
       billing_header_name,
@@ -10,11 +11,11 @@ exports.addBillingHeader = async (req, res) => {
     const savedbillingheaderdata = await billingheaderdata.save();
     res.status(200).send({
         data: savedbillingheaderdata,
-        message: "billingheaderdata created success",
+        message: "Bilingheader data created success",
       });
   } catch (err) {
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "Error adding billingheaderdata to database",
     });
   }
@@ -57,11 +58,12 @@ exports.getBillingHeaders = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .send({ error: err, message: "Error getting all billingheaderdata" });
+      .send({ error: err.message, message: "Error getting all billingheaderdata" });
   }
 };
 
 exports.getBillingHeaderById = async (req, res) => {
+  
   try {
     // const fetchedData = await billingheaderModel.findOne({
     //   billingheader_id: parseInt(req.params.id),
@@ -117,12 +119,12 @@ exports.editBillingHeader = async (req, res) => {
         dept_id : req.body.dept_id
       }, { new: true })
       if (!editbillingheader) {
-          res.status(500).send({ success: false })
+          res.status(200).send({ success: false })
       }
       res.status(200).send({ success: true, data: editbillingheader })
   } catch (err) {
       res.status(500).send({
-          error: err,
+          error: err.message,
           message: "Error updating the billingheader in the database",
       });
   }
