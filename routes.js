@@ -288,6 +288,13 @@ router.put("/update_sitting",  sitting.editSitting);
 router.delete("/delete_sitting/:id",  sitting.deleteSitting);
 router.get("/not_alloc_sitting",sitting.getNotAllocSitting);
 
+/* Sitting Routes */
+router.post("/add_room",upload.single("room_image"),  sitting.addRoom);
+router.put("/update_room",upload.single("room_image"),  sitting.editRoom);
+router.get("/get_all_rooms",  sitting.getRooms);
+router.get("/get_room/:id",  sitting.getRoomById);
+router.delete("/delete_room/:id",  sitting.deleteRoom);
+
 /* Agency Routes */
 router.post("/add_agency", agency.addAgency);
 router.get("/get_all_agencys", agency.getAgencys);
