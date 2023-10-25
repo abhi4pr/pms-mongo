@@ -1,26 +1,26 @@
 
-exports.billingHeaderDoc = {
-  "/api/add_billingheader": {
+exports.projectxCategoryDoc = {
+  "/api/projectxCategory": {
     post: {
-      tags: [`Billing Header Module`],
-      description: "Add a Billing Header.",
+      tags: [`Projectx Category Module`],
+      description: "Add a Projectx Category.",
       requestBody: {
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                billing_header_name: {
+                category_name: {
                   type: "string",
                 },
-                dept_id: {
+                brand_id: {
                   type: "integer",
                 },
               },
             },
             example: {
-              billing_header_name: "example",
-              dept_id: 1,
+              category_name: "example",
+              brand_id: 1,
             },
           },
         },
@@ -28,64 +28,89 @@ exports.billingHeaderDoc = {
       },
       responses: {
         200: {
-          description: "Bilingheader data created success",
+          description: "Projectx Category data created success",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
                   data: {
-                    billing_header_name: "test",
-                    dept_id: 11,
-                    _id: "65366fc9c74638c1d008a2a9",
-                    billingheader_id: 6,
+                    brand_id: 343,
+                    category_name: "example",
+                    _id: "6538e9058d99874f4b998c5a",
+                    category_id: 199,
                     __v: 0,
                   },
-                  message: "billingheaderdata created success",
+                  message: "projectxcategory created success",
+                },
+              },
+            },
+          },
+        },
+        "Err 500": {
+          description: "Error while adding Projectx Category to database",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  success: false,
+                  data: {},
+                  message: "Something went wrong..",
                 },
               },
             },
           },
         },
         500: {
-          description: "Error adding billingheaderdata to database",
+          description: "Error adding projectxcategory to database",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  error: "err.message",
+                  message: "Error adding projectxcategory to database",
+                },
+              },
+            },
+          },
         },
       },
     },
-  },
-  "/api/update_billingheader": {
     put: {
-      tags: [`Billing Header Module`],
-      description: "Edit a Billing Header with the specified ID.",
+      tags: [`Projectx Category Module`],
+      description:
+        "Edit a Projectx category with the specified ID. Note if you not want to update any specific field in that case you have to remove that target field from request body.",
       requestBody: {
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                billingheader_id: {
+                id: {
                   type: "integer",
                   required: true,
                 },
-                billing_header_name: {
+                category_name: {
                   type: "string",
                 },
-                dept_id: {
+                brand_id: {
                   type: "integer",
                 },
               },
             },
             example: {
-              billingheader_id: 1,
-              billing_header_name: "example",
+              category_name: "example",
               dept_id: 1,
+              id: 1,
             },
           },
         },
       },
       responses: {
         "Positive 200": {
-          description: "Data updated successfully.",
+          description: "Updation successfully.",
           content: {
             "application/json": {
               schema: {
@@ -93,10 +118,10 @@ exports.billingHeaderDoc = {
                 example: {
                   success: true,
                   data: {
-                    _id: "65367283ea0b2e7b9161d061",
-                    billing_header_name: "update",
-                    dept_id: 11,
-                    billingheader_id: 16,
+                    _id: "6538e9058d99874f4b998c5a",
+                    brand_id: 343,
+                    category_name: "exampleupdate",
+                    category_id: 199,
                     __v: 0,
                   },
                 },
@@ -104,36 +129,125 @@ exports.billingHeaderDoc = {
             },
           },
         },
-      
         200: {
-          description: "when your billingheader_id not match any data in db",
+          description: "Validation error for category name unique",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  status: false,
+                  message: "Category name must be unique",
+                  data: {},
+                },
+              },
+            },
+          },
+        },
+        "Err 200": {
+          description: "Category not found with provided ID.",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
                   success: false,
+                  message: "projectx category not found",
                 },
               },
             },
           },
         },
         500: {
-          description: "Error updating billingheaderdata to database",
+          description: "Error adding projectxcategory to database",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  error: "err.message",
+                  message:
+                    "Error updating the projectxcategory in the database",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    get: {
+      tags: [`Projectx Category Module`],
+      description: "Get all Projectx Categories.",
+      responses: {
+        "Positive 200": {
+          description: "Fetching operation success.",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  data: [
+                    {
+                      _id: "652fe3ea834d9fa8e1487c4d",
+                      brand_id: 0,
+                      category_name: "Chipss",
+                      category_id: 184,
+                      __v: 0,
+                    },
+                    {
+                      _id: "65312578d89678e2701c5c4b",
+                      brand_id: 3,
+                      category_name: "testcategoryname11",
+                      category_id: 189,
+                      __v: 0,
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+        200: {
+          description: "There is no data available.",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  success: true,
+                  data: [],
+                  message: "No Record found",
+                },
+              },
+            },
+          },
+        },
+        500: {
+          description: "Error message",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  error: "err.message",
+                  message: "Error getting all projectxCategory",
+                },
+              },
+            },
+          },
         },
       },
     },
   },
-
-  "/api/get_single_billingheader/{id}": {
+  "/api/projectxCategory/{id}": {
     get: {
-      tags: [`Billing Header Module`],
-      description: "Get Single Billing Header.",
+      tags: [`Projectx Category Module`],
+      description: "Get Single Projectx Category.",
       parameters: [
         {
           name: "id",
           in: "path",
-          description: "ID of Billing header for find.",
+          description: "ID of Projectx Category for find.",
           required: true,
           schema: {
             type: "integer",
@@ -148,15 +262,15 @@ exports.billingHeaderDoc = {
             "application/json": {
               schema: {
                 type: "object",
-                example: [
-                  {
-                    _id: "6536727bea0b2e7b9161d05b",
-                    billing_header_name: "example",
-                    dept_id: 11,
-                    billingheader_id: 14,
-                    department_name: "final test",
+                example: {
+                  data: {
+                    _id: "65291bb41e9825a282dd0668",
+                    brand_id: 1,
+                    category_name: "Entertainment",
+                    category_id: 170,
+                    __v: 0,
                   },
-                ],
+                },
               },
             },
           },
@@ -184,7 +298,7 @@ exports.billingHeaderDoc = {
                 type: "object",
                 example: {
                   error: "err.message",
-                  message: "Error getting billingheader details",
+                  message: "Error getting projectxCategorySchema details.",
                 },
               },
             },
@@ -192,79 +306,14 @@ exports.billingHeaderDoc = {
         },
       },
     },
-  },
-  "/api/get_all_billingheaders": {
-    get: {
-      tags: [`Billing Header Module`],
-      description: "Get all Billing Headers.",
-      responses: {
-        "Positive 200": {
-          description: "Fetching operation success.",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: [
-                  {
-                    _id: "6536727bea0b2e7b9161d05b",
-                    billing_header_name: "example",
-                    dept_id: 11,
-                    billingheader_id: 14,
-                    department_name: "final test",
-                  },
-                  {
-                    _id: "65367283ea0b2e7b9161d061",
-                    billing_header_name: "update",
-                    dept_id: 11,
-                    billingheader_id: 16,
-                    department_name: "final test",
-                  },
-                ],
-              },
-            },
-          },
-        },
-        200: {
-          description: "There is no data available.",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: {
-                  success: false,
-                  data: [],
-                  message: "No Record found",
-                },
-              },
-            },
-          },
-        },
-        500: {
-          description: "Error message",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: {
-                  error: "err.message",
-                  message: "Error getting all billingheaderdata",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "/api/delete_billingheader/{id}": {
     delete: {
-      tags: [`Billing Header Module`],
-      description: "Delete Billing Header.",
+      tags: [`Projectx Category Module`],
+      description: "Delete Projectx category.",
       parameters: [
         {
           name: "id",
           in: "path",
-          description: "ID of Billing header to delete",
+          description: "ID of Projectx category to delete",
           required: true,
           schema: {
             type: "integer",
@@ -281,21 +330,21 @@ exports.billingHeaderDoc = {
                 type: "object",
                 example: {
                   success: true,
-                  message: `billingheader with ID 1 deleted successfully`,
+                  message: `Projectx category with ID 1 deleted successfully`,
                 },
               },
             },
           },
         },
         200: {
-          description: "Error while finding data for perticular id.",
+          description: "Error while finding data for Projectx category id.",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
                   success: true,
-                  message: `billingheader with ID 1 not found`,
+                  message: `Projectx category with ID 1 not found`,
                 },
               },
             },
@@ -309,7 +358,8 @@ exports.billingHeaderDoc = {
                 type: "object",
                 example: {
                   success: false,
-                  message: "An error occurred while deleting the billingheader",
+                  message:
+                    "An error occurred while deleting the projectxcategory",
                   error: "error.message",
                 },
               },

@@ -51,7 +51,10 @@ exports.getProjectxCategory = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .send({ error: err, message: "Error getting all projectxCategory" });
+      .send({
+        error: err.message,
+        message: "Error getting all projectxCategory",
+      });
   }
 };
 
@@ -78,7 +81,7 @@ exports.getProjectxCategoryById = async (req, res) => {
 exports.editProjectxCategory = async (req, res) => {
   try {
     const { id, category_name, brand_id } = req.body;
-    if(req.body.category_name){
+    if (req.body.category_name) {
       let check = await projectxCategorySchema.findOne({
         category_name: category_name.toLowerCase().trim(),
         category_id: { $ne: id },
@@ -106,7 +109,7 @@ exports.editProjectxCategory = async (req, res) => {
         .send({ success: false, message: "projectx category not found" });
     }
 
-    res.status(200).send({ success: true,data:editProjectxCategoryObj });
+    res.status(200).send({ success: true, data: editProjectxCategoryObj });
   } catch (err) {
     res.status(500).send({
       error: err.message,

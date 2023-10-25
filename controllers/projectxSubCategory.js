@@ -17,7 +17,7 @@ exports.addProjectxSubCategory = async (req, res) => {
     }
     let check2 = await projectxSubCategorySchema.findOne({
       sub_category_name: sub_category_name?.toLowerCase().trim(),
-      category_id :parseInt(category_id)
+      category_id: parseInt(category_id),
     });
     if (check2) {
       return response.returnFalse(
@@ -45,7 +45,7 @@ exports.addProjectxSubCategory = async (req, res) => {
     }
   } catch (err) {
     res.status(500).send({
-      error: err,
+      error: err.message,
       message: "Error adding projectxsubcategory to database",
     });
   }
@@ -64,7 +64,10 @@ exports.getProjectxSubCategory = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .send({ error: err, message: "Error getting all projectxSubCategory" });
+      .send({
+        error: err.message,
+        message: "Error getting all projectxSubCategory",
+      });
   }
 };
 
@@ -82,8 +85,8 @@ exports.getProjectxSubCategoryById = async (req, res) => {
     }
   } catch (err) {
     res.status(500).send({
-      error: err,
-      message: "Error getting projectxSubCategorySchema details",
+      error: err.message,
+      message: "Error getting projectxSubCategory details",
     });
   }
 };
@@ -106,7 +109,7 @@ exports.editProjectxSubCategory = async (req, res) => {
     }
     let check2 = await projectxSubCategorySchema.findOne({
       sub_category_name: sub_category_name?.toLowerCase().trim(),
-      category_id :parseInt(category_id),
+      category_id: parseInt(category_id),
       sub_category_id: { $ne: sub_category_id },
     });
     if (check2) {
@@ -148,12 +151,12 @@ exports.deleteProjectxSubCategory = async (req, res) => {
     if (result.deletedCount === 1) {
       return res.status(200).json({
         success: true,
-        message: `projectxsubcategory with ID ${id} deleted successfully`,
+        message: `Projectx Sub category with ID ${id} deleted successfully`,
       });
     } else {
       return res.status(200).json({
         success: false,
-        message: `projectxsubcategory with ID ${id} not found`,
+        message: `Projectx Sub category with ID ${id} not found`,
       });
     }
   } catch (error) {
