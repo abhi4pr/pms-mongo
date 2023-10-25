@@ -1,5 +1,6 @@
 const tag = require("./components/tag");
 const BrandRouteDoc = require("./components/brandDoc");
+const {billingHeaderDoc} = require("./components/billingHeaderDoc");
 const registerCmp = require("./components/registerCampaignDoc");
 
 const swaggerDocumantion = {
@@ -25,7 +26,8 @@ const swaggerDocumantion = {
     tags: [...tag],              // Create tags for seprate api's folder wise
     paths: {                      // Create api's with the help of paths
       ...BrandRouteDoc,
-      ...registerCmp
+      ...registerCmp,
+      ...billingHeaderDoc
     
      
     },

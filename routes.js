@@ -208,7 +208,7 @@ router.post(
   registerCampaign.addRegisterCampaign
 );
 router.get("/register_campaign", registerCampaign.getRegisterCampaigns);
-router.put("/register_campaign", registerCampaign.editRegisterCampaign);
+router.put("/register_campaign",  upload.single("excel_file"), registerCampaign.editRegisterCampaign);
 router.delete("/register_campaign/:id", registerCampaign.deleteRegisterCmp);
 
 //Hash Tag
