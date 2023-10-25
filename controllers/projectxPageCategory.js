@@ -18,8 +18,8 @@ exports.addProjectxPageCategory = async (req, res) => {
     }
   } catch (err) {
     res.status(500).send({
-      error: err,
-      message: "Error adding projectxpagecategory to database",
+      error: err.message,
+      message: "Error adding projectx page category to database",
     });
   }
 };
@@ -37,7 +37,7 @@ exports.getProjectxPageCategory = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .send({ error: err, message: "Error getting all projectxPageCategory" });
+      .send({ error: err.message, message: "Error getting all projectxPageCategory" });
   }
 };
 
@@ -56,7 +56,7 @@ exports.getProjectxPageCategoryById = async (req, res) => {
   } catch (err) {
     res.status(500).send({
       error: err,
-      message: "Error getting projectxPageCategorySchema details",
+      message: "Error getting projectx page category details",
     });
   }
 };
@@ -94,18 +94,18 @@ exports.deleteProjectxPageCategory = async (req, res) => {
     if (result.deletedCount === 1) {
       return res.status(200).json({
         success: true,
-        message: `projectxpagecategory with ID ${id} deleted successfully`,
+        message: `projectx page category with ID ${id} deleted successfully`,
       });
     } else {
       return res.status(200).json({
         success: false,
-        message: `projectxpagecategory with ID ${id} not found`,
+        message: `projectx page category with ID ${id} not found`,
       });
     }
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "An error occurred while deleting the projectxpagecategory",
+      message: "An error occurred while deleting the projectx page category",
       error: error.message,
     });
   }

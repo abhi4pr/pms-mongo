@@ -65,7 +65,8 @@ exports.trackCreatorPutY = async (req, res) => {
         const trackCreatorParams = {
             cron_expression: req.body.cron_expression,
             tracking_expiry_at: req.body.tracking_expiry_at,
-            tracking: true,
+            tracking: req.body.tracking,
+            // tracking: true,
         };
 
         const response = await axios.put(
