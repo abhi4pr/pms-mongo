@@ -18,29 +18,28 @@ exports.addJobResponsibility = async (req, res) =>{
 
 exports.getJobResposibilities = async (req, res) => {
     try{
-        const simc = await jobResponsibilityModel.find();
-        // const simc = await jobResponsibilityModel.aggregate([
-        //     {
-        //         $lookup: {
-        //             from: 'usermodels',
-        //             localField: 'user_id',
-        //             foreignField: 'user_id',
-        //             as: 'user'
-        //         }
-        //     },
-        //     {
-        //         $unwind: '$user'
-        //     },
-        //     {
-        //         $project: {
-        //             _id: 1,
-        //             created_by_name: '$user.user_name',
-        //             description: '$description',
-        //             sjob_responsibility: '$sjob_responsibility',
-        //             user_id: '$user_id'
-        //         }
-        //     }
-        // ]).exec();
+        const simc = await jobResponsibilityModel.aggregate([
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: '$user'
+            },
+            {
+                $project: {
+                    _id: 1,
+                    user_name: '$user.user_name',
+                    description: '$description',
+                    sjob_responsibility: '$sjob_responsibility',
+                    user_id: '$user_id'
+                }
+            }
+        ]).exec();
         if(!simc){
             res.status(500).send({success:false})
         }

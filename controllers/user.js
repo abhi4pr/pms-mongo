@@ -31,7 +31,6 @@ const upload = multer({ dest: "uploads/" }).fields([
 
 exports.addUser = [upload, async (req, res) =>{
     try{
-        console.log("body",req.body);
         let encryptedPass;
         if(req.body.user_login_password){
             encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
@@ -170,8 +169,6 @@ exports.addUser = [upload, async (req, res) =>{
         const objectData = await objModel.find();
         const objects = objectData;    
         
-        // console.log('ffff',objects)
-
         for (const object of objects) {
             const objectId = object.obj_id;
             let insertValue = 0;
@@ -338,7 +335,7 @@ exports.updateUser = [upload1,async (req, res) => {
         if(!editsim){
            return res.status(500).send({success:false})
         }
-        console.log("output",editsim);
+    
         return res.status(200).send({success:true,data:editsim})
     } catch(err){
         return res.status(500).send({error:err.message,sms:'Error updating user details'})
@@ -357,9 +354,9 @@ exports.getWFHUsersByDept = async (req, res) => {
     }
 };
 
+const ImageUrl = 'http://34.93.135.33:8080/uploads/';
 exports.getAllUsers = async (req, res) => {
     try{
-        const ImageUrl = 'http://34.93.135.33:8080/uploads/';
         const singlesim = await userModel.aggregate([
             {
                 $lookup: {
@@ -387,35 +384,13 @@ exports.getAllUsers = async (req, res) => {
                 $lookup: {
                     from: 'rolemodels',
                     localField: 'role_id',
-                    foreignField: 'Role_id',
+                    foreignField: 'role_id',
                     as: 'role'
                 }
             },
             {
                 $unwind: '$role'
             },
-            // {
-            //     $lookup:{
-            //         from: 'usermodels',
-            //         localField: 'user_report_to_id',
-            //         foreignField: 'user_id',
-            //         as: 'user1'
-            //     }
-            // },
-            // {
-            //     $unwind: '$user1'
-            // },
-            // {
-            //     $lookup:{
-            //         from: 'usermodels',
-            //         localField: 'Report_L1',
-            //         foreignField: 'user_id',
-            //         as: 'user2'
-            //     }
-            // },
-            // {
-            //     $unwind: '$user2'
-            // },
             {
                 $project: {
                     department_name: '$department.dept_name',
@@ -425,8 +400,6 @@ exports.getAllUsers = async (req, res) => {
                     desi_id: '$user_designation',
                     user_id: "$user_id",
                     _id: "$_id",
-                    // report: '$user1.user_name',
-                    // report_L1_name: '$user2.user_name',
                     user_name: '$user_name',
                     user_email_id: '$user_email_id',
                     user_login_id: '$user_login_id',
@@ -526,7 +499,7 @@ exports.getAllUsers = async (req, res) => {
         ]).exec();
         res.status(200).send({data:singlesim})
     }catch(err){
-        res.status(500).send({error:err,sms:'Error getting all users'})
+        res.status(500).send({error:err.message,sms:'Error getting all users'})
     }
 }
 
@@ -563,7 +536,7 @@ exports.getSingleUser = async (req, res) => {
                 $lookup: {
                     from: 'rolemodels',
                     localField: 'role_id',
-                    foreignField: 'Role_id',
+                    foreignField: 'role_id',
                     as: 'role'
                 }
             },
@@ -596,6 +569,7 @@ exports.getSingleUser = async (req, res) => {
                 $project: {
                     department_name: '$department.dept_name',
                     designation_name: '$designation.desi_name',
+                    role_name:"$role.Role_name",
                     user_designation: '$user_designation', 
                     dept_id: "$dept_id",
                     desi_id: '$user_designation',

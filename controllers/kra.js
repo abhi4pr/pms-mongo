@@ -4,16 +4,18 @@ const jobResponsibilityModel = require("../models/jobResponsibilityModel.js");
 
 exports.addKra = async (req, res) => {
     try {
+        console.log("body",req.body);
         const krac = new kraTransModel({
-            user_to_id: req.body.user_to_id,
-            user_from_id: req.body.user_from_id,
-            job_responsibility_id: req.body.job_responsibility_id,
+            user_to_id: parseInt(req.body.user_to_id),
+            user_from_id: parseInt(req.body.user_from_id),
+            job_responsibility_id: parseInt(req.body.job_responsibility_id),
             remark: req.body.remark,
-            Created_by: req.body.Created_by,
-            Job_res_id: req.body.Job_res_id
+            Created_by: parseInt(req.body.created_by),
+            Job_res_id: parseInt(req.body.Job_res_id)
         })
 
         const krav = await krac.save();
+        console.log("data",krav)
         await kraTransModel.updateOne(
             { Job_res_id: Job_res_id },
             { user_id: user_to_id }
@@ -29,58 +31,55 @@ exports.addKra = async (req, res) => {
 exports.getJobResponById = async (req, res) => {
     try {
         const user_id = req.params.user_id;
+        console.log("userId",user_id);
         const ImageUrl = 'http://34.93.135.33:8080/uploads/';
         const userJobResponsi = await jobResponsibilityModel.aggregate([
             {
-                $match: { user_id: user_id },
+                $match: { user_id: parseInt(user_id) },
             },
             {
                 $lookup: {
-                    from: "user_mast",
-                    localField: "user_id",
-                    foreignField: "user_id",
-                    as: "user_info",
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user',
                 },
             },
             {
-                $unwind: "$user_info",
+                $unwind: "$user",
             },
             {
                 $lookup: {
-                    from: "dept_mast",
-                    localField: "user_info.dept_id",
+                    from: "departmentmodels",
+                    localField: "user.dept_id",
                     foreignField: "dept_id",
                     as: "department",
                 },
             },
             {
-                $lookup: {
-                    from: "designation_mast",
-                    localField: "user_info.user_designation",
-                    foreignField: "desi_id",
-                    as: "designation",
-                },
+                $unwind: "$department",
             },
             {
                 $project: {
                     _id: 0,
                     user_id: 1,
-                    job_responsibility_id: 1,
-                    user_name: "$user_info.user_name",
-                    user_email_id: "$user_info.user_email_id",
+                    Job_res_id: "$Job_res_id",
+                    description:"$description",
+                    user_name: "$user.user_name",
+                    user_email_id: "$user.user_email_id",
                     department_name: "$department.dept_name",
-                    designation_name: "$designation.desi_name",
-                    image: ImageUrl + '$image',
-                    UID: ImageUrl + '$UID',
-                    pan: ImageUrl + '$pan',
-                    highest_upload: ImageUrl + '$highest_upload',
-                    other_upload: ImageUrl + '$other_upload'
+                    sjob_responsibility:"$sjob_responsibility",
+                    UID: { $concat: [ImageUrl, '$UID'] },
+                    pan: { $concat: [ImageUrl, '$pan'] },
+                    highest_upload: { $concat: [ImageUrl, '$highest_upload'] },
+                    other_upload: { $concat: [ImageUrl, '$other_upload'] },
                 }
             },
         ]);
+        console.log("data",userJobResponsi);
         res.status(200).send(userJobResponsi);
     } catch (error) {
-        res.status(500).send({error:err,sms:'Error getting all kras'})
+        res.status(500).send({error:err.message,sms:'Error getting all kras'})
     }
 }
 
