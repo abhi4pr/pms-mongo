@@ -4,7 +4,12 @@ const AutoIncrement = require('mongoose-auto-increment');
 const userAuthModel = new mongoose.Schema({
     auth_id:{
         type: Number,
-        required: true
+        required: true,
+        unique: true
+    },
+    Juser_id:{
+        type: Number,
+        required: false
     },
     obj_id:{
         type: Number,

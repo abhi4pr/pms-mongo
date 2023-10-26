@@ -1,7 +1,8 @@
 const constant = require("../common/constant.js");
 const helper = require("../helper/helper.js");
 const roomModel = require("../models/roomModel.js");
-const sittingModel = require("../models/sittingModel.js");
+const sittingModel = require('../models/sittingModel.js');
+const userModel = require("../models/userModel.js");
 
 exports.addSitting = async (req, res) => {
   try {
@@ -100,60 +101,46 @@ exports.deleteSitting = async (req, res) => {
 };
 
 exports.getNotAllocSitting = async (req, res) => {
-  try {
-    const simc = await sittingModel
-      .aggregate([
+    const pipeline = [
         {
           $lookup: {
             from: "usermodels",
             localField: "sitting_id",
             foreignField: "sitting_id",
-            as: "users",
-          },
-        },
-        {
-          $unwind: "$users",
-        },
-        {
-          $match: {
-            $or: [
-              { "users.sitting_id": null },
-              { "users.sitting_id": { $exists: false } },
-            ],
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            sitting_id: "$sitting_id",
-            sitting_ref_no: "$sitting_ref_no",
-            sitting_area: "$sitting_area",
-            remarks: "$remarks",
-            created_by: "$created_by",
-            last_updated_by: "$last_updated_by",
-            room_id: "$room_id",
-          },
-        },
-      ])
-      .exec();
-    if (!simc) {
-      res.status(500).send({ success: false });
-    }
-    res.status(200).send({ success: true, data: simc });
-  } catch (err) {
-    res.status(500).send({ error: err, sms: "Error getting all sittings" });
-  }
-};
+            as: "user"
+        }
+      },
+      {
+        $match: {
+          "user": { $eq: [] }
+        }
+      },
+      {
+        $project: {
+          user: 0 
+        }
+      }
+    ];
+  
+    sittingModel.aggregate(pipeline, (err, results) => {
+      if (err) {
+        res.sendStatus(500);
+        return;
+      }
+  
+      res.send({ data: results });
+    });
+}
 
 exports.addRoom = async (req, res) => {
   try {
-    const { sitting_ref_no, remarks, created_By } = req.body;
+    const { sitting_ref_no, remarks, created_by } = req.body;
     let roomImage = req.file.filename;
     const roomObj = new roomModel({
       sitting_ref_no,
       remarks,
       roomImage,
-      created_By
+      created_by
     });
     const roomObjSaved = await roomObj.save();
     res.status(200).send(roomObjSaved);
@@ -170,7 +157,7 @@ exports.getRooms = async (req, res) => {
       {
         $lookup: {
           from: "usermodels",
-          localField: "created_By",
+          localField: "created_by",
           foreignField: "user_id",
           as: "data",
         },
@@ -188,7 +175,7 @@ exports.getRooms = async (req, res) => {
           roomImage: 1,
           remarks: 1,
           creation_date: 1,
-          created_By: 1,
+          created_by: 1,
           last_updated_by: 1,
           last_updated_date: 1,
           user_name: "$data.user_name",
@@ -206,7 +193,7 @@ exports.getRooms = async (req, res) => {
         .status(200)
         .send({ success: true, data: [], message: "No Record found" });
     } else {
-      res.status(200).send(dataWithImageUrl);
+      res.status(200).send({data:dataWithImageUrl});
     }
   } catch (err) {
     res
@@ -227,7 +214,7 @@ exports.getRoomById = async (req, res) => {
       {
         $lookup: {
           from: "usermodels",
-          localField: "created_By",
+          localField: "created_by",
           foreignField: "user_id",
           as: "data",
         },
@@ -245,7 +232,7 @@ exports.getRoomById = async (req, res) => {
           roomImage: 1,
           remarks: 1,
           creation_date: 1,
-          created_By: 1,
+          created_by: 1,
           last_updated_by: 1,
           last_updated_date: 1,
           user_name: "$data.user_name",
@@ -274,7 +261,7 @@ exports.getRoomById = async (req, res) => {
 
 exports.editRoom = async (req, res) => {
   try {
-    const { sitting_ref_no, remarks, id: room_id, Last_updated_by } = req.body;
+    const { sitting_ref_no, remarks,room_id, Last_updated_by } = req.body;
     let last_updated_date = Date.now();
     let roomImage = req?.file?.filename;
     const editRoomObj = await roomModel.findOneAndUpdate(
@@ -341,3 +328,4 @@ exports.deleteRoom = async (req, res) => {
     return res.status(400).json({ success: false, message: err.message });
   }
 };
+ 

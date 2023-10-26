@@ -22,7 +22,7 @@ const roomModel = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    created_By: {
+    created_by: {
         type: Number,
         default: 0,
     },
