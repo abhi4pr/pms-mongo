@@ -31,7 +31,11 @@ const upload = multer({ dest: "uploads/" }).fields([
 
 exports.addUser = [upload, async (req, res) =>{
     try{
-        const encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
+        console.log("body",req.body);
+        let encryptedPass;
+        if(req.body.user_login_password){
+            encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
+        }
         const simc = new userModel({
             user_name: req.body.user_name,
             user_designation: req.body.user_designation,
@@ -140,21 +144,21 @@ exports.addUser = [upload, async (req, res) =>{
         const work_days = 31 - extractDate;
         const bonus = 0;
         const presentDays = work_days - 0;
-        const perdaysal = salary / 30;
+        const perdaysal = simv.salary / 30;
         const totalSalary = perdaysal * presentDays;
         const netSalary = totalSalary + bonus;
-        const tdsDeduction = netSalary * (tds_per) / 100;
+        const tdsDeduction = netSalary * (simv.tds_per) / 100;
         const ToPay = netSalary - tdsDeduction;
 
         const lastInserted = new attendanceModel({
-            dept: req.body.dept_id,
+            dept: simv.dept_id,
             user_id: simv.user_id,
             user_name: req.body.user_name,
             noOfabsent: 0,
             month: joiningMonth,
             year: joiningYear,
             bonus: 0,
-            total_salary: req.body.salary,
+            total_salary: simv.salary,
             tds_deduction: tdsDeduction,
             net_salary: netSalary,
             toPay: ToPay,
@@ -163,8 +167,10 @@ exports.addUser = [upload, async (req, res) =>{
         })
         await lastInserted.save();
 
-        const objectData = objModel.find();
-        const objects = objectData[0];     
+        const objectData = await objModel.find();
+        const objects = objectData;    
+        
+        // console.log('ffff',objects)
 
         for (const object of objects) {
             const objectId = object.obj_id;
@@ -173,7 +179,7 @@ exports.addUser = [upload, async (req, res) =>{
             let updateValue = 0;
             let deleteValue = 0;
     
-            if (roleId === 1) {
+            if (simv.role_id === 1) {
             insertValue = 1;
             viewValue = 1;
             updateValue = 1;
@@ -181,20 +187,20 @@ exports.addUser = [upload, async (req, res) =>{
             }
     
             const userAuthDocument = {
-            Juser_id: userId,
+            Juser_id: simv.user_id,
             obj_id: objectId,
             insert_value: insertValue,
             view_value: viewValue,
             update_value: updateValue,
             delete_flag_value: deleteValue,
             creation_date: new Date(),
-            created_by: created_by || 0,
-            last_updated_by: created_by || 0,
+            created_by: simv.created_by || 0,
+            last_updated_by: simv.created_by || 0,
             last_updated_date: new Date(),
         };
   
         await userAuthModel.updateOne(
-          { Juser_id: userId, obj_id: objectId },
+          { Juser_id: simv.user_id, obj_id: objectId },
           { $set: userAuthDocument },
           { upsert: true }
         );
@@ -206,15 +212,37 @@ exports.addUser = [upload, async (req, res) =>{
     }
 }];
 
-exports.updateUser = async (req, res) => {
+
+
+const upload1 = multer({ dest: "uploads/" }).fields([
+    { name: "image", maxCount: 1 },
+    { name: "UID", maxCount: 1 },
+    { name: "pan", maxCount: 1 },
+    { name: "highest_upload", maxCount: 1 },
+    { name: "other_upload", maxCount: 1 },
+    { name: "tenth_marksheet", maxCount: 1 },
+    { name: "twelveth_marksheet", maxCount: 1 },
+    { name: "UG_Marksheet", maxCount: 1 },
+    { name: "passport", maxCount: 1 },
+    { name: "pre_off_letter", maxCount: 1 },
+    { name: "pre_expe_letter", maxCount: 1 },
+    { name: "pre_relieving_letter", maxCount: 1 },
+    { name: "bankPassBook_Cheque", maxCount: 1 },
+    { name: "joining_extend_document", maxCount:1 },
+  ]);
+exports.updateUser = [upload1,async (req, res) => {
     try{
-        const encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
-        const editsim = await userModel.findOneAndUpdate({user_id:req.body.id},{
+        
+        let encryptedPass;
+       if (req.body.user_login_password){
+         encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
+       }
+        const editsim = await userModel.findOneAndUpdate({user_id:req.body.user_id},{
             user_name: req.body.user_name,
             user_designation: req.body.user_designation,
             user_email_id: req.body.user_email_id,
             user_login_id: req.body.user_login_id,
-            user_login_password: encryptedPass,
+            // user_login_password: encryptedPass,
             user_report_to_id: req.body.user_report_to_id,
             user_contact_no: req.body.user_contact_no,
             dept_id: req.body.dept_id,
@@ -308,13 +336,14 @@ exports.updateUser = async (req, res) => {
             joining_extend_document: req.file ? req.files.joining_extend_document[0].filename : ''
         }, { new: true })
         if(!editsim){
-            res.status(500).send({success:false})
+           return res.status(500).send({success:false})
         }
-        res.status(200).send({success:true,data:editsim})
+        console.log("output",editsim);
+        return res.status(200).send({success:true,data:editsim})
     } catch(err){
-        res.status(500).send({error:err,sms:'Error updating user details'})
+        return res.status(500).send({error:err.message,sms:'Error updating user details'})
     }
-};
+}];
 
 exports.getWFHUsersByDept = async (req, res) => {
     try{
