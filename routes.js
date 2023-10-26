@@ -27,6 +27,7 @@ const responsibility = require("./controllers/responsibility.js");
 const contentM = require("./controllers/contentManagement.js");
 const billingheader = require("./controllers/billingheader.js");
 const brandCategory = require("./controllers/brandCategory.js");
+const campaignCategory = require("./controllers/campaignCategory.js");
 const brandSubCategory = require("./controllers/brandSubCategory.js");
 const productController = require("./controllers/product.js");
 const brandMajorCategory = require("./controllers/brandMajorCategory.js");
@@ -67,9 +68,11 @@ router.get("/creator_insights", insta.creatorInsights);
 router.get("/cfinstaapi", insta.cfInstaApi);
 router.get("/countinstacp", insta.countInstaCPModels);
 router.post("/get_all_posts_by_id", insta.getPostsByDecNum)
+router.get("/get_avg_frq_of_post", insta.getAvgFrqOfPost)
 /*execution api*/
 router.post("/exe_inven_post", exe.exeInvenPost);
 router.get("/get_exe_inventory", exe.getExeInventory);
+router.get("/execution_graph", exe.executionGraph);
 router.post("/exe_sum_post", exe.exeSumPost);
 router.get("/get_exe_sum", exe.getExeSum);
 router.put("/edit_exe_sum", exe.editExeSum);
@@ -436,6 +439,13 @@ router.get("/brandCategory", brandCategory.getBrandCategorys);
 router.get("/brandCategory/:id", brandCategory.getBrandCategoryById);
 router.put("/brandCategory", brandCategory.editBrandCategory);
 router.delete("/brandCategory/:id", brandCategory.deleteBrandCategory);
+
+/* Campaign Category */
+router.post("/campaignCategory", campaignCategory.addCampaignCategory);
+router.get("/campaignCategory", campaignCategory.getCampaignCategories);
+router.get("/campaignCategory/:id", campaignCategory.getCampaignCategoryById);
+router.put("/campaignCategory", campaignCategory.editCampaignCategory);
+router.delete("/campaignCategory/:id", campaignCategory.deleteCampaignCategory);
 
 /* Brand Sub Category */
 router.post("/brandSubCategory", brandSubCategory.addBrandSubCategory);

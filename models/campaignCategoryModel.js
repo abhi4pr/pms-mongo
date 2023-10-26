@@ -1,18 +1,18 @@
 const { default: mongoose } = require("mongoose");
 const AutoIncrement = require("mongoose-auto-increment");
 
-const brandSubCategoryModel = new mongoose.Schema({
-  brandSubCategory_id: {
+const campaignCategoryModel = new mongoose.Schema({
+  campaignCategory_id: {
     type: Number,
     required: true,
   },
-  brandSubCategory_name: {
+  campaignCategory_name: {
     type: String,
     required: true,
     lowercase: true,
     trim: true,
   },
-  brandCategory_id: {
+  campaign_id: {
     type: Number,
     required: true,
   },
@@ -27,10 +27,10 @@ const brandSubCategoryModel = new mongoose.Schema({
 });
 
 AutoIncrement.initialize(mongoose.connection);
-brandSubCategoryModel.plugin(AutoIncrement.plugin, {
-  model: "brandSubCategoryModels",
-  field: "brandSubCategory_id",
+campaignCategoryModel.plugin(AutoIncrement.plugin, {
+  model: "campaignCategoryModels",
+  field: "campaignCategory_id",
   startAt: 1,
   incrementBy: 1,
 });
-module.exports = mongoose.model("brandSubCategoryModel", brandSubCategoryModel);
+module.exports = mongoose.model("campaignCategoryModel", campaignCategoryModel);
