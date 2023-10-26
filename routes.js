@@ -50,6 +50,7 @@ router.get("/", (req, res) => {
 });
 
 /*insta api*/
+router.post("/get_dynamic_key_value", insta.getDynamicReqAndRes)
 router.post("/track_creator_post", insta.trackCreator);
 router.get("/instagetcreators", insta.getCreators);
 router.post("/track_creator_posty", insta.trackCreatorY);

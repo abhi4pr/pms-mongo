@@ -7,6 +7,8 @@ const jwt = require("jsonwebtoken");
 const variable = require("../variables.js");
 const axios = require("axios");
 const constant = require("../common/constant.js");
+const fs = require('fs');
+const path = require('path');
 
 exports.trackCreator = async (req, res) => {
     try {
@@ -101,6 +103,54 @@ exports.getCreators = async (req, res) => {
 
 exports.trackPost = async (req, res) => {
     try {
+        // const imageUrl = req.body.data.display_url[0];
+        // const savePath = path.join(__dirname, '../uploads/instaImages');
+
+        // if (!fs.existsSync(savePath)) {
+        //     fs.mkdirSync(savePath, { recursive: true });
+        // }
+
+        // const fileExtension = path.extname(imageUrl);
+        // const fileName = `image-${Date.now()}${fileExtension}`;
+        // var filePath = path.join(savePath, fileName);
+
+        // axios({
+        //     method: 'get',
+        //     url: imageUrl,
+        //     responseType: 'stream',
+        // })
+        // .then(async (response) => {
+        //     response.data.pipe(fs.createWriteStream(filePath));
+            
+        //     const creators = new instaP({
+        //         postType: req.body.data.post_type,
+        //         creatorName: req.body.data.creator.username,
+        //         allComments: req.body.data.comments_count.overall,
+        //         todayComment: req.body.data.comments_count.today,
+        //         pastComment: req.body.data.comments_count.vs_previous,
+        //         allLike: req.body.data.likes_count.overall,
+        //         todayLike: req.body.data.likes_count.today,
+        //         pastLike: req.body.data.likes_count.vs_previous,
+        //         allView: req.body.data.views_count.overall,
+        //         todayView: req.body.data.views_count.today,
+        //         pastView: req.body.data.views_count.vs_previous,
+        //         title: req.body.data.title,
+        //         postedOn: req.body.data.posted_at,
+        //         postUrl: req.body.data.post_url,
+        //         postImage: filePath,
+        //         shortCode: req.body.shortcode,
+        //         posttype_decision: req.body.posttype_decision,
+        //         selector_name: req.body.selector_name,
+        //         interpretor_name: req.body.interpretor_name,
+        //         auditor_name: req.body.auditor_name,
+        //         auditor_decision: req.body.auditor_decision,
+        //         interpretor_decision: req.body.interpretor_decision,
+        //         selector_decision: req.body.selector_decision,
+        //     });
+        //     const instav = await creators.save();
+        //     res.send({ instav, status: 200 });
+        // })
+
         const creators = new instaP({
             postType: req.body.data.post_type,
             creatorName: req.body.data.creator.username,
@@ -128,6 +178,7 @@ exports.trackPost = async (req, res) => {
         });
         const instav = await creators.save();
         res.send({ instav, status: 200 });
+
     } catch (error) {
         res.status(500).send({ error: error, sms: "error while adding data" });
     }
@@ -463,5 +514,16 @@ exports.countInstaCPModels = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send({ error: err, sms: "Something went wrong..." });
+    }
+};
+
+exports.getDynamicReqAndRes = async (req, res) => {
+    try {
+        const ReqKey = req.body.request_key;
+        const ReqValue = req.body.request_value;
+        const getPosts = await instaP.find({ [ReqKey]: parseInt(ReqValue) });
+        res.status(200).send(getPosts);
+    } catch (error) {
+        res.send({ status:500, error: error, sms: "error getting posts from name" });
     }
 };

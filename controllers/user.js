@@ -745,53 +745,51 @@ exports.loginUser = async (req, res) => {
             },
             {
                 $project: {
-                    Sitting_id: '$sitting.Sitting_id',
-                    Sitting_ref_no: '$sitting.Sitting_ref_no',
+                    Sitting_id: '$sitting.sitting_id',
+                    Sitting_ref_no: '$sitting.sitting_ref_no',
                     id: "$id",
                     name: '$user_name',
                     email: '$user_email_id',
                     dept_id: '$dept_id',
                     role_id: '$role_id',
-                    sitting_id: '$sitting_id',
+                    // sitting_id: '$sitting_id',
                     room_id: '$room_id',
                     user_status: '$user_status',
                     user_login_password: '$user_login_password',
-                    onboard_status: '$onboard_status'
+                    onboard_status: '$onboard_status',
+                    id: '$user_id'
                 }
             }
         ]).exec();
-
-        
- 
           
         if(simc.length === 0){
-            res.status(500).send({success:false})
+            return res.status(500).send({success:false})
         }
         if (bcrypt.compareSync(req.body.user_login_password, simc[0].user_login_password)) {
             const token = jwt.sign(
                 {
-                  id: simc.user_id,
-                  name: simc.user_name,
-                  email: simc.user_email_id,
-                  sitting_id: simc.sitting_id,
-                  role_id: simc.role_id,
-                  dept_id: simc.dept_id,
-                  room_id: simc.room_id,
-                  Sitting_id: simc.Sitting_id,
-                  Sitting_ref_no: simc.Sitting_ref_no,
-                  onboard_status: simc.onboard_status,
-                  user_status: simc.user_status,
+                  id: simc[0].user_id,
+                  name: simc[0].user_name,
+                  email: simc[0].user_email_id,
+                  sitting_id: simc[0].sitting_id,
+                  role_id: simc[0].role_id,
+                  dept_id: simc[0].dept_id,
+                  room_id: simc[0].room_id,
+                  Sitting_id: simc[0].Sitting_id,
+                  Sitting_ref_no: simc[0].Sitting_ref_no,
+                  onboard_status: simc[0].onboard_status,
+                  user_status: simc[0].user_status,
                 },
                 constant.SECRET_KEY_LOGIN,
             { expiresIn:  constant.CONST_VALIDATE_SESSION_EXPIRE }
             );
-            res.status(200).send({token,...simc})
+            return res.status(200).send({token,user:simc[0]})
           } else {
-            res.status(200).send({sms:'Invalid Password'})
+            return res.status(200).send({sms:'Invalid Password'})
           }
        
     } catch(err){
-        res.status(500).send({error:err.message,sms:'Error getting user details'})
+        return res.status(500).send({error:err.message,sms:'Error getting user details'})
     }
 }
 
