@@ -37,7 +37,7 @@ exports.getDesignations = async (req, res) => {
                     desi_name: '$desi_name',
                     dept_id: "$dept_id",
                     desi_id: "$desi_id",
-                    id: "$id",
+                    _id: "$_id",
                     remark: "$remark"
                 }
             }
