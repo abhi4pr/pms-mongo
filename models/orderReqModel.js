@@ -36,7 +36,6 @@ const orderReqSchema = new mongoose.Schema({
   Status: {
     type: String,
     dafault: "pending",
-    required: true,
   },
   Request_delivered_by: {
     type: Number,

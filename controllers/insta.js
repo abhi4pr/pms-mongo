@@ -527,3 +527,46 @@ exports.getDynamicReqAndRes = async (req, res) => {
         res.send({ status:500, error: error, sms: "error getting posts from name" });
     }
 };
+
+exports.getAvgFrqOfPost = async (req, res) => {
+    try {
+    //underworing-----------------------------------------------------
+    console.log(endOfCurrentDate)
+    const query = await instaP.aggregate([
+    //   {
+    //     $match: {
+    //       postedOn: {
+    //         $gte: startOfCurrentDate, // Match documents with "postedOn" greater than or equal to the start of the current date
+    //         $lt: endOfCurrentDate,     // Match documents with "postedOn" less than the end of the current date
+    //       }
+    //     }
+    //   },
+            {
+                $group: {
+                    _id: "$creatorName",
+                    index: { $first: "$_id" },
+                    maxPostedOn: { $max: "$postedOn" }, 
+      minPostedOn: { $min: "$postedOn" },
+                    decision_2_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}
+                        }
+                    },
+                    decision_1_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 1] }, then: 1, else: 0 }
+                        }
+                    },
+                    decision_0_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 0] }, then: 1, else: 0 }
+                        }
+                    }
+                }
+            }
+        ]).exec();
+        res.status(200).send(query);
+    } catch (error) {
+        res.send({ status:500, error: error.message, sms: "error getting posts from name" });
+    }
+};

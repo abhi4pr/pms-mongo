@@ -1,20 +1,30 @@
 const brandSubCategoryModel = require("../models/brandSubCategoryModel.js");
 
 exports.addBrandSubCategory = async (req, res) => {
-    const { brandSubCategory_name, brand_id, created_by } = req.body;
+    const { brandSubCategory_name, brandCategory_id, created_by } = req.body;
     try {
+        let check = await brandSubCategoryModel.findOne({
+            brandSubCategory_name: brandSubCategory_name?.toLowerCase().trim(),
+            brandCategory_id: parseInt(brandCategory_id),
+          });
+          if (check) {
+           return res.status(200).send({
+                data: {},
+                message: "Provided brandCategory_id and existing brandSubCategory_name should be unique.",
+            });
+          }
         const brandsubcategory = new brandSubCategoryModel({
             brandSubCategory_name,
-            brand_id,
+            brandCategory_id,
             created_by
         });
         const savedbrandsubcategory = await brandsubcategory.save();
-        res.status(200).send({
+       return res.status(200).send({
             data: savedbrandsubcategory,
             message: "brandsubcategory created success",
         });
     } catch (err) {
-        res.status(500).send({
+      return  res.status(500).send({
             error: err,
             message: "Error adding brandsubcategory to database",
         });
@@ -60,18 +70,29 @@ exports.getBrandSubCategoryById = async (req, res) => {
 
 exports.editBrandSubCategory = async (req, res) => {
     try {
+        let check = await brandSubCategoryModel.findOne({
+            brandSubCategory_name: req.body?.brandSubCategory_name?.toLowerCase().trim(),
+            brandCategory_id: req.body?.brandCategory_id && parseInt(req.body?.brandCategory_id),
+            brandSubCategory_id: { $ne: req.body.brandSubCategory_id },
+          });
+          if (check) {
+           return res.status(200).send({
+                data: {},
+                message: "Provided brandCategory_id and existing brandSubCategory_name should be unique.",
+            });
+          }
         const editbrandsubCategory = await brandSubCategoryModel.findOneAndUpdate({ brandSubCategory_id: req.body.brandSubCategory_id }, {
             brandSubCategory_name: req.body.brandSubCategory_name,
-            brand_id: req.body.brand_id,
+            brandCategory_id: req.body.brandCategory_id,
             created_by: req.body.created_by
         }, { new: true })
         if (!editbrandsubCategory) {
-            res.status(500).send({ success: false })
+          return  res.status(500).send({ success: false })
         }
-        res.status(200).send({ success: true, data: editbrandsubCategory })
+      return  res.status(200).send({ success: true, data: editbrandsubCategory })
     } catch (err) {
-        res.status(500).send({
-            error: err,
+      return  res.status(500).send({
+            error: err.message,
             message: "Error updating the brandsubCategory in the database",
         });
     }
