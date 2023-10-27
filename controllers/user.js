@@ -395,6 +395,7 @@ exports.getAllUsers = async (req, res) => {
                 $project: {
                     department_name: '$department.dept_name',
                     designation_name: '$designation.desi_name',
+                    Role_name:"$role.Role_name",
                     user_designation: '$user_designation', 
                     dept_id: "$dept_id",
                     desi_id: '$user_designation',
@@ -1046,24 +1047,12 @@ exports.deleteUserAuth = async (req, res) =>{
 
 exports.getSingleUserAuthDetail = async (req, res) => {
     try{
+        console.log("param",req.params.Juser_id);
         const delv = await userAuthModel.aggregate([
             {
-                $match:{
-                    Juser_id: req.params.Juser_id
-                }
+                $match:{ Juser_id: parseInt(req.params.Juser_id)}
             },
-            {
-                $lookup: {
-                    from: 'usermodels',
-                    localField: 'user_id',
-                    foreignField: 'Juser_id',
-                    as: 'user'
-                }
-            },
-            {
-                $unwind: '$user'
-            },
-            {
+             {
                 $lookup: {
                     from: 'objectmodels',
                     localField: 'obj_id',
@@ -1074,29 +1063,53 @@ exports.getSingleUserAuthDetail = async (req, res) => {
             {
                 $unwind: '$object'
             },
-            {
-                $lookup: {
-                    from: 'departmentmodels',
-                    localField: 'dept_id',
-                    foreignField: 'dept_id',
-                    as: 'department'
-                }
-            },
-            {
-                $unwind: '$department'
-            },
+            // {
+            //     $lookup: {
+            //         from: 'usermodels',
+            //         localField: 'user_id',
+            //         foreignField: 'Juser_id',
+            //         as: 'user'
+            //     }
+            // },
+            // {
+            //     $unwind: '$user'
+            // },
+            // {
+            //     $lookup: {
+            //         from: 'objectmodels',
+            //         localField: 'obj_id',
+            //         foreignField: 'obj_id',
+            //         as: 'object'
+            //     }
+            //  },
+            // {
+            //     $unwind: '$object'
+            // },
+            // {
+            //     $lookup: {
+            //         from: 'departmentmodels',
+            //         localField: 'object.dept_id',
+            //         foreignField: 'dept_id',
+            //         as: 'department'
+            //     }
+            // },
+            // {
+            //     $unwind: '$department'
+            // },
             {
                 $project: {
-                    user_name: '$user.user_name',
-                    department_name: '$department.dept_name',
-                    obj_name: "$object.obj_name",
+                    // auth_id:"$auth_id",
+                    // user_name: '$user.user_name',
+                    // obj_name: "$object.obj_name",
+                    // department_name: "$department.dept_name",
                     id: "$_id",
                     Juser_id: '$Juser_id',
+                    obj_name:'$object.obj_name',
                     obj_id: '$obj_id',
                     insert: '$insert',
                     view: '$view',
                     update: '$update',
-                    delete_flag: '$delete_flag',
+                    delete_flag: '$delete_flag'
                 }
             }
         ]).exec();
@@ -1105,9 +1118,10 @@ exports.getSingleUserAuthDetail = async (req, res) => {
         }
         res.status(200).send(delv)
     } catch(err){
-        res.status(500).send({error:err, sms:'error getting user auth details'})
+        res.status(500).send({error:err.message, sms:'error getting user auth details'})
     }
 }
+
 
 exports.userObjectAuth = async (req, res) =>{
     try{

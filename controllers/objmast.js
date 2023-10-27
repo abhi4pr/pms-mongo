@@ -1,4 +1,6 @@
 const objectMastSchema = require("../models/objModel.js");
+const userAuthModel = require('../models/userAuthModel.js');
+const userModel = require('../models/userModel.js');
 const response = require("../common/response");
 
 exports.addObjectMast = async (req, res) => {
@@ -12,17 +14,57 @@ exports.addObjectMast = async (req, res) => {
       Created_by: created_by,
     });
     const savedObjectMast = await Obj.save();
+    const objectId = savedObjectMast.obj_id; 
+    
+    let maxAuthId = await userAuthModel.findOne({}, { auth_id: 1 }, { sort: { auth_id: -1 } });
+    let nextAuthId = maxAuthId ? maxAuthId.auth_id + 1 : 1;
+
+    const userData = await userModel.find({});
+    
+    let userAuthDocuments = [];
+
+    for (const user of userData) {
+      const userId = user.user_id;
+      const roleId = user.role_id;
+      let insertValue = 0;
+      let viewValue = 0;
+      let updateValue = 0;
+      let deleteValue = 0;
+
+      if (roleId === 1) {
+        insertValue = 1;
+        viewValue = 1;
+        updateValue = 1;
+        deleteValue = 1;
+      }
+
+      const userAuthDocument = new userAuthModel({
+        auth_id: nextAuthId,
+        Juser_id: userId,
+        obj_id: objectId,
+        insert_value: insertValue,
+        view_value: viewValue,
+        update_value: updateValue,
+        delete_flag_value: deleteValue,
+      });
+
+      userAuthDocuments.push(userAuthDocument);
+      nextAuthId++;
+    }
+
+    // Save all userAuthDocuments in one go
+    await userAuthModel.insertMany(userAuthDocuments);
+
     res.send({
       data: savedObjectMast,
       status: 200,
       message: "Object and user_auth_detail added successfully",
     });
   } catch (err) {
-    res
-      .status(500)
-      .send({ error: err.message, message: "This objMast cannot be created" });
+    res.status(500).send({ error: err.message, message: "This objMast cannot be created" });
   }
 };
+
 
 exports.getObjectMastById = async (req, res) => {
   try {

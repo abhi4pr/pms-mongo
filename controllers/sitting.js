@@ -151,59 +151,59 @@ exports.addRoom = async (req, res) => {
   }
 };
 
+const baseUrl = constant.base_url;
+let roomImageUrl = `${baseUrl}/uploads/`;
 exports.getRooms = async (req, res) => {
   try {
-    const roomObj = await roomModel.find();
-    res.status(200).send({data:roomObj});
-    // const roomObj = await roomModel.aggregate([
-    //   {
-    //     $lookup: {
-    //       from: "usermodels",
-    //       localField: "created_by",
-    //       foreignField: "user_id",
-    //       as: "data",
-    //     },
-    //   },
+    const roomObj = await roomModel.aggregate([
+      {
+        $lookup: {
+          from: "usermodels",
+          localField: "created_by",
+          foreignField: "user_id",
+          as: "data",
+        },
+      },
 
-    //   {
-    //     $unwind: "$data",
-    //   },
+      {
+        $unwind: "$data",
+      },
 
-    //   {
-    //     $project: {
-    //       _id: 1,
-    //       room_id: 1,
-    //       sitting_ref_no: 1,
-    //       roomImage: 1,
-    //       remarks: 1,
-    //       creation_date: 1,
-    //       created_by: 1,
-    //       last_updated_by: 1,
-    //       last_updated_date: 1,
-    //       user_name: "$data.user_name",
-    //     },
-    //   },
-    // ]);
+      {
+        $project: {
+          _id: 1,
+          room_id: "$room_id",
+          sitting_ref_no: "$sitting_ref_no",
+          roomImage: "$roomImage",
+          remarks: "$remarks",
+          creation_date: "$creation_date",
+          created_by: "$created_by",
+          last_updated_by: "$last_updated_by",
+          last_updated_date: "$last_updated_date",
+          user_name: "$data.user_name",
+        },
+      },
+    ]);
 
-    // const baseUrl = constant.base_url;
-    // let roomImageUrl = `${baseUrl}/uploads/`;
-    // const dataWithImageUrl = roomObj?.map((room) => ({
-    //   ...room,
-    //   room_image_url: room?.roomImage ? roomImageUrl + room?.roomImage : null,
-    // }));
-    // if (dataWithImageUrl?.length === 0) {
-    //   res
-    //     .status(200)
-    //     .send({ success: true, data: [], message: "No Record found" });
-    // } else {
-    //   res.status(200).send({data:dataWithImageUrl});
-    // }
+    const dataWithImageUrl = roomObj?.map((room) => ({
+      ...room,
+      room_image_url: room?.roomImage ? roomImageUrl + room?.roomImage : null,
+    }));
+    if (dataWithImageUrl?.length === 0) {
+      res
+        .status(200)
+        .send({ success: true, data: [], message: "No Record found" });
+    } else {
+      res.status(200).send({data:dataWithImageUrl});
+    }
   } catch (err) {
     res
       .status(500)
       .send({ error: err.message, message: "Error getting all Rooms" });
   }
 };
+
+
 
 exports.getRoomById = async (req, res) => {
   try {

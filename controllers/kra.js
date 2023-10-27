@@ -16,11 +16,11 @@ exports.addKra = async (req, res) => {
 
         const krav = await krac.save();
         console.log("data",krav)
-        await kraTransModel.updateOne(
+       const kraTrans =  await jobResponsibilityModel.updateOne(
             { Job_res_id: Job_res_id },
             { user_id: user_to_id }
         );
-
+        console.log("kratrans",kraTrans);
         res.status(200).send(krav, "KRA added and user_id updated successfully");
     } catch (err) {
         res.status(500).send({ error: err, sms: 'This kra cannot be created' })
