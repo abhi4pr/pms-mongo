@@ -494,7 +494,7 @@ router.get(
   user.deliveryBoyByRoom
 );
 router.get(
-  "/get_single_user_auth_detail/:id",
+  "/get_single_user_auth_detail/:Juser_id",
   
   user.getSingleUserAuthDetail
 );
