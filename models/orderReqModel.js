@@ -34,8 +34,7 @@ const orderReqSchema = new mongoose.Schema({
     default: Date.now,
   },
   Status: {
-    type: String,
-    dafault: "pending",
+    type: String
   },
   Request_delivered_by: {
     type: Number,

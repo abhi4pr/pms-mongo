@@ -531,7 +531,7 @@ exports.getDynamicReqAndRes = async (req, res) => {
 exports.getAvgFrqOfPost = async (req, res) => {
     try {
     //underworing-----------------------------------------------------
-    console.log(endOfCurrentDate)
+  
     const query = await instaP.aggregate([
     //   {
     //     $match: {

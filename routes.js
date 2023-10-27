@@ -489,10 +489,10 @@ router.post("/login_user", user.loginUser);
 router.post("/get_delivery_boy",  user.deliveryBoy);  //done
 router.get("/get_delivery_user",  user.deliveryUser);
 router.get(
-  "/get_single_delivery_boy_by_room/:id",
+  "/get_single_delivery_boy_by_room/:room_id",
   
   user.deliveryBoyByRoom
-);
+); //done
 router.get(
   "/get_single_user_auth_detail/:Juser_id",
   
@@ -582,13 +582,13 @@ router.delete("/delete_commitment/:id", cmtController.deleteCmt);
 //Product
 router.post(
   "/add_product",
-  upload1.single("Product_image"),
+  upload.single("Product_image"), //upload1
   
   productController.addProduct
 ); //done
 router.put(
   "/update_productupdate",
-  upload1.single("Product_image"),
+  upload.single("Product_image"),  //upload1
   
   productController.editProduct
 ); //done
@@ -613,90 +613,90 @@ router.get(
   "/get_single_propsdata/:product_id",
   
   productController.getProductPropsByProductId
-);
+); //done
 router.put(
   "/update_propsdataupdate/:id",
   
   productController.editProductProps
-);
+); // build in sql but not used in react
 router.delete(
   "/delete_propdelete/:id",
   
   productController.deleteProductProp
-);
+); //done
 
 // Order Delivery api's
 router.post(
   "/add_orderdelivery",
   
   productController.addOrderDelivery
-);
+); // build in sql but not used in react
 router.get(
   "/get_all_orderdelivery",
   
   productController.getAllOrderDeliveries
-);
+); // build in sql but not used in react
 
 //Order Req api's
 router.post("/add_orderreq",  productController.addOrderReq); //done
 router.post(
-  "/add_orderrequest",
+  "/get_orderrequest",
   
   productController.getOrderReqByOrderId
-);
-router.put("/update_orderrequest",  productController.editOrderReq);
+); // build in sql but not used in react
+router.put("/update_orderrequest",  productController.editOrderReq); //done
 router.put(
   "/update_statusupdatebymanager",
   
   productController.statusUpdateByManager
-);
+);  //build in sql but not used in react
 router.put(
   "/update_orderrequesttransbyman",
   
   productController.statusUpdateByManager
-);
+); // build in sql but not used in react
 router.delete(
   "/delete_orderreqdelete",
   
   productController.deleteOrderReqById
-);
-router.get("/get_LastOrderId",  productController.getLastOrderId);
+);  // build in sql but not used in react
+router.get("/get_LastOrderId",  productController.getLastOrderId); //done
 router.get(
   "/get_single_deliveredorders/:id",
   
   productController.delivereOrdersById
-);
+);  // build in sql but not used in react
 router.get(
   "/get_single_pendingorders/:id",
   
   productController.pendingOrdersById
-);
+);  //done
 router.post(
   "/add_userorderrequest",
   
   productController.orderRequestsForUser
-);
+); // build in sql but not used in react
 router.get(
   "/get_all_orderreqdata",
   
   productController.allOrderReqData
-);
+); //done
 router.get(
   "/get_single_orderreqshistory/:user_id",
   
   productController.orderReqHistory
-);
+); //done
 router.post(
   "/add_orderreqs",
   
   productController.getOrderReqsBasedOnFilter
 ); //done
-router.post("/add_transreq",  productController.addTransferReq);
+router.post("/add_transreq",  productController.addTransferReq); //done
 router.get(
-  "/get-all_transreq",
+  "/get_all_transreq",
   
   productController.getAllTransferReq
-);
+); //done
 
 /* KRA Routes */
 router.post("/add_kra",  kra.addKra);

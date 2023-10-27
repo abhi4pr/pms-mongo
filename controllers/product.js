@@ -122,7 +122,7 @@ exports.getProductById = async (req, res) => {
         {}
       );
     }
-    const url = `${constant.base_url}/uploads/productImage/`;
+    const url = `${constant.local_base_url}/uploads/`;
     const dataWithFileUrls = product.map((item) => ({
       ...item,
       imageUrl: item.Product_image ? url + item.Product_image : "",
@@ -160,10 +160,10 @@ exports.getProduct = async (req, res) => {
         {}
       );
     }
-    const url = `${constant.base_url}/uploads/productImage/`;
+    const url = `${constant.local_base_url}/uploads/`;
     const dataWithFileUrls = product.map((item) => ({
       ...item,
-      imageUrl: item.Product_image ? url + item.Product_image : "",
+      Product_image_download_url: item.Product_image ? url + item.Product_image : "",
     }));
     // return response.returnTrue(
     //   200,
@@ -186,7 +186,7 @@ exports.deleteProductById = async (req, res) => {
     if (result) {
       const productImagesFolder = path.join(
         __dirname,
-        "../uploads/productImage"
+        "../uploads"
       );
       const imageFileName = result.Product_image;
 
@@ -473,6 +473,7 @@ exports.addOrderReq = async (req, res) => {
       Created_by: created_by,
       room_id,
       props1,
+      Status : "pending"
     });
     const savedOrderReqObj = await orderReqObj.save();
 
@@ -531,16 +532,16 @@ exports.getOrderReqByOrderId = async (req, res) => {
       {
         $lookup: {
           from: "usermodels",
-          localField: "user_id",
-          foreignField: "User_id",
+          localField: "User_id",
+          foreignField: "user_id",
           as: "User",
         },
       },
       {
         $lookup: {
           from: "usermodels",
-          localField: "user_id",
-          foreignField: "Request_delivered_by",
+          localField: "Request_delivered_by",
+          foreignField: "user_id",
           as: "Request_delivered_by",
         },
       },
@@ -796,7 +797,7 @@ exports.getLastOrderId = async (req, res) => {
     return response.returnFalse(500, req, res, err.message, {});
   }
 };
-
+let timers1 = {};
 exports.pendingOrdersById = async (req, res) => {
   try {
     const orders = await orderReqModel.aggregate([
@@ -806,8 +807,8 @@ exports.pendingOrdersById = async (req, res) => {
       {
         $lookup: {
           from: "sittingmodels",
-          localField: "sitting_id",
-          foreignField: "Sitting_id",
+          localField: "Sitting_id",
+          foreignField: "sitting_id",
           as: "Sitting",
         },
       },
@@ -868,11 +869,11 @@ exports.pendingOrdersById = async (req, res) => {
 
     //Create Logic for create timer as well as image url
     const currentTime = new Date();
-    let timers1 = {};
+   
 
     const responseData = orders.map((item) => {
       const orderRequestId = item.Order_req_id;
-      const imageUrl = `${constant.base_url}/uploads/productImage/${item.Product_image}`;
+      const imageUrl = `${constant.local_base_url}/uploads/${item.Product_image}`;
       if (!timers1[orderRequestId]) {
         timers1[orderRequestId] = {
           startTime: currentTime,
@@ -919,8 +920,8 @@ exports.delivereOrdersById = async (req, res) => {
       {
         $lookup: {
           from: "sittingmodels",
-          localField: "sitting_id",
-          foreignField: "Sitting_id",
+          localField: "Sitting_id",
+          foreignField: "sitting_id",
           as: "Sitting",
         },
       },
@@ -985,7 +986,7 @@ exports.delivereOrdersById = async (req, res) => {
 
     const responseData = orders.map((item) => {
       const orderRequestId = item.Order_req_id;
-      const imageUrl = `${constant.base_url}/uploads/productImage/${item.Product_image}`;
+      const imageUrl = `${constant.local_base_url}/uploads/${item.Product_image}`;
       if (!timers1[orderRequestId]) {
         timers1[orderRequestId] = {
           startTime: currentTime,
@@ -1124,28 +1125,28 @@ exports.orderRequestsForUser = async (req, res) => {
     return response.returnFalse(500, req, res, error.message, {});
   }
 };
-
+let timers = {};
 exports.allOrderReqData = async (req, res) => {
   try {
     const orderReq = await orderReqModel.aggregate([
-      {
-        $match: {
-          Status: "pending",
-        },
-      },
+      // {
+      //   $match: {
+      //     Status: "pending",
+      //   },
+      // },
       {
         $lookup: {
           from: "usermodels",
-          localField: "user_id",
-          foreignField: "User_id",
+          localField: "User_id",
+          foreignField: "user_id",
           as: "userModel",
         },
       },
       {
         $lookup: {
           from: "usermodels",
-          localField: "user_id",
-          foreignField: "Request_delivered_by",
+          localField: "Request_delivered_by",
+          foreignField: "user_id",
           as: "userModelRequestDelivered",
         },
       },
@@ -1160,8 +1161,8 @@ exports.allOrderReqData = async (req, res) => {
       {
         $lookup: {
           from: "sittingmodels",
-          localField: "sitting_id",
-          foreignField: "Sitting_id",
+          localField: "Sitting_id",
+          foreignField: "sitting_id",
           as: "sittingModel",
         },
       },
@@ -1216,7 +1217,7 @@ exports.allOrderReqData = async (req, res) => {
 
     // Calculate the countdown timers based on the "Duration" from the database
     const currentTime = new Date();
-    let timers = {};
+    
     const responseData = orderReq.map((item) => {
       const orderRequestId = item.Order_req_id;
 
@@ -1276,8 +1277,8 @@ exports.orderReqHistory = async (req, res) => {
       {
         $lookup: {
           from: "usermodels",
-          localField: "user_id",
-          foreignField: "User_id",
+          localField: "User_id",
+          foreignField: "user_id",
           as: "user_info",
         },
       },
@@ -1292,8 +1293,8 @@ exports.orderReqHistory = async (req, res) => {
       {
         $lookup: {
           from: "sittingmodels",
-          localField: "sitting_id",
-          foreignField: "Sitting_id",
+          localField: "Sitting_id",
+          foreignField: "sitting_id",
           as: "sitting_info",
         },
       },
@@ -1324,26 +1325,26 @@ exports.orderReqHistory = async (req, res) => {
           Special_request: 1,
         },
       },
+      // {
+      //   $group: {
+      //     _id: "$_id", // Group by the unique identifier of each document
+      //     data: { $first: "$$ROOT" }, // Take the first occurrence of each document
+      //   },
+      // },
       {
-        $group: {
-          _id: "$_id", // Group by the unique identifier of each document
-          data: { $first: "$$ROOT" }, // Take the first occurrence of each document
-        },
-      },
-      {
-        $sort: { "data.Request_datetime": -1 },
+        $sort: { "Request_datetime": -1 },
       },
       {
         $limit: 3,
       },
     ]);
-    console.log(orderReqHis, "tttt");
+    
     const responseData = orderReqHis.map((item) => {
       const imageUrl = item.Product_image
-        ? `${constant.base_url}/uploads/productImage/${item.Product_image}`
+        ? `${constant.local_base_url}/uploads/${item.Product_image}`
         : "";
       const userImageeUrl = item.image
-        ? `${constant.base_url}/uploads/${item.image}`
+        ? `${constant.local_base_url}/uploads/${item.image}`
         : "";
 
       return {
@@ -1354,20 +1355,20 @@ exports.orderReqHistory = async (req, res) => {
     });
     // Transform the response objects into the desired format
     const transformedArray = responseData.map((item) => ({
-      Order_req_id: item?.data?.Order_req_id,
-      User_id: item?.data?.User_id,
-      User_name: item?.data?.User_name, // You can set the actual user name here
+      Order_req_id: item?.Order_req_id,
+      User_id: item?.User_id,
+      User_name: item?.User_name, // You can set the actual user name here
       image: item?.image,
-      product_id: item?.data?.product_id,
-      Product_name: item?.data?.Product_name,
+      product_id: item?.product_id,
+      Product_name: item?.Product_name,
       Product_image: item?.Product_image,
-      Order_quantity: item?.data?.Order_quantity,
-      Sitting_id: item?.data?.Sitting_id,
-      Sitting_area: item?.data?.Sitting_area,
-      Sitting_ref_no: item?.data?.Sitting_ref_no, // Set the desired value for Sitting_ref_no
-      Request_datetime: item?.data?.Request_datetime,
-      Message: item?.data?.Message,
-      Special_request: item?.data?.Special_request,
+      Order_quantity: item?.Order_quantity,
+      Sitting_id: item?.Sitting_id,
+      Sitting_area: item?.Sitting_area,
+      Sitting_ref_no: item?.Sitting_ref_no, // Set the desired value for Sitting_ref_no
+      Request_datetime: item?.Request_datetime,
+      Message: item?.Message,
+      Special_request: item?.Special_request,
     }));
     if (!transformedArray?.[0]) {
       return response.returnFalse(
@@ -1415,8 +1416,8 @@ exports.getOrderReqsBasedOnFilter = async (req, res) => {
       {
         $lookup: {
           from: "usermodels",
-          localField: "user_id",
-          foreignField: "User_id",
+          localField: "User_id",
+          foreignField: "user_id",
           as: "userModel",
         },
       },
@@ -1432,8 +1433,8 @@ exports.getOrderReqsBasedOnFilter = async (req, res) => {
       {
         $lookup: {
           from: "sittingmodels",
-          localField: "sitting_id",
-          foreignField: "Sitting_id",
+          localField: "Sitting_id",
+          foreignField: "sitting_id",
           as: "sittingModel",
         },
       },
@@ -1486,10 +1487,10 @@ exports.getOrderReqsBasedOnFilter = async (req, res) => {
 
     const responseData = orderReq.map((item) => {
       const imageUrl = item.Product_image
-        ? `${constant.base_url}/uploads/productImage/${item.Product_image}`
+        ? `${constant.local_base_url}/uploads/${item.Product_image}`
         : "";
       const userImageeUrl = item.image
-        ? `${constant.base_url}/uploads/${item.image}`
+        ? `${constant.local_base_url}/uploads/${item.image}`
         : "";
       return {
         ...item,
@@ -1507,13 +1508,7 @@ exports.getOrderReqsBasedOnFilter = async (req, res) => {
         {}
       );
     }
-    return response.returnTrue(
-      200,
-      req,
-      res,
-      "Order requests Fetch successfully.",
-      responseData
-    );
+    return res.status(200).json(responseData)
   } catch (error) {
     return response.returnFalse(500, req, res, error.message, {});
   }
@@ -1576,24 +1571,24 @@ exports.getAllTransferReq = async (req, res) => {
       {
         $lookup: {
           from: "usermodels",
-          localField: "user_id",
-          foreignField: "From_id",
+          localField: "From_id",
+          foreignField: "user_id",
           as: "userModelFrom",
         },
       },
       {
         $lookup: {
           from: "usermodels",
-          localField: "user_id",
-          foreignField: "To_id",
+          localField: "To_id",
+          foreignField: "user_id",
           as: "userModelTo",
         },
       },
       {
         $lookup: {
           from: "orderreqmodels",
-          localField: "Order_req_id",
-          foreignField: "order_req_id",
+          localField: "order_req_id",
+          foreignField: "Order_req_id",
           as: "OrderReqModel",
         },
       },
@@ -1603,8 +1598,8 @@ exports.getAllTransferReq = async (req, res) => {
       {
         $lookup: {
           from: "usermodels",
-          localField: "user_id",
-          foreignField: "OrderReqModel.User_id",
+          localField: "OrderReqModel.User_id",
+          foreignField: "user_id",
           as: "userModelORM",
         },
       },
@@ -1612,8 +1607,8 @@ exports.getAllTransferReq = async (req, res) => {
       {
         $lookup: {
           from: "productmodels",
-          localField: "product_id",
-          foreignField: "OrderReqModel.product_id",
+          localField: "OrderReqModel.product_id",
+          foreignField: "product_id",
           as: "productModel",
         },
       },
@@ -1621,8 +1616,8 @@ exports.getAllTransferReq = async (req, res) => {
       {
         $lookup: {
           from: "sittingmodels",
-          localField: "sitting_id",
-          foreignField: "OrderReqModel.Sitting_id",
+          localField: "OrderReqModel.Sitting_id",
+          foreignField: "sitting_id",
           as: "sittingModel",
         },
       },
@@ -1659,7 +1654,6 @@ exports.getAllTransferReq = async (req, res) => {
         },
       },
     ]);
-
     if (!resData?.[0]) {
       return response.returnFalse(
         200,
