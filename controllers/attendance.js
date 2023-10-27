@@ -1,5 +1,6 @@
 const attendanceModel = require("../models/attendanceModel.js");
 const userModels = require("../models/userAuthModel.js");
+const userModel = require("../models/userModel.js");
 
 async function doesUserExistInAttendance(userId, month, year) {
     const results = await attendanceModel.find({ user_id: userId, month: month, year: year })
@@ -437,5 +438,163 @@ exports.getSalaryCountByYear = async (req, res) => {
         res.status(200).send(getCount);
     } catch (err) {
         res.status(500).send({ error: err, sms: "Error getting salary count by year" });
+    }
+}
+
+exports.totalSalary = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear().toString();
+        const query = await attendanceModel.aggregate([
+            {
+                $match: { year: parseInt(currentYear) }
+            },
+            {
+                $group: {
+                    _id: 0,
+                    totalsalary: { $sum: '$total_salary' },
+                    totalBonus: { $sum: '$bonus' },
+                    totaltdsdeduction: { $sum: '$tds_deduction' },
+                    totalsalarydeduction: { $sum: '$salary_deduction' }
+                }
+            }
+        ]).exec();
+        res.send({status:200, data:query})
+    } catch (error) {
+        return res.send({error:error.message, status:500, sms:"error getting all salary"})
+    }
+}
+
+exports.updateSalary = async (req, res) => {
+    try {
+        const editsim = await attendanceModel.findOneAndUpdate({ attendence_id: req.body.attendence_id }, {
+            sendToFinance: req.body.sendToFinance
+        }, { new: true })
+        res.send({status:200, sms:'send to finance update successfully'})
+    } catch (error) {
+        return res.send({error:error.message, status:500, sms:"error updating send to finance"})
+    }
+}
+
+exports.updateAttendenceStatus = async (req, res) => {
+    try {
+        const editsim = await attendanceModel.findOneAndUpdate({ 
+            attendence_id: req.body.attendence_id,
+            dept: req.body.dept,
+            month: req.body.month,
+            year: req.body.year
+        }, {
+            attendence_generated: 1,
+            salary_status: 1
+        }, { new: true })
+        res.send({status:200, sms:'send to update salary status'})
+    } catch (error) {
+        return res.send({error:error.message, status:500, sms:"error updating salary status"})
+    }
+}
+
+exports.getMonthYearData = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonthIndex = currentDate.getMonth() + 1;
+        const numberOfMonths = 6;
+        const months = ["April", "May", "June", "July", "August", "September", "October", "November", "December", "January", "February", "March"];
+
+        const monthYearArray = months.map((month) => ({ month, year: month === "January" || month === "February" || month === "March" ? currentYear + 1 : currentYear, }));
+
+        const aggregationPipeline = [
+        {
+            $group: {
+              _id: {
+                month: "$month",
+                year: "$year",
+              },
+            },
+        },
+        ];
+
+        const dbResult = await attendanceModel.aggregate(aggregationPipeline).toArray();
+
+        const dbSet = new Set(dbResult.map((item) => `${item._id.month}-${item._id.year}`));
+
+        const actualExistingResult = monthYearArray.map((item) => {
+            const dateStr = `${item.month}-${item.year}`;
+            item.atdGenerated = dbSet.has(dateStr) ? 1 : 0;
+
+            return item;
+        });
+
+        const response = { data: [...actualExistingResult] };
+        res.status(200).json(response);
+    } catch (error) {
+        return res.send({error:error.message, status:500, sms:"error getting data"})
+    }
+}
+
+exports.getDistinctDepts = async (req, res) => {
+    try {
+        const editsim = await attendanceModel.distinct('dept',{ 
+            month: req.body.month,
+            year: req.body.year
+        })
+        res.status(200).send(editsim)
+    } catch (error) {
+        return res.send({error:error.message, status:500, sms:"error getting distinct depts"})
+    }
+}
+
+exports.checkSalaryStatus = async (req, res) => {
+    try {
+        const editsim = await attendanceModel.find({ 
+            dept: req.body.dept,
+            month: req.body.month,
+            year: req.body.year
+        })
+        res.status(200).send(editsim)
+    } catch (error) {
+        return res.send({error:error.message, status:500, sms:"error getting salary status"})
+    }
+}
+
+exports.allDeptsOfWfh = async (req, res) => {
+    try {
+        const editsim = await userModel.aggregate([
+            {
+                $match: { job_type: 'WFH' }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'dept'
+                }
+            },
+            {
+                $unwind: '$dept'
+            },
+            {
+                $group: {
+                    _id: '$dept.dept_id',
+                    dept_name: { $first: '$dept.dept_name' },
+                    total_salary: { $sum: '$salary' },
+                    user_count: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    dept_id: '$_id',
+                    dept_name: 1,
+                    total_salary: 1,
+                    user_count: 1
+                }
+            }
+        ]).exec();
+        
+        res.send({status:200, data:editsim})
+    } catch (error) {
+        return res.send({error:error.message, status:500, sms:"error getting salary status"})
     }
 }

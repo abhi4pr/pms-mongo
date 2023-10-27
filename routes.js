@@ -562,6 +562,13 @@ router.get(
   
   attendance.getSalaryCountByYear
 );
+router.get("/get_total_salary", attendance.totalSalary)
+router.put("/update_salary", attendance.updateSalary)
+router.put("/update_attendence_status", attendance.updateAttendenceStatus)
+router.get("/get_month_year_data", attendance.getMonthYearData)
+router.post("/get_distinct_depts", attendance.getDistinctDepts)
+router.post("/check_salary_status", attendance.checkSalaryStatus)
+router.get("/all_departments_of_wfh", attendance.allDeptsOfWfh)
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
