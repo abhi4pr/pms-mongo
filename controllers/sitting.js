@@ -151,15 +151,14 @@ exports.addRoom = async (req, res) => {
   }
 };
 
-const baseUrl = constant.base_url;
-let roomImageUrl = `${baseUrl}/uploads/`;
+
 exports.getRooms = async (req, res) => {
   try {
     const roomObj = await roomModel.aggregate([
       {
         $lookup: {
           from: "usermodels",
-          localField: "created_by",
+          localField: "Created_by",
           foreignField: "user_id",
           as: "data",
         },
@@ -173,11 +172,11 @@ exports.getRooms = async (req, res) => {
         $project: {
           _id: 1,
           room_id: "$room_id",
-          sitting_ref_no: "$sitting_ref_no",
+          sitting_ref_no: "$Sitting_ref_no",
           roomImage: "$roomImage",
           remarks: "$remarks",
           creation_date: "$creation_date",
-          created_by: "$created_by",
+          created_by: "$Created_by",
           last_updated_by: "$last_updated_by",
           last_updated_date: "$last_updated_date",
           user_name: "$data.user_name",
@@ -185,9 +184,10 @@ exports.getRooms = async (req, res) => {
       },
     ]);
 
-    const dataWithImageUrl = roomObj?.map((room) => ({
+    const url = "http://34.93.135.33:8080/uploads/";
+    const dataWithImageUrl = roomObj.map((room) => ({
       ...room,
-      room_image_url: room?.roomImage ? roomImageUrl + room?.roomImage : null,
+      room_image_url: room.roomImage ? url + room.roomImage : null,
     }));
     if (dataWithImageUrl?.length === 0) {
       res
