@@ -477,7 +477,7 @@ router.delete("/insta_brand/:id", instaBrand.deleteInstaBrand);
 /* user */
 router.post("/add_user", user.addUser);
 router.put("/update_user",  user.updateUser);
-router.get("/get_wfh_user",  user.getWFHUsersByDept);
+router.get("/get_wfh_user",  user.getWFHUsersByDept); 
 router.get("/get_all_users",  user.getAllUsers);
 router.get("/get_single_user/:id",  user.getSingleUser);
 router.delete("/delete_user/:id",  user.deleteUser);

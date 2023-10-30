@@ -243,6 +243,7 @@ exports.editInsta = async (req, res) => {
             req.body._id,
             {
                 posttype_decision: req.body.posttype_decision,
+                postImage: req.body.postImage,
                 selector_name: req.body.selector_name,
                 interpretor_name: req.body.interpretor_name,
                 auditor_name: req.body.auditor_name,
@@ -424,21 +425,29 @@ exports.getPostsByDecNum = async (req, res) => {
 exports.trackStory = async (req, res) => {
     try {
         // console.log("story api", req.body);
-        const creators = new instaS({
-            mediaCount : req.body.media_count,
-            expiredAt: req.body.expiry_at,
-            savedOn: req.body.taken_at,
-            shortCode: req.body.shortcode,
-            links: req.body.links,
-            hashtags: req.body.hashtags,
-            mentions: req.body.mentions,
-            locations: req.body.locations,
-            music: req.body.music
-        })
-        const instav = await creators.save();
-        res.send({instav,status:200})
+        if (req.body) {
+              for (const data of req.body?.story_data?.stories) {
+                const creators = new instaS({
+                    creatorName : req.body?.handle,
+                    mediaCount : req.body?.story_data?.media_count,
+                    expiredAt: req.body?.story_data?.expiry_at,
+                    savedOn: data?.taken_at,
+                    shortcode: data?.shortcode,
+                    links: data?.links,
+                    hashtags: data?.hashtags,
+                    mentions:data?.mentions,
+                    locations:data?.locations,
+                    music: data?.music
+                })
+                 await creators.save();
+              }  
+              return res.send({status:200,sms:"Stories created successfully."})
+          }else{
+          return  res.send({status:200,sms:"Please provide request body."})
+          }
+       
     } catch (error) {
-        res.status(500).send({ error: error, sms: "error while adding data" });
+        res.status(500).send({ error: error.message, sms: "error while adding data" });
     }
 };
 

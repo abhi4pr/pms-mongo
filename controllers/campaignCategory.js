@@ -85,7 +85,7 @@ exports.editCampaignCategory = async (req, res) => {
       return res.status(200).send({
         data: {},
         message:
-          "Provided campaign_id and existing campaignCateg`ory_name should be unique.",
+          "Provided campaign_id and existing campaignCategeory_name should be unique.",
       });
     }
     const editcampaignCategory = await campaignCategoryModel.findOneAndUpdate(
