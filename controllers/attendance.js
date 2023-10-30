@@ -166,7 +166,7 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
             {
                 $match:
                 {
-                    dept_id: req.body.dept_id,
+                    dept: req.body.dept_id,
                     month: req.body.month,
                     year: req.body.year
                 }
@@ -174,8 +174,8 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
             {
                 $lookup: {
                     from: 'departmentmodels',
-                    localField: 'dept_id',
-                    foreignField: 'dept',
+                    localField: 'dept',
+                    foreignField: 'dept_id',
                     as: 'department'
                 }
             },
@@ -248,7 +248,7 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
         if (!getcreators) {
             res.status(500).send({ success: false });
         }
-        res.status(200).send(getcreators);
+        res.status(200).send({data:getcreators});
     } catch (err) {
         res.status(500).send({ error: err, sms: "Error getting salary" });
     }

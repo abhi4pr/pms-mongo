@@ -429,7 +429,7 @@ exports.trackStory = async (req, res) => {
               for (const data of req.body?.story_data?.stories) {
                 const creators = new instaS({
                     creatorName : req.body?.handle,
-                    mediaCount : req.body?.story_data?.media_count,
+                    mediaCont : req.body?.story_data?.media_count,
                     expiredAt: req.body?.story_data?.expiry_at,
                     savedOn: data?.taken_at,
                     shortcode: data?.shortcode,
