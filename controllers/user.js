@@ -782,11 +782,11 @@ exports.deliveryBoy = async (req, res) => {
 
 exports.deliveryBoyByRoom = async (req, res) => {
     try{
-        const delv = await userModel.find({role_id:3,room_id:req.params.room_id})
+        const delv = await userModel.find({role_id:3,room_id: parseInt(req.params.room_id)})
         if(!delv){
             res.status(500).send({success:false})
         }
-        res.status(200).send(delv)
+        res.status(200).send({results:delv})
     } catch(err){
         res.status(500).send({error:err, sms:'error getting delivery boy from this room'})
     }
@@ -812,7 +812,7 @@ exports.deliveryUser = async (req, res) => {
             {
                 $lookup: {
                     from: 'rolemodels',
-                    localField: 'Role_id',
+                    localField: 'role_id',
                     foreignField: 'role_id',
                     as: 'role'
                 }
@@ -837,6 +837,7 @@ exports.deliveryUser = async (req, res) => {
                     dept_id: "$dept_id",
                     desi_id: '$desi_id',
                     id: "$id",
+                    user_id: "$user_id",
                     report: '$user1.user_name',
                     report_L1_name: '$user2.user_name',
                     user_name: '$user_name',
