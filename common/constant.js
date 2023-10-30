@@ -5,6 +5,7 @@ module.exports = Object.freeze({
   CF_INSTA_API: "https://www.instagram.com/trolls_official/?__a=1&__d=dis",
   INSTA_C_MODELS: 1,
   INSTA_P_MODELS: 2,
+  ADMIN_ROLE: 1,
 
   /* JWT  */
   SECRET_KEY_LOGIN:"thisissecret12",

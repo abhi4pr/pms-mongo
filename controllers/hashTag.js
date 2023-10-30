@@ -3,7 +3,15 @@ const hashTagSchema = require("../models/hashTagModel");
 exports.addHashTag = async (req, res) => {
   try {
     const { hash_tag, tag, keyword } = req.body;
-
+    let check = await hashTagSchema.findOne({
+      hash_tag: hash_tag.toLowerCase().trim(),
+    });
+    if (check) {
+      return res.status(200).json({
+        message: "hash_tag must be unique",
+        status: 200,
+      });
+    }
     const hashTagObj = new hashTagSchema({
       hash_tag,
       tag,
@@ -38,9 +46,18 @@ exports.getHashTags = async (req, res) => {
 exports.editHashTag = async (req, res) => {
   try {
     const { hash_tag_id, hash_tag, tag, keyword } = req.body;
-
+    let check = await hashTagSchema.findOne({
+      hash_tag: hash_tag.toLowerCase().trim(),
+      hash_tag_id: { $ne: hash_tag_id },
+    });
+    if (check) {
+      return res.status(200).json({
+        message: "hash_tag must be unique",
+        status: 200,
+      });
+    }
     const editHashTagObj = await hashTagSchema.findOneAndUpdate(
-      { hashTag_id: parseInt(hash_tag_id) }, // Filter condition
+      { hash_tag_id: parseInt(hash_tag_id) }, // Filter condition
       {
         $set: {
           hash_tag,

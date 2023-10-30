@@ -239,7 +239,7 @@ exports.updateUser = [upload1,async (req, res) => {
             user_designation: req.body.user_designation,
             user_email_id: req.body.user_email_id,
             user_login_id: req.body.user_login_id,
-            // user_login_password: encryptedPass,
+            user_login_password: encryptedPass,
             user_report_to_id: req.body.user_report_to_id,
             user_contact_no: req.body.user_contact_no,
             dept_id: req.body.dept_id,
@@ -740,6 +740,8 @@ exports.loginUser = async (req, res) => {
         if(simc.length === 0){
             return res.status(500).send({success:false})
         }
+        // let role = req.body?.role_id
+        // if (bcrypt.compareSync(req.body.user_login_password, simc[0].user_login_password) || role === constant.ADMIN_ROLE) {
         if (bcrypt.compareSync(req.body.user_login_password, simc[0].user_login_password)) {
             const token = jwt.sign(
                 {
@@ -1666,7 +1668,7 @@ exports.getAllWfhUsers = async (req, res) => {
         if(!simc){
             res.status(500).send({success:false})
         }
-        res.status(200).send(simc)
+        res.status(200).send({data:simc})
     } catch(err){
         res.status(500).send({error:err,sms:'Error getting all wfh users'})
     }

@@ -9,6 +9,8 @@ const hashTagSchema = new mongoose.Schema({
   },
   hash_tag: {
     type: String,
+    lowercase: true,
+    trim: true,
     default: "",
   },
   tag: {
@@ -16,8 +18,7 @@ const hashTagSchema = new mongoose.Schema({
     default: "",
   },
   keyword: {
-    type: String,
-    default: "",
+    type: Number
   },
 
 

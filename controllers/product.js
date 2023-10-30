@@ -194,7 +194,7 @@ exports.deleteProductById = async (req, res) => {
         const imagePath = path.join(productImagesFolder, imageFileName);
         fs.unlink(imagePath, (err) => {
           if (err) {
-            return response.false(req, res, err.message, {});
+            return response.returnFalse(req, res, err.message, {});
           } else {
             return response.returnTrue(
               200,

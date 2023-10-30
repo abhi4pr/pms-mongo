@@ -24,6 +24,11 @@ const instaSModel = new mongoose.Schema({
         required: false,
         default: ""
     },
+    creatorName: {
+        type: String,
+        required: false,
+        default: ""
+    },
     links: {
         type: Array,
         required: false,
