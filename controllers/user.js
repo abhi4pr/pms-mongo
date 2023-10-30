@@ -26,13 +26,13 @@ const upload = multer({ dest: "uploads/" }).fields([
     { name: "pre_expe_letter", maxCount: 1 },
     { name: "pre_relieving_letter", maxCount: 1 },
     { name: "bankPassBook_Cheque", maxCount: 1 },
-    { name: "joining_extend_document", maxCount:1 },
-  ]);
+    { name: "joining_extend_document", maxCount: 1 },
+]);
 
-exports.addUser = [upload, async (req, res) =>{
-    try{
+exports.addUser = [upload, async (req, res) => {
+    try {
         let encryptedPass;
-        if(req.body.user_login_password){
+        if (req.body.user_login_password) {
             encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
         }
         const simc = new userModel({
@@ -138,7 +138,7 @@ exports.addUser = [upload, async (req, res) =>{
         const joining = simv.joining_date;
         const convertDate = new Date(joining);
         const extractDate = convertDate.getDate();
-        const joiningMonth = new Intl.DateTimeFormat('en-US',{ month : 'long' }).format(convertDate);
+        const joiningMonth = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(convertDate);
         const joiningYear = String(convertDate.getUTCFullYear());
         const work_days = 31 - extractDate;
         const bonus = 0;
@@ -167,45 +167,45 @@ exports.addUser = [upload, async (req, res) =>{
         await lastInserted.save();
 
         const objectData = await objModel.find();
-        const objects = objectData;    
-        
+        const objects = objectData;
+
         for (const object of objects) {
             const objectId = object.obj_id;
             let insertValue = 0;
             let viewValue = 0;
             let updateValue = 0;
             let deleteValue = 0;
-    
-            if (simv.role_id === 1) {
-            insertValue = 1;
-            viewValue = 1;
-            updateValue = 1;
-            deleteValue = 1;
-            }
-    
-            const userAuthDocument = {
-            Juser_id: simv.user_id,
-            obj_id: objectId,
-            insert_value: insertValue,
-            view_value: viewValue,
-            update_value: updateValue,
-            delete_flag_value: deleteValue,
-            creation_date: new Date(),
-            created_by: simv.created_by || 0,
-            last_updated_by: simv.created_by || 0,
-            last_updated_date: new Date(),
-        };
-  
-        await userAuthModel.updateOne(
-          { Juser_id: simv.user_id, obj_id: objectId },
-          { $set: userAuthDocument },
-          { upsert: true }
-        );
-      }
 
-        res.send({simv,status:200});
-    } catch(err){
-        res.status(500).send({error:err.message,sms:'This user cannot be created'})
+            if (simv.role_id === 1) {
+                insertValue = 1;
+                viewValue = 1;
+                updateValue = 1;
+                deleteValue = 1;
+            }
+
+            const userAuthDocument = {
+                Juser_id: simv.user_id,
+                obj_id: objectId,
+                insert_value: insertValue,
+                view_value: viewValue,
+                update_value: updateValue,
+                delete_flag_value: deleteValue,
+                creation_date: new Date(),
+                created_by: simv.created_by || 0,
+                last_updated_by: simv.created_by || 0,
+                last_updated_date: new Date(),
+            };
+
+            await userAuthModel.updateOne(
+                { Juser_id: simv.user_id, obj_id: objectId },
+                { $set: userAuthDocument },
+                { upsert: true }
+            );
+        }
+
+        res.send({ simv, status: 200 });
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'This user cannot be created' })
     }
 }];
 
@@ -225,16 +225,15 @@ const upload1 = multer({ dest: "uploads/" }).fields([
     { name: "pre_expe_letter", maxCount: 1 },
     { name: "pre_relieving_letter", maxCount: 1 },
     { name: "bankPassBook_Cheque", maxCount: 1 },
-    { name: "joining_extend_document", maxCount:1 },
-  ]);
-exports.updateUser = [upload1,async (req, res) => {
-    try{
-        
+    { name: "joining_extend_document", maxCount: 1 },
+]);
+exports.updateUser = [upload1, async (req, res) => {
+    try {
         let encryptedPass;
-       if (req.body.user_login_password){
-         encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
-       }
-        const editsim = await userModel.findOneAndUpdate({user_id:req.body.user_id},{
+        if (req.body.user_login_password) {
+            encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
+        }
+        const editsim = await userModel.findOneAndUpdate({ user_id: parseInt(req.body.user_id) }, {
             user_name: req.body.user_name,
             user_designation: req.body.user_designation,
             user_email_id: req.body.user_email_id,
@@ -249,9 +248,9 @@ exports.updateUser = [upload1,async (req, res) => {
             sitting_id: req.body.sitting_id,
             job_type: req.body.job_type,
             personal_number: req.body.personal_number,
-            report_L1: req.body.report_L1,
-            report_L2: req.body.report_L2,
-            report_L3: req.body.report_L3,
+            Report_L1: isNaN(req.body.report_L1) ? 0 : req.body.report_L1,
+            Report_L2: isNaN(req.body.report_L2) ? 0 : req.body.report_L2,
+            Report_L3: isNaN(req.body.report_L3) ? 0 : req.body.report_L3,
             Personal_email: req.body.Personal_email,
             joining_date: req.body.joining_date,
             releaving_date: req.body.releaving_date,
@@ -331,185 +330,205 @@ exports.updateUser = [upload1,async (req, res) => {
             pre_relieving_letter: req.file ? req.files.pre_relieving_letter[0].filename : '',
             bankPassBook_Cheque: req.file ? req.files.bankPassBook_Cheque[0].filename : '',
             joining_extend_document: req.file ? req.files.joining_extend_document[0].filename : ''
-        }, { new: true })
-        if(!editsim){
-           return res.status(500).send({success:false})
+        }, { new: true });
+        if (!editsim) {
+            return res.status(500).send({ success: false })
         }
-    
-        return res.status(200).send({success:true,data:editsim})
-    } catch(err){
-        return res.status(500).send({error:err.message,sms:'Error updating user details'})
+
+        return res.status(200).send({ success: true, data: editsim })
+    } catch (err) {
+        return res.status(500).send({ error: err.message, sms: 'Error updating user details' })
     }
 }];
 
 exports.getWFHUsersByDept = async (req, res) => {
-    try{
-        const simc = await userModel.find({dept_id:req.body.dept_id,job_type:'WFH'});
-        if(!simc){
-            res.status(500).send({success:false})
+    try {
+        const simc = await userModel.find({ dept_id: req.body.dept_id, job_type: 'WFH' });
+        if (!simc) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(simc)
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error getting all wfh users'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error getting all wfh users' })
     }
 };
 
 const ImageUrl = 'http://34.93.135.33:8080/uploads/';
 exports.getAllUsers = async (req, res) => {
-    try{
-        const singlesim = await userModel.aggregate([
-            {
-                $lookup: {
-                    from: 'departmentmodels',
-                    localField: 'dept_id',
-                    foreignField: 'dept_id',
-                    as: 'department'
-                }
-            },
-            {
-                $unwind: '$department'
-            },
-            {
-                $lookup: {
-                    from: 'designationmodels',
-                    localField: 'user_designation',
-                    foreignField: 'desi_id',
-                    as: 'designation'
-                }
-            },
-            {
-                $unwind: '$designation'
-            },
-            {
-                $lookup: {
-                    from: 'rolemodels',
-                    localField: 'role_id',
-                    foreignField: 'role_id',
-                    as: 'role'
-                }
-            },
-            {
-                $unwind: '$role'
-            },
-            {
-                $project: {
-                    department_name: '$department.dept_name',
-                    designation_name: '$designation.desi_name',
-                    Role_name:"$role.Role_name",
-                    user_designation: '$user_designation', 
-                    dept_id: "$dept_id",
-                    desi_id: '$user_designation',
-                    user_id: "$user_id",
-                    _id: "$_id",
-                    user_name: '$user_name',
-                    user_email_id: '$user_email_id',
-                    user_login_id: '$user_login_id',
-                    user_login_password: '$user_login_password',
-                    user_report_to_id: '$user_report_to_id',
-                    user_contact_no: '$user_contact_no',
-                    location_id: '$location_id',
-                    created_by: '$created_by',
-                    role_id: '$role_id',
-                    sitting_id: '$sitting_id',
-                    job_type: '$job_type',
-                    personal_number: '$PersonalNumber',
-                    report_L1: '$Report_L1',
-                    report_L2: '$Report_L2',
-                    report_L3: '$Report_L3',
-                    Personal_email: '$PersonalEmail',
-                    joining_date: '$joining_date',
-                    releaving_date: '$releaving_date',
-                    level: '$level',
-                    room_id: '$room_id',
-                    salary: '$salary',
-                    SpokenLanguages: '$SpokenLanguages',
-                    Gender: '$Gender',
-                    Nationality: '$Nationality',
-                    DOB: '$DOB',
-                    Age: '$Age',
-                    FatherName: '$fatherName',
-                    MotherName: '$motherName',
-                    Hobbies: '$Hobbies',
-                    BloodGroup: '$BloodGroup',
-                    MartialStatus: '$MartialStatus',
-                    DateofMarriage: '$DateofMarriage',
-                    tds_applicable: '$tds_applicable',
-                    tds_per: '$tds_per',
-                    onboard_status: '$onboard_status',
-                    image_remark: '$image_remark',
-                    image_validate: '$image_validate',
-                    uid_remark: '$uid_remark',
-                    uid_validate: '$uid_validate',
-                    pan_remark: '$pan_remark',
-                    pan_validate: '$pan_validate',
-                    highest_upload_remark: '$highest_upload_remark',
-                    highest_upload_validate: '$highest_upload_validate',
-                    other_upload_remark: '$other_upload_remark',
-                    other_upload_validate: '$other_upload_validate',
-                    user_status: '$user_status',
-                    lastupdated: '$lastupdated',
-                    sub_dept_id: '$sub_dept_id',
-                    pan_no: '$pan_no',
-                    uid_no: '$uid_no',
-                    spouse_name: '$spouse_name',
-                    highest_qualification_name: '$highest_qualification_name',
-                    tenth_marksheet_validate: '$tenth_marksheet_validate',
-                    twelveth_marksheet_validate: '$twelveth_marksheet_validate',
-                    UG_Marksheet_validate: '$UG_Marksheet_validate',
-                    passport_validate: '$passport_validate',
-                    pre_off_letter_validate: '$pre_off_letter_validate',
-                    pre_expe_letter_validate: '$pre_expe_letter_validate',
-                    pre_relieving_letter_validate: '$pre_relieving_letter_validate',
-                    bankPassBook_Cheque_validate: '$bankPassBook_Cheque_validate',
-                    tenth_marksheet_validate_remark: '$tenth_marksheet_validate_remark',
-                    twelveth_marksheet_validate_remark: '$twelveth_marksheet_validate_remark',
-                    UG_Marksheet_validate_remark: '$UG_Marksheet_validate_remark',
-                    passport_validate_remark: '$passport_validate',
-                    pre_off_letter_validate_remark: '$pre_off_letter_validate_remark',
-                    pre_expe_letter_validate_remark: '$pre_expe_letter_validate_remark',
-                    pre_relieving_letter_validate_remark: '$pre_relieving_letter_validate_remark',
-                    bankPassBook_Cheque_validate_remark: '$bankPassBook_Cheque_validate_remark',
-                    current_address: '$current_address',
-                    current_city: '$current_city',
-                    current_state: '$current_state',
-                    current_pin_code: '$current_pin_code',
-                    permanent_address: '$permanent_address',
-                    permanent_city: '$permanent_city',
-                    permanent_state: '$permanent_state',
-                    permanent_pin_code: '$permanent_pin_code',
-                    joining_date_extend: '$joining_date_extend',
-                    joining_date_extend_status: '$joining_date_extend_status',
-                    joining_date_extend_reason: '$joining_date_extend_reason',
-                    invoice_template_no: '$invoice_template_no',
-                    image: { $concat: [ImageUrl, '$image'] },
-                    UID: { $concat: [ImageUrl, '$UID'] },
-                    pan: { $concat: [ImageUrl, '$pan'] },
-                    highest_upload: { $concat: [ImageUrl, '$highest_upload'] },
-                    other_upload: { $concat: [ImageUrl, '$other_upload'] },
-                    tenth_marksheet: { $concat: [ImageUrl, '$tenth_marksheet'] },
-                    twelveth_marksheet: { $concat: [ImageUrl, '$twelveth_marksheet'] },
-                    UG_Marksheet: { $concat: [ImageUrl, '$UG_Marksheet'] },
-                    passport: { $concat: [ImageUrl, '$passport'] },
-                    pre_off_letter: { $concat: [ImageUrl, '$pre_off_letter'] },
-                    pre_expe_letter: { $concat: [ImageUrl, '$pre_expe_letter'] },
-                    pre_relieving_letter: { $concat: [ImageUrl, '$pre_relieving_letter'] },
-                    bankPassBook_Cheque: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
-                    joining_extend_document: { $concat: [ImageUrl, '$joining_extend_document'] }
-                }
-            }
-        ]).exec();
-        res.status(200).send({data:singlesim})
-    }catch(err){
-        res.status(500).send({error:err.message,sms:'Error getting all users'})
+    try {
+        const singlesim = await userModel.find();
+        // const singlesim = await userModel.aggregate([
+        //     {
+        //         $lookup: {
+        //             from: 'departmentmodels',
+        //             localField: 'dept_id',
+        //             foreignField: 'dept_id',
+        //             as: 'department'
+        //         }
+        //     },
+        //     {
+        //         $unwind: '$department'
+        //     },
+        //     {
+        //         $lookup: {
+        //             from: 'designationmodels',
+        //             localField: 'user_designation',
+        //             foreignField: 'desi_id',
+        //             as: 'designation'
+        //         }
+        //     },
+        //     {
+        //         $unwind: '$designation'
+        //     },
+        //     {
+        //         $lookup: {
+        //             from: 'rolemodels',
+        //             localField: 'role_id',
+        //             foreignField: 'role_id',
+        //             as: 'role'
+        //         }
+        //     },
+        //     {
+        //         $unwind: '$role'
+        //     },
+        //     {
+        //         $project: {
+        //             user_id: "$user_id",
+        //             user_name: "$user_name",
+        //             user_designation: "$user_designation",
+        //             user_email_id: "$user_email_id",
+        //             user_login_id: "$user_login_id",
+        //             user_login_password: "$user_login_password",
+        //             user_report_to_id: "$user_report_to_id",
+        //             created_At: "$created_At",
+        //             last_updated: "$last_updated",
+        //             created_by: "$created_by",
+        //             user_contact_no: "$user_contact_no",
+        //             dept_id: "$dept_id",
+        //             location_id: "$location_id",
+        //             role_id: "$role_id",
+        //             sitting_id: "$sitting_id",
+        //             image: "$image",
+        //             job_type: "$job_type",
+        //             PersonalNumber: "PersonalNumber",
+        //             Report_L1: "$Report_L1",
+        //             Report_L2: "$Report_L2",
+        //             Report_L3: "$Report_L3",
+        //             PersonalEmail: "$PersonalEmail",
+        //             level: "$level",
+        //             joining_date:"$joining_date",
+        //             releaving_date: "$releaving_date",
+        //             room_id: "$room_id",
+        //             UID: "$UID",
+        //             pan: "$pan",
+        //             highest_upload: "$highest_upload",
+        //             other_upload: "$other_upload",
+        //             salary: "$salry",
+        //             SpokenLanguages: "$SpokenLanguages",
+        //             Gender: "$Gender",
+        //             Nationality: "$Nationality",
+        //             DOB: "$DOB",
+        //             Age: "$Age",
+        //             fatherName: "$fatherName",
+        //             motherName: "$motherName",
+        //             Hobbies:"$Hobbies",
+        //             BloodGroup: "$BloodGroup",
+        //             MartialStatus: "$MartialStatus",
+        //             DateOfMarriage: "$DateOfMarriage",
+        //             onboard_status: "$onboard_status",
+        //             tbs_applicable: "$tbs_applicable",
+        //             tds_per: "$tds_per",
+        //             image_remark: "$image_remark",
+        //             image_validate: "$image_validate",
+        //             uid_remark: "$uid_remark",
+        //             uid_validate: "$uid_validate",
+        //             pan_remark:"$pan_remark" ,
+        //             pan_validate: "$pan_validate",
+        //             highest_upload_remark: "$highest_upload_remark",
+        //             highest_upload_validate: "$highest_upload_validate",
+        //             other_upload_remark:"$other_upload_remark",
+        //             other_upload_validate:"$other_upload_validate" ,
+        //             user_status: "$user_status",
+        //             sub_dept_id: "$sub_dept_id",
+        //             pan_no: "$pan_no",
+        //             uid_no: "$uid_no",
+        //             spouse_name: "$spouse_name",
+        //             highest_qualification_name: "$highest_qualification_name",
+        //             tenth_marksheet: "$tenth_marksheet",
+        //             twelveth_marksheet: "$twelveth_marksheet",
+        //             UG_Marksheet: "$UG_Marksheet",
+        //             passport: "$passport",
+        //             pre_off_letter: "$pre_off_letter",
+        //             pre_expe_letter: "$pre_expe_letter",
+        //             pre_relieving_letter: "$pre_relieving_letter",
+        //             bankPassBook_Cheque: "$bankPassBook_Cheque",
+        //             tenth_marksheet_validate: "$tenth_marksheet_validate",
+        //             twelveth_marksheet_validate: "$twelveth_marksheet_validate",
+        //             UG_Marksheet_validate: "$UG_Marksheet_validate",
+        //             passport_validate: "$passport_validate",
+        //             pre_off_letter_validate: "$pre_off_letter_validate",
+        //             pre_expe_letter_validate: "$pre_expe_letter_validate",
+        //             pre_relieving_letter_validate: "$pre_relieving_letter_validate",
+        //             bankPassBook_Cheque_validate: "$bankPassBook_Cheque_validate",
+        //             tenth_marksheet_validate_remark: "$tenth_marksheet_validate_remark",
+        //             twelveth_marksheet_validate_remark: "$twelveth_marksheet_validate_remark",
+        //             UG_Marksheet_validate_remark: "$UG_Marksheet_validate_remark",
+        //             passport_validate_remark: "$passport_validate_remark",
+        //             pre_off_letter_validate_remark: "$pre_off_letter_validate_remark",
+        //             pre_expe_letter_validate_remark: "$pre_expe_letter_validate_remark",
+        //             pre_relieving_letter_validate_remark: "$pre_relieving_letter_validate_remark",
+        //             bankPassBook_Cheque_validate_remark: "$bankPassBook_Cheque_validate_remark",
+        //             current_address: "$current_address",
+        //             current_city: "$current_city",
+        //             current_state: "$current_state",
+        //             current_pin_code: "$current_pin_code",
+        //             permanent_address: "$permanent_address",
+        //             permanent_city: "$permanent_city",
+        //             permanent_state: "$permanent_state",
+        //             permanent_pin_code: "$permanent_pin_code",
+        //             joining_date_extend: "$joining_date_extend",
+        //             joining_date_extend_status: "$joining_date_extend_status",
+        //             joining_date_extend_reason: "$joining_date_extend_reason",
+        //             joining_extend_document: "$joining_extend_document",
+        //             invoice_template_no: "$invoice_template_no",
+        //             userSalaryStatus: "$userSalaryStatus",
+        //             digital_signature_image: "$digital_signature_image",
+        //             department_name: "$departmet.dept_name",
+        //             Role_name: "$role.role_name",
+        //             report: "$report",
+        //             Report_L1N: "$Report_L1N",
+        //             Report_L2N: "$Report_L2N",
+        //             Report_L3N: "$Report_L3N",
+        //             designation_name: "$designation.desi_name",
+        //             image_url: { $concat: [ImageUrl, '$image'] },
+        //             UID_url: { $concat: [ImageUrl, '$UID'] },
+        //             pan_url: { $concat: [ImageUrl, '$pan'] },
+        //             highest_upload_url: { $concat: [ImageUrl, '$highest_upload'] },
+        //             other_upload_url: { $concat: [ImageUrl, '$other_upload'] },
+        //             tenth_marksheet_url: { $concat: [ImageUrl, '$tenth_marksheet'] },
+        //             twelveth_marksheet_url: { $concat: [ImageUrl, '$twelveth_marksheet'] },
+        //             UG_Marksheet_url: { $concat: [ImageUrl, '$UG_Marksheet'] },
+        //             passport_url: { $concat: [ImageUrl, '$passport'] },
+        //             pre_off_letter_url: { $concat: [ImageUrl, '$pre_off_letter'] },
+        //             pre_expe_letter_url: { $concat: [ImageUrl, '$pre_expe_letter'] },
+        //             pre_relieving_letter_url: { $concat: [ImageUrl, '$pre_relieving_letter'] },
+        //             bankPassBook_Cheque_url: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
+        //             joining_extend_document_url: { $concat: [ImageUrl, '$joining_extend_document'] }
+        //         }
+        //     }
+        // ]).exec();
+        res.status(200).send({ data: singlesim })
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'Error getting all users' })
     }
 }
 
 exports.getSingleUser = async (req, res) => {
-    try{
+    try {
         const ImageUrl = 'http://34.93.135.33:8080/uploads/';
         const singlesim = await userModel.aggregate([
             {
-                $match: { user_id: parseInt(req.params.id) } 
+                $match: { user_id: parseInt(req.params.id) }
             },
             {
                 $lookup: {
@@ -570,8 +589,8 @@ exports.getSingleUser = async (req, res) => {
                 $project: {
                     department_name: '$department.dept_name',
                     designation_name: '$designation.desi_name',
-                    role_name:"$role.Role_name",
-                    user_designation: '$user_designation', 
+                    role_name: "$role.Role_name",
+                    user_designation: '$user_designation',
                     dept_id: "$dept_id",
                     desi_id: '$user_designation',
                     user_id: "$user_id",
@@ -681,29 +700,29 @@ exports.getSingleUser = async (req, res) => {
             // }
         ]).exec();
         res.status(200).send(singlesim[0])
-    }catch(err){
-        res.status(500).send({error:err,sms:'Error getting all users'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error getting all users' })
     }
 }
 
-exports.deleteUser = async (req, res) =>{
-    userModel.deleteOne({user_id:req.params.id}).then(item =>{
-        if(item){
-            return res.status(200).json({success:true, message:'user deleted'})
-        }else{
-            return res.status(404).json({success:false, message:'user not found'})
+exports.deleteUser = async (req, res) => {
+    userModel.deleteOne({ user_id: req.params.id }).then(item => {
+        if (item) {
+            return res.status(200).json({ success: true, message: 'user deleted' })
+        } else {
+            return res.status(404).json({ success: false, message: 'user not found' })
         }
-    }).catch(err=>{
-        return res.status(400).json({success:false, message:err})
+    }).catch(err => {
+        return res.status(400).json({ success: false, message: err })
     })
 };
 
 exports.loginUser = async (req, res) => {
-    try{
+    try {
         const simc = await userModel.aggregate([
             {
                 $match: {
-                    user_login_id:req.body.user_login_id,
+                    user_login_id: req.body.user_login_id,
                     // user_login_password:req.body.user_login_password
                 }
             },
@@ -736,49 +755,49 @@ exports.loginUser = async (req, res) => {
                 }
             }
         ]).exec();
-          
-        if(simc.length === 0){
-            return res.status(500).send({success:false})
+
+        if (simc.length === 0) {
+            return res.status(500).send({ success: false })
         }
         // let role = req.body?.role_id
         // if (bcrypt.compareSync(req.body.user_login_password, simc[0].user_login_password) || role === constant.ADMIN_ROLE) {
         if (bcrypt.compareSync(req.body.user_login_password, simc[0].user_login_password)) {
             const token = jwt.sign(
                 {
-                  id: simc[0].user_id,
-                  name: simc[0].user_name,
-                  email: simc[0].user_email_id,
-                  sitting_id: simc[0].sitting_id,
-                  role_id: simc[0].role_id,
-                  dept_id: simc[0].dept_id,
-                  room_id: simc[0].room_id,
-                  Sitting_id: simc[0].Sitting_id,
-                  Sitting_ref_no: simc[0].Sitting_ref_no,
-                  onboard_status: simc[0].onboard_status,
-                  user_status: simc[0].user_status,
+                    id: simc[0].user_id,
+                    name: simc[0].user_name,
+                    email: simc[0].user_email_id,
+                    sitting_id: simc[0].sitting_id,
+                    role_id: simc[0].role_id,
+                    dept_id: simc[0].dept_id,
+                    room_id: simc[0].room_id,
+                    Sitting_id: simc[0].Sitting_id,
+                    Sitting_ref_no: simc[0].Sitting_ref_no,
+                    onboard_status: simc[0].onboard_status,
+                    user_status: simc[0].user_status,
                 },
                 constant.SECRET_KEY_LOGIN,
-            { expiresIn:  constant.CONST_VALIDATE_SESSION_EXPIRE }
+                { expiresIn: constant.CONST_VALIDATE_SESSION_EXPIRE }
             );
-            return res.status(200).send({token,user:simc[0]})
-          } else {
-            return res.status(200).send({sms:'Invalid Password'})
-          }
-       
-    } catch(err){
-        return res.status(500).send({error:err.message,sms:'Error getting user details'})
+            return res.status(200).send({ token, user: simc[0] })
+        } else {
+            return res.status(200).send({ sms: 'Invalid Password' })
+        }
+
+    } catch (err) {
+        return res.status(500).send({ error: err.message, sms: 'Error getting user details' })
     }
 }
 
 exports.deliveryBoy = async (req, res) => {
-    try{
-        const delv = await userModel.find({role_id:3}).select('user_id')
-        if(!delv){
-            res.status(500).send({success:false})
+    try {
+        const delv = await userModel.find({ role_id: 3 }).select('user_id')
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({results:delv})
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting all delivery boy'})
+        res.status(200).send({ results: delv })
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting all delivery boy' })
     }
 }
 
@@ -795,10 +814,10 @@ exports.deliveryBoyByRoom = async (req, res) => {
 }
 
 exports.deliveryUser = async (req, res) => {
-    try{
+    try {
         const delv = await userModel.aggregate([
             {
-                $match: { role_id: 3 } 
+                $match: { role_id: 3 }
             },
             {
                 $lookup: {
@@ -823,7 +842,7 @@ exports.deliveryUser = async (req, res) => {
                 $unwind: '$role'
             },
             {
-                $lookup:{
+                $lookup: {
                     from: 'usermodels',
                     localField: 'user_report_to_id',
                     foreignField: 'user_id',
@@ -922,34 +941,34 @@ exports.deliveryUser = async (req, res) => {
                     joining_date_extend_status: '$joining_date_extend_status',
                     joining_date_extend_reason: '$joining_date_extend_reason',
                     invoice_template_no: '$invoice_template_no',
-                    image: ImageUrl+'$image',
-                    UID: ImageUrl+'$UID',
-                    pan: ImageUrl+'$pan',
-                    highest_upload: ImageUrl+'$highest_upload',
-                    other_upload: ImageUrl+'$other_upload',
-                    tenth_marksheet: ImageUrl+'$tenth_marksheet',
-                    twelveth_marksheet: ImageUrl+'$twelveth_marksheet',
-                    UG_Marksheet: ImageUrl+'$UG_Marksheet',
-                    passport: ImageUrl+'$passport',
-                    pre_off_letter: ImageUrl+'$pre_off_letter',
-                    pre_expe_letter: ImageUrl+'$pre_expe_letter',
-                    pre_relieving_letter: ImageUrl+'$pre_relieving_letter',
-                    bankPassBook_Cheque: ImageUrl+'$bankPassBook_Cheque',
-                    joining_extend_document: ImageUrl+'$joining_extend_document'
+                    image: ImageUrl + '$image',
+                    UID: ImageUrl + '$UID',
+                    pan: ImageUrl + '$pan',
+                    highest_upload: ImageUrl + '$highest_upload',
+                    other_upload: ImageUrl + '$other_upload',
+                    tenth_marksheet: ImageUrl + '$tenth_marksheet',
+                    twelveth_marksheet: ImageUrl + '$twelveth_marksheet',
+                    UG_Marksheet: ImageUrl + '$UG_Marksheet',
+                    passport: ImageUrl + '$passport',
+                    pre_off_letter: ImageUrl + '$pre_off_letter',
+                    pre_expe_letter: ImageUrl + '$pre_expe_letter',
+                    pre_relieving_letter: ImageUrl + '$pre_relieving_letter',
+                    bankPassBook_Cheque: ImageUrl + '$bankPassBook_Cheque',
+                    joining_extend_document: ImageUrl + '$joining_extend_document'
                 }
             }
         ]).exec();
-        if(!delv){
-            res.status(500).send({success:false})
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting delivery user'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting delivery user' })
     }
 }
 
 exports.addUserAuth = async (req, res) => {
-    try{
+    try {
         const simc = new userAuthModel({
             Juser_id: req.body.Juser_id,
             obj_id: req.body.obj_id,
@@ -961,14 +980,14 @@ exports.addUserAuth = async (req, res) => {
             created_by: req.body.created_by
         })
         const simv = await simc.save();
-        res.send({simv,status:200});
-    } catch(err){
-        res.status(500).send({error:err,sms:'This user auth cannot be created'})
+        res.send({ simv, status: 200 });
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'This user auth cannot be created' })
     }
 }
 
 exports.allUserAuthDetail = async (req, res) => {
-    try{
+    try {
         const delv = await userAuthModel.aggregate([
             {
                 $lookup: {
@@ -1006,18 +1025,18 @@ exports.allUserAuthDetail = async (req, res) => {
                 }
             }
         ]).exec();
-        if(!delv){
-            res.status(500).send({success:false})
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting all user auth details'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting all user auth details' })
     }
 }
 
 exports.updateUserAuth = async (req, res) => {
-    try{
-        const editsim = await userAuthModel.findOneAndUpdate({auth_id:req.body.auth_id},{
+    try {
+        const editsim = await userAuthModel.findOneAndUpdate({ auth_id: req.body.auth_id }, {
             Juser_id: req.body.Juser_id,
             obj_id: req.body.obj_id,
             insert: req.body.insert,
@@ -1027,35 +1046,34 @@ exports.updateUserAuth = async (req, res) => {
             Last_updated_date: req.body.Last_updated_date,
             Last_updated_by: req.body.Last_updated_by
         }, { new: true })
-        if(!editsim){
-            res.status(500).send({success:false})
+        if (!editsim) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({success:true,data:editsim})
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error updating user auth details'})
+        res.status(200).send({ success: true, data: editsim })
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error updating user auth details' })
     }
 };
 
-exports.deleteUserAuth = async (req, res) =>{
-    userAuthModel.deleteOne({auth_id:req.body.auth_id}).then(item =>{
-        if(item){
-            return res.status(200).json({success:true, message:'user auth deleted'})
-        }else{
-            return res.status(404).json({success:false, message:'user auth not found'})
+exports.deleteUserAuth = async (req, res) => {
+    userAuthModel.deleteOne({ auth_id: req.body.auth_id }).then(item => {
+        if (item) {
+            return res.status(200).json({ success: true, message: 'user auth deleted' })
+        } else {
+            return res.status(404).json({ success: false, message: 'user auth not found' })
         }
-    }).catch(err=>{
-        return res.status(400).json({success:false, message:err})
+    }).catch(err => {
+        return res.status(400).json({ success: false, message: err })
     })
 };
 
 exports.getSingleUserAuthDetail = async (req, res) => {
-    try{
-        console.log("param",req.params.Juser_id);
+    try {
         const delv = await userAuthModel.aggregate([
             {
-                $match:{ Juser_id: parseInt(req.params.Juser_id)}
+                $match: { Juser_id: parseInt(req.params.Juser_id) }
             },
-             {
+            {
                 $lookup: {
                     from: 'objectmodels',
                     localField: 'obj_id',
@@ -1101,13 +1119,9 @@ exports.getSingleUserAuthDetail = async (req, res) => {
             // },
             {
                 $project: {
-                    // auth_id:"$auth_id",
-                    // user_name: '$user.user_name',
-                    // obj_name: "$object.obj_name",
-                    // department_name: "$department.dept_name",
-                    id: "$_id",
+                    auth_id: "$auth_id",
                     Juser_id: '$Juser_id',
-                    obj_name:'$object.obj_name',
+                    obj_name: '$object.obj_name',
                     obj_id: '$obj_id',
                     insert: '$insert',
                     view: '$view',
@@ -1116,21 +1130,21 @@ exports.getSingleUserAuthDetail = async (req, res) => {
                 }
             }
         ]).exec();
-        if(!delv){
-            res.status(500).send({success:false})
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err.message, sms:'error getting user auth details'})
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'error getting user auth details' })
     }
 }
 
 
-exports.userObjectAuth = async (req, res) =>{
-    try{
+exports.userObjectAuth = async (req, res) => {
+    try {
         const delv = await userAuthModel.aggregate([
             {
-                $match:{
+                $match: {
                     Juser_id: req.body.Juser_id,
                     user_id: req.body.user_id
                 }
@@ -1183,12 +1197,12 @@ exports.userObjectAuth = async (req, res) =>{
                 }
             }
         ]).exec();
-        if(!delv){
-            res.status(500).send({success:false})
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting user object auth details'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting user object auth details' })
     }
 };
 
@@ -1197,78 +1211,78 @@ exports.sendUserMail = async (req, res) => {
         const { email, subject, name, password, login_id, status, text } = req.body;
         const attachment = req.file;
         if (status == "onboarded") {
-          const templatePath = path.join(__dirname, "template.ejs");
-          const template = await fs.promises.readFile(templatePath, "utf-8");
-    
-          const html = ejs.render(template, {
-            email,
-            password,
-            name,
-            login_id,
-            text,
-          });
-    
-          let mailTransporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-              user: "vijayanttrivedi1500@gmail.com", 
-              pass: "odovpikkjvkprrjv",
-            },
-          });
-    
-          let mailOptions = {
-            from: "vijayanttrivedi1500@gmail.com",
-            to: email,
-            subject: subject,
-            html: html,
-            attachments: attachment
-              ? [
-                {
-                  filename: attachment.originalname,
-                  path: attachment.path,
+            const templatePath = path.join(__dirname, "template.ejs");
+            const template = await fs.promises.readFile(templatePath, "utf-8");
+
+            const html = ejs.render(template, {
+                email,
+                password,
+                name,
+                login_id,
+                text,
+            });
+
+            let mailTransporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: "vijayanttrivedi1500@gmail.com",
+                    pass: "odovpikkjvkprrjv",
                 },
-              ]
-              : [],
-          };
-    
-          await mailTransporter.sendMail(mailOptions);
-          res.sendStatus(200);
+            });
+
+            let mailOptions = {
+                from: "vijayanttrivedi1500@gmail.com",
+                to: email,
+                subject: subject,
+                html: html,
+                attachments: attachment
+                    ? [
+                        {
+                            filename: attachment.originalname,
+                            path: attachment.path,
+                        },
+                    ]
+                    : [],
+            };
+
+            await mailTransporter.sendMail(mailOptions);
+            res.sendStatus(200);
         } else {
-          const templatePath = path.join(__dirname, "template.ejs");
-          const template = await fs.promises.readFile(templatePath, "utf-8");
-          const html = ejs.render(template, {
-            email,
-            password,
-            name,
-            login_id,
-            text,
-          });
-    
-          let mailTransporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-              user: "vijayanttrivedi1500@gmail.com", 
-              pass: "odovpikkjvkprrjv", 
-            },
-          });
-    
-          let mailOptions = {
-            from: "vijayanttrivedi1500@gmail.com",
-            to: email,
-            subject: subject,
-            html: html,
-            attachments: attachment
-              ? [
-                {
-                  filename: attachment.originalname,
-                  path: attachment.path,
+            const templatePath = path.join(__dirname, "template.ejs");
+            const template = await fs.promises.readFile(templatePath, "utf-8");
+            const html = ejs.render(template, {
+                email,
+                password,
+                name,
+                login_id,
+                text,
+            });
+
+            let mailTransporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: "vijayanttrivedi1500@gmail.com",
+                    pass: "odovpikkjvkprrjv",
                 },
-              ]
-              : [],
-          };
-    
-          await mailTransporter.sendMail(mailOptions);
-          res.sendStatus(200);
+            });
+
+            let mailOptions = {
+                from: "vijayanttrivedi1500@gmail.com",
+                to: email,
+                subject: subject,
+                html: html,
+                attachments: attachment
+                    ? [
+                        {
+                            filename: attachment.originalname,
+                            path: attachment.path,
+                        },
+                    ]
+                    : [],
+            };
+
+            await mailTransporter.sendMail(mailOptions);
+            res.sendStatus(200);
         }
     } catch (error) {
         res.sendStatus(500);
@@ -1276,22 +1290,22 @@ exports.sendUserMail = async (req, res) => {
 }
 
 exports.getUserByDeptAndWFH = async (req, res) => {
-    try{
-        const delv = await userModel.find({dept_id:req.params.dept_id,job_type:'wfh'})
-        if(!delv){
-            res.status(500).send({success:false})
+    try {
+        const delv = await userModel.find({ dept_id: req.params.dept_id, job_type: 'wfh' })
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting all whf user with dept id'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting all whf user with dept id' })
     }
 }
 
 exports.getUserJobResponsibility = async (req, res) => {
-    try{
+    try {
         const delv = await jobResponsibilityModel.aggregate([
             {
-                $match:{
+                $match: {
                     user_id: req.body.user_id
                 }
             },
@@ -1308,45 +1322,43 @@ exports.getUserJobResponsibility = async (req, res) => {
             },
             {
                 $project: {
-                    user_name: '$user.user_name',
-                    department_name: '$department.dept_name',
-                    obj_name: "$object.obj_name",
                     id: "$_id",
-                    Juser_id: '$Juser_id',
-                    obj_id: '$obj_id',
-                    insert: '$insert',
-                    view: '$view',
-                    update: '$update',
-                    delete_flag: '$delete_flag',
+                    Job_res_id: '$Job_res_id',
+                    user_name: '$user.user_name',
+                    sjob_responsibility: "$sjob_responsibility",
+                    description: "$description",
+                    Created_by: "$Created_by",
+                    Last_updated_by: "$Last_updated_by",
+                    Last_updated_date: "$Last_updated_date"
                 }
             }
         ]).exec();
-        if(!delv){
-            res.status(500).send({success:false})
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting user job responsibility'})
+        res.status(200).send({ data: delv })
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting user job responsibility' })
     }
 }
 
 exports.getUserByDeptId = async (req, res) => {
-    try{
-        const delv = await userModel.find({dept_id:req.params.id})
-        if(!delv){
-            res.status(500).send({success:false})
+    try {
+        const delv = await userModel.find({ dept_id: req.params.id })
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting all users by dept id'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting all users by dept id' })
     }
 }
 
 exports.getUserOtherFields = async (req, res) => {
-    try{
+    try {
         const delv = await userOtherFieldModel.aggregate([
             {
-                $match:{
+                $match: {
                     user_id: req.params.user_id
                 }
             },
@@ -1376,17 +1388,17 @@ exports.getUserOtherFields = async (req, res) => {
                 }
             }
         ]).exec();
-        if(!delv){
-            res.status(500).send({success:false})
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting user other fields'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting user other fields' })
     }
 }
 
 exports.addUserOtherField = async (req, res) => {
-    try{
+    try {
         const simc = new userOtherFieldModel({
             user_id: req.body.user_id,
             field_name: req.body.field_name,
@@ -1395,43 +1407,43 @@ exports.addUserOtherField = async (req, res) => {
             created_by: req.body.created_at
         })
         const simv = await simc.save();
-        res.send({simv,status:200});
-    } catch(err){
-        res.status(500).send({error:err,sms:'This users other fields cannot be created'})
+        res.send({ simv, status: 200 });
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'This users other fields cannot be created' })
     }
 }
 
 exports.updateUserOtherField = async (req, res) => {
-    try{
-        const editsim = await userOtherFieldModel.findOneAndUpdate({user_id:req.params.user_id},{
+    try {
+        const editsim = await userOtherFieldModel.findOneAndUpdate({ user_id: req.params.user_id }, {
             field_name: req.body.field_name,
             field_value: req.file,
             remark: req.body.remark
         }, { new: true })
-        if(!editsim){
-            res.status(500).send({success:false})
+        if (!editsim) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({success:true,data:editsim})
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error updating user other fields'})
+        res.status(200).send({ success: true, data: editsim })
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error updating user other fields' })
     }
 };
 
 exports.addReason = async (req, res) => {
-    try{
+    try {
         const simc = new reasonModel({
             remark: req.body.remark,
             reason: req.body.reason
         })
         const simv = await simc.save();
-        res.send({simv,status:200});
-    } catch(err){
-        res.status(500).send({error:err,sms:'This reason cannot be created'})
+        res.send({ simv, status: 200 });
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'This reason cannot be created' })
     }
 }
 
 exports.getAllReasons = async (req, res) => {
-    try{
+    try {
         // const delv = await reasonModel.aggregate([
         //     {
         //         $lookup: {
@@ -1455,17 +1467,17 @@ exports.getAllReasons = async (req, res) => {
         //     }
         // ]).exec();
         const delv = await reasonModel.find();
-        if(!delv){
-            res.status(500).send({success:false})
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting all reasons'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting all reasons' })
     }
 }
 
 exports.addSeparation = async (req, res) => {
-    try{
+    try {
         const simc = new separationModel({
             user_id: req.body.user_id,
             status: req.body.status,
@@ -1477,14 +1489,14 @@ exports.addSeparation = async (req, res) => {
             reinstate_date: req.body.reinstate_date
         })
         const simv = await simc.save();
-        res.send({simv,status:200});
-    } catch(err){
-        res.status(500).send({error:err,sms:'This separation cannot be created'})
+        res.send({ simv, status: 200 });
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'This separation cannot be created' })
     }
 }
 
 exports.getAllSeparations = async (req, res) => {
-    try{
+    try {
         const delv = await separationModel.aggregate([
             {
                 $lookup: {
@@ -1523,23 +1535,23 @@ exports.getAllSeparations = async (req, res) => {
                 }
             }
         ]).exec();
-        if(!delv){
-            res.status(500).send({success:false})
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting all separations'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting all separations' })
     }
 }
 
 exports.getSingleSeparation = async (req, res) => {
-    try{
+    try {
         const delv = await separationModel.aggregate([
             {
-                $match:{
+                $match: {
                     user_id: req.params.user_id
                 }
-            }, 
+            },
             {
                 $lookup: {
                     from: 'usermodels',
@@ -1577,18 +1589,18 @@ exports.getSingleSeparation = async (req, res) => {
                 }
             }
         ]).exec();
-        if(!delv){
-            res.status(500).send({success:false})
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(delv)
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting single separation details'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting single separation details' })
     }
 }
 
 exports.updateSeparation = async (req, res) => {
-    try{
-        const editsim = await separationModel.findOneAndUpdate({id:req.body.id},{
+    try {
+        const editsim = await separationModel.findOneAndUpdate({ id: req.body.id }, {
             user_id: req.body.user_id,
             status: req.body.status,
             resignation_date: req.body.resignation_date,
@@ -1597,24 +1609,24 @@ exports.updateSeparation = async (req, res) => {
             reason: req.body.reason,
             reinstate_date: req.body.reinstate_date
         }, { new: true })
-        if(!editsim){
-            res.status(500).send({success:false})
+        if (!editsim) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({success:true,data:editsim})
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error updating user separation'})
+        res.status(200).send({ success: true, data: editsim })
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error updating user separation' })
     }
 };
 
 exports.sendMailAllWfoUser = async (req, res) => {
-    try{
+    try {
         const { subject, text } = req.body;
         const attachment = req.file;
 
         const templatePath = path.join(__dirname, "template2.ejs");
         const template = await fs.promises.readFile(templatePath, "utf-8");
 
-        const results = await userModel.find({job_type:'WFO'})
+        const results = await userModel.find({ job_type: 'WFO' })
 
         results.forEach((user) => {
             const userName = user.user_name;
@@ -1629,8 +1641,8 @@ exports.sendMailAllWfoUser = async (req, res) => {
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                user: "vijayanttrivedi1500@gmail.com",
-                pass: "odovpikkjvkprrjv",
+                    user: "vijayanttrivedi1500@gmail.com",
+                    pass: "odovpikkjvkprrjv",
                 },
             });
 
@@ -1640,33 +1652,33 @@ exports.sendMailAllWfoUser = async (req, res) => {
                 subject: subject,
                 html: html,
                 attachments: attachment
-                ? [
-                    {
-                    filename: attachment.originalname,
-                    path: attachment.path,
-                    },
-                ]
-                : [],
+                    ? [
+                        {
+                            filename: attachment.originalname,
+                            path: attachment.path,
+                        },
+                    ]
+                    : [],
             };
 
             mailTransporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
-                return error;
+                    return error;
                 } else {
-                res.send("Email sent successfully to:", emailId);
+                    res.send("Email sent successfully to:", emailId);
                 }
             });
-        })    
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error sending email'})
+        })
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error sending email' })
     }
 }
 
 exports.getAllWfhUsers = async (req, res) => {
-    try{
-        const simc = await userModel.find({job_type:'WFH'});
-        if(!simc){
-            res.status(500).send({success:false})
+    try {
+        const simc = await userModel.find({ job_type: 'WFH' });
+        if (!simc) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send({data:simc})
     } catch(err){

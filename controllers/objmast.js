@@ -113,12 +113,12 @@ exports.getObjectMastById = async (req, res) => {
 
 exports.getObjectMasts = async (req, res) => {
   try {
-    let objets = await objectMastSchema.aggregate([
+    let objects = await objectMastSchema.aggregate([
       {
         $lookup: {
           from: "departmentmodels",
-          localField: "Dept_id",
-          foreignField: "dept_id",
+          localField: "dept_id",
+          foreignField: "Dept_id",
           as: "data",
         },
       },
@@ -138,12 +138,12 @@ exports.getObjectMasts = async (req, res) => {
         },
       },
     ]);
-    if (objets.length === 0) {
+    if (objects.length === 0) {
       res
         .status(200)
         .send({ success: true, data: [], message: "No Record found" });
     } else {
-      return res.status(200).send({ success: true, data: objets });
+      return res.status(200).send({ success: true, data: objects });
     }
   } catch (err) {
     res.status(500).send({ error: err.message, message: "Error getting all Objects" });
