@@ -68,7 +68,8 @@ router.get("/creator_insights", insta.creatorInsights);
 router.get("/cfinstaapi", insta.cfInstaApi);
 router.get("/countinstacp", insta.countInstaCPModels);
 router.post("/get_all_posts_by_id", insta.getPostsByDecNum)
-router.get("/get_avg_frq_of_post", insta.getAvgFrqOfPost)
+router.get("/get_avg_frq_of_post", insta.getAvgFrqOfPost);
+router.get("/get_all_stories", insta.getStories);
 /*execution api*/
 router.post("/exe_inven_post", exe.exeInvenPost);
 router.get("/get_exe_inventory", exe.getExeInventory);

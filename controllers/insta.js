@@ -451,6 +451,15 @@ exports.trackStory = async (req, res) => {
     }
 };
 
+exports.getStories = async (req, res) => {
+    try {
+        const getPosts = await instaS.find({});
+        return res.status(200).send(getPosts);
+    } catch (error) {
+        res.status(500).send({ error: error, sms: "error getting stories" });
+    }
+};
+
 exports.creatorInsights = async (req, res) => {
     try {
         const response = await axios.get(
