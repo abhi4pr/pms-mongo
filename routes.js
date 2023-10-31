@@ -11,6 +11,7 @@ const projectxPageCategory = require("./controllers/projectxPageCategory.js");
 const projectxSubCategory = require("./controllers/projectxSubCategory.js");
 const hashTag = require("./controllers/hashTag.js");
 const keyword = require("./controllers/keywordInsta.js");
+const mention = require("./controllers/mentionInsta.js");
 const projectxCategory = require("./controllers/projectxCategory.js");
 const projectxRecord = require("./controllers/projectxRecord.js");
 const registerCampaign = require("./controllers/registerCampaign.js");
@@ -67,7 +68,8 @@ router.post("/creator_name_count", insta.creatorNameCount);
 router.post("/get_posts_from_name", insta.getPostsFromName);
 router.get("/creator_insights", insta.creatorInsights);
 router.get("/cfinstaapi", insta.cfInstaApi);
-router.get("/countinstacp", insta.countInstaCPModels);
+router.post("/countinstacp", insta.countInstaCPModels);
+// router.get("/countinstacp", insta.countInstaCPModels);
 router.post("/get_all_posts_by_id", insta.getPostsByDecNum)
 router.get("/get_avg_frq_of_post", insta.getAvgFrqOfPost);
 router.get("/get_all_stories", insta.getStories);
@@ -229,6 +231,13 @@ router.get("/keyword",  keyword.getKeywords);
 router.get("/keyword/:id",  keyword.getKeyword);
 router.put("/keyword",  keyword.editKeyword);
 router.delete("/keyword/:id",  keyword.deleteKeyword);
+
+//Mentions
+router.post("/mention",  mention.addMention);
+router.get("/mention",  mention.getMentions);
+router.get("/mention/:id",  mention.getMention);
+router.put("/mention",  mention.editMention);
+router.delete("/mention/:id",  mention.deleteMention);
 
 //Projectx Category
 router.post("/projectxCategory", projectxCategory.addProjectxCategory);
@@ -579,7 +588,7 @@ router.get("/get_month_year_data", attendance.getMonthYearData)
 router.post("/get_distinct_depts", attendance.getDistinctDepts)
 router.post("/check_salary_status", attendance.checkSalaryStatus)
 router.get("/all_departments_of_wfh", attendance.allDeptsOfWfh)
-// router.get("/dept_with_wfh", attendance.deptWithWFH)
+router.get("/dept_with_wfh", attendance.deptWithWFH)
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);

@@ -598,3 +598,43 @@ exports.allDeptsOfWfh = async (req, res) => {
         return res.send({error:error.message, status:500, sms:"error getting salary status"})
     }
 }
+
+exports.deptWithWFH = async (req, res) => {
+    try {
+        const result = await userModel.aggregate([
+            {
+                $match: { job_type: 'WFH' }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'dept'
+                }
+            },
+            {
+                $unwind: '$dept'
+            },
+            {
+                $group: {
+                    _id: '$dept.dept_id',
+                    dept_name: { $first: '$dept.dept_name' },
+                   
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    dept_id: '$_id',
+                    dept_name: 1,
+                   
+                }
+            }
+        ]).exec();
+        
+      return  res.send(result)
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
+  };
