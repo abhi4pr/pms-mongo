@@ -47,7 +47,7 @@ exports.getKeywords = async (req, res) => {
 exports.getKeyword = async (req, res) => {
   try {
     const keyword = await keywordSchema.findOne({
-      keywordId: req?.params?.id,
+      keywordId: parseInt(req?.params?.id),
     });
     if (!keyword) {
       res
