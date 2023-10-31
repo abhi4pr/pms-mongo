@@ -10,6 +10,7 @@ const campagin = require("./controllers/campaign.js");
 const projectxPageCategory = require("./controllers/projectxPageCategory.js");
 const projectxSubCategory = require("./controllers/projectxSubCategory.js");
 const hashTag = require("./controllers/hashTag.js");
+const keyword = require("./controllers/keywordInsta.js");
 const projectxCategory = require("./controllers/projectxCategory.js");
 const projectxRecord = require("./controllers/projectxRecord.js");
 const registerCampaign = require("./controllers/registerCampaign.js");
@@ -221,6 +222,13 @@ router.post("/hash_tag",  hashTag.addHashTag);
 router.get("/hash_tag",  hashTag.getHashTags);
 router.put("/hash_tag_edit",  hashTag.editHashTag);
 router.delete("/hash_tag/:id",  hashTag.deleteHashTag);
+
+//Keyword
+router.post("/keyword",  keyword.addKeyword);
+router.get("/keyword",  keyword.getKeywords);
+router.get("/keyword/:id",  keyword.getKeyword);
+router.put("/keyword",  keyword.editKeyword);
+router.delete("/keyword/:id",  keyword.deleteKeyword);
 
 //Projectx Category
 router.post("/projectxCategory", projectxCategory.addProjectxCategory);
@@ -571,6 +579,7 @@ router.get("/get_month_year_data", attendance.getMonthYearData)
 router.post("/get_distinct_depts", attendance.getDistinctDepts)
 router.post("/check_salary_status", attendance.checkSalaryStatus)
 router.get("/all_departments_of_wfh", attendance.allDeptsOfWfh)
+// router.get("/dept_with_wfh", attendance.deptWithWFH)
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
