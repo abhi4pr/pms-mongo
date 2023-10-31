@@ -155,18 +155,18 @@ exports.addRoom = async (req, res) => {
 exports.getRooms = async (req, res) => {
   try {
     const roomObj = await roomModel.aggregate([
-      {
-        $lookup: {
-          from: "usermodels",
-          localField: "Created_by",
-          foreignField: "user_id",
-          as: "data",
-        },
-      },
+      // {
+      //   $lookup: {
+      //     from: "usermodels",
+      //     localField: "created_by",
+      //     foreignField: "user_id",
+      //     as: "data",
+      //   },
+      // },
 
-      {
-        $unwind: "$data",
-      },
+      // {
+      //   $unwind: "$data",
+      // },
 
       {
         $project: {
@@ -176,15 +176,15 @@ exports.getRooms = async (req, res) => {
           roomImage: "$roomImage",
           remarks: "$remarks",
           creation_date: "$creation_date",
-          created_by: "$Created_by",
+          created_by: "$created_by",
           last_updated_by: "$last_updated_by",
           last_updated_date: "$last_updated_date",
-          user_name: "$data.user_name",
+          // created_by_name: "$data.user_name",
         },
       },
     ]);
 
-    const url = "http://34.93.135.33:8080/uploads/";
+    const url = "http://192.168.29.116:8080/uploads/";
     const dataWithImageUrl = roomObj.map((room) => ({
       ...room,
       room_image_url: room.roomImage ? url + room.roomImage : null,
@@ -202,7 +202,6 @@ exports.getRooms = async (req, res) => {
       .send({ error: err.message, message: "Error getting all Rooms" });
   }
 };
-
 
 
 exports.getRoomById = async (req, res) => {

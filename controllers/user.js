@@ -50,9 +50,9 @@ exports.addUser = [upload, async (req, res) => {
             sitting_id: req.body.sitting_id,
             job_type: req.body.job_type,
             personal_number: req.body.personal_number,
-            report_L1: req.body.report_L1,
-            report_L2: req.body.report_L2,
-            report_L3: req.body.report_L3,
+            Report_L1: req.body.report_L1,
+            Report_L2: req.body.report_L2,
+            Report_L3: req.body.report_L3,
             Personal_email: req.body.Personal_email,
             joining_date: req.body.joining_date,
             releaving_date: req.body.releaving_date,
@@ -64,8 +64,8 @@ exports.addUser = [upload, async (req, res) => {
             Nationality: req.body.Nationality,
             DOB: req.body.DOB,
             Age: req.body.Age,
-            FatherName: req.body.FatherName,
-            MotherName: req.body.MotherName,
+            fatherName: req.body.FatherName,
+            motherName: req.body.MotherName,
             Hobbies: req.body.Hobbies,
             BloodGroup: req.body.BloodGroup,
             MartialStatus: req.body.MartialStatus,
@@ -256,7 +256,7 @@ exports.updateUser = [upload1, async (req, res) => {
             releaving_date: req.body.releaving_date,
             level: req.body.level,
             room_id: req.body.room_id,
-            salary: req.body.salary,
+            salary: isNaN(req.body.salary) ? 0 : req.body.salary,
             SpokenLanguages: req.body.SpokenLanguages,
             Gender: req.body.Gender,
             Nationality: req.body.Nationality,
@@ -356,172 +356,228 @@ exports.getWFHUsersByDept = async (req, res) => {
 const ImageUrl = 'http://34.93.135.33:8080/uploads/';
 exports.getAllUsers = async (req, res) => {
     try {
-        const singlesim = await userModel.find();
-        // const singlesim = await userModel.aggregate([
-        //     {
-        //         $lookup: {
-        //             from: 'departmentmodels',
-        //             localField: 'dept_id',
-        //             foreignField: 'dept_id',
-        //             as: 'department'
-        //         }
-        //     },
-        //     {
-        //         $unwind: '$department'
-        //     },
-        //     {
-        //         $lookup: {
-        //             from: 'designationmodels',
-        //             localField: 'user_designation',
-        //             foreignField: 'desi_id',
-        //             as: 'designation'
-        //         }
-        //     },
-        //     {
-        //         $unwind: '$designation'
-        //     },
-        //     {
-        //         $lookup: {
-        //             from: 'rolemodels',
-        //             localField: 'role_id',
-        //             foreignField: 'role_id',
-        //             as: 'role'
-        //         }
-        //     },
-        //     {
-        //         $unwind: '$role'
-        //     },
-        //     {
-        //         $project: {
-        //             user_id: "$user_id",
-        //             user_name: "$user_name",
-        //             user_designation: "$user_designation",
-        //             user_email_id: "$user_email_id",
-        //             user_login_id: "$user_login_id",
-        //             user_login_password: "$user_login_password",
-        //             user_report_to_id: "$user_report_to_id",
-        //             created_At: "$created_At",
-        //             last_updated: "$last_updated",
-        //             created_by: "$created_by",
-        //             user_contact_no: "$user_contact_no",
-        //             dept_id: "$dept_id",
-        //             location_id: "$location_id",
-        //             role_id: "$role_id",
-        //             sitting_id: "$sitting_id",
-        //             image: "$image",
-        //             job_type: "$job_type",
-        //             PersonalNumber: "PersonalNumber",
-        //             Report_L1: "$Report_L1",
-        //             Report_L2: "$Report_L2",
-        //             Report_L3: "$Report_L3",
-        //             PersonalEmail: "$PersonalEmail",
-        //             level: "$level",
-        //             joining_date:"$joining_date",
-        //             releaving_date: "$releaving_date",
-        //             room_id: "$room_id",
-        //             UID: "$UID",
-        //             pan: "$pan",
-        //             highest_upload: "$highest_upload",
-        //             other_upload: "$other_upload",
-        //             salary: "$salry",
-        //             SpokenLanguages: "$SpokenLanguages",
-        //             Gender: "$Gender",
-        //             Nationality: "$Nationality",
-        //             DOB: "$DOB",
-        //             Age: "$Age",
-        //             fatherName: "$fatherName",
-        //             motherName: "$motherName",
-        //             Hobbies:"$Hobbies",
-        //             BloodGroup: "$BloodGroup",
-        //             MartialStatus: "$MartialStatus",
-        //             DateOfMarriage: "$DateOfMarriage",
-        //             onboard_status: "$onboard_status",
-        //             tbs_applicable: "$tbs_applicable",
-        //             tds_per: "$tds_per",
-        //             image_remark: "$image_remark",
-        //             image_validate: "$image_validate",
-        //             uid_remark: "$uid_remark",
-        //             uid_validate: "$uid_validate",
-        //             pan_remark:"$pan_remark" ,
-        //             pan_validate: "$pan_validate",
-        //             highest_upload_remark: "$highest_upload_remark",
-        //             highest_upload_validate: "$highest_upload_validate",
-        //             other_upload_remark:"$other_upload_remark",
-        //             other_upload_validate:"$other_upload_validate" ,
-        //             user_status: "$user_status",
-        //             sub_dept_id: "$sub_dept_id",
-        //             pan_no: "$pan_no",
-        //             uid_no: "$uid_no",
-        //             spouse_name: "$spouse_name",
-        //             highest_qualification_name: "$highest_qualification_name",
-        //             tenth_marksheet: "$tenth_marksheet",
-        //             twelveth_marksheet: "$twelveth_marksheet",
-        //             UG_Marksheet: "$UG_Marksheet",
-        //             passport: "$passport",
-        //             pre_off_letter: "$pre_off_letter",
-        //             pre_expe_letter: "$pre_expe_letter",
-        //             pre_relieving_letter: "$pre_relieving_letter",
-        //             bankPassBook_Cheque: "$bankPassBook_Cheque",
-        //             tenth_marksheet_validate: "$tenth_marksheet_validate",
-        //             twelveth_marksheet_validate: "$twelveth_marksheet_validate",
-        //             UG_Marksheet_validate: "$UG_Marksheet_validate",
-        //             passport_validate: "$passport_validate",
-        //             pre_off_letter_validate: "$pre_off_letter_validate",
-        //             pre_expe_letter_validate: "$pre_expe_letter_validate",
-        //             pre_relieving_letter_validate: "$pre_relieving_letter_validate",
-        //             bankPassBook_Cheque_validate: "$bankPassBook_Cheque_validate",
-        //             tenth_marksheet_validate_remark: "$tenth_marksheet_validate_remark",
-        //             twelveth_marksheet_validate_remark: "$twelveth_marksheet_validate_remark",
-        //             UG_Marksheet_validate_remark: "$UG_Marksheet_validate_remark",
-        //             passport_validate_remark: "$passport_validate_remark",
-        //             pre_off_letter_validate_remark: "$pre_off_letter_validate_remark",
-        //             pre_expe_letter_validate_remark: "$pre_expe_letter_validate_remark",
-        //             pre_relieving_letter_validate_remark: "$pre_relieving_letter_validate_remark",
-        //             bankPassBook_Cheque_validate_remark: "$bankPassBook_Cheque_validate_remark",
-        //             current_address: "$current_address",
-        //             current_city: "$current_city",
-        //             current_state: "$current_state",
-        //             current_pin_code: "$current_pin_code",
-        //             permanent_address: "$permanent_address",
-        //             permanent_city: "$permanent_city",
-        //             permanent_state: "$permanent_state",
-        //             permanent_pin_code: "$permanent_pin_code",
-        //             joining_date_extend: "$joining_date_extend",
-        //             joining_date_extend_status: "$joining_date_extend_status",
-        //             joining_date_extend_reason: "$joining_date_extend_reason",
-        //             joining_extend_document: "$joining_extend_document",
-        //             invoice_template_no: "$invoice_template_no",
-        //             userSalaryStatus: "$userSalaryStatus",
-        //             digital_signature_image: "$digital_signature_image",
-        //             department_name: "$departmet.dept_name",
-        //             Role_name: "$role.role_name",
-        //             report: "$report",
-        //             Report_L1N: "$Report_L1N",
-        //             Report_L2N: "$Report_L2N",
-        //             Report_L3N: "$Report_L3N",
-        //             designation_name: "$designation.desi_name",
-        //             image_url: { $concat: [ImageUrl, '$image'] },
-        //             UID_url: { $concat: [ImageUrl, '$UID'] },
-        //             pan_url: { $concat: [ImageUrl, '$pan'] },
-        //             highest_upload_url: { $concat: [ImageUrl, '$highest_upload'] },
-        //             other_upload_url: { $concat: [ImageUrl, '$other_upload'] },
-        //             tenth_marksheet_url: { $concat: [ImageUrl, '$tenth_marksheet'] },
-        //             twelveth_marksheet_url: { $concat: [ImageUrl, '$twelveth_marksheet'] },
-        //             UG_Marksheet_url: { $concat: [ImageUrl, '$UG_Marksheet'] },
-        //             passport_url: { $concat: [ImageUrl, '$passport'] },
-        //             pre_off_letter_url: { $concat: [ImageUrl, '$pre_off_letter'] },
-        //             pre_expe_letter_url: { $concat: [ImageUrl, '$pre_expe_letter'] },
-        //             pre_relieving_letter_url: { $concat: [ImageUrl, '$pre_relieving_letter'] },
-        //             bankPassBook_Cheque_url: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
-        //             joining_extend_document_url: { $concat: [ImageUrl, '$joining_extend_document'] }
-        //         }
-        //     }
-        // ]).exec();
+        const singlesim = await userModel.aggregate([
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: '$department'
+            },
+            {
+                $lookup: {
+                    from: 'designationmodels',
+                    localField: 'user_designation',
+                    foreignField: 'desi_id',
+                    as: 'designation'
+                }
+            },
+            {
+                $unwind: '$designation'
+            },
+            {
+                $lookup: {
+                    from: 'rolemodels',
+                    localField: 'role_id',
+                    foreignField: 'role_id',
+                    as: 'role'
+                }
+            },
+            {
+                $unwind: '$role'
+            },
+            {
+                $lookup: {
+                  from: "usermodels",
+                  localField: "user_report_to_id",
+                  foreignField: "user_id",
+                  as: "reportTo"
+                }
+              },
+              {
+                $unwind: {
+                    path: "$reportTo",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                  from: "usermodels",
+                  localField: "Report_L1",
+                  foreignField: "user_id",
+                  as: "reportL1"
+                }
+              },
+              {
+                $unwind: {
+                    path: "$reportL1",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+              {
+                $lookup: {
+                  from: "usermodels",
+                  localField: "Report_L2",
+                  foreignField: "user_id",
+                  as: "reportL2"
+                }
+              },
+              {
+                $unwind: {
+                    path: "$reportL2",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+              {
+                $lookup: {
+                  from: "usermodels",
+                  localField: "Report_L3",
+                  foreignField: "user_id",
+                  as: "reportL3"
+                }
+              },
+              {
+                $unwind: {
+                    path: "$reportl3",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    user_id: "$user_id",
+                    user_name: "$user_name",
+                    user_designation: "$user_designation",
+                    user_email_id: "$user_email_id",
+                    user_login_id: "$user_login_id",
+                    user_login_password: "$user_login_password",
+                    user_report_to_id: "$user_report_to_id",
+                    created_At: "$created_At",
+                    last_updated: "$last_updated",
+                    created_by: "$created_by",
+                    user_contact_no: "$user_contact_no",
+                    dept_id: "$dept_id",
+                    location_id: "$location_id",
+                    role_id: "$role_id",
+                    sitting_id: "$sitting_id",
+                    image: "$image",
+                    job_type: "$job_type",
+                    PersonalNumber: "PersonalNumber",
+                    Report_L1: "$Report_L1",
+                    Report_L2: "$Report_L2",
+                    Report_L3: "$Report_L3",
+                    PersonalEmail: "$PersonalEmail",
+                    level: "$level",
+                    joining_date:"$joining_date",
+                    releaving_date: "$releaving_date",
+                    room_id: "$room_id",
+                    UID: "$UID",
+                    pan: "$pan",
+                    highest_upload: "$highest_upload",
+                    other_upload: "$other_upload",
+                    salary: "$salry",
+                    SpokenLanguages: "$SpokenLanguages",
+                    Gender: "$Gender",
+                    Nationality: "$Nationality",
+                    DOB: "$DOB",
+                    Age: "$Age",
+                    fatherName: "$fatherName",
+                    motherName: "$motherName",
+                    Hobbies:"$Hobbies",
+                    BloodGroup: "$BloodGroup",
+                    MartialStatus: "$MartialStatus",
+                    DateOfMarriage: "$DateOfMarriage",
+                    onboard_status: "$onboard_status",
+                    tbs_applicable: "$tbs_applicable",
+                    tds_per: "$tds_per",
+                    image_remark: "$image_remark",
+                    image_validate: "$image_validate",
+                    uid_remark: "$uid_remark",
+                    uid_validate: "$uid_validate",
+                    pan_remark:"$pan_remark" ,
+                    pan_validate: "$pan_validate",
+                    highest_upload_remark: "$highest_upload_remark",
+                    highest_upload_validate: "$highest_upload_validate",
+                    other_upload_remark:"$other_upload_remark",
+                    other_upload_validate:"$other_upload_validate" ,
+                    user_status: "$user_status",
+                    sub_dept_id: "$sub_dept_id",
+                    pan_no: "$pan_no",
+                    uid_no: "$uid_no",
+                    spouse_name: "$spouse_name",
+                    highest_qualification_name: "$highest_qualification_name",
+                    tenth_marksheet: "$tenth_marksheet",
+                    twelveth_marksheet: "$twelveth_marksheet",
+                    UG_Marksheet: "$UG_Marksheet",
+                    passport: "$passport",
+                    pre_off_letter: "$pre_off_letter",
+                    pre_expe_letter: "$pre_expe_letter",
+                    pre_relieving_letter: "$pre_relieving_letter",
+                    bankPassBook_Cheque: "$bankPassBook_Cheque",
+                    tenth_marksheet_validate: "$tenth_marksheet_validate",
+                    twelveth_marksheet_validate: "$twelveth_marksheet_validate",
+                    UG_Marksheet_validate: "$UG_Marksheet_validate",
+                    passport_validate: "$passport_validate",
+                    pre_off_letter_validate: "$pre_off_letter_validate",
+                    pre_expe_letter_validate: "$pre_expe_letter_validate",
+                    pre_relieving_letter_validate: "$pre_relieving_letter_validate",
+                    bankPassBook_Cheque_validate: "$bankPassBook_Cheque_validate",
+                    tenth_marksheet_validate_remark: "$tenth_marksheet_validate_remark",
+                    twelveth_marksheet_validate_remark: "$twelveth_marksheet_validate_remark",
+                    UG_Marksheet_validate_remark: "$UG_Marksheet_validate_remark",
+                    passport_validate_remark: "$passport_validate_remark",
+                    pre_off_letter_validate_remark: "$pre_off_letter_validate_remark",
+                    pre_expe_letter_validate_remark: "$pre_expe_letter_validate_remark",
+                    pre_relieving_letter_validate_remark: "$pre_relieving_letter_validate_remark",
+                    bankPassBook_Cheque_validate_remark: "$bankPassBook_Cheque_validate_remark",
+                    current_address: "$current_address",
+                    current_city: "$current_city",
+                    current_state: "$current_state",
+                    current_pin_code: "$current_pin_code",
+                    permanent_address: "$permanent_address",
+                    permanent_city: "$permanent_city",
+                    permanent_state: "$permanent_state",
+                    permanent_pin_code: "$permanent_pin_code",
+                    joining_date_extend: "$joining_date_extend",
+                    joining_date_extend_status: "$joining_date_extend_status",
+                    joining_date_extend_reason: "$joining_date_extend_reason",
+                    joining_extend_document: "$joining_extend_document",
+                    invoice_template_no: "$invoice_template_no",
+                    userSalaryStatus: "$userSalaryStatus",
+                    digital_signature_image: "$digital_signature_image",
+                    department_name: "$departmet.dept_name",
+                    Role_name: "$role.Role_name",
+                    report: "$reportTo.user_name",
+                    Report_L1N: "$reportL1.user_name",
+                    Report_L2N: "$reportL2.user_name",
+                    Report_L3N: "$reportL3.user_name",
+                    designation_name: "$designation.desi_name",
+                    image_url: { $concat: [ImageUrl, '$image'] },
+                    UID_url: { $concat: [ImageUrl, '$UID'] },
+                    pan_url: { $concat: [ImageUrl, '$pan'] },
+                    highest_upload_url: { $concat: [ImageUrl, '$highest_upload'] },
+                    other_upload_url: { $concat: [ImageUrl, '$other_upload'] },
+                    tenth_marksheet_url: { $concat: [ImageUrl, '$tenth_marksheet'] },
+                    twelveth_marksheet_url: { $concat: [ImageUrl, '$twelveth_marksheet'] },
+                    UG_Marksheet_url: { $concat: [ImageUrl, '$UG_Marksheet'] },
+                    passport_url: { $concat: [ImageUrl, '$passport'] },
+                    pre_off_letter_url: { $concat: [ImageUrl, '$pre_off_letter'] },
+                    pre_expe_letter_url: { $concat: [ImageUrl, '$pre_expe_letter'] },
+                    pre_relieving_letter_url: { $concat: [ImageUrl, '$pre_relieving_letter'] },
+                    bankPassBook_Cheque_url: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
+                    joining_extend_document_url: { $concat: [ImageUrl, '$joining_extend_document'] }
+                }
+            }
+        ]).exec();
         res.status(200).send({ data: singlesim })
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'Error getting all users' })
     }
 }
+
 
 exports.getSingleUser = async (req, res) => {
     try {
@@ -563,141 +619,187 @@ exports.getSingleUser = async (req, res) => {
             {
                 $unwind: '$role'
             },
-            // {
-            //     $lookup:{
-            //         from: 'usermodels',
-            //         localField: 'user_report_to_id',
-            //         foreignField: 'user_id',
-            //         as: 'user1'
-            //     }
-            // },
-            // {
-            //     $unwind: '$user1'
-            // },
-            // {
-            //     $lookup:{
-            //         from: 'usermodels',
-            //         localField: 'Report_L1',
-            //         foreignField: 'user_id',
-            //         as: 'user2'
-            //     }
-            // },
-            // {
-            //     $unwind: '$user2'
-            // },
+            {
+                $lookup: {
+                  from: "usermodels",
+                  localField: "user_report_to_id",
+                  foreignField: "user_id",
+                  as: "reportTo"
+                }
+              },
+              {
+                $unwind: {
+                    path: "$reportTo",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                  from: "usermodels",
+                  localField: "Report_L1",
+                  foreignField: "user_id",
+                  as: "reportL1"
+                }
+              },
+              {
+                $unwind: {
+                    path: "$reportL1",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+              {
+                $lookup: {
+                  from: "usermodels",
+                  localField: "Report_L2",
+                  foreignField: "user_id",
+                  as: "reportL2"
+                }
+              },
+              {
+                $unwind: {
+                    path: "$reportL2",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+              {
+                $lookup: {
+                  from: "usermodels",
+                  localField: "Report_L3",
+                  foreignField: "user_id",
+                  as: "reportL3"
+                }
+              },
+              {
+                $unwind: {
+                    path: "$reportl3",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             {
                 $project: {
-                    department_name: '$department.dept_name',
-                    designation_name: '$designation.desi_name',
-                    role_name: "$role.Role_name",
-                    user_designation: '$user_designation',
-                    dept_id: "$dept_id",
-                    desi_id: '$user_designation',
                     user_id: "$user_id",
-                    _id: "$_id",
-                    // report: '$user1.user_name',
-                    // report_L1_name: '$user2.user_name',
-                    user_name: '$user_name',
-                    user_email_id: '$user_email_id',
-                    user_login_id: '$user_login_id',
-                    user_login_password: '$user_login_password',
-                    user_report_to_id: '$user_report_to_id',
-                    user_contact_no: '$user_contact_no',
-                    location_id: '$location_id',
-                    created_by: '$created_by',
-                    role_id: '$role_id',
-                    sitting_id: '$sitting_id',
-                    job_type: '$job_type',
-                    personal_number: '$PersonalNumber',
-                    report_L1: '$Report_L1',
-                    report_L2: '$Report_L2',
-                    report_L3: '$Report_L3',
-                    Personal_email: '$PersonalEmail',
-                    joining_date: '$joining_date',
-                    releaving_date: '$releaving_date',
-                    level: '$level',
-                    room_id: '$room_id',
-                    salary: '$salary',
-                    SpokenLanguages: '$SpokenLanguages',
-                    Gender: '$Gender',
-                    Nationality: '$Nationality',
-                    DOB: '$DOB',
-                    Age: '$Age',
-                    FatherName: '$fatherName',
-                    MotherName: '$motherName',
-                    Hobbies: '$Hobbies',
-                    BloodGroup: '$BloodGroup',
-                    MartialStatus: '$MartialStatus',
-                    DateofMarriage: '$DateofMarriage',
-                    tds_applicable: '$tds_applicable',
-                    tds_per: '$tds_per',
-                    onboard_status: '$onboard_status',
-                    image_remark: '$image_remark',
-                    image_validate: '$image_validate',
-                    uid_remark: '$uid_remark',
-                    uid_validate: '$uid_validate',
-                    pan_remark: '$pan_remark',
-                    pan_validate: '$pan_validate',
-                    highest_upload_remark: '$highest_upload_remark',
-                    highest_upload_validate: '$highest_upload_validate',
-                    other_upload_remark: '$other_upload_remark',
-                    other_upload_validate: '$other_upload_validate',
-                    user_status: '$user_status',
-                    lastupdated: '$lastupdated',
-                    sub_dept_id: '$sub_dept_id',
-                    pan_no: '$pan_no',
-                    uid_no: '$uid_no',
-                    spouse_name: '$spouse_name',
-                    highest_qualification_name: '$highest_qualification_name',
-                    tenth_marksheet_validate: '$tenth_marksheet_validate',
-                    twelveth_marksheet_validate: '$twelveth_marksheet_validate',
-                    UG_Marksheet_validate: '$UG_Marksheet_validate',
-                    passport_validate: '$passport_validate',
-                    pre_off_letter_validate: '$pre_off_letter_validate',
-                    pre_expe_letter_validate: '$pre_expe_letter_validate',
-                    pre_relieving_letter_validate: '$pre_relieving_letter_validate',
-                    bankPassBook_Cheque_validate: '$bankPassBook_Cheque_validate',
-                    tenth_marksheet_validate_remark: '$tenth_marksheet_validate_remark',
-                    twelveth_marksheet_validate_remark: '$twelveth_marksheet_validate_remark',
-                    UG_Marksheet_validate_remark: '$UG_Marksheet_validate_remark',
-                    passport_validate_remark: '$passport_validate',
-                    pre_off_letter_validate_remark: '$pre_off_letter_validate_remark',
-                    pre_expe_letter_validate_remark: '$pre_expe_letter_validate_remark',
-                    pre_relieving_letter_validate_remark: '$pre_relieving_letter_validate_remark',
-                    bankPassBook_Cheque_validate_remark: '$bankPassBook_Cheque_validate_remark',
-                    current_address: '$current_address',
-                    current_city: '$current_city',
-                    current_state: '$current_state',
-                    current_pin_code: '$current_pin_code',
-                    permanent_address: '$permanent_address',
-                    permanent_city: '$permanent_city',
-                    permanent_state: '$permanent_state',
-                    permanent_pin_code: '$permanent_pin_code',
-                    joining_date_extend: '$joining_date_extend',
-                    joining_date_extend_status: '$joining_date_extend_status',
-                    joining_date_extend_reason: '$joining_date_extend_reason',
-                    invoice_template_no: '$invoice_template_no',
-                    image: { $concat: [ImageUrl, '$image'] },
-                    UID: { $concat: [ImageUrl, '$UID'] },
-                    pan: { $concat: [ImageUrl, '$pan'] },
-                    highest_upload: { $concat: [ImageUrl, '$highest_upload'] },
-                    other_upload: { $concat: [ImageUrl, '$other_upload'] },
-                    tenth_marksheet: { $concat: [ImageUrl, '$tenth_marksheet'] },
-                    twelveth_marksheet: { $concat: [ImageUrl, '$twelveth_marksheet'] },
-                    UG_Marksheet: { $concat: [ImageUrl, '$UG_Marksheet'] },
-                    passport: { $concat: [ImageUrl, '$passport'] },
-                    pre_off_letter: { $concat: [ImageUrl, '$pre_off_letter'] },
-                    pre_expe_letter: { $concat: [ImageUrl, '$pre_expe_letter'] },
-                    pre_relieving_letter: { $concat: [ImageUrl, '$pre_relieving_letter'] },
-                    bankPassBook_Cheque: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
-                    joining_extend_document: { $concat: [ImageUrl, '$joining_extend_document'] }
+                    user_name: "$user_name",
+                    user_designation: "$user_designation",
+                    user_email_id: "$user_email_id",
+                    user_login_id: "$user_login_id",
+                    user_login_password: "$user_login_password",
+                    user_report_to_id: "$user_report_to_id",
+                    created_At: "$created_At",
+                    last_updated: "$last_updated",
+                    created_by: "$created_by",
+                    user_contact_no: "$user_contact_no",
+                    dept_id: "$dept_id",
+                    location_id: "$location_id",
+                    role_id: "$role_id",
+                    sitting_id: "$sitting_id",
+                    image: "$image",
+                    job_type: "$job_type",
+                    PersonalNumber: "PersonalNumber",
+                    Report_L1: "$Report_L1",
+                    Report_L2: "$Report_L2",
+                    Report_L3: "$Report_L3",
+                    PersonalEmail: "$PersonalEmail",
+                    level: "$level",
+                    joining_date:"$joining_date",
+                    releaving_date: "$releaving_date",
+                    room_id: "$room_id",
+                    UID: "$UID",
+                    pan: "$pan",
+                    highest_upload: "$highest_upload",
+                    other_upload: "$other_upload",
+                    salary: "$salry",
+                    SpokenLanguages: "$SpokenLanguages",
+                    Gender: "$Gender",
+                    Nationality: "$Nationality",
+                    DOB: "$DOB",
+                    Age: "$Age",
+                    fatherName: "$fatherName",
+                    motherName: "$motherName",
+                    Hobbies:"$Hobbies",
+                    BloodGroup: "$BloodGroup",
+                    MartialStatus: "$MartialStatus",
+                    DateOfMarriage: "$DateOfMarriage",
+                    onboard_status: "$onboard_status",
+                    tbs_applicable: "$tbs_applicable",
+                    tds_per: "$tds_per",
+                    image_remark: "$image_remark",
+                    image_validate: "$image_validate",
+                    uid_remark: "$uid_remark",
+                    uid_validate: "$uid_validate",
+                    pan_remark:"$pan_remark" ,
+                    pan_validate: "$pan_validate",
+                    highest_upload_remark: "$highest_upload_remark",
+                    highest_upload_validate: "$highest_upload_validate",
+                    other_upload_remark:"$other_upload_remark",
+                    other_upload_validate:"$other_upload_validate" ,
+                    user_status: "$user_status",
+                    sub_dept_id: "$sub_dept_id",
+                    pan_no: "$pan_no",
+                    uid_no: "$uid_no",
+                    spouse_name: "$spouse_name",
+                    highest_qualification_name: "$highest_qualification_name",
+                    tenth_marksheet: "$tenth_marksheet",
+                    twelveth_marksheet: "$twelveth_marksheet",
+                    UG_Marksheet: "$UG_Marksheet",
+                    passport: "$passport",
+                    pre_off_letter: "$pre_off_letter",
+                    pre_expe_letter: "$pre_expe_letter",
+                    pre_relieving_letter: "$pre_relieving_letter",
+                    bankPassBook_Cheque: "$bankPassBook_Cheque",
+                    tenth_marksheet_validate: "$tenth_marksheet_validate",
+                    twelveth_marksheet_validate: "$twelveth_marksheet_validate",
+                    UG_Marksheet_validate: "$UG_Marksheet_validate",
+                    passport_validate: "$passport_validate",
+                    pre_off_letter_validate: "$pre_off_letter_validate",
+                    pre_expe_letter_validate: "$pre_expe_letter_validate",
+                    pre_relieving_letter_validate: "$pre_relieving_letter_validate",
+                    bankPassBook_Cheque_validate: "$bankPassBook_Cheque_validate",
+                    tenth_marksheet_validate_remark: "$tenth_marksheet_validate_remark",
+                    twelveth_marksheet_validate_remark: "$twelveth_marksheet_validate_remark",
+                    UG_Marksheet_validate_remark: "$UG_Marksheet_validate_remark",
+                    passport_validate_remark: "$passport_validate_remark",
+                    pre_off_letter_validate_remark: "$pre_off_letter_validate_remark",
+                    pre_expe_letter_validate_remark: "$pre_expe_letter_validate_remark",
+                    pre_relieving_letter_validate_remark: "$pre_relieving_letter_validate_remark",
+                    bankPassBook_Cheque_validate_remark: "$bankPassBook_Cheque_validate_remark",
+                    current_address: "$current_address",
+                    current_city: "$current_city",
+                    current_state: "$current_state",
+                    current_pin_code: "$current_pin_code",
+                    permanent_address: "$permanent_address",
+                    permanent_city: "$permanent_city",
+                    permanent_state: "$permanent_state",
+                    permanent_pin_code: "$permanent_pin_code",
+                    joining_date_extend: "$joining_date_extend",
+                    joining_date_extend_status: "$joining_date_extend_status",
+                    joining_date_extend_reason: "$joining_date_extend_reason",
+                    joining_extend_document: "$joining_extend_document",
+                    invoice_template_no: "$invoice_template_no",
+                    userSalaryStatus: "$userSalaryStatus",
+                    digital_signature_image: "$digital_signature_image",
+                    department_name: "$departmet.dept_name",
+                    Role_name: "$role.Role_name",
+                    report: "$reportTo.user_name",
+                    Report_L1N: "$reportL1.user_name",
+                    Report_L2N: "$reportL2.user_name",
+                    Report_L3N: "$reportL3.user_name",
+                    designation_name: "$designation.desi_name",
+                    image_url: { $concat: [ImageUrl, '$image'] },
+                    UID_url: { $concat: [ImageUrl, '$UID'] },
+                    pan_url: { $concat: [ImageUrl, '$pan'] },
+                    highest_upload_url: { $concat: [ImageUrl, '$highest_upload'] },
+                    other_upload_url: { $concat: [ImageUrl, '$other_upload'] },
+                    tenth_marksheet_url: { $concat: [ImageUrl, '$tenth_marksheet'] },
+                    twelveth_marksheet_url: { $concat: [ImageUrl, '$twelveth_marksheet'] },
+                    UG_Marksheet_url: { $concat: [ImageUrl, '$UG_Marksheet'] },
+                    passport_url: { $concat: [ImageUrl, '$passport'] },
+                    pre_off_letter_url: { $concat: [ImageUrl, '$pre_off_letter'] },
+                    pre_expe_letter_url: { $concat: [ImageUrl, '$pre_expe_letter'] },
+                    pre_relieving_letter_url: { $concat: [ImageUrl, '$pre_relieving_letter'] },
+                    bankPassBook_Cheque_url: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
+                    joining_extend_document_url: { $concat: [ImageUrl, '$joining_extend_document'] }
                 }
             }
-            // ,{
-            //     $replaceRoot: {
-            //         newRoot: "$$ROOT"
-            //     }
-            // }
         ]).exec();
         res.status(200).send(singlesim[0])
     } catch (err) {
@@ -992,8 +1094,8 @@ exports.allUserAuthDetail = async (req, res) => {
             {
                 $lookup: {
                     from: 'usermodels',
-                    localField: 'user_id',
-                    foreignField: 'Juser_id',
+                    localField: 'Juser_id',
+                    foreignField: 'user_id',
                     as: 'user'
                 }
             },
@@ -1013,6 +1115,7 @@ exports.allUserAuthDetail = async (req, res) => {
             },
             {
                 $project: {
+                    auth_id:"$auth_id",
                     user_name: '$user.user_name',
                     obj_name: "$object.obj_name",
                     id: "$_id",
