@@ -564,6 +564,7 @@ router.get(
   attendance.getSalaryCountByYear
 );
 router.get("/get_total_salary", attendance.totalSalary)
+router.get("/get_all_dept_with_wfh", attendance.allDeptWithWfh)
 router.put("/update_salary", attendance.updateSalary)
 router.put("/update_attendence_status", attendance.updateAttendenceStatus)
 router.get("/get_month_year_data", attendance.getMonthYearData)
