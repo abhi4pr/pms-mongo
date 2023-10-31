@@ -32,7 +32,8 @@ const userAuthModel = new mongoose.Schema({
     },
     delete_flag:{
         type: Number,
-        required: false
+        required: false,
+        default: 0
     },
     creation_date:{
         type: Date,

@@ -9,18 +9,15 @@ const kraTransModel = new mongoose.Schema({
     },
     user_to_id: {
         type: Number,
-        required: true,
-        unique: true,
+        required: true
     },
     user_from_id: {
         type: Number,
-        required: true,
-        unique: true,
+        required: true
     },
     job_responsibility_id: {
         type: Number,
-        required: true,
-        unique: true,
+        required: true
     },
     remark: {
         type: String,
