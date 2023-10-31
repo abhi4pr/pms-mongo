@@ -17,7 +17,7 @@ const hashTagSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  keyword: {
+  campaign_id: {
     type: Number
   },
 

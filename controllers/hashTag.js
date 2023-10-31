@@ -2,7 +2,7 @@ const hashTagSchema = require("../models/hashTagModel");
 
 exports.addHashTag = async (req, res) => {
   try {
-    const { hash_tag, tag, keyword } = req.body;
+    const { hash_tag, tag, campaign_id } = req.body;
     let check = await hashTagSchema.findOne({
       hash_tag: hash_tag.toLowerCase().trim(),
     });
@@ -15,7 +15,7 @@ exports.addHashTag = async (req, res) => {
     const hashTagObj = new hashTagSchema({
       hash_tag,
       tag,
-      keyword,
+      campaign_id,
     });
 
     const savedHashTag = await hashTagObj.save();
@@ -45,7 +45,7 @@ exports.getHashTags = async (req, res) => {
 
 exports.editHashTag = async (req, res) => {
   try {
-    const { hash_tag_id, hash_tag, tag, keyword } = req.body;
+    const { hash_tag_id, hash_tag, tag, campaign_id } = req.body;
     let check = await hashTagSchema.findOne({
       hash_tag: hash_tag.toLowerCase().trim(),
       hash_tag_id: { $ne: hash_tag_id },
@@ -62,7 +62,7 @@ exports.editHashTag = async (req, res) => {
         $set: {
           hash_tag,
           tag,
-          keyword,
+          campaign_id,
         },
       },
       { new: true }

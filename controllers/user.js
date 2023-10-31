@@ -1394,7 +1394,7 @@ exports.sendUserMail = async (req, res) => {
 
 exports.getUserByDeptAndWFH = async (req, res) => {
     try {
-        const delv = await userModel.find({ dept_id: req.params.dept_id, job_type: 'wfh' })
+        const delv = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFH' })
         if (!delv) {
             res.status(500).send({ success: false })
         }
