@@ -1187,60 +1187,34 @@ exports.getSingleUserAuthDetail = async (req, res) => {
             {
                 $unwind: '$object'
             },
-            // {
-            //     $lookup: {
-            //         from: 'usermodels',
-            //         localField: 'user_id',
-            //         foreignField: 'Juser_id',
-            //         as: 'user'
-            //     }
-            // },
-            // {
-            //     $unwind: '$user'
-            // },
-            // {
-            //     $lookup: {
-            //         from: 'objectmodels',
-            //         localField: 'obj_id',
-            //         foreignField: 'obj_id',
-            //         as: 'object'
-            //     }
-            //  },
-            // {
-            //     $unwind: '$object'
-            // },
-            // {
-            //     $lookup: {
-            //         from: 'departmentmodels',
-            //         localField: 'object.dept_id',
-            //         foreignField: 'dept_id',
-            //         as: 'department'
-            //     }
-            // },
-            // {
-            //     $unwind: '$department'
-            // },
             {
-                $project: {
-                    auth_id: "$auth_id",
-                    Juser_id: '$Juser_id',
-                    obj_name: '$object.obj_name',
-                    obj_id: '$obj_id',
-                    insert: '$insert',
-                    view: '$view',
-                    update: '$update',
-                    delete_flag: '$delete_flag'
+                $group: {
+                    _id: '$obj_id', 
+                    auth_id: { $first: '$auth_id' },
+                    Juser_id: { $first: '$Juser_id' },
+                    obj_name: { $first: '$object.obj_name' },
+                    obj_id: { $first: '$obj_id' },
+                    insert_value: { $first: '$insert' },
+                    view_value: { $first: '$view' },
+                    update_value: { $first: '$update' },
+                    delete_flag_value: { $first: '$delete_flag' }
                 }
+            },
+            {
+                $sort: { obj_id: 1 } 
             }
-        ]).exec();
-        if (!delv) {
-            res.status(500).send({ success: false })
+        ]);
+
+        if (delv.length === 0) {
+            return res.status(404).send({ success: false, message: 'User not found' });
         }
-        res.status(200).send(delv)
+
+        res.status(200).send(delv);
     } catch (err) {
-        res.status(500).send({ error: err.message, sms: 'error getting user auth details' })
+        console.error(err);
+        res.status(500).send({ error: err.message, message: 'Error getting user auth details' });
     }
-}
+};
 
 
 exports.userObjectAuth = async (req, res) => {

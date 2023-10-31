@@ -25,6 +25,9 @@ const keywordSchema = new mongoose.Schema({
     type: Number,
     default:0
   },
+  status: {
+    type: Number
+  },
   updatedAt: {
     type: Date
   },

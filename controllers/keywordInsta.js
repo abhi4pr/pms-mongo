@@ -2,7 +2,7 @@ const keywordSchema = require("../models/keywordModel");
 
 exports.addKeyword = async (req, res) => {
   try {
-    const { keyword, createdBy } = req.body;
+    const { keyword, createdBy,status } = req.body;
     let check = await keywordSchema.findOne({
       keyword: keyword.toLowerCase().trim(),
     });
@@ -15,6 +15,7 @@ exports.addKeyword = async (req, res) => {
     const keywordObj = new keywordSchema({
       keyword,
       createdBy,
+      status
     });
 
     const savedKeyword = await keywordObj.save();
@@ -64,7 +65,7 @@ exports.getKeyword = async (req, res) => {
 
 exports.editKeyword = async (req, res) => {
   try {
-    const { keywordId, keyword, updatedBy } = req.body;
+    const { keywordId, keyword, updatedBy,status } = req.body;
     let check = await keywordSchema.findOne({
       keyword: keyword.toLowerCase().trim(),
       keywordId: { $ne: keywordId },
@@ -82,6 +83,7 @@ exports.editKeyword = async (req, res) => {
           keyword,
           updatedBy,
           updatedAt: Date.now(),
+          status
         },
       },
       { new: true }

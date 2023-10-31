@@ -172,7 +172,7 @@ exports.getRooms = async (req, res) => {
         $project: {
           _id: 1,
           room_id: "$room_id",
-          sitting_ref_no: "$Sitting_ref_no",
+          sitting_ref_no: "$sitting_ref_no",
           roomImage: "$roomImage",
           remarks: "$remarks",
           creation_date: "$creation_date",
