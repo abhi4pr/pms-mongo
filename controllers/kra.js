@@ -4,7 +4,6 @@ const jobResponsibilityModel = require("../models/jobResponsibilityModel.js");
 
 exports.addKra = async (req, res) => {
     try {
-        // console.log("body",req.body);
         const krac = new kraTransModel({
             user_to_id: parseInt(req.body.user_to_id),
             user_from_id: parseInt(req.body.user_from_id),
@@ -15,12 +14,10 @@ exports.addKra = async (req, res) => {
         })
 
         const krav = await krac.save();
-        console.log("data",krav);
         const kraTrans = await jobResponsibilityModel.updateOne(
             { Job_res_id: parseInt(req.body.Job_res_id) },
             { $set: { user_id: parseInt(req.body.user_to_id) } }
           );
-          console.log("data1",kraTrans);
         res.status(200).send(krav);
     } catch (err) {
         res.status(500).send({ error: err, sms: 'This kra cannot be created' })

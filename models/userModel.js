@@ -479,6 +479,17 @@ const userModel = new mongoose.Schema({
         type: String,
         required: false,
         default: ""
+    },
+    userSalaryStatus: {
+        type: Number,
+        required: false,
+        default:0
+    },
+    digital_signature_image:{
+        type: String,
+        required: false,
+        default:""
+
     }
 });
 
