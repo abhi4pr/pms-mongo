@@ -117,8 +117,8 @@ exports.getObjectMasts = async (req, res) => {
       {
         $lookup: {
           from: "departmentmodels",
-          localField: "dept_id",
-          foreignField: "Dept_id",
+          localField: "Dept_id",
+          foreignField: "dept_id",
           as: "data",
         },
       },

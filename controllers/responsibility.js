@@ -33,6 +33,7 @@ exports.getJobResposibilities = async (req, res) => {
             {
                 $project: {
                     _id: 1,
+                    Job_res_id:"$Job_res_id",
                     user_name: '$user.user_name',
                     description: '$description',
                     sjob_responsibility: '$sjob_responsibility',

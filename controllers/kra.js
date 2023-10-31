@@ -4,7 +4,7 @@ const jobResponsibilityModel = require("../models/jobResponsibilityModel.js");
 
 exports.addKra = async (req, res) => {
     try {
-        console.log("body",req.body);
+        // console.log("body",req.body);
         const krac = new kraTransModel({
             user_to_id: parseInt(req.body.user_to_id),
             user_from_id: parseInt(req.body.user_from_id),
@@ -15,11 +15,13 @@ exports.addKra = async (req, res) => {
         })
 
         const krav = await krac.save();
-       const kraTrans =  await jobResponsibilityModel.updateOne(
-            { Job_res_id: Job_res_id },
-            { user_id: user_to_id }
-        );
-        res.status(200).send(krav, "KRA added and user_id updated successfully");
+        console.log("data",krav);
+        const kraTrans = await jobResponsibilityModel.updateOne(
+            { Job_res_id: parseInt(req.body.Job_res_id) },
+            { $set: { user_id: parseInt(req.body.user_to_id) } }
+          );
+          console.log("data1",kraTrans);
+        res.status(200).send(krav);
     } catch (err) {
         res.status(500).send({ error: err, sms: 'This kra cannot be created' })
     }
@@ -29,7 +31,6 @@ exports.addKra = async (req, res) => {
 exports.getJobResponById = async (req, res) => {
     try {
         const user_id = req.params.user_id;
-        console.log("userId",user_id);
         const ImageUrl = 'http://34.93.135.33:8080/uploads/';
         const userJobResponsi = await jobResponsibilityModel.aggregate([
             {
@@ -74,7 +75,6 @@ exports.getJobResponById = async (req, res) => {
                 }
             },
         ]);
-        console.log("data",userJobResponsi);
         res.status(200).send(userJobResponsi);
     } catch (error) {
         res.status(500).send({error:err.message,sms:'Error getting all kras'})
