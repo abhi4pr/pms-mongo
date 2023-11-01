@@ -396,9 +396,16 @@ exports.creatorNameCount = async (req, res) => {
 exports.getPostsFromName = async (req, res) => {
     try {
         const creatorName = req.body.creatorName;
+        const page = req.query.page || 1; 
+        const perPage = req.query.perPage || 50; 
+        const skip = (page - 1) * perPage;
+
         const getPosts = await instaP
-            .find({ creatorName: creatorName })
-            .sort({ postedOn: -1 });
+            .find({ creatorName: creatorName, posttype_decision: req.body.posttype_decision })
+            .sort({ postedOn: -1 })
+            .skip(skip)
+            .limit(perPage);
+
         if (!getPosts || getPosts.length == 0) {
             res.status(404).send({
                 success: false,
