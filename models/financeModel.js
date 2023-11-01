@@ -8,9 +8,9 @@ const financeModel = new mongoose.Schema({
         required: true
     },
     status_: { 
-        type: Boolean,
+        type: Number,
         required: false,
-        default: "",
+        default: 0,
     },
     reason: {
         type: String,
@@ -28,7 +28,8 @@ const financeModel = new mongoose.Schema({
     },
     screenshot:{
         type: String,
-        required: false
+        required: false,
+        default:""
     },
     attendence_id:{
         type: Number,
@@ -36,13 +37,16 @@ const financeModel = new mongoose.Schema({
     },
     reference_no:{
         type: Number,
-        required: false
+        required: false,
+        default:0
     },
     amount:{
-        type: Schema.Types.Decimal128,
+        type:Number,
+        default:0
     },
     pay_date:{
-        type: Date
+        type: Date,
+        default:""
     }
 });
 
