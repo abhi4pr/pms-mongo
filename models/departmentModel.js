@@ -16,7 +16,7 @@ const departmentModel = new mongoose.Schema({
     required: false,
     default: "",
   },
-  Created_date: {
+  Creation_date: {
     type: Date,
     default: Date.now,
   },

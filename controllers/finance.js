@@ -6,7 +6,7 @@ exports.addFinance = async (req, res) =>{
             status_: req.body.status_,
             reason: req.body.reason,
             remark: req.body.remark,
-            screenshot: req.file.filename,
+            screenshot: req.file?.filename,
             attendence_id: req.body.attendence_id,
             reference_no: req.body.reference_no,
             amount: req.body.amount,
@@ -15,7 +15,7 @@ exports.addFinance = async (req, res) =>{
         const simv = await simc.save();
         res.send({simv,status:200});
     } catch(err){
-        res.status(500).send({error:err,sms:'This finance cannot be created'})
+        res.status(500).send({error:err.message,sms:'This finance cannot be created'})
     }
 };
 
