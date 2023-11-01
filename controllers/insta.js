@@ -304,6 +304,11 @@ exports.creatorNameCount = async (req, res) => {
                 $group: {
                     _id: "$creatorName",
                     index: { $first: "$_id" },
+                    decision_11_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 11] }, then: 1, else: 0 }
+                        }
+                    },
                     decision_2_count: {
                         $sum: {
                             $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}

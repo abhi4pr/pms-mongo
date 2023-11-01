@@ -11,6 +11,9 @@ const attendanceModel = require('../models/attendanceModel.js');
 const objModel = require('../models/objModel.js');
 const constant = require('../common/constant.js');
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+const ejs = require('ejs');
+const nodemailer = require("nodemailer");
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "image", maxCount: 1 },
@@ -1371,7 +1374,7 @@ exports.sendUserMail = async (req, res) => {
             res.sendStatus(200);
         }
     } catch (error) {
-        res.sendStatus(500);
+        res.status(500).send({ error: error.message, sms: 'error sending to email' });
     }
 }
 
