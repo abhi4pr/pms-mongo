@@ -36,7 +36,7 @@ const financeModel = new mongoose.Schema({
     },
     reference_no:{
         type: Number,
-        required: true
+        required: false
     },
     amount:{
         type: Schema.Types.Decimal128,

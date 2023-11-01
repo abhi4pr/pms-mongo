@@ -7,17 +7,54 @@ async function doesUserExistInAttendance(userId, month, year) {
     return results.length > 0;
 }
 
+function monthNameToNumber(monthName) {
+    const months = [
+      "January", "February", "March", "April",
+      "May", "June", "July", "August",
+      "September", "October", "November", "December"
+    ];
+  
+    const monthIndex = months.findIndex(m => m.toLowerCase() === monthName.toLowerCase());
+  
+    // Adding 1 because months are zero-indexed in JavaScript (0-11)
+    return monthIndex !== -1 ? monthIndex + 1 : null;
+  }
+
 exports.addAttendance = async (req, res) => {
     try {
+        const {
+            dept,
+            user_id,
+            noOfabsent,
+            month,
+            year,
+            bonus,
+            remark,
+            created_by,
+            salary_deduction,
+            attendence_status,
+            salary_status,
+          } = req.body;
+      
+          const Dept = dept || "";
+          const User_id = user_id || "";
+          const No_of_absent = noOfabsent || 0;
+          const Month = month || "";
+          const Year = year || "";
+          const Bonus = bonus || 0;
+          const Remark = remark || "";
+      
+          const created_By = created_by ? parseInt(created_by) : 0;
+          const creation_date = new Date();
         const check1 = await attendanceModel.find({
-            user_id: req.body.user_id,
+            user_id: parseInt(req.body.user_id),
             month: req.body.month,
-            year: req.body.year
+            year: parseInt(req.body.year)
         })
         if (check1.length == 0) {
-            const check2 = await userModels.find({
+            const check2 = await userModel.find({
                 job_type: 'WFH',
-                dept: req.body.dept_id
+                dept_id: parseInt(req.body.dept)
             })
 
             for (const user of check2) {
@@ -52,9 +89,9 @@ exports.addAttendance = async (req, res) => {
                     const ToPay = netSalary - tdsDeduction;
 
                     const creators = new attendanceModel({
-                        dept: req.body.dept_id,
-                        user_id: req.body.user_id,
-                        user_name: req.body.user_name,
+                        dept: user.dept_id,
+                        user_id:user.user_id,
+                        user_name: user.user_name,
                         noOfabsent: 0,
                         month: req.body.month,
                         year: req.body.year,
@@ -66,29 +103,47 @@ exports.addAttendance = async (req, res) => {
                         remark: '',
                         created_by: req.body.user_id
                     });
+                    // const creators = new attendanceModel({
+                    //     dept: req.body.dept,
+                    //     user_id: req.body.user_id,
+                    //     user_name: req.body.user_name,
+                    //     noOfabsent: 0,
+                    //     month: req.body.month,
+                    //     year: req.body.year,
+                    //     bonus: 0,
+                    //     total_salary: user.salary,
+                    //     tds_deduction: tdsDeduction,
+                    //     net_salary: netSalary,
+                    //     toPay: ToPay,
+                    //     remark: '',
+                    //     created_by: req.body.user_id
+                    // });
                     const instav = await creators.save();
                 }
             }
         } else if (req.body.user_id == check1[0].user_id && req.body.month == check1[0].month && req.body.year == check1[0].year) {
-            const check3 = await attendanceModel.find({
+            
+            const results4 = await userModel.find({
                 job_type: 'WFH',
-                user_id: req.body.user_id
+                user_id: parseInt(req.body.user_id)
             })
 
             const perdaysal = results4[0].salary / 30;
             const totalSalary = perdaysal * (30 - noOfabsent);
-            const netSalary = totalSalary + bonus;
+            const netSalary = bonus ? totalSalary + bonus : totalSalary;
+           
             const tdsDeduction = netSalary * (results4[0].tds_per) / 100;
+            
             const ToPay = netSalary - tdsDeduction;
 
-            const editsim = await attendanceModel.findOneAndUpdate({ attendence_id: check1.attendence_id }, {
-                dept: req.body.dept_id,
+            const editsim = await attendanceModel.findOneAndUpdate({ attendence_id: parseInt(check1[0].attendence_id) }, {
+                dept: req.body.dept,
                 user_id: req.body.user_id,
                 // user_name: req.body.user_name,
-                noOfabsent: req.body.noOfabsent,
+                noOfabsent: No_of_absent,
                 month: req.body.month,
                 year: req.body.year,
-                bonus: req.body.bonus,
+                bonus: Bonus,
                 total_salary: totalSalary,
                 tds_deduction: tdsDeduction,
                 net_salary: netSalary,
@@ -96,9 +151,9 @@ exports.addAttendance = async (req, res) => {
                 remark: req.body.remark
             }, { new: true })
         } else {
-            const check4 = await userModels.find({
+            const check4 = await userModel.find({
                 job_type: 'WFH',
-                dept: req.body.dept_id
+                dept_id: parseInt(req.body.dept)
             })
 
             for (const user of check4) {
@@ -120,12 +175,12 @@ exports.addAttendance = async (req, res) => {
                     work_days = 30;
                 }
 
-                const userExistsInAttendance = await doesUserExistInAttendance(
-                    user.user_id,
-                    req.body.month,
-                    req.body.year
-                );
-                if (!userExistsInAttendance) {
+                // const userExistsInAttendance = await doesUserExistInAttendance(
+                //     user.user_id,
+                //     req.body.month,
+                //     req.body.year
+                // );
+                // if (!userExistsInAttendance) {
                     const presentDays = work_days - 0;
                     const perdaysal = user.salary / 30;
                     const totalSalary = perdaysal * presentDays;
@@ -134,9 +189,9 @@ exports.addAttendance = async (req, res) => {
                     const ToPay = netSalary - tdsDeduction;
 
                     const creators = new attendanceModel({
-                        dept: req.body.dept_id,
-                        user_id: req.body.user_id,
-                        user_name: req.body.user_name,
+                        dept: user.dept_id,
+                        user_id: user.user_id,
+                        user_name: user.user_name,
                         noOfabsent: 0,
                         month: req.body.month,
                         year: req.body.year,
@@ -148,14 +203,30 @@ exports.addAttendance = async (req, res) => {
                         remark: '',
                         created_by: req.body.user_id
                     });
+                    // const creators = new attendanceModel({
+                    //     dept: req.body.dept,
+                    //     user_id: req.body.user_id,
+                    //     user_name: req.body.user_name,
+                    //     noOfabsent: 0,
+                    //     month: req.body.month,
+                    //     year: req.body.year,
+                    //     bonus: 0,
+                    //     total_salary: user.salary,
+                    //     tds_deduction: tdsDeduction,
+                    //     net_salary: netSalary,
+                    //     toPay: ToPay,
+                    //     remark: '',
+                    //     created_by: req.body.user_id
+                    // });
                     const instav = await creators.save();
-                }
+                // }
             }
         }
 
-        res.send({ instav, status: 200 });
+        res.send({  status: 200 });
     } catch (error) {
-        res.status(500).send({ error: error, sms: "error while adding data" });
+        console.log(error)
+        res.status(500).send({ error: error.message, sms: "error while adding data" });
     }
 };
 
@@ -166,9 +237,9 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
             {
                 $match:
                 {
-                    dept: req.body.dept_id,
+                    dept: parseInt(req.body.dept_id),
                     month: req.body.month,
-                    year: req.body.year
+                    year: parseInt(req.body.year)
                 }
             },
             {
@@ -261,7 +332,7 @@ exports.getSalaryByFilter = async (req, res) => {
         } else {
             const getcreators = await attendanceModel.aggregate([
                 {
-                    $match: { dept: req.body.dept }
+                    $match: { dept: parseInt(req.body.dept) }
                 },
                 {
                     $lookup: {
@@ -293,7 +364,7 @@ exports.getSalaryByFilter = async (req, res) => {
                     }
                 }
             ]).exec();
-            res.status(200).send(getcreators);
+            res.status(200).send({data:getcreators});
         }
     } catch (err) {
         res.status(500).send({ error: err, sms: "Error getting salary from dept id" });
@@ -309,8 +380,8 @@ exports.getSalaryByUserId = async (req, res) => {
             {
                 $lookup: {
                     from: 'departmentmodels',
-                    localField: 'dept_id',
-                    foreignField: 'dept',
+                    localField: 'dept',
+                    foreignField: 'dept_id',
                     as: 'department'
                 }
             },
@@ -367,7 +438,7 @@ exports.getSalaryByUserId = async (req, res) => {
         if (!getcreators) {
             res.status(500).send({ success: false });
         }
-        res.status(200).send(getcreators);
+        res.status(200).send({data:getcreators});
     } catch (err) {
         res.status(500).send({ error: err, sms: "Error getting salary of user" });
     }
@@ -389,8 +460,8 @@ exports.getSalaryCountByDeptYear = async (req, res) => {
         const getCount = await attendanceModel.aggregate([
             {
                 $match: {
-                    dept: req.body.dept,
-                    year: currentYear
+                    dept: parseInt(req.body.dept),
+                    year: parseInt(currentYear)
                 }
             },
             {
@@ -407,7 +478,7 @@ exports.getSalaryCountByDeptYear = async (req, res) => {
                 }
             }
         ]).exec();
-        res.status(200).send(getCount);
+        res.status(200).send({data:getCount});
     } catch (err) {
         res.status(500).send({ error: err, sms: "Error getting salary count by dept and year" });
     }
@@ -514,7 +585,8 @@ exports.getMonthYearData = async (req, res) => {
         },
         ];
 
-        const dbResult = await attendanceModel.aggregate(aggregationPipeline).toArray();
+        const dbResult = await attendanceModel.aggregate(aggregationPipeline);
+        // const dbResult = await attendanceModel.aggregate(aggregationPipeline).toArray();
 
         const dbSet = new Set(dbResult.map((item) => `${item._id.month}-${item._id.year}`));
 
@@ -534,11 +606,13 @@ exports.getMonthYearData = async (req, res) => {
 
 exports.getDistinctDepts = async (req, res) => {
     try {
-        const editsim = await attendanceModel.distinct('dept',{ 
-            month: req.body.month,
-            year: req.body.year
-        })
-        res.status(200).send(editsim)
+        const distinctDepts = await attendanceModel.distinct('dept', {
+        month: req.body.month,
+        year: req.body.year
+    });
+    const result = distinctDepts.map(dept => ({ dept }));
+
+    res.status(200).send(result);
     } catch (error) {
         return res.send({error:error.message, status:500, sms:"error getting distinct depts"})
     }
