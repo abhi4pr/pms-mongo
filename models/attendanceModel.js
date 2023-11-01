@@ -36,11 +36,13 @@ const attendanceModel = new mongoose.Schema({
     },
     Created_by:{
         type: Number,
-        required: false
+        required: false,
+        default:0
     },
     Last_updated_by:{
         type: Number,
-        required: false
+        required: false,
+        default:""
     },
     Last_updated_date:{
         type: Date,
@@ -76,6 +78,31 @@ const attendanceModel = new mongoose.Schema({
     toPay:{
         type: Number,
         required: false
+    },
+    attendence_generated:{
+        type: Number,
+        required: false,
+        default:0
+    },
+    attendence_status:{
+        type: Number,
+        required: false,
+        default:0
+    },
+    salary_status:{
+        type: Number,
+        required: false,
+        default:0
+    },
+    salary_deduction:{
+        type: Number,
+        required: false,
+        default:0
+    },
+    salary:{
+        type: Number,
+        required: false,
+        default:0
     },
     sendToFinance:{
         type: Number,
