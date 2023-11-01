@@ -27,6 +27,7 @@ const upload = multer({ dest: "uploads/" }).fields([
     { name: "pre_relieving_letter", maxCount: 1 },
     { name: "bankPassBook_Cheque", maxCount: 1 },
     { name: "joining_extend_document", maxCount: 1 },
+    { name: "digital_signature_image", maxCount: 1 }
 ]);
 
 exports.addUser = [upload, async (req, res) => {
@@ -131,7 +132,9 @@ exports.addUser = [upload, async (req, res) => {
             pre_expe_letter: req.file ? req.files.pre_expe_letter[0].filename : '',
             pre_relieving_letter: req.file ? req.files.pre_relieving_letter[0].filename : '',
             bankPassBook_Cheque: req.file ? req.files.bankPassBook_Cheque[0].filename : '',
-            joining_extend_document: req.file ? req.files.joining_extend_document[0].filename : ''
+            joining_extend_document: req.file ? req.files.joining_extend_document[0].filename : '',
+            digital_signature_image:req.file ? req.files.digital_signature_image[0].filename : '',
+            userSalaryStatus: req.body.userSalaryStatus
         })
         const simv = await simc.save();
 
@@ -171,32 +174,32 @@ exports.addUser = [upload, async (req, res) => {
 
         for (const object of objects) {
             const objectId = object.obj_id;
-            let insertValue = 0;
-            let viewValue = 0;
-            let updateValue = 0;
-            let deleteValue = 0;
+            let insert = 0;
+            let view = 0;
+            let update = 0;
+            let delete_flag = 0;
 
             if (simv.role_id === 1) {
-                insertValue = 1;
-                viewValue = 1;
-                updateValue = 1;
-                deleteValue = 1;
+                insert = 1;
+                view = 1;
+                update = 1;
+                delete_flag = 1;
             }
 
             const userAuthDocument = {
                 Juser_id: simv.user_id,
                 obj_id: objectId,
-                insert_value: insertValue,
-                view_value: viewValue,
-                update_value: updateValue,
-                delete_flag_value: deleteValue,
+                insert: insert,
+                view: view,
+                update: update,
+                delete_flag: delete_flag,
                 creation_date: new Date(),
                 created_by: simv.created_by || 0,
                 last_updated_by: simv.created_by || 0,
                 last_updated_date: new Date(),
             };
 
-            await userAuthModel.insertOne(userAuthDocument);
+            await userAuthModel.create(userAuthDocument);
         }
 
         res.send({ simv, status: 200 });
@@ -222,6 +225,7 @@ const upload1 = multer({ dest: "uploads/" }).fields([
     { name: "pre_relieving_letter", maxCount: 1 },
     { name: "bankPassBook_Cheque", maxCount: 1 },
     { name: "joining_extend_document", maxCount: 1 },
+    { name: "digital_signature_image", maxCount: 1 }
 ]);
 exports.updateUser = [upload1, async (req, res) => {
     try {
@@ -546,7 +550,7 @@ exports.getAllUsers = async (req, res) => {
                     invoice_template_no: "$invoice_template_no",
                     userSalaryStatus: "$userSalaryStatus",
                     digital_signature_image: "$digital_signature_image",
-                    department_name: "$departmet.dept_name",
+                    department_name: "$department.dept_name",
                     Role_name: "$role.Role_name",
                     report: "$reportTo.user_name",
                     Report_L1N: "$reportL1.user_name",
@@ -802,7 +806,8 @@ exports.getSingleUser = async (req, res) => {
                 }
             }
         ]).exec();
-        res.status(200).send(singlesim[0])
+        const result = singlesim[0];
+        res.status(200).send(result)
     } catch (err) {
         res.status(500).send({ error: err, sms: 'Error getting all users' })
     }
