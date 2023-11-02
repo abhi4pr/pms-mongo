@@ -269,6 +269,7 @@ exports.addAttendance = async (req, res) => {
 exports.getSalaryByDeptIdMonthYear = async (req, res) => {
   try {
     const imageUrl = "http://34.93.135.33:8080/uploads/";
+    
     const getcreators = await attendanceModel
       .aggregate([
         {
@@ -315,14 +316,20 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
         {
           $lookup: {
             from: "financemodels",
-            localField: "sendToFinance",
-            foreignField: "id",
+            localField: "attendence_id",
+            foreignField: "attendence_id",
             as: "finance",
           },
         },
+        // {
+        //   $unwind: "$finance",
+        // },
         {
-          $unwind: "$finance",
-        },
+          $unwind: {
+              path: "$finance",
+              preserveNullAndEmptyArrays: true
+          }
+      },
         {
           $project: {
             attendence_id: 1,
@@ -660,16 +667,17 @@ exports.updateSalary = async (req, res) => {
 
 exports.updateAttendenceStatus = async (req, res) => {
   try {
-    const editsim = await attendanceModel.findOneAndUpdate(
+    const editsim = await attendanceModel.updateMany(
       {
-        attendence_id: req.body.attendence_id,
         dept: req.body.dept,
         month: req.body.month,
         year: req.body.year,
       },
       {
-        attendence_generated: 1,
-        salary_status: 1,
+        $set: {
+          attendence_generated: 1,
+          salary_status: 1,
+        },
       },
       { new: true }
     );
@@ -970,9 +978,9 @@ exports.allAttendenceMastData = async (req, res) => {
     const results = await attendanceModel.aggregate([
       {
         $lookup: {
-          from: "dept",
-          localField: "dept",
-          foreignField: "dept_id",
+          from: "departmentmodels",
+          localField: "dept_id",
+          foreignField: "dept",
           as: "dept_data",
         },
       },
@@ -981,7 +989,7 @@ exports.allAttendenceMastData = async (req, res) => {
       },
       {
         $lookup: {
-          from: "user",
+          from: "usermodels",
           localField: "user_id",
           foreignField: "user_id",
           as: "user_data",
@@ -992,13 +1000,34 @@ exports.allAttendenceMastData = async (req, res) => {
       },
       {
         $project: {
-          _id: 0, // Exclude the _id field if not needed
-          // Map fields from the collections to the output
-          // Example: "dept_name": "$dept_data.dept_name"
+          attendence_id: 1,
+          dept: 1,
+          user_id: 1,
+          noOfabsent: 1,
+          year: 1,
+          remark: 1,
+          Creation_date: 1,
+          Created_by: 1,
+          Last_updated_by: 1,
+          Last_updated_date: 1,
+          month: 1,
+          bonus: 1,
+          total_salary: 1,
+          net_salary: 1,
+          tds_deduction: 1,
+          user_name: "$user_data.user_name",
+          toPay: 1,
+          sendToFinance: 1,
+          attendence_generated: 1,
+          // attendence_mastcol: 1,
+          attendence_status: 1,
+          salary_status: 1,
+          salary_deduction: 1,
+          salary: 1,
+          dept_name: "$dept_data.dept_name",
         },
       },
     ]);
-
     res.status(200).json(results);
   } catch (error) {
     console.error("Error querying MongoDB:", error.message);
@@ -1155,25 +1184,34 @@ exports.deptIdWithWfh = async (req, res) => {
             $cond: {
               if: {
                 $and: [
-                  { $eq: [{ $type: "$designation_data.last_updated_by" }, "missing"] },
-                ]
+                  {
+                    $eq: [
+                      { $type: "$designation_data.last_updated_by" },
+                      "missing",
+                    ],
+                  },
+                ],
               },
-              then: "", 
-              else: "$designation_data.last_updated_by" 
-            }
+              then: "",
+              else: "$designation_data.last_updated_by",
+            },
           },
           last_updated_at: {
             $cond: {
               if: {
                 $and: [
-                  { $eq: [{ $type: "$designation_data.last_updated_at" }, "missing"] },
-                ]
+                  {
+                    $eq: [
+                      { $type: "$designation_data.last_updated_at" },
+                      "missing",
+                    ],
+                  },
+                ],
               },
-              then: "", 
-              else: "$designation_data.last_updated_at" 
-            }
-          }
-          
+              then: "",
+              else: "$designation_data.last_updated_at",
+            },
+          },
         },
       },
     ]);
