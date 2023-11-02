@@ -461,7 +461,7 @@ exports.getAllUsers = async (req, res) => {
                     user_login_password: "$user_login_password",
                     user_report_to_id: "$user_report_to_id",
                     created_At: "$created_At",
-                    last_updated: "$last_updated",
+                    last_updated: "$lastupdated",
                     created_by: "$created_by",
                     user_contact_no: "$user_contact_no",
                     dept_id: "$dept_id",
@@ -483,7 +483,7 @@ exports.getAllUsers = async (req, res) => {
                     pan: "$pan",
                     highest_upload: "$highest_upload",
                     other_upload: "$other_upload",
-                    salary: "$salry",
+                    salary: "$salary",
                     SpokenLanguages: "$SpokenLanguages",
                     Gender: "$Gender",
                     Nationality: "$Nationality",
@@ -496,7 +496,7 @@ exports.getAllUsers = async (req, res) => {
                     MartialStatus: "$MartialStatus",
                     DateOfMarriage: "$DateOfMarriage",
                     onboard_status: "$onboard_status",
-                    tbs_applicable: "$tbs_applicable",
+                    tbs_applicable: "$tds_applicable",
                     tds_per: "$tds_per",
                     image_remark: "$image_remark",
                     image_validate: "$image_validate",
@@ -558,12 +558,14 @@ exports.getAllUsers = async (req, res) => {
                     report: "$reportTo.user_name",
                     Report_L1N: "$reportL1.user_name",
                     Report_L2N: "$reportL2.user_name",
-                    Report_L3N: "$reportL3.user_name",
+                    Report_L3N: {
+                        $arrayElemAt: ["$reportL3.user_name", 0]
+                    },
                     designation_name: "$designation.desi_name",
                     userSalaryStatus:'$userSalaryStatus',
                     digital_signature_image:"$digital_signature_image",
                     image_url: { $concat: [ImageUrl, '$image'] },
-                    UID_url: { $concat: [ImageUrl, '$UID'] },
+                    uid_url: { $concat: [ImageUrl, '$UID'] },
                     pan_url: { $concat: [ImageUrl, '$pan'] },
                     highest_upload_url: { $concat: [ImageUrl, '$highest_upload'] },
                     other_upload_url: { $concat: [ImageUrl, '$other_upload'] },
@@ -573,7 +575,7 @@ exports.getAllUsers = async (req, res) => {
                     passport_url: { $concat: [ImageUrl, '$passport'] },
                     pre_off_letter_url: { $concat: [ImageUrl, '$pre_off_letter'] },
                     pre_expe_letter_url: { $concat: [ImageUrl, '$pre_expe_letter'] },
-                    pre_relieving_letter_url: { $concat: [ImageUrl, '$pre_relieving_letter'] },
+                    Pre_relieving_letter_url: { $concat: [ImageUrl, '$pre_relieving_letter'] },
                     bankPassBook_Cheque_url: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
                     joining_extend_document_url: { $concat: [ImageUrl, '$joining_extend_document'] },
                     digital_signature_image_url:{$concat: [ImageUrl, '$digital_signature_image']}
@@ -693,7 +695,7 @@ exports.getSingleUser = async (req, res) => {
                     user_login_password: "$user_login_password",
                     user_report_to_id: "$user_report_to_id",
                     created_At: "$created_At",
-                    last_updated: "$last_updated",
+                    last_updated: "$lastupdated",
                     created_by: "$created_by",
                     user_contact_no: "$user_contact_no",
                     dept_id: "$dept_id",
@@ -715,7 +717,7 @@ exports.getSingleUser = async (req, res) => {
                     pan: "$pan",
                     highest_upload: "$highest_upload",
                     other_upload: "$other_upload",
-                    salary: "$salry",
+                    salary: "$salary",
                     SpokenLanguages: "$SpokenLanguages",
                     Gender: "$Gender",
                     Nationality: "$Nationality",
@@ -1433,11 +1435,22 @@ exports.getUserJobResponsibility = async (req, res) => {
 
 exports.getUserByDeptId = async (req, res) => {
     try {
-        const delv = await userModel.find({ dept_id: req.params.id })
+        const delv = await userModel.find({ dept_id: req.params.id }).lean();
         if (!delv) {
             res.status(500).send({ success: false })
         }
-        res.status(200).send(delv)
+        const modifiedUsers = delv.map(user => {
+            if (user.hasOwnProperty('lastupdated')) {
+                user.last_updated = user.lastupdated;
+                delete user.lastupdated;
+            }
+            if (user.hasOwnProperty('tds_applicable')) {
+                user.tbs_applicable = user.tds_applicable;
+                delete user.tds_applicable;
+            }
+            return user;
+        });
+        res.status(200).send(modifiedUsers)
     } catch (err) {
         res.status(500).send({ error: err, sms: 'error getting all users by dept id' })
     }
@@ -1765,12 +1778,25 @@ exports.sendMailAllWfoUser = async (req, res) => {
 
 exports.getAllWfhUsers = async (req, res) => {
     try {
-        const simc = await userModel.find({ job_type: 'WFH' });
-        if (!simc) {
-            res.status(500).send({ success: false })
+        const simc = await userModel.find({ job_type: 'WFH' }).lean();
+        if (simc.length === 0) {
+            res.status(500).send({ success: false , message :"No record found" })
         }
-        res.status(200).send({data:simc})
+        
+        const modifiedUsers = simc.map(user => {
+           
+            if (user.hasOwnProperty('lastupdated')) {
+                user.last_updated = user.lastupdated;
+                delete user.lastupdated;
+            }
+            if (user.hasOwnProperty('tds_applicable')) {
+                user.tbs_applicable = user.tds_applicable;
+                delete user.tds_applicable;
+            }
+            return user;
+        });
+        res.status(200).send({data:modifiedUsers})
     } catch(err){
-        res.status(500).send({error:err,sms:'Error getting all wfh users'})
+        res.status(500).send({error:err.message,sms:'Error getting all wfh users'})
     }
 };

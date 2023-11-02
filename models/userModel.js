@@ -245,6 +245,10 @@ const userModel = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    created_At: {
+        type: Date,
+        default: Date.now
+    },
     sub_dept_id: {
         type: Number,
         required: false,

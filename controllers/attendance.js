@@ -747,3 +747,189 @@ exports.deptWithWFH = async (req, res) => {
       res.status(500).send(err.message);
     }
   };
+
+ exports.leftEmployees = async (req, res) => {
+    const { dept_id, month, year } = req.body;
+  
+    try {
+      const results = await userModel.find({
+        dept_id: dept_id,
+        job_type: "WFH",
+      });
+  
+      let leftCount = 0;
+      const newLefts = [];
+  
+      for (const user of results) {
+        const convertDate = user.releaving_date;
+        const joiningMonth = String(convertDate.getUTCMonth() + 1).padStart(2, '0');
+        const joiningYear = String(convertDate.getUTCFullYear());
+  
+        const monthNumber = monthNameToNumber(month);
+  
+        const mergeJoining = parseInt(joiningMonth + joiningYear);
+        const mergeJoining1 = `${monthNumber}` + `${year}`;
+  
+        if (mergeJoining == mergeJoining1) {
+          leftCount++;
+          newLefts.push({ user_name: user.user_name });
+        }
+      }
+  
+      if (leftCount >= 0) {
+        res.json({ leftEmployees: leftCount, UserLefts: newLefts });
+      } else {
+        res.send("No left employee");
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+  
+  exports.newJoiners = async (req, res) => {
+    const { dept_id, month, year } = req.body;
+  
+    try {
+      // Use Mongoose to query the MongoDB collection
+      const results = await userModel.find({
+        dept_id: dept_id,
+        job_type: "WFH",
+      });
+  
+      let newJoinersCount = 0;
+      const newJoiners = [];
+  
+      for (const user of results) {
+        const convertDate = user.joining_date;
+        const joiningMonth = String(convertDate.getUTCMonth() + 1).padStart(2, '0');
+        const joiningYear = String(convertDate.getUTCFullYear());
+  
+        const monthNumber = monthNameToNumber(month);
+  
+        const mergeJoining = parseInt(joiningMonth + joiningYear);
+        const mergeJoining1 = `${monthNumber}` + `${year}`;
+  
+        if (mergeJoining == mergeJoining1) {
+          newJoinersCount++;
+          newJoiners.push({ user_name: user.user_name });
+        }
+      }
+  
+      if (newJoinersCount > 0) {
+        res.json({ NewJoiners: newJoinersCount, NewUsers: newJoiners });
+      } else {
+        res.send("No new joiners");
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+  
+exports.checkSalaryStatus=  async (req, res) => {
+    const { month, year, dept } = req.body;
+  
+    try {
+       const distinctSalaryStatuses = await attendanceModel.distinct("salary_status", {
+        month,
+        year,
+        dept,
+      });
+  
+      if (result) {
+        res.status(200).json({ distinctSalaryStatuses });
+      } else {
+        res.status(200).send("No record found");
+      }
+    } catch (error) {
+      console.error("Error querying MongoDB:", error.message);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+
+  exports.allAttendenceMastData =  async (req, res) => {
+    try {
+      // Use Mongoose to perform a left join and retrieve data from multiple collections
+      const results = await attendanceModel.aggregate([
+        {
+          $lookup: {
+            from: "dept",
+            localField: "dept",
+            foreignField: "dept_id",
+            as: "dept_data",
+          },
+        },
+        {
+          $unwind: "$dept_data",
+        },
+        {
+          $lookup: {
+            from: "user",
+            localField: "user_id",
+            foreignField: "user_id",
+            as: "user_data",
+          },
+        },
+        {
+          $unwind: "$user_data",
+        },
+        {
+          $project: {
+            _id: 0, // Exclude the _id field if not needed
+            // Map fields from the collections to the output
+            // Example: "dept_name": "$dept_data.dept_name"
+          },
+        },
+      ]);
+  
+      res.status(200).json(results);
+    } catch (error) {
+      console.error("Error querying MongoDB:", error.message);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+
+ exports.deptIdWithWfh= async (req, res) => {
+    const { dept_id } = req.body;
+  
+    try {
+    
+      const results = await User.aggregate([
+        {
+          $match: {
+            job_type: "WFH",
+            dept_id: mongoose.Types.ObjectId(dept_id),
+          },
+        },
+        {
+          $lookup: {
+            from: "dept",
+            localField: "dept_id",
+            foreignField: "_id",
+            as: "dept_data",
+          },
+        },
+        {
+          $lookup: {
+            from: "designation",
+            localField: "user_designation",
+            foreignField: "_id",
+            as: "designation_data",
+          },
+        },
+        {
+          $project: {
+            _id: 0, // Exclude the _id field if not needed
+            // Map fields from the collections to the output
+            // Example: "user_name": "$user_name"
+          },
+        },
+      ]);
+  
+      res.status(200).json(results);
+    } catch (error) {
+      console.error("Error querying MongoDB:", error.message);
+      res.status(500).send("Internal Server Error");
+    }
+  };
