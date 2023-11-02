@@ -257,7 +257,10 @@ exports.editInsta = async (req, res) => {
                 pastLike: req.body.pastLike,
                 pastView: req.body.pastView,
                 hashTag: req.body.hashTag,
-                mentions: req.body.mentions
+                mentions: req.body.mentions,
+                selector_date: req.body.selector_date,
+                interpretor_date: req.body.interpretor_date,
+                auditor_date: req.body.auditor_date
             },
             { new: true }
         );
@@ -282,7 +285,10 @@ exports.editInstaStory = async (req, res) => {
                 auditor_name: req.body.auditor_name,
                 auditor_decision: req.body.auditor_decision,
                 interpretor_decision: req.body.interpretor_decision,
-                selector_decision: req.body.selector_decision
+                selector_decision: req.body.selector_decision,
+                selector_date: req.body.selector_date,
+                interpretor_date: req.body.interpretor_date,
+                auditor_date: req.body.auditor_date
             },
             { new: true }
         );
@@ -305,7 +311,7 @@ exports.getStorysFromName = async (req, res) => {
 
         const getStorys = await instaS
             .find({ creatorName: creatorName, posttype_decision: req.body.posttype_decision })
-            .sort({ postedOn: -1 })
+            .sort({ savedOn: -1 })
             .skip(skip)
             .limit(perPage);
 
@@ -315,9 +321,9 @@ exports.getStorysFromName = async (req, res) => {
                 message: "No posts found from this creatorName",
             });
         } else {
-            const newMap = new Map();
-            getStorys.forEach((item) => newMap.set(item.postUrl, item));
-            res.status(200).send([...newMap.values()]);
+            // const newMap = new Map();
+            // getStorys.forEach((item) => newMap.set(item.postUrl, item));
+            res.status(200).send(getStorys);
         }
     } catch (error) {
         res

@@ -49,6 +49,11 @@ const instaSModel = new mongoose.Schema({
         required: false,
         default: []
     },
+    music:{
+        type: Array,
+        required: false,
+        default: []
+    },
     posttype_decision:{
         type: Number,
         required: false,
@@ -83,6 +88,21 @@ const instaSModel = new mongoose.Schema({
         type: Number,
         required: false,
         default: 0
+    },
+    selector_date:{
+        type: Date,
+        required: false,
+        default: ""
+    },
+    interpretor_date:{
+        type: Date,
+        required: false,
+        default: ""
+    },
+    auditor_date:{
+        type: Date,
+        required: false,
+        default: ""
     }
 });
 

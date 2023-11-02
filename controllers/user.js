@@ -812,7 +812,7 @@ exports.getSingleUser = async (req, res) => {
             }
         ]).exec();
         const result = singlesim[0];
-        res.status(200).send({data:result})
+        res.status(200).send(result);
     } catch (err) {
         res.status(500).send({ error: err, sms: 'Error getting all users' })
     }

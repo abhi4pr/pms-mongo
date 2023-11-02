@@ -239,7 +239,7 @@ const userModel = new mongoose.Schema({
     user_status: {
         type: String,
         required: false,
-        default: ""
+        default: "Active"
     },
     lastupdated: {
         type: Date,
