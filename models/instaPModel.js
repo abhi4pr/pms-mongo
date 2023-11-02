@@ -135,6 +135,21 @@ const instaPModel = new mongoose.Schema({
     mentions: {
         type: String,
         required: false
+    },
+    selector_date:{
+        type: Date,
+        required: false,
+        default: ""
+    },
+    interpretor_date:{
+        type: Date,
+        required: false,
+        default: ""
+    },
+    auditor_date:{
+        type: Date,
+        required: false,
+        default: ""
     }
 });
 
