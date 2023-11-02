@@ -270,6 +270,118 @@ exports.editInsta = async (req, res) => {
     }
 };
 
+//insta story update
+exports.editInstaStory = async (req, res) => {
+    try {
+        const editinstastory = await instaS.findByIdAndUpdate(
+            req.body._id,
+            {
+                posttype_decision: req.body.posttype_decision,
+                selector_name: req.body.selector_name,
+                interpretor_name: req.body.interpretor_name,
+                auditor_name: req.body.auditor_name,
+                auditor_decision: req.body.auditor_decision,
+                interpretor_decision: req.body.interpretor_decision,
+                selector_decision: req.body.selector_decision
+            },
+            { new: true }
+        );
+        if (!editinsta) {
+            res.status(500).send({ success: false });
+        }
+        res.status(200).send({ success: true, data: editinstastory });
+    } catch (err) {
+        res.status(500).send({ error: err, sms: "Error updating insta story" });
+    }
+};
+
+
+exports.getStorysFromName = async (req, res) => {
+    try {
+        const creatorName = req.body.creatorName;
+        const page = req.query.page || 1; 
+        const perPage = req.query.perPage || 50; 
+        const skip = (page - 1) * perPage;
+
+        const getStorys = await instaS
+            .find({ creatorName: creatorName, posttype_decision: req.body.posttype_decision })
+            .sort({ postedOn: -1 })
+            .skip(skip)
+            .limit(perPage);
+
+        if (!getStorys || getStorys.length == 0) {
+            res.status(404).send({
+                success: false,
+                message: "No posts found from this creatorName",
+            });
+        } else {
+            const newMap = new Map();
+            getStorys.forEach((item) => newMap.set(item.postUrl, item));
+            res.status(200).send([...newMap.values()]);
+        }
+    } catch (error) {
+        res
+            .status(500)
+            .send({ error: error, sms: "error getting storys from name" });
+    }
+};
+
+
+exports.creatorNameCountForStory = async (req, res) => {
+    try {
+        const query = await instaS.aggregate([
+            {
+                $group: {
+                    _id: "$creatorName",
+                    index: { $first: "$_id" },
+                    decision_11_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 11] }, then: 1, else: 0 }
+                        }
+                    },
+                    decision_2_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}
+                        }
+                    },
+                    decision_1_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 1] }, then: 1, else: 0 }
+                        }
+                    },
+                    decision_0_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 0] }, then: 1, else: 0 }
+                        }
+                    }
+                }
+            }
+        ]).exec();
+        const sortOrder = req.body.sortOrder;
+      
+        switch (sortOrder) {
+            case 0:
+                query.sort((a, b) => b.decision_0_count - a.decision_0_count);
+                break;
+            case 1:
+                query.sort((a, b) => b.decision_1_count - a.decision_1_count);
+                break;
+            case 2:
+                query.sort((a, b) => b.decision_2_count - a.decision_2_count);
+                break;
+            case 3:
+                query.sort((a, b) => b.decision_11_count - a.decision_11_count);
+                break;
+            default:
+                break;
+        }
+
+        res.status(200).send({ success: true, data: query });
+    } catch (error) {
+        res.status(500).send({ error: error.message, sms: "something went wrong" });
+    }
+};
+
 exports.postTypeDecCount = async (req, res) => {
     try {
         const pipeline = [
@@ -381,7 +493,7 @@ exports.creatorNameCount = async (req, res) => {
                 query.sort((a, b) => b.decision_2_count - a.decision_2_count);
                 break;
             case 3:
-                query.sort((a, b) => b.decision_0_count - a.decision_0_count);
+                query.sort((a, b) => b.decision_11_count - a.decision_11_count);
                 break;
             default:
                 break;
@@ -448,8 +560,15 @@ exports.trackStory = async (req, res) => {
                     links: data?.links,
                     hashtags: data?.hashtags,
                     mentions:data?.mentions,
-                    locations:data?.locations,
-                    music: data?.music
+                    locations:data?.locations, 
+                    music: data?.music,
+                    posttype_decision: req.body?.posttype_decision,
+                    selector_name: req.body?.selector_name,
+                    interpretor_name: req.body?.interpretor_name,
+                    auditor_name: req.body?.auditor_name,
+                    auditor_decision: req.body?.auditor_decision,
+                    interpretor_decision: req.body?.interpretor_decision,
+                    selector_decision: req.body?.selector_decision
                 })
                  await creators.save();
               }  
@@ -465,10 +584,15 @@ exports.trackStory = async (req, res) => {
 
 exports.getStories = async (req, res) => {
     try {
-        const getPosts = await instaS.find({});
-        return res.status(200).send(getPosts);
+        const page = req.query.page || 1;
+        const perPage = req.query.perPage || 50; 
+        const skip = (page - 1) * perPage;
+
+        const getStorys = await instaS.find({}).skip(skip)
+            .limit(perPage);
+        return res.status(200).send(getStorys);
     } catch (error) {
-        res.status(500).send({ error: error, sms: "error getting stories" });
+        res.status(500).send({ error: error.message, sms: "error getting stories" });
     }
 };
 

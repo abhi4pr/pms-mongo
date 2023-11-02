@@ -73,6 +73,9 @@ router.post("/countinstacp", insta.countInstaCPModels);
 router.post("/get_all_posts_by_id", insta.getPostsByDecNum)
 router.get("/get_avg_frq_of_post", insta.getAvgFrqOfPost);
 router.get("/get_all_stories", insta.getStories);
+router.put("/update_insta_story",insta.editInstaStory);
+router.post("/get_stories_from_name",insta.getStorysFromName);
+router.post("/creator_name_count_for_stories", insta.creatorNameCountForStory);
 /*execution api*/
 router.post("/exe_inven_post", exe.exeInvenPost);
 router.get("/get_exe_inventory", exe.getExeInventory);

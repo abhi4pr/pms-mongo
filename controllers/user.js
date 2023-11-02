@@ -470,7 +470,7 @@ exports.getAllUsers = async (req, res) => {
                     sitting_id: "$sitting_id",
                     image: "$image",
                     job_type: "$job_type",
-                    PersonalNumber: "PersonalNumber",
+                    PersonalNumber: "$PersonalNumber",
                     Report_L1: "$Report_L1",
                     Report_L2: "$Report_L2",
                     Report_L3: "$Report_L3",
@@ -810,7 +810,7 @@ exports.getSingleUser = async (req, res) => {
             }
         ]).exec();
         const result = singlesim[0];
-        res.status(200).send(result)
+        res.status(200).send({data:result})
     } catch (err) {
         res.status(500).send({ error: err, sms: 'Error getting all users' })
     }
