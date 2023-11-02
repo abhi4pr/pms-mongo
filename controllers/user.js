@@ -348,11 +348,23 @@ exports.updateUser = [upload1, async (req, res) => {
 
 exports.getWFHUsersByDept = async (req, res) => {
     try {
-        const simc = await userModel.find({ dept_id: req.body.dept_id, job_type: 'WFH' });
+        const simc = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFH' }).lean();
         if (!simc) {
             res.status(500).send({ success: false })
         }
-        res.status(200).send(simc)
+        const modifiedUsers = simc.map(user => {
+           
+            if (user.hasOwnProperty('lastupdated')) {
+                user.last_updated = user.lastupdated;
+                delete user.lastupdated;
+            }
+            if (user.hasOwnProperty('tds_applicable')) {
+                user.tbs_applicable = user.tds_applicable;
+                delete user.tds_applicable;
+            }
+            return user;
+        });
+        res.status(200).send(modifiedUsers)
     } catch (err) {
         res.status(500).send({ error: err, sms: 'Error getting all wfh users' })
     }

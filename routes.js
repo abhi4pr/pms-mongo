@@ -65,6 +65,7 @@ router.post("/track_story_post", insta.trackStory);
 router.put("/instaupdate", insta.editInsta);
 router.get("/post_type_dec_count", insta.postTypeDecCount);
 router.post("/creator_name_count", insta.creatorNameCount);
+router.post("/creator_stories_count", insta.creatorStoriesCount);
 router.post("/get_posts_from_name", insta.getPostsFromName);
 router.get("/creator_insights", insta.creatorInsights);
 router.get("/cfinstaapi", insta.cfInstaApi);
@@ -498,7 +499,7 @@ router.delete("/insta_brand/:id", instaBrand.deleteInstaBrand);
 /* user */
 router.post("/add_user", user.addUser);
 router.put("/update_user",  user.updateUser);
-router.get("/get_wfh_user",  user.getWFHUsersByDept); 
+router.get("/get_wfh_user/:dept_id",  user.getWFHUsersByDept); 
 router.get("/get_all_users",  user.getAllUsers);
 router.get("/get_single_user/:id",  user.getSingleUser);
 router.delete("/delete_user/:id",  user.deleteUser);
@@ -582,6 +583,21 @@ router.get(
   "/get_salary_count_by_year",
   
   attendance.getSalaryCountByYear
+);
+router.post(
+  "/new_joiners",
+  
+  attendance.newJoiners
+);
+router.post(
+  "/left_employees",
+  
+  attendance.leftEmployees
+);
+router.post(
+  "/dept_id_with_wfh",
+  
+  attendance.deptIdWithWfh
 );
 router.get("/get_total_salary", attendance.totalSalary)
 // router.get("/get_all_dept_with_wfh", attendance.allDeptWithWfh)
