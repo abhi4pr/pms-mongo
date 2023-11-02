@@ -48,6 +48,41 @@ const instaSModel = new mongoose.Schema({
         type: Array,
         required: false,
         default: []
+    },
+    posttype_decision:{
+        type: Number,
+        required: false,
+        default: 0
+    },
+    selector_name:{
+        type: Number,
+        required: false,
+        default: 0
+    },
+    interpretor_name:{
+        type: Number,
+        required: false,
+        default: 0
+    },
+    auditor_name:{
+        type: Number,
+        required: false,
+        default: 0
+    },
+    auditor_decision:{
+        type: Number,
+        required: false,
+        default: 0
+    },
+    interpretor_decision:{
+        type: Number,
+        required: false,
+        default: 0
+    },
+    selector_decision:{
+        type: Number,
+        required: false,
+        default: 0
     }
 });
 
