@@ -435,7 +435,52 @@ exports.creatorNameCount = async (req, res) => {
                         $sum: {
                             $cond: { if: { $eq: ["$posttype_decision", 0] }, then: 1, else: 0 }
                         }
-                    }
+                    },
+                    selector_decision_1_count: {
+                        $sum: {
+                          $cond: {
+                            if: { $eq: ["$posttype_decision", 1] }, 
+                            then: {
+                              $cond: {
+                                if: { $eq: ["$selector_decision", 1] }, 
+                                then: 1, 
+                                else: 0 
+                              }
+                            },
+                            else: 0 
+                          }
+                        }
+                      },
+                    selector_decision_2_count: {
+                        $sum: {
+                          $cond: {
+                            if: { $eq: ["$posttype_decision", 1] }, 
+                            then: {
+                              $cond: {
+                                if: { $eq: ["$selector_decision", 2] }, 
+                                then: 1, 
+                                else: 0 
+                              }
+                            },
+                            else: 0 
+                          }
+                        }
+                      },
+                    selector_decision_3_count: {
+                        $sum: {
+                          $cond: {
+                            if: { $eq: ["$posttype_decision", 1] }, 
+                            then: {
+                              $cond: {
+                                if: { $eq: ["$selector_decision", 3] }, 
+                                then: 1, 
+                                else: 0 
+                              }
+                            },
+                            else: 0 
+                          }
+                        }
+                      },
                 }
             }
         ]).exec();
@@ -505,6 +550,105 @@ exports.creatorNameCount = async (req, res) => {
     }
 };
 
+exports.creatorStoriesCount = async (req, res) => {
+    try {
+        const query = await instaS.aggregate([
+            {
+                $group: {
+                    _id: "$creatorName",
+                    index: { $first: "$_id" },
+                    decision_11_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 11] }, then: 1, else: 0 }
+                        }
+                    },
+                    decision_2_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}
+                        }
+                    },
+                    decision_1_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 1] }, then: 1, else: 0 }
+                        }
+                    },
+                    decision_0_count: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$posttype_decision", 0] }, then: 1, else: 0 }
+                        }
+                    },
+                    selector_decision_1_count: {
+                        $sum: {
+                          $cond: {
+                            if: { $eq: ["$posttype_decision", 1] }, 
+                            then: {
+                              $cond: {
+                                if: { $eq: ["$selector_decision", 1] }, 
+                                then: 1, 
+                                else: 0 
+                              }
+                            },
+                            else: 0 
+                          }
+                        }
+                      },
+                    selector_decision_2_count: {
+                        $sum: {
+                          $cond: {
+                            if: { $eq: ["$posttype_decision", 1] }, 
+                            then: {
+                              $cond: {
+                                if: { $eq: ["$selector_decision", 2] }, 
+                                then: 1, 
+                                else: 0 
+                              }
+                            },
+                            else: 0 
+                          }
+                        }
+                      },
+                    selector_decision_3_count: {
+                        $sum: {
+                          $cond: {
+                            if: { $eq: ["$posttype_decision", 1] }, 
+                            then: {
+                              $cond: {
+                                if: { $eq: ["$selector_decision", 3] }, 
+                                then: 1, 
+                                else: 0 
+                              }
+                            },
+                            else: 0 
+                          }
+                        }
+                      },
+                }
+            }
+        ]).exec();
+        const sortOrder = req.body.sortOrder;
+
+        switch (sortOrder) {
+            case 0:
+                query.sort((a, b) => b.decision_0_count - a.decision_0_count);
+                break;
+            case 1:
+                query.sort((a, b) => b.decision_1_count - a.decision_1_count);
+                break;
+            case 2:
+                query.sort((a, b) => b.decision_2_count - a.decision_2_count);
+                break;
+            case 3:
+                query.sort((a, b) => b.decision_0_count - a.decision_0_count);
+                break;
+            default:
+                break;
+        }
+
+        res.status(200).send({ success: true, data: query });
+    } catch (error) {
+        res.status(500).send({ error: error.message, sms: "something went wrong" });
+    }
+};
 exports.getPostsFromName = async (req, res) => {
     try {
         const creatorName = req.body.creatorName;

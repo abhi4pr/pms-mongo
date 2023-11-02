@@ -25,6 +25,15 @@ const designationModel = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    last_updated_at: {
+        type: Date,
+        default: ""
+    },
+    last_updated_by: {
+        type: Number,
+        required: false,
+        default: 0
+    },
     created_by: {
         type: Number,
         required: false,
