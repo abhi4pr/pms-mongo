@@ -383,7 +383,10 @@ exports.getAllUsers = async (req, res) => {
                 }
             },
             {
-                $unwind: '$department'
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
@@ -394,7 +397,10 @@ exports.getAllUsers = async (req, res) => {
                 }
             },
             {
-                $unwind: '$designation'
+                $unwind: {
+                    path: "$designation",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
@@ -405,7 +411,10 @@ exports.getAllUsers = async (req, res) => {
                 }
             },
             {
-                $unwind: '$role'
+                $unwind: {
+                    path: "$role",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
@@ -617,7 +626,10 @@ exports.getSingleUser = async (req, res) => {
                 }
             },
             {
-                $unwind: '$department'
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
@@ -628,7 +640,10 @@ exports.getSingleUser = async (req, res) => {
                 }
             },
             {
-                $unwind: '$designation'
+                $unwind: {
+                    path: "$designation",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
@@ -639,7 +654,10 @@ exports.getSingleUser = async (req, res) => {
                 }
             },
             {
-                $unwind: '$role'
+                $unwind: {
+                    path: "$role",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
