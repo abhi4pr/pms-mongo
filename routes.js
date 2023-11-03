@@ -559,7 +559,7 @@ router.post(
   user.getUserJobResponsibility
 );
 router.get("/get_user_by_deptid/:id",  user.getUserByDeptId);
-router.get("/get_user_other_fields/:id",  user.getUserOtherFields);
+router.get("/get_user_other_fields/:user_id",  user.getUserOtherFields);
 router.post(
   "/add_user_other_field",
   
