@@ -184,7 +184,7 @@ exports.getRooms = async (req, res) => {
       },
     ]);
 
-    const url = "http://192.168.29.116:8080/uploads/";
+    const url = "http://34.93.135.33:8080/uploads/";
     const dataWithImageUrl = roomObj.map((room) => ({
       ...room,
       room_image_url: room.roomImage ? url + room.roomImage : null,

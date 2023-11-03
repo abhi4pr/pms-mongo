@@ -153,9 +153,8 @@ exports.addAttendance = async (req, res) => {
       const perdaysal = results4[0].salary / 30;
 
       const totalSalary = perdaysal * (30 - noOfabsent);
-      const netSalary = bonus ? totalSalary + bonus : totalSalary;
-
-      const tdsDeduction = (netSalary * results4[0].tds_per) / 100;
+      const netSalary = bonus ? totalSalary + bonus - salary_deduction : totalSalary;
+      const tdsDeduction = netSalary * (results4[0].tds_per) / 100;
 
       const ToPay = netSalary - tdsDeduction;
       const salary = results4[0].salary;

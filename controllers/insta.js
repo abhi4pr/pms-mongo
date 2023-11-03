@@ -321,9 +321,10 @@ exports.getStorysFromName = async (req, res) => {
                 message: "No posts found from this creatorName",
             });
         } else {
-            // const newMap = new Map();
-            // getStorys.forEach((item) => newMap.set(item.postUrl, item));
-            res.status(200).send(getStorys);
+            const newMap = new Map();
+            getStorys.forEach((item) => newMap.set(item.shortcode, item));
+            res.status(200).send([...newMap.values()]);
+            // res.status(200).send(getStorys);
         }
     } catch (error) {
         res
