@@ -655,6 +655,98 @@ exports.creatorStoriesCount = async (req, res) => {
         res.status(500).send({ error: error.message, sms: "something went wrong" });
     }
 };
+exports.selectorNameCountInstaP = async (req, res) => {
+    try {
+        const {  selectData, startDate,endDate} = req.body
+        let startDateParse = new Date(startDate); 
+        let endDateParse = new Date(endDate);
+        // const startDate = new Date("2023-01-01"); 
+        // const endDate = new Date("2023-12-31");
+        //Flag 2 for all data fetch and flag 1 for perticular date range data fetch
+        if(selectData === 1){
+            const query = await instaP.aggregate([
+                {
+                    $match: {
+                      selector_date: {
+                        $gte: startDateParse, 
+                        $lte: endDateParse    
+                      }
+                    }
+                  },
+                {
+                    $group: {
+                      _id: "$selector_name", 
+                      count: { $sum: 1 } 
+                    }
+                  }
+            ]).exec();
+            
+        res.status(200).send({ success: true, data: query });
+        }else if (selectData === 2){
+            const query = await instaP.aggregate([
+                {
+                    $group: {
+                      _id: "$selector_name", 
+                      count: { $sum: 1 } 
+                    }
+                  }
+            ]).exec();
+            
+        res.status(200).send({ success: true, data: query });
+        }else{
+            res.status(200).send({ success: false, message: "Please provide valid selectData" });
+        }
+        
+    } catch (error) {
+        res.status(500).send({ error: error.message, sms: "something went wrong" });
+    }
+};
+exports.selectorNameCountInstaS = async (req, res) => {
+    try {
+        const {  selectData, startDate,endDate} = req.body
+        let startDateParse = new Date(startDate); 
+        let endDateParse = new Date(endDate);
+        // const startDate = new Date("2023-01-01"); 
+        // const endDate = new Date("2023-12-31");
+        //Flag 2 for all data fetch and flag 1 for perticular date range data fetch
+        if(selectData === 1){
+            const query = await instaS.aggregate([
+                {
+                    $match: {
+                      selector_date: {
+                        $gte: startDateParse, 
+                        $lte: endDateParse    
+                      }
+                    }
+                  },
+                {
+                    $group: {
+                      _id: "$selector_name", 
+                      count: { $sum: 1 } 
+                    }
+                  }
+            ]).exec();
+            
+        res.status(200).send({ success: true, data: query });
+        }else if (selectData === 2){
+            const query = await instaS.aggregate([
+                {
+                    $group: {
+                      _id: "$selector_name", 
+                      count: { $sum: 1 } 
+                    }
+                  }
+            ]).exec();
+            
+        res.status(200).send({ success: true, data: query });
+        }else{
+            res.status(200).send({ success: false, message: "Please provide valid selectData" });
+        }
+        
+    } catch (error) {
+        res.status(500).send({ error: error.message, sms: "something went wrong" });
+    }
+};
 exports.getPostsFromName = async (req, res) => {
     try {
         const creatorName = req.body.creatorName;
@@ -681,7 +773,7 @@ exports.getPostsFromName = async (req, res) => {
     } catch (error) {
         res
             .status(500)
-            .send({ error: error, sms: "error getting posts from name" });
+            .send({ error: error.message, sms: "error getting posts from name" });
     }
 };
 

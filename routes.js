@@ -77,6 +77,8 @@ router.get("/get_all_stories", insta.getStories);
 router.put("/update_insta_story",insta.editInstaStory);
 router.post("/get_stories_from_name",insta.getStorysFromName);
 router.post("/creator_name_count_for_stories", insta.creatorNameCountForStory);
+router.post("/selector_name_count_instas", insta.selectorNameCountInstaS);
+router.post("/selector_name_count_instap", insta.selectorNameCountInstaP);
 /*execution api*/
 router.post("/exe_inven_post", exe.exeInvenPost);
 router.get("/get_exe_inventory", exe.getExeInventory);
@@ -588,6 +590,11 @@ router.post(
   "/new_joiners",
   
   attendance.newJoiners
+);
+router.get(
+  "/all_attendence_mast_data",
+  
+  attendance.allAttendenceMastData
 );
 router.post(
   "/left_employees",
