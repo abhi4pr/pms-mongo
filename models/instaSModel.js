@@ -103,7 +103,12 @@ const instaSModel = new mongoose.Schema({
         type: Date,
         required: false,
         default: ""
-    }
+    },
+    image_url: {
+        type: String,
+        required: false,
+        default: ""
+    },
 });
 
 module.exports = mongoose.model('instaSModel', instaSModel);

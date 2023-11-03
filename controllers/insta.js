@@ -288,7 +288,8 @@ exports.editInstaStory = async (req, res) => {
                 selector_decision: req.body.selector_decision,
                 selector_date: req.body.selector_date,
                 interpretor_date: req.body.interpretor_date,
-                auditor_date: req.body.auditor_date
+                auditor_date: req.body.auditor_date,
+                image_url:req.body.image_url
             },
             { new: true }
         );
@@ -810,7 +811,8 @@ exports.trackStory = async (req, res) => {
                     auditor_name: req.body?.auditor_name,
                     auditor_decision: req.body?.auditor_decision,
                     interpretor_decision: req.body?.interpretor_decision,
-                    selector_decision: req.body?.selector_decision
+                    selector_decision: req.body?.selector_decision,
+                    image_url: data?.image_url,
                 })
                  await creators.save();
               }  
