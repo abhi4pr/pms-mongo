@@ -12,6 +12,9 @@ const projectxSubCategory = require("./controllers/projectxSubCategory.js");
 const hashTag = require("./controllers/hashTag.js");
 const keyword = require("./controllers/keywordInsta.js");
 const mention = require("./controllers/mentionInsta.js");
+const instaBotY = require("./controllers/instaBotY.js");
+const instaBotM = require("./controllers/instaBotM.js");
+const instaBotW = require("./controllers/instaBotW.js");
 const projectxCategory = require("./controllers/projectxCategory.js");
 const projectxRecord = require("./controllers/projectxRecord.js");
 const registerCampaign = require("./controllers/registerCampaign.js");
@@ -244,6 +247,27 @@ router.get("/mention",  mention.getMentions);
 router.get("/mention/:id",  mention.getMention);
 router.put("/mention",  mention.editMention);
 router.delete("/mention/:id",  mention.deleteMention);
+
+//InstaBotY
+router.post("/bot_y",  instaBotY.addBotY);
+router.get("/bot_y",  instaBotY.getBotYs);
+router.get("/bot_y/:id",  instaBotY.getBotY);
+router.put("/bot_y",  instaBotY.editBotY);
+router.delete("/bot_y/:id",  instaBotY.deleteBotY);
+
+//InstaBotM
+router.post("/bot_m",  instaBotM.addBotM);
+router.get("/bot_m",  instaBotM.getBotMs);
+router.get("/bot_m/:id",  instaBotM.getBotM);
+router.put("/bot_m",  instaBotM.editBotM);
+router.delete("/bot_m/:id",  instaBotM.deleteBotM);
+
+//InstaBotW
+router.post("/bot_w",  instaBotW.addBotW);
+router.get("/bot_w",  instaBotW.getBotWs);
+router.get("/bot_w/:id",  instaBotW.getBotW);
+router.put("/bot_w",  instaBotW.editBotW);
+router.delete("/bot_w/:id",  instaBotW.deleteBotW);
 
 //Projectx Category
 router.post("/projectxCategory", projectxCategory.addProjectxCategory);

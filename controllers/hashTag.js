@@ -1,10 +1,20 @@
 const hashTagSchema = require("../models/hashTagModel");
+const mentionModel = require("../models/mentionModel");
 
 exports.addHashTag = async (req, res) => {
   try {
     const { hash_tag, tag, campaign_id } = req.body;
+    let check2 = await mentionModel.findOne({
+      mention: hash_tag?.toLowerCase().trim(),
+    });
+    if (check2) {
+      return res.status(200).json({
+        message: "hash_tag is available in mention you can not add this hash tag.",
+        status: 200,
+      });
+    }
     let check = await hashTagSchema.findOne({
-      hash_tag: hash_tag.toLowerCase().trim(),
+      hash_tag: hash_tag?.toLowerCase().trim(),
     });
     if (check) {
       return res.status(200).json({
@@ -46,8 +56,17 @@ exports.getHashTags = async (req, res) => {
 exports.editHashTag = async (req, res) => {
   try {
     const { hash_tag_id, hash_tag, tag, campaign_id } = req.body;
+    let check2 = await mentionModel.findOne({
+      mention: hash_tag?.toLowerCase().trim(),
+    });
+    if (check2) {
+      return res.status(200).json({
+        message: "hash_tag is available in mention you can not add this hash tag.",
+        status: 200,
+      });
+    }
     let check = await hashTagSchema.findOne({
-      hash_tag: hash_tag.toLowerCase().trim(),
+      hash_tag: hash_tag?.toLowerCase().trim(),
       hash_tag_id: { $ne: hash_tag_id },
     });
     if (check) {
