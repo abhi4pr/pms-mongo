@@ -292,7 +292,7 @@ exports.editInstaStory = async (req, res) => {
             },
             { new: true }
         );
-        if (!editinsta) {
+        if (!editinstastory) {
             res.status(500).send({ success: false });
         }
         res.status(200).send({ success: true, data: editinstastory });
