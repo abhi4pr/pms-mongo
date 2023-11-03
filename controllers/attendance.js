@@ -62,14 +62,14 @@ exports.addAttendance = async (req, res) => {
     const created_By = created_by ? parseInt(created_by) : 0;
     const creation_date = new Date();
     const check1 = await attendanceModel.find({
-      user_id: parseInt(req.body.user_id),
+      user_id: req.body.user_id,
       month: req.body.month,
-      year: parseInt(req.body.year),
+      year: req.body.year,
     });
     if (check1.length == 0) {
       const check2 = await userModel.find({
         job_type: "WFH",
-        dept_id: parseInt(req.body.dept),
+        dept_id: req.body.dept,
       });
 
       for (const user of check2) {
