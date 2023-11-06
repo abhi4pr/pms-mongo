@@ -175,6 +175,10 @@ const exeSumModel = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    start_date:{
+        type: Date,
+        default:""
+    }
 });
 
 AutoIncrement.initialize(mongoose.connection);
