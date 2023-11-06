@@ -795,27 +795,30 @@ exports.trackStory = async (req, res) => {
         // console.log("story api", req.body);
         if (req.body) {
               for (const data of req.body?.story_data?.stories) {
-                const creators = new instaS({
-                    creatorName : req.body?.handle,
-                    mediaCont : req.body?.story_data?.media_count,
-                    expiredAt: req.body?.story_data?.expiry_at,
-                    savedOn: data?.taken_at,
-                    shortcode: data?.shortcode,
-                    links: data?.links,
-                    hashtags: data?.hashtags,
-                    mentions:data?.mentions,
-                    locations:data?.locations, 
-                    music: data?.music,
-                    posttype_decision: req.body?.posttype_decision,
-                    selector_name: req.body?.selector_name,
-                    interpretor_name: req.body?.interpretor_name,
-                    auditor_name: req.body?.auditor_name,
-                    auditor_decision: req.body?.auditor_decision,
-                    interpretor_decision: req.body?.interpretor_decision,
-                    selector_decision: req.body?.selector_decision,
-                    image_url: data?.image_url,
-                })
-                 await creators.save();
+                let check = await instaS.findOne({shortcode:data?.shortcode})
+                if(!check){
+                    const creators = new instaS({
+                        creatorName : req.body?.handle,
+                        mediaCont : req.body?.story_data?.media_count,
+                        expiredAt: req.body?.story_data?.expiry_at,
+                        savedOn: data?.taken_at,
+                        shortcode: data?.shortcode,
+                        links: data?.links,
+                        hashtags: data?.hashtags,
+                        mentions:data?.mentions,
+                        locations:data?.locations, 
+                        music: data?.music,
+                        posttype_decision: req.body?.posttype_decision,
+                        selector_name: req.body?.selector_name,
+                        interpretor_name: req.body?.interpretor_name,
+                        auditor_name: req.body?.auditor_name,
+                        auditor_decision: req.body?.auditor_decision,
+                        interpretor_decision: req.body?.interpretor_decision,
+                        selector_decision: req.body?.selector_decision,
+                        image_url: data?.image_url,
+                    })
+                     await creators.save();
+                }
               }  
               return res.send({status:200,sms:"Stories created successfully."})
           }else{
