@@ -9,6 +9,7 @@ const departmentModel = new mongoose.Schema({
   dept_name: {
     type: String,
     required: false,
+    unique:true,
     default: "",
   },
   Remarks: {

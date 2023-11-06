@@ -9,7 +9,8 @@ const subDepartmentModel = new mongoose.Schema({
     sub_dept_name: { 
         type: String,
         required: false,
-        default: "",
+        unique:true,
+        default: ""
     },
     dept_id: {
         type: Number,

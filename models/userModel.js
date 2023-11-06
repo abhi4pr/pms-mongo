@@ -28,6 +28,7 @@ const userModel = new mongoose.Schema({
     user_name:{
         type: String,
         required: true,
+        unique:true,
         default: ""
     },
     user_report_to_id:{
