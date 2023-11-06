@@ -748,7 +748,7 @@ exports.getSingleUser = async (req, res) => {
                     sitting_id: "$sitting_id",
                     image: "$image",
                     job_type: "$job_type",
-                    PersonalNumber: "PersonalNumber",
+                    PersonalNumber: "$PersonalNumber",
                     Report_L1: "$Report_L1",
                     Report_L2: "$Report_L2",
                     Report_L3: "$Report_L3",
@@ -1496,22 +1496,69 @@ exports.getUserJobResponsibility = async (req, res) => {
 
 exports.getUserByDeptId = async (req, res) => {
     try {
-        const delv = await userModel.find({ dept_id: req.params.id }).lean();
-        if (!delv) {
-            res.status(500).send({ success: false })
-        }
-        const modifiedUsers = delv.map(user => {
-            if (user.hasOwnProperty('lastupdated')) {
-                user.last_updated = user.lastupdated;
-                delete user.lastupdated;
+
+        const singlesim = await userModel.aggregate([
+            {
+                $match: { dept_id: parseInt(req.params.id) }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'designationmodels',
+                    localField: 'user_designation',
+                    foreignField: 'desi_id',
+                    as: 'designation'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$designation",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+          
+            {
+                $project: {
+                    user_id: "$user_id",
+                    user_name: "$user_name",
+                    user_designation: "$user_designation",
+                    department_name: '$department.dept_name',
+                    designation_name: "$designation.desi_name",
+                    last_updated:"$lastupdated",
+                    tbs_applicable:"$tds_applicable"
+                }
             }
-            if (user.hasOwnProperty('tds_applicable')) {
-                user.tbs_applicable = user.tds_applicable;
-                delete user.tds_applicable;
-            }
-            return user;
-        });
-        res.status(200).send(modifiedUsers)
+        ]).exec();
+
+        // const delv = await userModel.find({ dept_id: req.params.id }).lean();
+        // if (!delv) {
+        //     res.status(500).send({ success: false })
+        // }
+        // const modifiedUsers = delv.map(user => {
+        //     if (user.hasOwnProperty('lastupdated')) {
+        //         user.last_updated = user.lastupdated;
+        //         delete user.lastupdated;
+        //     }
+        //     if (user.hasOwnProperty('tds_applicable')) {
+        //         user.tbs_applicable = user.tds_applicable;
+        //         delete user.tds_applicable;
+        //     }
+        //     return user;
+        // });
+        res.status(200).send(singlesim)
     } catch (err) {
         res.status(500).send({ error: err, sms: 'error getting all users by dept id' })
     }

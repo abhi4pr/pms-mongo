@@ -14,7 +14,8 @@ const designationModel = new mongoose.Schema({
     desi_name: { 
         type: String,
         required: false,
-        default: "",
+        unique:true,
+        default: ""
     },
     remark: {
         type: String,

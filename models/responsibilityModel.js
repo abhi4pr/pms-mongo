@@ -9,7 +9,8 @@ const responsibilityModel = new mongoose.Schema({
     respo_name: { 
         type: String,
         required: true,
-        default: "",
+        unique:true,
+        default: ""
     },
     remark: {
         type: String,

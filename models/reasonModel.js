@@ -8,7 +8,8 @@ const reasonModel = new mongoose.Schema({
     },
     reason:{
         type: String,
-        required: true
+        required: true,
+        unique:true
     },
     remark:{
         type: String,
