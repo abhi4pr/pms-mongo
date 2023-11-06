@@ -136,7 +136,7 @@ exports.addUser = [upload, async (req, res) => {
             pre_relieving_letter: req.file ? req.files.pre_relieving_letter[0].filename : '',
             bankPassBook_Cheque: req.file ? req.files.bankPassBook_Cheque[0].filename : '',
             joining_extend_document: req.file ? req.files.joining_extend_document[0].filename : '',
-            digital_signature_image:req.file ? req.files.digital_signature_image[0].filename : '',
+            digital_signature_image: req.file ? req.files.digital_signature_image[0].filename : '',
             userSalaryStatus: req.body.userSalaryStatus
         })
         const simv = await simc.save();
@@ -319,22 +319,23 @@ exports.updateUser = [upload1, async (req, res) => {
             joining_date_extend_status: req.body.joining_date_extend_status,
             joining_date_extend_reason: req.body.joining_date_extend_reason,
             invoice_template_no: req.body.invoice_template_no,
-            image: req.file ? req.files.image[0].filename : '',
-            UID: req.file ? req.files.UID[0].filename : '',
-            pan: req.file ? req.files.pan[0].filename : '',
-            highest_upload: req.file ? req.files.highest_upload[0].filename : '',
-            other_upload: req.file ? req.files.other_upload[0].filename : '',
-            tenth_marksheet: req.file ? req.files.tenth_marksheet[0].filename : '',
-            twelveth_marksheet: req.file ? req.files.twelveth_marksheet[0].filename : '',
-            UG_Marksheet: req.file ? req.files.UG_Marksheet[0].filename : '',
-            passport: req.file ? req.files.passport[0].filename : '',
-            pre_off_letter: req.file ? req.files.pre_off_letter[0].filename : '',
-            pre_expe_letter: req.file ? req.files.pre_expe_letter[0].filename : '',
-            pre_relieving_letter: req.file ? req.files.pre_relieving_letter[0].filename : '',
-            bankPassBook_Cheque: req.file ? req.files.bankPassBook_Cheque[0].filename : '',
-            joining_extend_document: req.file ? req.files.joining_extend_document[0].filename : '',
+            image: req.files && req.files['image'] && req.files['image'][0] ? req.files['image'][0].filename : '',
+            UID: req.files && req.files['UID'] && req.files['UID'][0] ? req.files['UID'][0].filename : '',
+            pan: req.files && req.files['pan'] && req.files['pan'][0] ? req.files['pan'][0].filename : '',
+            highest_upload: req.files && req.files['highest_upload'] && req.files['highest_upload'][0] ? req.files['highest_upload'][0].filename : '',
+            other_upload: req.files && req.files['other_upload'] && req.files['other_upload'][0] ? req.files['other_upload'][0].filename : '',
+            tenth_marksheet: req.files && req.files['tenth_marksheet'] && req.files['tenth_marksheet'][0] ? req.files['tenth_marksheet'][0].filename : '',
+            twelveth_marksheet: req.files && req.files['twelveth_marksheet'] && req.files['twelveth_marksheet'][0] ? req.files['twelveth_marksheet'][0].filename : '',
+            UG_Marksheet: req.files && req.files['UG_Marksheet'] && req.files['UG_Marksheet'][0] ? req.files['UG_Marksheet'][0].filename : '',
+            passport: req.files && req.files['passport'] && req.files['passport'][0] ? req.files['passport'][0].filename : '',
+            pre_off_letter: req.files && req.files['pre_off_letter'] && req.files['pre_off_letter'][0] ? req.files['pre_off_letter'][0].filename : '',
+            pre_expe_letter: req.files && req.files['pre_expe_letter'] && req.files['pre_expe_letter'][0] ? req.files['pre_expe_letter'][0].filename : '',
+            pre_relieving_letter: req.files && req.files['pre_relieving_letter'] && req.files['pre_relieving_letter'][0] ? req.files['pre_relieving_letter'][0].filename : '',
+            bankPassBook_Cheque: req.files && req.files['bankPassBook_Cheque'] && req.files['bankPassBook_Cheque'][0] ? req.files['bankPassBook_Cheque'][0].filename : '',
+            joining_extend_document: req.files && req.files['joining_extend_document'] && req.files['joining_extend_document'][0] ? req.files['joining_extend_document'][0].filename : '',
             userSalaryStatus: req.body.userSalaryStatus,
-            digital_signature_image:req.file ? req.files.digital_signature_image[0].filename : ''
+            digital_signature_image: req.files && req.files['digital_signature_image'] && req.files['digital_signature_image'][0] ? req.files['digital_signature_image'][0].filename : ''
+
         }, { new: true });
         if (!editsim) {
             return res.status(500).send({ success: false })
@@ -353,7 +354,7 @@ exports.getWFHUsersByDept = async (req, res) => {
             res.status(500).send({ success: false })
         }
         const modifiedUsers = simc.map(user => {
-           
+
             if (user.hasOwnProperty('lastupdated')) {
                 user.last_updated = user.lastupdated;
                 delete user.lastupdated;
@@ -370,7 +371,7 @@ exports.getWFHUsersByDept = async (req, res) => {
     }
 };
 
-const ImageUrl = 'http://34.93.135.33:8080/uploads/';
+
 exports.getAllUsers = async (req, res) => {
     try {
         const singlesim = await userModel.aggregate([
@@ -418,13 +419,13 @@ exports.getAllUsers = async (req, res) => {
             },
             {
                 $lookup: {
-                  from: "usermodels",
-                  localField: "user_report_to_id",
-                  foreignField: "user_id",
-                  as: "reportTo"
+                    from: "usermodels",
+                    localField: "user_report_to_id",
+                    foreignField: "user_id",
+                    as: "reportTo"
                 }
-              },
-              {
+            },
+            {
                 $unwind: {
                     path: "$reportTo",
                     preserveNullAndEmptyArrays: true
@@ -432,41 +433,41 @@ exports.getAllUsers = async (req, res) => {
             },
             {
                 $lookup: {
-                  from: "usermodels",
-                  localField: "Report_L1",
-                  foreignField: "user_id",
-                  as: "reportL1"
+                    from: "usermodels",
+                    localField: "Report_L1",
+                    foreignField: "user_id",
+                    as: "reportL1"
                 }
-              },
-              {
+            },
+            {
                 $unwind: {
                     path: "$reportL1",
                     preserveNullAndEmptyArrays: true
                 }
             },
-              {
+            {
                 $lookup: {
-                  from: "usermodels",
-                  localField: "Report_L2",
-                  foreignField: "user_id",
-                  as: "reportL2"
+                    from: "usermodels",
+                    localField: "Report_L2",
+                    foreignField: "user_id",
+                    as: "reportL2"
                 }
-              },
-              {
+            },
+            {
                 $unwind: {
                     path: "$reportL2",
                     preserveNullAndEmptyArrays: true
                 }
             },
-              {
+            {
                 $lookup: {
-                  from: "usermodels",
-                  localField: "Report_L3",
-                  foreignField: "user_id",
-                  as: "reportL3"
+                    from: "usermodels",
+                    localField: "Report_L3",
+                    foreignField: "user_id",
+                    as: "reportL3"
                 }
-              },
-              {
+            },
+            {
                 $unwind: {
                     path: "$reportl3",
                     preserveNullAndEmptyArrays: true
@@ -497,7 +498,7 @@ exports.getAllUsers = async (req, res) => {
                     Report_L3: "$Report_L3",
                     PersonalEmail: "$PersonalEmail",
                     level: "$level",
-                    joining_date:"$joining_date",
+                    joining_date: "$joining_date",
                     releaving_date: "$releaving_date",
                     room_id: "$room_id",
                     UID: "$UID",
@@ -512,7 +513,7 @@ exports.getAllUsers = async (req, res) => {
                     Age: "$Age",
                     fatherName: "$fatherName",
                     motherName: "$motherName",
-                    Hobbies:"$Hobbies",
+                    Hobbies: "$Hobbies",
                     BloodGroup: "$BloodGroup",
                     MartialStatus: "$MartialStatus",
                     DateOfMarriage: "$DateOfMarriage",
@@ -523,12 +524,12 @@ exports.getAllUsers = async (req, res) => {
                     image_validate: "$image_validate",
                     uid_remark: "$uid_remark",
                     uid_validate: "$uid_validate",
-                    pan_remark:"$pan_remark" ,
+                    pan_remark: "$pan_remark",
                     pan_validate: "$pan_validate",
                     highest_upload_remark: "$highest_upload_remark",
                     highest_upload_validate: "$highest_upload_validate",
-                    other_upload_remark:"$other_upload_remark",
-                    other_upload_validate:"$other_upload_validate" ,
+                    other_upload_remark: "$other_upload_remark",
+                    other_upload_validate: "$other_upload_validate",
                     user_status: "$user_status",
                     sub_dept_id: "$sub_dept_id",
                     pan_no: "$pan_no",
@@ -583,27 +584,41 @@ exports.getAllUsers = async (req, res) => {
                         $arrayElemAt: ["$reportL3.user_name", 0]
                     },
                     designation_name: "$designation.desi_name",
-                    userSalaryStatus:'$userSalaryStatus',
-                    digital_signature_image:"$digital_signature_image",
-                    image_url: { $concat: [ImageUrl, '$image'] },
-                    uid_url: { $concat: [ImageUrl, '$UID'] },
-                    pan_url: { $concat: [ImageUrl, '$pan'] },
-                    highest_upload_url: { $concat: [ImageUrl, '$highest_upload'] },
-                    other_upload_url: { $concat: [ImageUrl, '$other_upload'] },
-                    tenth_marksheet_url: { $concat: [ImageUrl, '$tenth_marksheet'] },
-                    twelveth_marksheet_url: { $concat: [ImageUrl, '$twelveth_marksheet'] },
-                    UG_Marksheet_url: { $concat: [ImageUrl, '$UG_Marksheet'] },
-                    passport_url: { $concat: [ImageUrl, '$passport'] },
-                    pre_off_letter_url: { $concat: [ImageUrl, '$pre_off_letter'] },
-                    pre_expe_letter_url: { $concat: [ImageUrl, '$pre_expe_letter'] },
-                    Pre_relieving_letter_url: { $concat: [ImageUrl, '$pre_relieving_letter'] },
-                    bankPassBook_Cheque_url: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
-                    joining_extend_document_url: { $concat: [ImageUrl, '$joining_extend_document'] },
-                    digital_signature_image_url:{$concat: [ImageUrl, '$digital_signature_image']}
+                    userSalaryStatus: '$userSalaryStatus',
+                    digital_signature_image: "$digital_signature_image"
                 }
             }
         ]).exec();
-        res.status(200).send({ data: singlesim })
+        const userImagesBaseUrl = "http://34.93.135.33:8080/uploads/";
+        const dataWithImageUrl = singlesim.map((user) => ({
+            ...user,
+            image_url: user.image ? userImagesBaseUrl + user.image : null,
+            uid_url: user.UID ? userImagesBaseUrl + user.UID : null,
+            pan_url: user.pan ? userImagesBaseUrl + user.pan : null,
+            highest_upload_url: user.highest_upload
+                ? userImagesBaseUrl + user.highest_upload
+                : null,
+            other_upload_url: user.other_upload
+                ? userImagesBaseUrl + user.other_upload
+                : null,
+            tenth_marksheet_url: user.tenth_marksheet ? userImagesBaseUrl + user.tenth_marksheet : null,
+            twelveth_marksheet_url: user.twelveth_marksheet ? userImagesBaseUrl + user.twelveth_marksheet : null,
+            UG_Marksheet_url: user.UG_Marksheet ? userImagesBaseUrl + user.UG_Marksheet : null,
+            pasport_url: user.passport ? userImagesBaseUrl + user.passport : null,
+            pre_off_letter_url: user.pre_off_letter ? userImagesBaseUrl + user.pre_off_letter : null,
+            pre_expe_letter_url: user.pre_expe_letter ? userImagesBaseUrl + user.pre_expe_letter : null,
+            Pre_relieving_letter_url: user.pre_relieving_letter ? userImagesBaseUrl + user.pre_relieving_letter : null,
+            bankPassBook_Cheque_url: user.bankPassBook_Cheque ? userImagesBaseUrl + user.bankPassBook_Cheque : null,
+            joining_extend_document_url: user.joining_extend_document ? userImagesBaseUrl + user.joining_extend_document : null,
+            digital_signature_image_url: user.digital_signature_image ? userImagesBaseUrl + user.digital_signature_image : null
+        }));
+        if (dataWithImageUrl?.length === 0) {
+            res
+                .status(200)
+                .send({ success: true, data: [], message: "No Record found" });
+        } else {
+            res.status(200).send({ data: dataWithImageUrl });
+        }
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'Error getting all users' })
     }
@@ -612,7 +627,6 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getSingleUser = async (req, res) => {
     try {
-        const ImageUrl = 'http://34.93.135.33:8080/uploads/';
         const singlesim = await userModel.aggregate([
             {
                 $match: { user_id: parseInt(req.params.id) }
@@ -661,13 +675,13 @@ exports.getSingleUser = async (req, res) => {
             },
             {
                 $lookup: {
-                  from: "usermodels",
-                  localField: "user_report_to_id",
-                  foreignField: "user_id",
-                  as: "reportTo"
+                    from: "usermodels",
+                    localField: "user_report_to_id",
+                    foreignField: "user_id",
+                    as: "reportTo"
                 }
-              },
-              {
+            },
+            {
                 $unwind: {
                     path: "$reportTo",
                     preserveNullAndEmptyArrays: true
@@ -675,41 +689,41 @@ exports.getSingleUser = async (req, res) => {
             },
             {
                 $lookup: {
-                  from: "usermodels",
-                  localField: "Report_L1",
-                  foreignField: "user_id",
-                  as: "reportL1"
+                    from: "usermodels",
+                    localField: "Report_L1",
+                    foreignField: "user_id",
+                    as: "reportL1"
                 }
-              },
-              {
+            },
+            {
                 $unwind: {
                     path: "$reportL1",
                     preserveNullAndEmptyArrays: true
                 }
             },
-              {
+            {
                 $lookup: {
-                  from: "usermodels",
-                  localField: "Report_L2",
-                  foreignField: "user_id",
-                  as: "reportL2"
+                    from: "usermodels",
+                    localField: "Report_L2",
+                    foreignField: "user_id",
+                    as: "reportL2"
                 }
-              },
-              {
+            },
+            {
                 $unwind: {
                     path: "$reportL2",
                     preserveNullAndEmptyArrays: true
                 }
             },
-              {
+            {
                 $lookup: {
-                  from: "usermodels",
-                  localField: "Report_L3",
-                  foreignField: "user_id",
-                  as: "reportL3"
+                    from: "usermodels",
+                    localField: "Report_L3",
+                    foreignField: "user_id",
+                    as: "reportL3"
                 }
-              },
-              {
+            },
+            {
                 $unwind: {
                     path: "$reportl3",
                     preserveNullAndEmptyArrays: true
@@ -740,7 +754,7 @@ exports.getSingleUser = async (req, res) => {
                     Report_L3: "$Report_L3",
                     PersonalEmail: "$PersonalEmail",
                     level: "$level",
-                    joining_date:"$joining_date",
+                    joining_date: "$joining_date",
                     releaving_date: "$releaving_date",
                     room_id: "$room_id",
                     UID: "$UID",
@@ -755,7 +769,7 @@ exports.getSingleUser = async (req, res) => {
                     Age: "$Age",
                     fatherName: "$fatherName",
                     motherName: "$motherName",
-                    Hobbies:"$Hobbies",
+                    Hobbies: "$Hobbies",
                     BloodGroup: "$BloodGroup",
                     MartialStatus: "$MartialStatus",
                     DateOfMarriage: "$DateOfMarriage",
@@ -766,12 +780,12 @@ exports.getSingleUser = async (req, res) => {
                     image_validate: "$image_validate",
                     uid_remark: "$uid_remark",
                     uid_validate: "$uid_validate",
-                    pan_remark:"$pan_remark" ,
+                    pan_remark: "$pan_remark",
                     pan_validate: "$pan_validate",
                     highest_upload_remark: "$highest_upload_remark",
                     highest_upload_validate: "$highest_upload_validate",
-                    other_upload_remark:"$other_upload_remark",
-                    other_upload_validate:"$other_upload_validate" ,
+                    other_upload_remark: "$other_upload_remark",
+                    other_upload_validate: "$other_upload_validate",
                     user_status: "$user_status",
                     sub_dept_id: "$sub_dept_id",
                     pan_no: "$pan_no",
@@ -823,26 +837,41 @@ exports.getSingleUser = async (req, res) => {
                     Report_L1N: "$reportL1.user_name",
                     Report_L2N: "$reportL2.user_name",
                     Report_L3N: "$reportL3.user_name",
-                    designation_name: "$designation.desi_name",
-                    image_url: { $concat: [ImageUrl, '$image'] },
-                    UID_url: { $concat: [ImageUrl, '$UID'] },
-                    pan_url: { $concat: [ImageUrl, '$pan'] },
-                    highest_upload_url: { $concat: [ImageUrl, '$highest_upload'] },
-                    other_upload_url: { $concat: [ImageUrl, '$other_upload'] },
-                    tenth_marksheet_url: { $concat: [ImageUrl, '$tenth_marksheet'] },
-                    twelveth_marksheet_url: { $concat: [ImageUrl, '$twelveth_marksheet'] },
-                    UG_Marksheet_url: { $concat: [ImageUrl, '$UG_Marksheet'] },
-                    passport_url: { $concat: [ImageUrl, '$passport'] },
-                    pre_off_letter_url: { $concat: [ImageUrl, '$pre_off_letter'] },
-                    pre_expe_letter_url: { $concat: [ImageUrl, '$pre_expe_letter'] },
-                    pre_relieving_letter_url: { $concat: [ImageUrl, '$pre_relieving_letter'] },
-                    bankPassBook_Cheque_url: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
-                    joining_extend_document_url: { $concat: [ImageUrl, '$joining_extend_document'] }
+                    designation_name: "$designation.desi_name"
                 }
             }
         ]).exec();
-        const result = singlesim[0];
-        res.status(200).send(result);
+        const userImagesBaseUrl = "http://34.93.135.33:8080/uploads/";
+        const dataWithImageUrl = singlesim.map((user) => ({
+            ...user,
+            image_url: user.image ? userImagesBaseUrl + user.image : null,
+            uid_url: user.UID ? userImagesBaseUrl + user.UID : null,
+            pan_url: user.pan ? userImagesBaseUrl + user.pan : null,
+            highest_upload_url: user.highest_upload
+                ? userImagesBaseUrl + user.highest_upload
+                : null,
+            other_upload_url: user.other_upload
+                ? userImagesBaseUrl + user.other_upload
+                : null,
+            tenth_marksheet_url: user.tenth_marksheet ? userImagesBaseUrl + user.tenth_marksheet : null,
+            twelveth_marksheet_url: user.twelveth_marksheet ? userImagesBaseUrl + user.twelveth_marksheet : null,
+            UG_Marksheet_url: user.UG_Marksheet ? userImagesBaseUrl + user.UG_Marksheet : null,
+            pasport_url: user.passport ? userImagesBaseUrl + user.passport : null,
+            pre_off_letter_url: user.pre_off_letter ? userImagesBaseUrl + user.pre_off_letter : null,
+            pre_expe_letter_url: user.pre_expe_letter ? userImagesBaseUrl + user.pre_expe_letter : null,
+            Pre_relieving_letter_url: user.pre_relieving_letter ? userImagesBaseUrl + user.pre_relieving_letter : null,
+            bankPassBook_Cheque_url: user.bankPassBook_Cheque ? userImagesBaseUrl + user.bankPassBook_Cheque : null,
+            joining_extend_document_url: user.joining_extend_document ? userImagesBaseUrl + user.joining_extend_document : null,
+            digital_signature_image_url: user.digital_signature_image ? userImagesBaseUrl + user.digital_signature_image : null,
+        }));
+        if (dataWithImageUrl?.length === 0) {
+            res
+                .status(200)
+                .send({ success: true, data: [], message: "No Record found" });
+        } else {
+            const result = dataWithImageUrl[0];
+            res.status(200).send(result);
+        }
     } catch (err) {
         res.status(500).send({ error: err, sms: 'Error getting all users' })
     }
@@ -889,9 +918,9 @@ exports.loginUser = async (req, res) => {
                     email: '$user_email_id',
                     dept_id: '$dept_id',
                     role_id: '$role_id',
-                    id:"$user_id",
-                    name:"$user_name",
-                    email:"$user_email_id",
+                    id: "$user_id",
+                    name: "$user_name",
+                    email: "$user_email_id",
                     // sitting_id: '$sitting_id',
                     room_id: '$room_id',
                     user_status: '$user_status',
@@ -902,12 +931,14 @@ exports.loginUser = async (req, res) => {
             }
         ]).exec();
 
+        console.log("simc",simc[0]?.user_login_password);
+        console.log("cdd",req.body.user_login_password)
         if (simc.length === 0) {
             return res.status(500).send({ success: false })
         }
         let role = req.body?.role_id
         if (bcrypt.compareSync(req.body.user_login_password, simc[0]?.user_login_password) || role === constant.ADMIN_ROLE) {
-        // if (bcrypt.compareSync(req.body.user_login_password, simc[0].user_login_password)) {
+            // if (bcrypt.compareSync(req.body.user_login_password, simc[0].user_login_password)) {
             const token = jwt.sign(
                 {
                     id: simc[0]?.id,
@@ -948,14 +979,14 @@ exports.deliveryBoy = async (req, res) => {
 }
 
 exports.deliveryBoyByRoom = async (req, res) => {
-    try{
-        const delv = await userModel.find({role_id:3,room_id: parseInt(req.params.room_id)})
-        if(!delv){
-            res.status(500).send({success:false})
+    try {
+        const delv = await userModel.find({ role_id: 3, room_id: parseInt(req.params.room_id) })
+        if (!delv) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({results:delv})
-    } catch(err){
-        res.status(500).send({error:err, sms:'error getting delivery boy from this room'})
+        res.status(200).send({ results: delv })
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'error getting delivery boy from this room' })
     }
 }
 
@@ -1159,7 +1190,7 @@ exports.allUserAuthDetail = async (req, res) => {
             },
             {
                 $project: {
-                    auth_id:"$auth_id",
+                    auth_id: "$auth_id",
                     user_name: '$user.user_name',
                     obj_name: "$object.obj_name",
                     id: "$_id",
@@ -1233,7 +1264,7 @@ exports.getSingleUserAuthDetail = async (req, res) => {
             },
             {
                 $group: {
-                    _id: '$obj_id', 
+                    _id: '$obj_id',
                     auth_id: { $first: '$auth_id' },
                     Juser_id: { $first: '$Juser_id' },
                     obj_name: { $first: '$object.obj_name' },
@@ -1245,7 +1276,7 @@ exports.getSingleUserAuthDetail = async (req, res) => {
                 }
             },
             {
-                $sort: { obj_id: 1 } 
+                $sort: { obj_id: 1 }
             }
         ]);
 
@@ -1488,6 +1519,7 @@ exports.getUserByDeptId = async (req, res) => {
 
 exports.getUserOtherFields = async (req, res) => {
     try {
+        // const delv = await userOtherFieldModel.find({});
         const delv = await userOtherFieldModel.aggregate([
             {
                 $match: {
@@ -1503,12 +1535,15 @@ exports.getUserOtherFields = async (req, res) => {
                 }
             },
             {
-                $unwind: '$user'
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $project: {
                     user_name: '$user.user_name',
-                    created_by_name: '$user.user_name',
+                    // created_by_name: '$user.user_name',
                     id: "$_id",
                     user_id: '$user_id',
                     field_name: '$field_name',
@@ -1534,7 +1569,7 @@ exports.addUserOtherField = async (req, res) => {
         const simc = new userOtherFieldModel({
             user_id: req.body.user_id,
             field_name: req.body.field_name,
-            field_value: req.file,
+            field_value: req.file ? req.file.filename : '',
             remark: req.body.remark,
             created_by: req.body.created_at
         })
@@ -1810,11 +1845,11 @@ exports.getAllWfhUsers = async (req, res) => {
     try {
         const simc = await userModel.find({ job_type: 'WFH' }).lean();
         if (simc.length === 0) {
-            res.status(500).send({ success: false , message :"No record found" })
+            res.status(500).send({ success: false, message: "No record found" })
         }
-        
+
         const modifiedUsers = simc.map(user => {
-           
+
             if (user.hasOwnProperty('lastupdated')) {
                 user.last_updated = user.lastupdated;
                 delete user.lastupdated;
@@ -1825,8 +1860,8 @@ exports.getAllWfhUsers = async (req, res) => {
             }
             return user;
         });
-        res.status(200).send({data:modifiedUsers})
-    } catch(err){
-        res.status(500).send({error:err.message,sms:'Error getting all wfh users'})
+        res.status(200).send({ data: modifiedUsers })
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'Error getting all wfh users' })
     }
 };

@@ -89,7 +89,7 @@ exports.getSingleJobResponsibility = async (req, res) => {
 exports.editJobResponsibility = async (req, res) => {
     try{
         const editsim = await jobResponsibilityModel.findOneAndUpdate({Job_res_id:req.body.Job_res_id},{
-            user_id: req.body.role_name,
+            user_id: req.body.user_id,
             sjob_responsibility: req.body.job_responsi,
             description: req.body.description,
             last_updated_by: req.body.last_updated_by

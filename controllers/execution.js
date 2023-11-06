@@ -125,7 +125,8 @@ exports.exeSumPost = async (req, res) => {
                     credit_approval_amount: data.credit_approval_amount,
                     credit_approval_date: data.credit_approval_date,
                     credit_approval_by: data.credit_approval_by,
-                    campaign_amount_without_gst: data.campaign_amount_without_gst
+                    campaign_amount_without_gst: data.campaign_amount_without_gst,
+                    start_date: data.start_date
                 })
                 const instav = await creators.save();
              
