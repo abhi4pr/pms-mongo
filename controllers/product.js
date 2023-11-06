@@ -122,7 +122,7 @@ exports.getProductById = async (req, res) => {
         {}
       );
     }
-    const url = `${constant.local_base_url}/uploads/`;
+    const url = `${constant.base_url}/uploads/`;
     const dataWithFileUrls = product.map((item) => ({
       ...item,
       imageUrl: item.Product_image ? url + item.Product_image : "",
@@ -160,7 +160,7 @@ exports.getProduct = async (req, res) => {
         {}
       );
     }
-    const url = `${constant.local_base_url}/uploads/`;
+    const url = `${constant.base_url}/uploads/`;
     const dataWithFileUrls = product.map((item) => ({
       ...item,
       Product_image_download_url: item.Product_image ? url + item.Product_image : "",
@@ -873,7 +873,7 @@ exports.pendingOrdersById = async (req, res) => {
 
     const responseData = orders.map((item) => {
       const orderRequestId = item.Order_req_id;
-      const imageUrl = `${constant.local_base_url}/uploads/${item.Product_image}`;
+      const imageUrl = `${constant.base_url}/uploads/${item.Product_image}`;
       if (!timers1[orderRequestId]) {
         timers1[orderRequestId] = {
           startTime: currentTime,
@@ -986,7 +986,7 @@ exports.delivereOrdersById = async (req, res) => {
 
     const responseData = orders.map((item) => {
       const orderRequestId = item.Order_req_id;
-      const imageUrl = `${constant.local_base_url}/uploads/${item.Product_image}`;
+      const imageUrl = `${constant.base_url}/uploads/${item.Product_image}`;
       if (!timers1[orderRequestId]) {
         timers1[orderRequestId] = {
           startTime: currentTime,
@@ -1341,10 +1341,10 @@ exports.orderReqHistory = async (req, res) => {
     
     const responseData = orderReqHis.map((item) => {
       const imageUrl = item.Product_image
-        ? `${constant.local_base_url}/uploads/${item.Product_image}`
+        ? `${constant.base_url}/uploads/${item.Product_image}`
         : "";
       const userImageeUrl = item.image
-        ? `${constant.local_base_url}/uploads/${item.image}`
+        ? `${constant.base_url}/uploads/${item.image}`
         : "";
 
       return {
@@ -1487,10 +1487,10 @@ exports.getOrderReqsBasedOnFilter = async (req, res) => {
 
     const responseData = orderReq.map((item) => {
       const imageUrl = item.Product_image
-        ? `${constant.local_base_url}/uploads/${item.Product_image}`
+        ? `${constant.base_url}/uploads/${item.Product_image}`
         : "";
       const userImageeUrl = item.image
-        ? `${constant.local_base_url}/uploads/${item.image}`
+        ? `${constant.base_url}/uploads/${item.image}`
         : "";
       return {
         ...item,

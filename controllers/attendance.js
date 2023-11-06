@@ -373,12 +373,12 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
         },
       ])
       .exec();
-    if (!getcreators) {
-      res.status(500).send({ success: false });
+    if (getcreators?.length === 0) {
+     return res.status(500).send({ success: false });
     }
-    res.status(200).send({ data: getcreators });
+    return res.status(200).send({ data: getcreators });
   } catch (err) {
-    res.status(500).send({ error: err, sms: "Error getting salary" });
+    return res.status(500).send({ error: err, sms: "Error getting salary" });
   }
 };
 
@@ -459,7 +459,10 @@ exports.getSalaryByUserId = async (req, res) => {
           },
         },
         {
-          $unwind: "$fn",
+          $unwind: {
+            path: "$fn",
+            preserveNullAndEmptyArrays: true
+        }
         },
 
         {
@@ -527,11 +530,11 @@ exports.getSalaryByUserId = async (req, res) => {
       ])
       .exec();
     if (getcreators?.length === 0) {
-      res.status(500).send({ success: false });
+     return res.status(500).send({ success: false });
     }
-    res.status(200).send({ data: getcreators });
+    return res.status(200).send({ data: getcreators });
   } catch (err) {
-    res
+    return  res
       .status(500)
       .send({ error: err.message, sms: "Error getting salary of user" });
   }
