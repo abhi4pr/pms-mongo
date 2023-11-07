@@ -2,6 +2,8 @@ const schedule = require('node-schedule');
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const userModel = require('../models/userModel');
+const fs = require('fs');
+const ejs = require('ejs');
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -9,6 +11,10 @@ var transporter = nodemailer.createTransport({
     user: 'vijayanttrivedi1500@gmail.com',
     pass: 'odovpikkjvkprrjv',
   },
+});
+
+const job0Days = schedule.scheduleJob('0 0 * * *', async () => {
+  sendReminderEmail(0);
 });
 
 const job1Days = schedule.scheduleJob('0 0 * * *', async () => {
@@ -35,11 +41,15 @@ async function sendReminderEmail(daysBefore) {
   const users = await userModel.find({ joining_date: formattedDate });
 
   users.forEach((user) => {
+    const templatePath = `controllers/emailtemp${daysBefore}.ejs`;
+    const templateContent = fs.readFileSync(templatePath, 'utf-8');
+    const compiledTemplate = ejs.compile(templateContent);
+
     const mailOptions = {
       from: 'vijayanttrivedi1500@gmail.com',
       to: user.user_email_id,
       subject: 'Reminder: Your Joining Date is Approaching',
-      text: `Your joining date is on ${formattedDate}. Please prepare for your first day!`,
+      html : compiledTemplate({ formattedDate })
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

@@ -453,6 +453,20 @@ exports.getSalaryByUserId = async (req, res) => {
         },
         {
           $lookup: {
+            from: "billingheadermodels",
+            localField: "dept",
+            foreignField: "dept_id",
+            as: "billingheadermodels",
+          },
+        },
+        {
+          $unwind: {
+            path: "$billingheadermodels",
+            preserveNullAndEmptyArrays: true
+        }
+        },
+        {
+          $lookup: {
             from: "financemodels",
             localField: "attendence_id",
             foreignField: "attendence_id",
@@ -491,6 +505,23 @@ exports.getSalaryByUserId = async (req, res) => {
         {
           $project: {
             user_name: "$user.user_name",
+            billing_header_name: {
+              $cond: {
+                if: {
+                  $and: [
+                    {
+                      $eq: [
+                        { $type: "$billingheadermodels.billing_header_name" },
+                        "missing",
+                      ],
+                    },
+                  ],
+                },
+                then: "",
+                else: "$billingheadermodels.billing_header_name",
+              },
+            },
+            // billing_header_name: "$billingheadermodels.billing_header_name",
             user_email_id: "$user.user_email_id",
             digital_signature_image: "$user.digital_signature_image",
             pan_no: "$user.pan_no",

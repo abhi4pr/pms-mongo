@@ -183,8 +183,14 @@ exports.getAllocations = async (req, res) => {
                     as: 'user'
                 }
             },
+            // {
+            //     $unwind: '$user'
+            // },
             {
-                $unwind: '$user'
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
@@ -194,8 +200,14 @@ exports.getAllocations = async (req, res) => {
                     as: 'sim'
                 }
             },
+            // {
+            //     $unwind: '$sim'
+            // },
             {
-                $unwind: '$sim'
+                $unwind: {
+                    path: "$sim",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
@@ -205,8 +217,14 @@ exports.getAllocations = async (req, res) => {
                     as: 'department'
                 }
             },
+            // {
+            //     $unwind: '$department'
+            // },
             {
-                $unwind: '$department'
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
@@ -216,8 +234,14 @@ exports.getAllocations = async (req, res) => {
                   as: "designation"
                 }
             },
+            // {
+            //     $unwind: "$designation"
+            // },
             {
-                $unwind: "$designation"
+                $unwind: {
+                    path: "$designation",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $project: {
