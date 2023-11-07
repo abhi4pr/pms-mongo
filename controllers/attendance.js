@@ -369,6 +369,7 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
             screenshot: {
               $concat: [imageUrl, "$finance.screenshot"],
             },
+            digital_signature_image:"$user.digital_signature_image"
           },
         },
       ])
