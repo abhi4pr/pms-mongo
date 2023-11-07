@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocumantion = require('./doc/swaggerDoc.js');
 const OpenAI = require("openai");
+require('./controllers/autoMail.js');
 
 const app = express();
 // app.use(express.json());
