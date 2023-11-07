@@ -27,7 +27,6 @@ const getBrand = {
       },
     },
   },
-
 };
 
 // const BrandRouteDoc = {
@@ -40,7 +39,7 @@ const getBrand = {
 exports.BrandRouteDoc = {
   "/api/add_brand": {
     post: {
-        tags: [`Brand Module`],
+      tags: [`Brand Module`],
       description: "Add a Billing Header.",
       requestBody: {
         content: {
@@ -93,7 +92,7 @@ exports.BrandRouteDoc = {
   },
   "/api/edit_brand": {
     put: {
-        tags: [`Brand Module`],
+      tags: [`Brand Module`],
       description: "Edit a Billing Header with the specified ID.",
       requestBody: {
         content: {
@@ -138,7 +137,7 @@ exports.BrandRouteDoc = {
             },
           },
         },
-      
+
         200: {
           description: "when your billingheader_id not match any data in db",
           content: {
@@ -160,7 +159,7 @@ exports.BrandRouteDoc = {
   },
   "/api/get_brand/{id}": {
     get: {
-        tags: [`Brand Module`],
+      tags: [`Brand Module`],
       description: "Get Single Billing Header.",
       parameters: [
         {
@@ -228,7 +227,7 @@ exports.BrandRouteDoc = {
   },
   "/api/get_brands": {
     get: {
-        tags: [`Brand Module`],
+      tags: [`Brand Module`],
       description: "Get all Billing Headers.",
       responses: {
         "Positive 200": {
@@ -291,7 +290,7 @@ exports.BrandRouteDoc = {
   },
   "/api/delete_brand/{id}": {
     delete: {
-        tags: [`Brand Module`],
+      tags: [`Brand Module`],
       description: "Delete Billing Header.",
       parameters: [
         {
