@@ -1,8 +1,16 @@
 const tag = require("./components/tag");
-const BrandRouteDoc = require("./components/brandDoc");
+const brandSchema = require("./schema/BrandSchema.js");
+const billingSchema = require("./schema/billingSchema.js");
+const projectxCategorySchema = require("./schema/projectxCategorySchema.js");
+const projectxPageCategorySchema = require("./schema/projectxPageCategorySchema.js");
+const projectxSubCategorySchema = require("./schema/projectxSubCategorySchema.js");
+const registerCampaignSchema = require("./schema/registerCampaignSchema.js");
+const { BrandRouteDoc } = require("./components/brandDoc");
 const { projectxCategoryDoc } = require("./components/projectxCategoryDoc");
 const { billingHeaderDoc } = require("./components/billingHeaderDoc");
-const { projectxPageCategoryDoc } = require("./components/projectxPageCategoryDoc");
+const {
+  projectxPageCategoryDoc,
+} = require("./components/projectxPageCategoryDoc");
 const {
   projectxSubCategoryDoc,
 } = require("./components/projectxSubCategoryDoc");
@@ -38,25 +46,43 @@ const swaggerDocumantion = {
     ...projectxSubCategoryDoc,
     ...projectxPageCategoryDoc,
   },
-  // components: {                 //Create reusable components
-  //   schemas: {                  //Create schema for display schema
-  //     User: {
-  //       ...userSchema,
-  //     },
-  //   },
-  //   UserArray: {
-  //     description: "List of user object",
-  //     content: {
-  //       "application/json": {
-  //         schema: {
-  //           type: "array",
-  //           items: {
-  //             $ref: "#/components/schemas/User",
-  //           },
-  //         },
-  //       },
-  //     },
-  //   },                               // Create for authorization button
+  components: {
+    //Create reusable components
+    schemas: {
+      //Create schema for display schema
+      Brand: {
+        ...brandSchema,
+      },
+      Billing_Header: {
+        ...billingSchema,
+      },
+      Projectx_Sub_Category_Schema: {
+        ...projectxSubCategorySchema,
+      },
+      Projectx_Page_Category_Schema: {
+        ...projectxPageCategorySchema,
+      },
+      Projectx_Category_Schema: {
+        ...projectxCategorySchema,
+      },
+      Register_Campaign_Schema: {
+        ...registerCampaignSchema,
+      },
+    },
+  },
+  UserArray: {
+    description: "List of user object",
+    content: {
+      "application/json": {
+        schema: {
+          type: "array",
+          items: {
+            $ref: "#/components/schemas/Brand",
+          },
+        },
+      },
+    },
+  }, // Create for authorization button
   //   securitySchemes: {
   //     bearerAuth: {
   //       type: "apiKey",

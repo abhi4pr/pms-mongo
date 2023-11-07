@@ -228,7 +228,7 @@ exports.getPosts = async (req, res) => {
         ]);
 
         if (!distinctPosts || distinctPosts.length === 0) {
-            res.status(404).send({ success: false, message: "No posts found" });
+            res.status(200).send({ success: false, message: "No posts found" });
         } else {
             res.status(200).send(distinctPosts);
         }
@@ -317,7 +317,7 @@ exports.getStorysFromName = async (req, res) => {
             .limit(perPage);
 
         if (!getStorys || getStorys.length == 0) {
-            res.status(404).send({
+            res.status(200).send({
                 success: false,
                 message: "No posts found from this creatorName",
             });
@@ -763,7 +763,7 @@ exports.getPostsFromName = async (req, res) => {
             .limit(perPage);
 
         if (!getPosts || getPosts.length == 0) {
-            res.status(404).send({
+            res.status(200).send({
                 success: false,
                 message: "No posts found from this creatorName",
             });
