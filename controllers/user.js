@@ -236,6 +236,13 @@ exports.updateUser = [upload1, async (req, res) => {
         if (req.body.user_login_password) {
             encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
         }
+
+        const existingUser = await userModel.findOne({ user_id: req.body.user_id });
+
+        if (!existingUser) {
+            return res.status(404).send({ success: false, message: 'User not found' });
+        }
+
         const editsim = await userModel.findOneAndUpdate({ user_id: parseInt(req.body.user_id) }, {
             user_name: req.body.user_name,
             user_designation: req.body.user_designation,
@@ -256,7 +263,7 @@ exports.updateUser = [upload1, async (req, res) => {
             Report_L3: isNaN(req.body.report_L3) ? 0 : req.body.report_L3,
             Personal_email: req.body.Personal_email,
             joining_date: req.body.joining_date,
-            releaving_date: req.body.releaving_date,
+            // releaving_date: req.body.releaving_date,
             level: req.body.level,
             room_id: req.body.room_id,
             salary: isNaN(req.body.salary) ? 0 : req.body.salary,
@@ -320,21 +327,21 @@ exports.updateUser = [upload1, async (req, res) => {
             joining_date_extend_reason: req.body.joining_date_extend_reason,
             invoice_template_no: req.body.invoice_template_no,
             image: req.files && req.files['image'] && req.files['image'][0] ? req.files['image'][0].filename : '',
-            UID: req.files && req.files['UID'] && req.files['UID'][0] ? req.files['UID'][0].filename : '',
-            pan: req.files && req.files['pan'] && req.files['pan'][0] ? req.files['pan'][0].filename : '',
-            highest_upload: req.files && req.files['highest_upload'] && req.files['highest_upload'][0] ? req.files['highest_upload'][0].filename : '',
-            other_upload: req.files && req.files['other_upload'] && req.files['other_upload'][0] ? req.files['other_upload'][0].filename : '',
-            tenth_marksheet: req.files && req.files['tenth_marksheet'] && req.files['tenth_marksheet'][0] ? req.files['tenth_marksheet'][0].filename : '',
-            twelveth_marksheet: req.files && req.files['twelveth_marksheet'] && req.files['twelveth_marksheet'][0] ? req.files['twelveth_marksheet'][0].filename : '',
-            UG_Marksheet: req.files && req.files['UG_Marksheet'] && req.files['UG_Marksheet'][0] ? req.files['UG_Marksheet'][0].filename : '',
-            passport: req.files && req.files['passport'] && req.files['passport'][0] ? req.files['passport'][0].filename : '',
-            pre_off_letter: req.files && req.files['pre_off_letter'] && req.files['pre_off_letter'][0] ? req.files['pre_off_letter'][0].filename : '',
-            pre_expe_letter: req.files && req.files['pre_expe_letter'] && req.files['pre_expe_letter'][0] ? req.files['pre_expe_letter'][0].filename : '',
-            pre_relieving_letter: req.files && req.files['pre_relieving_letter'] && req.files['pre_relieving_letter'][0] ? req.files['pre_relieving_letter'][0].filename : '',
-            bankPassBook_Cheque: req.files && req.files['bankPassBook_Cheque'] && req.files['bankPassBook_Cheque'][0] ? req.files['bankPassBook_Cheque'][0].filename : '',
-            joining_extend_document: req.files && req.files['joining_extend_document'] && req.files['joining_extend_document'][0] ? req.files['joining_extend_document'][0].filename : '',
+            UID: req.files && req.files['UID'] && req.files['UID'][0] ? req.files['UID'][0].filename : existingUser.UID || '',
+            pan: req.files && req.files['pan'] && req.files['pan'][0] ? req.files['pan'][0].filename : existingUser.pan || '',
+            tenth_marksheet:req.files && req.files['tenth_marksheet'] && req.files['tenth_marksheet'][0] ? req.files['tenth_marksheet'][0].filename : existingUser.tenth_marksheet || '',
+            highest_upload: req.files && req.files['highest_upload'] && req.files['highest_upload'][0] ? req.files['highest_upload'][0].filename : existingUser.highest_upload || '',
+            other_upload: req.files && req.files['other_upload'] && req.files['other_upload'][0] ? req.files['other_upload'][0].filename : existingUser.other_upload || '',
+            twelveth_marksheet: req.files && req.files['twelveth_marksheet'] && req.files['twelveth_marksheet'][0] ? req.files['twelveth_marksheet'][0].filename : existingUser.twelveth_marksheet || '',
+            UG_Marksheet: req.files && req.files['UG_Marksheet'] && req.files['UG_Marksheet'][0] ? req.files['UG_Marksheet'][0].filename : existingUser.UG_Marksheet || '',
+            passport: req.files && req.files['passport'] && req.files[' passport'][0] ? req.files[' passport'][0].filename : existingUser. passport || '',
+            pre_off_letter: req.files && req.files['pre_off_letter'] && req.files[' pre_off_letter'][0] ? req.files['pre_off_letter'][0].filename : existingUser. pre_off_letter || '',
+            pre_expe_letter: req.files && req.files['pre_expe_letter'] && req.files['pre_expe_letter'][0] ? req.files['pre_expe_letter'][0].filename : existingUser. pre_expe_letter || '',
+            pre_relieving_letter: req.files && req.files['pre_relieving_letter'] && req.files['pre_relieving_letter'][0] ? req.files['pre_relieving_letter'][0].filename : existingUser. pre_relieving_letter || '',
+            bankPassBook_Cheque: req.files && req.files['bankPassBook_Cheque'] && req.files['bankPassBook_Cheque'][0] ? req.files['bankPassBook_Cheque'][0].filename : existingUser. bankPassBook_Cheque || '',
+            joining_extend_document: req.files && req.files['joining_extend_document'] && req.files['joining_extend_document'][0] ? req.files[' joining_extend_document'][0].filename : existingUser.joining_extend_document  || '',
             userSalaryStatus: req.body.userSalaryStatus,
-            digital_signature_image: req.files && req.files['digital_signature_image'] && req.files['digital_signature_image'][0] ? req.files['digital_signature_image'][0].filename : ''
+            digital_signature_image: req.files && req.files['digital_signature_image'] && req.files['digital_signature_image'][0] ? req.files['digital_signature_image'][0].filename : existingUser. digital_signature_image || '',
 
         }, { new: true });
         if (!editsim) {
@@ -931,8 +938,8 @@ exports.loginUser = async (req, res) => {
             }
         ]).exec();
 
-        console.log("simc",simc[0]?.user_login_password);
-        console.log("cdd",req.body.user_login_password)
+        console.log("simc", simc[0]?.user_login_password);
+        console.log("cdd", req.body.user_login_password)
         if (simc.length === 0) {
             return res.status(500).send({ success: false })
         }
@@ -1529,7 +1536,7 @@ exports.getUserByDeptId = async (req, res) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
-          
+
             {
                 $project: {
                     user_id: "$user_id",
@@ -1537,8 +1544,8 @@ exports.getUserByDeptId = async (req, res) => {
                     user_designation: "$user_designation",
                     department_name: '$department.dept_name',
                     designation_name: "$designation.desi_name",
-                    last_updated:"$lastupdated",
-                    tbs_applicable:"$tds_applicable"
+                    last_updated: "$lastupdated",
+                    tbs_applicable: "$tds_applicable"
                 }
             }
         ]).exec();
