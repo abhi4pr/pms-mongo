@@ -4,13 +4,14 @@ const apis = require("./components/allApiCollection");
 const mainServers = require("./components/mainServers");
 
 const swaggerDocumantion = {
-  openapi: "3.0.0",
+  openapi: "3.0.3",
   info: {
-    title: "Jarvis Mongo API Documentation",
+    // title: "Jarvis Mongo API Hub",
     version: "1.0.0",
-    description: `There is a collection of all api's`,
+    // description:
+    //   "Welcome to the Jarvis API! Your central spot for managing and retrieving data efficiently.",
     contact: {
-      email: "apiteam@swagger.io",
+      email: "apiteam@yourdomain.com",
     },
   },
   servers: [...mainServers],

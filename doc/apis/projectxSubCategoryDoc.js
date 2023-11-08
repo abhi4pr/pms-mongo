@@ -1,7 +1,7 @@
-exports.projectxSubCategoryDoc = {
+exports.projectxSubCategoryApis = {
   "/api/projectxSubCategory": {
     post: {
-      tags: [`Projectx Sub Category Module`],
+      tags: [`Projectx Sub Category`],
       description: "Add a Projectx Sub Category.",
       requestBody: {
         content: {
@@ -110,7 +110,7 @@ exports.projectxSubCategoryDoc = {
       },
     },
     put: {
-      tags: [`Projectx Sub Category Module`],
+      tags: [`Projectx Sub Category`],
       description:
         "Edit a Projectx Sub category with the specified ID. Note if you not want to update any specific field in that case you have to remove that target field from request body.",
       requestBody: {
@@ -217,7 +217,7 @@ exports.projectxSubCategoryDoc = {
       },
     },
     get: {
-      tags: [`Projectx Sub Category Module`],
+      tags: [`Projectx Sub Category`],
       description: "Get all Projectx Sub Categories.",
 
       responses: {
@@ -290,7 +290,7 @@ exports.projectxSubCategoryDoc = {
   },
   "/api/projectxSubCategory/{id}": {
     get: {
-      tags: [`Projectx Sub Category Module`],
+      tags: [`Projectx Sub Category`],
       description: "Get Single Projectx Sub Category.",
       parameters: [
         {
@@ -356,7 +356,7 @@ exports.projectxSubCategoryDoc = {
       },
     },
     delete: {
-      tags: [`Projectx Sub Category Module`],
+      tags: [`Projectx Sub Category`],
       description: "Delete Projectx Sub category.",
       parameters: [
         {

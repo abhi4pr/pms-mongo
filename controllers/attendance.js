@@ -1,3 +1,4 @@
+const { createNextInvoiceNumber } = require("../helper/helper.js");
 const attendanceModel = require("../models/attendanceModel.js");
 const userModels = require("../models/userAuthModel.js");
 const userModel = require("../models/userModel.js");
@@ -106,9 +107,11 @@ exports.addAttendance = async (req, res) => {
           const tdsDeduction = (netSalary * user.tds_per) / 100;
           const ToPay = netSalary - tdsDeduction;
           const salary = user.salary;
+          let invoiceNo = await createNextInvoiceNumber(user.user_id);
           const creators = new attendanceModel({
             dept: user.dept_id,
             user_id: user.user_id,
+            invoiceNo: invoiceNo,
             user_name: user.user_name,
             noOfabsent: 0,
             month: req.body.month,
@@ -116,8 +119,8 @@ exports.addAttendance = async (req, res) => {
             bonus: 0,
             total_salary: user.salary && user.salary.toFixed(2),
             tds_deduction: tdsDeduction && tdsDeduction.toFixed(2),
-            net_salary: netSalary  && netSalary.toFixed(2),
-            toPay: ToPay  && ToPay.toFixed(2),
+            net_salary: netSalary && netSalary.toFixed(2),
+            toPay: ToPay && ToPay.toFixed(2),
             remark: "",
             Created_by: req.body.user_id,
             salary,
@@ -139,6 +142,7 @@ exports.addAttendance = async (req, res) => {
           // });
           const instav = await creators.save();
         }
+        res.send({ status: 200 });
       }
     } else if (
       req.body.user_id == check1[0].user_id &&
@@ -153,8 +157,10 @@ exports.addAttendance = async (req, res) => {
       const perdaysal = results4[0].salary / 30;
 
       const totalSalary = perdaysal * (30 - noOfabsent);
-      const netSalary = bonus ? totalSalary + bonus - salary_deduction : totalSalary;
-      const tdsDeduction = netSalary * (results4[0].tds_per) / 100;
+      const netSalary = bonus
+        ? totalSalary + bonus - salary_deduction
+        : totalSalary;
+      const tdsDeduction = (netSalary * results4[0].tds_per) / 100;
 
       const ToPay = netSalary - tdsDeduction;
       const salary = results4[0].salary;
@@ -169,9 +175,9 @@ exports.addAttendance = async (req, res) => {
           year: req.body.year,
           bonus: Bonus,
           total_salary: totalSalary && totalSalary.toFixed(2),
-          tds_deduction: tdsDeduction  && tdsDeduction.toFixed(2),
-          net_salary: netSalary  && netSalary.toFixed(2),
-          toPay: ToPay  && ToPay.toFixed(2),
+          tds_deduction: tdsDeduction && tdsDeduction.toFixed(2),
+          net_salary: netSalary && netSalary.toFixed(2),
+          toPay: ToPay && ToPay.toFixed(2),
           remark: req.body.remark,
           salary,
           salary_deduction,
@@ -180,6 +186,7 @@ exports.addAttendance = async (req, res) => {
         },
         { new: true }
       );
+      res.send({ status: 200 });
     } else {
       const check4 = await userModel.find({
         job_type: "WFH",
@@ -220,19 +227,20 @@ exports.addAttendance = async (req, res) => {
         const netSalary = totalSalary;
         const tdsDeduction = (netSalary * user.tds_per) / 100;
         const ToPay = netSalary - tdsDeduction;
-
+        let invoiceNo = await createNextInvoiceNumber(user.user_id);
         const creators = new attendanceModel({
           dept: user.dept_id,
           user_id: user.user_id,
+          invoiceNo,
           user_name: user.user_name,
           noOfabsent: 0,
           month: req.body.month,
           year: req.body.year,
           bonus: 0,
           total_salary: totalSalary && totalSalary.toFixed(2),
-          tds_deduction: tdsDeduction  && tdsDeduction.toFixed(2),
-          net_salary: netSalary  && netSalary.toFixed(2),
-          toPay: ToPay  && ToPay.toFixed(2),
+          tds_deduction: tdsDeduction && tdsDeduction.toFixed(2),
+          net_salary: netSalary && netSalary.toFixed(2),
+          toPay: ToPay && ToPay.toFixed(2),
           remark: "",
           created_by: req.body.user_id,
         });
@@ -253,10 +261,15 @@ exports.addAttendance = async (req, res) => {
         // });
         const instav = await creators.save();
         // }
+        if (instav) {
+          return res.send({ status: 200 });
+        } else {
+          return res.send("Something went wrong");
+        }
       }
     }
 
-    res.send({ status: 200 });
+    // res.send({ status: 200 });
   } catch (error) {
     console.log(error);
     res
@@ -268,7 +281,7 @@ exports.addAttendance = async (req, res) => {
 exports.getSalaryByDeptIdMonthYear = async (req, res) => {
   try {
     const imageUrl = "http://34.93.135.33:8080/uploads/";
-    
+
     const getcreators = await attendanceModel
       .aggregate([
         {
@@ -325,10 +338,10 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
         // },
         {
           $unwind: {
-              path: "$finance",
-              preserveNullAndEmptyArrays: true
-          }
-      },
+            path: "$finance",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
         {
           $project: {
             attendence_id: 1,
@@ -347,10 +360,19 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
             net_salary: 1,
             tds_deduction: 1,
             user_name: "$user.user_name",
+            user_email_id: "$user.user_email_id",
+            user_contact_no: "$user.user_contact_no",
+            permanent_address: "$user.permanent_address",
+            permanent_city: "$user.permanent_city",
+            permanent_state: "$user.permanent_state",
+            permanent_pin_code: "$user.permanent_pin_code",
+            bank_name: "$user.bank_name",
+            ifsc_code: "$user.ifsc_code",
+            account_no: "$user.account_no",
             toPay: 1,
             sendToFinance: 1,
             attendence_generated: 1,
-            // attendence_mastcol: 0,
+            invoiceNo: 1,
             attendence_status: 1,
             salary_status: 1,
             salary_deduction: 1,
@@ -369,13 +391,13 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
             screenshot: {
               $concat: [imageUrl, "$finance.screenshot"],
             },
-            digital_signature_image:"$user.digital_signature_image"
+            digital_signature_image: "$user.digital_signature_image",
           },
         },
       ])
       .exec();
     if (getcreators?.length === 0) {
-     return res.status(500).send({ success: false });
+      return res.status(500).send({ success: false });
     }
     return res.status(200).send({ data: getcreators });
   } catch (err) {
@@ -462,8 +484,8 @@ exports.getSalaryByUserId = async (req, res) => {
         {
           $unwind: {
             path: "$billingheadermodels",
-            preserveNullAndEmptyArrays: true
-        }
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $lookup: {
@@ -476,8 +498,8 @@ exports.getSalaryByUserId = async (req, res) => {
         {
           $unwind: {
             path: "$fn",
-            preserveNullAndEmptyArrays: true
-        }
+            preserveNullAndEmptyArrays: true,
+          },
         },
 
         {
@@ -562,11 +584,11 @@ exports.getSalaryByUserId = async (req, res) => {
       ])
       .exec();
     if (getcreators?.length === 0) {
-     return res.status(500).send({ success: false });
+      return res.status(500).send({ success: false });
     }
     return res.status(200).send({ data: getcreators });
   } catch (err) {
-    return  res
+    return res
       .status(500)
       .send({ error: err.message, sms: "Error getting salary of user" });
   }

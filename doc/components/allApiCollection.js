@@ -1,16 +1,18 @@
-const { BrandRouteDoc } = require("../apis/brandDoc");
-const { projectxCategoryDoc } = require("../apis/projectxCategoryDoc");
-const { billingHeaderDoc } = require("../apis/billingHeaderDoc");
-const { projectxPageCategoryDoc } = require("../apis/projectxPageCategoryDoc");
-const { projectxSubCategoryDoc } = require("../apis/projectxSubCategoryDoc");
-const registerCmp = require("../apis/registerCampaignDoc");
+const { brandApis } = require("../apis/brandDoc");
+const { projectxCategoryApis } = require("../apis/projectxCategoryDoc");
+const { billingHeaderApis } = require("../apis/billingHeaderDoc");
+const { projectxPageCategoryApis } = require("../apis/projectxPageCategoryDoc");
+const { projectxSubCategoryApis } = require("../apis/projectxSubCategoryDoc");
+const { brandCategoryApis } = require("../apis/brandCategoryDoc");
+const { registerCmpApis } = require("../apis/registerCampaignDoc");
 
 const mainSchema = {
-  ...BrandRouteDoc,
-  ...registerCmp,
-  ...billingHeaderDoc,
-  ...projectxCategoryDoc,
-  ...projectxSubCategoryDoc,
-  ...projectxPageCategoryDoc,
+  ...brandApis,
+  ...brandCategoryApis,
+  ...registerCmpApis,
+  ...billingHeaderApis,
+  ...projectxCategoryApis,
+  ...projectxSubCategoryApis,
+  ...projectxPageCategoryApis,
 };
 module.exports = mainSchema;

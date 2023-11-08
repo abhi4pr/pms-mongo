@@ -1,21 +1,29 @@
-exports.projectxPageCategoryApis = {
-  "/api/projectxpagecategory": {
+exports.brandCategoryApis = {
+  "/api/brandCategory": {
     post: {
-      tags: [`Projectx Page Category Module`],
-      description: "Add a Projectx Page Category.",
+      tags: [`Brand Category`],
+      description: "Add a Brand Category data.",
       requestBody: {
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                category_name: {
+                brandCategory_name: {
                   type: "string",
+                },
+                brand_id: {
+                  type: "integer",
+                },
+                created_by: {
+                  type: "integer",
                 },
               },
             },
             example: {
-              category_name: "example",
+              brandCategory_name: "Entertainment",
+              brand_id: 2,
+              created_by: 1,
             },
           },
         },
@@ -23,125 +31,115 @@ exports.projectxPageCategoryApis = {
       },
       responses: {
         200: {
-          description: "Projectx Page Category data created success",
+          description: "Brand Category data created success",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
+                  status: 200,
                   data: {
-                    brand_id: 343,
-                    category_name: "example",
-                    _id: "6538e9058d99874f4b998c5a",
-                    category_id: 199,
-                    __v: 0,
+                    data: {
+                      brandCategory_name: "Entertainment",
+                      brand_id: 1,
+                      created_by: 1,
+                      _id: "654b608adc0535d84ce7b3ba",
+                      created_date: "2023-11-08T10:18:50.098Z",
+                      brandCategory_id: 1,
+                      __v: 0,
+                    },
+                    message: "brandcategory created success",
                   },
-                  message: "projectx page category created success",
-                },
-              },
-            },
-          },
-        },
-        "Err 500": {
-          description: "Error while adding Projectx Page Category to database",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: {
-                  success: false,
-                  data: {},
-                  message: "Something went wrong..",
                 },
               },
             },
           },
         },
         500: {
-          description: "Internal server error",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: {
-                  error: "err.message",
-                  message: "Error adding projectx page category to database",
-                },
-              },
-            },
-          },
+          description: "Error adding Brand Category to database",
         },
       },
     },
     put: {
-      tags: [`Projectx Page Category Module`],
-      description:
-        "Edit a Projectx Page category with the specified ID. Note if you not want to update any specific field in that case you have to remove that target field from request body.",
+      tags: [`Brand Category`],
+      description: "Edit a Brand Category with the specified ID.",
       requestBody: {
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                id: {
+                brandCategory_id: {
                   type: "integer",
                   required: true,
                 },
-                category_name: {
+                brandCategory_name: {
                   type: "string",
+                },
+
+                brand_id: {
+                  type: "integer",
+                },
+                created_by: {
+                  type: "integer",
                 },
               },
             },
             example: {
-              category_name: "example",
-              id: 1,
+              brandCategory_id: 1,
+              brand_id: 2,
+              brandCategory_name: "Test2",
+              created_by: 1,
             },
           },
         },
       },
       responses: {
         "Positive 200": {
-          description: "Updation successfully.",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: { success: true },
-              },
-            },
-          },
-        },
-        404: {
-          description: "Category not found with provided ID.",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: { success: false, message: "Page category not found" },
-              },
-            },
-          },
-        },
-        500: {
-          description: "Error adding projectx page category to database",
+          description: "Data updated successfully.",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
-                  error: "err.message",
-                  message:
-                    "Error updating the projectx page category in the database",
+                  success: true,
+                  data: {
+                    _id: "654b608adc0535d84ce7b3ba",
+                    brandCategory_name: "Test2",
+                    brand_id: 2,
+                    created_by: 1,
+                    created_date: "2023-11-08T10:18:50.098Z",
+                    brandCategory_id: 1,
+                    __v: 0,
+                  },
                 },
               },
             },
           },
         },
+
+        200: {
+          description: "when your brandCategory_id not match any data in db",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  success: false,
+                  message: "Brand Category not found",
+                },
+              },
+            },
+          },
+        },
+        500: {
+          description: "Error updating brand category to database",
+        },
       },
     },
     get: {
-      tags: [`Projectx Page Category Module`],
-      description: "Get all Projectx Page Categories.",
+      tags: [`Brand Category`],
+      description: "Get all Brand Categories.",
       responses: {
         "Positive 200": {
           description: "Fetching operation success.",
@@ -152,17 +150,12 @@ exports.projectxPageCategoryApis = {
                 example: {
                   data: [
                     {
-                      _id: "652fe3ea834d9fa8e1487c4d",
-                      brand_id: 0,
-                      category_name: "Chipss",
-                      category_id: 184,
-                      __v: 0,
-                    },
-                    {
-                      _id: "65312578d89678e2701c5c4b",
-                      brand_id: 3,
-                      category_name: "testcategoryname11",
-                      category_id: 189,
+                      _id: "654b608adc0535d84ce7b3ba",
+                      brandCategory_name: "Entertainment",
+                      brand_id: 1,
+                      created_by: 1,
+                      created_date: "2023-11-08T10:18:50.098Z",
+                      brandCategory_id: 1,
                       __v: 0,
                     },
                   ],
@@ -178,7 +171,7 @@ exports.projectxPageCategoryApis = {
               schema: {
                 type: "object",
                 example: {
-                  success: true,
+                  success: false,
                   data: [],
                   message: "No Record found",
                 },
@@ -194,7 +187,7 @@ exports.projectxPageCategoryApis = {
                 type: "object",
                 example: {
                   error: "err.message",
-                  message: "Error getting all projectxPageCategory",
+                  message: "Error getting all Brand Categories.",
                 },
               },
             },
@@ -203,15 +196,15 @@ exports.projectxPageCategoryApis = {
       },
     },
   },
-  "/api/projectxpagecategory/{id}": {
+  "/api/brandCategory/{id}": {
     get: {
-      tags: [`Projectx Page Category Module`],
-      description: "Get Single Projectx page Category.",
+      tags: [`Brand Category`],
+      description: "Get Single Brand Category.",
       parameters: [
         {
           name: "id",
           in: "path",
-          description: "ID of Projectx Page Category for find.",
+          description: "ID of Brand category for find.",
           required: true,
           schema: {
             type: "integer",
@@ -228,10 +221,12 @@ exports.projectxPageCategoryApis = {
                 type: "object",
                 example: {
                   data: {
-                    _id: "65291bb41e9825a282dd0668",
-                    brand_id: 1,
-                    category_name: "Entertainment",
-                    category_id: 170,
+                    _id: "654b608adc0535d84ce7b3ba",
+                    brandCategory_name: "Test2",
+                    brand_id: 2,
+                    created_by: 1,
+                    created_date: "2023-11-08T10:18:50.098Z",
+                    brandCategory_id: 1,
                     __v: 0,
                   },
                 },
@@ -262,7 +257,7 @@ exports.projectxPageCategoryApis = {
                 type: "object",
                 example: {
                   error: "err.message",
-                  message: "Error getting projectx page category details.",
+                  message: "Error getting brandCategory details",
                 },
               },
             },
@@ -271,13 +266,13 @@ exports.projectxPageCategoryApis = {
       },
     },
     delete: {
-      tags: [`Projectx Page Category Module`],
-      description: "Delete Projectx Page category.",
+      tags: [`Brand Category`],
+      description: "Delete Brand Category.",
       parameters: [
         {
           name: "id",
           in: "path",
-          description: "ID of Projectx Page category to delete",
+          description: "ID of Brand Category to delete",
           required: true,
           schema: {
             type: "integer",
@@ -294,21 +289,21 @@ exports.projectxPageCategoryApis = {
                 type: "object",
                 example: {
                   success: true,
-                  message: `projectx page category  with ID 1 deleted successfully`,
+                  message: `Brand Category with ID 1 deleted successfully`,
                 },
               },
             },
           },
         },
         200: {
-          description: "Error while finding data for Projectx Page category id.",
+          description: "Error while finding data for perticular id.",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
                   success: true,
-                  message: `projectx page category  with ID 1 not found`,
+                  message: `Brand Category with ID 1 not found`,
                 },
               },
             },
@@ -322,8 +317,7 @@ exports.projectxPageCategoryApis = {
                 type: "object",
                 example: {
                   success: false,
-                  message:
-                    "An error occurred while deleting the projectx page category",
+                  message: "An error occurred while deleting the Brand Category.",
                   error: "error.message",
                 },
               },

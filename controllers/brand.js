@@ -41,7 +41,7 @@ exports.addBrand = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .send({ erroradd_brand: err, message: "This brand cannot be created" });
+      .send({ erroradd_brand: err.message, message: "This brand cannot be created" });
   }
 };
 
@@ -97,7 +97,7 @@ exports.getBrands = async (req, res) => {
       res.status(200).send({ data: brands });
     }
   } catch (err) {
-    res.status(500).send({ error: err, message: "Error getting all brands" });
+    res.status(500).send({ error: err.message, message: "Error getting all brands" });
   }
 };
 
@@ -164,7 +164,7 @@ exports.getBrandById = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .send({ error: err, message: "Error getting brand details" });
+      .send({ error: err.message, message: "Error getting brand details" });
   }
 };
 
@@ -222,7 +222,7 @@ exports.editBrand = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .send({ error: err, message: "Error updating brand details" });
+      .send({ error: err.message, message: "Error updating brand details" });
   }
 };
 

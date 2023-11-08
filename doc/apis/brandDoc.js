@@ -1,63 +1,50 @@
-const brandData = {
-  data: [
-    {
-      _id: "6522cc4b3b2912a12bacbf4d",
-      brand_name: "react test",
-      category_id: 52,
-      sub_category_id: 142,
-      igusername: "react",
-    },
-  ],
-};
 
-// Data used in get profile
-const getBrand = {
-  tags: [`Brand Module`],
-  description: "Get All Brands",
-  responses: {
-    200: {
-      description: "Ok",
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            example: brandData,
-          },
-        },
-      },
-    },
-  },
-};
-
-// const BrandRouteDoc = {
-//   "/api/get_brands": {
-//     get: getBrand,
-//   },
-// };
-// module.exports = BrandRouteDoc;
-
-exports.BrandRouteDoc = {
+exports.brandApis = {
   "/api/add_brand": {
     post: {
-      tags: [`Brand Module`],
-      description: "Add a Billing Header.",
+      tags: [`Brand`],
+      description: "Add a Brand data.",
       requestBody: {
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                billing_header_name: {
+                brand_name: {
                   type: "string",
                 },
-                dept_id: {
+                category_id: {
                   type: "integer",
+                },
+                sub_category_id: {
+                  type: "integer",
+                },
+                user_id: {
+                  type: "integer",
+                },
+                igusername: {
+                  type: "string",
+                },
+                whatsapp: {
+                  type: "string",
+                },
+                major_category: {
+                  type: "string",
+                },
+                website: {
+                  type: "string",
                 },
               },
             },
             example: {
-              billing_header_name: "example",
-              dept_id: 1,
+              major_category: "Entertainment",
+              brand_name: "Test",
+              user_id: 2,
+              whatsapp: "TestWhatsup",
+              igusername: "Testigusername",
+              sub_category_id: 1,
+              category_id: 1,
+              website: "test",
             },
           },
         },
@@ -65,54 +52,103 @@ exports.BrandRouteDoc = {
       },
       responses: {
         200: {
-          description: "Bilingheader data created success",
+          description: "Validation error",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
+                  status: false,
+                  data: {},
+                  message: "Brand name must be unique",
+                },
+              },
+            },
+          },
+        },
+        "Positive 200": {
+          description: "Brand data created success",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  status: 200,
                   data: {
-                    billing_header_name: "test",
-                    dept_id: 11,
                     _id: "65366fc9c74638c1d008a2a9",
-                    billingheader_id: 6,
+                    brand_name: "tiger",
+                    category_id: 170,
+                    sub_category_id: 517,
+                    igusername: "user name",
+                    whatsapp: "wts app",
+                    website: "",
+                    major_category: "Entertainment",
+                    created_at: "2023-11-03T14:10:17.875Z",
+                    brand_id: 3000,
                     __v: 0,
                   },
-                  message: "billingheaderdata created success",
                 },
               },
             },
           },
         },
         500: {
-          description: "Error adding billingheaderdata to database",
+          description: "Error adding Brand to database",
         },
       },
     },
   },
   "/api/edit_brand": {
     put: {
-      tags: [`Brand Module`],
-      description: "Edit a Billing Header with the specified ID.",
+      tags: [`Brand`],
+      description: "Edit a Brand with the specified ID.",
       requestBody: {
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                billingheader_id: {
+                brand_id: {
                   type: "integer",
                   required: true,
                 },
-                billing_header_name: {
+                brand_name: {
                   type: "string",
                 },
-                dept_id: {
+                igusername: {
+                  type: "string",
+                },
+                whatsapp: {
+                  type: "string",
+                },
+                major_category: {
+                  type: "string",
+                },
+                website: {
+                  type: "string",
+                },
+                category_id: {
+                  type: "integer",
+                },
+                user_id: {
+                  type: "integer",
+                },
+                sub_category_id: {
                   type: "integer",
                 },
               },
             },
-            example: brandData,
+            example: {
+              brand_id: 1,
+              major_category: 2,
+              brand_name: "Test2",
+              user_id: 1,
+              status: "Inactive",
+              whatsapp: "TestWhatsup",
+              igusername: "Testigusername",
+              sub_category_id: 1,
+              category_id: 1,
+            },
           },
         },
       },
@@ -126,11 +162,19 @@ exports.BrandRouteDoc = {
                 example: {
                   success: true,
                   data: {
-                    _id: "65367283ea0b2e7b9161d061",
-                    billing_header_name: "update",
-                    dept_id: 11,
-                    billingheader_id: 16,
+                    _id: "654b447de5dafce2563e6524",
+                    brand_name: "test2",
+                    category_id: 1,
+                    sub_category_id: 1,
+                    igusername: "Testigusername",
+                    whatsapp: "TestWhatsup",
+                    website: "test",
+                    major_category: "2",
+                    user_id: 1,
+                    created_at: "2023-11-08T08:19:09.566Z",
+                    brand_id: 1,
                     __v: 0,
+                    updated_at: "2023-11-08T08:36:49.955Z",
                   },
                 },
               },
@@ -139,33 +183,34 @@ exports.BrandRouteDoc = {
         },
 
         200: {
-          description: "when your billingheader_id not match any data in db",
+          description: "when your brand_id not match any data in db",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
                   success: false,
+                  message: "Brand not found",
                 },
               },
             },
           },
         },
         500: {
-          description: "Error updating billingheaderdata to database",
+          description: "Error updating brand to database",
         },
       },
     },
   },
   "/api/get_brand/{id}": {
     get: {
-      tags: [`Brand Module`],
-      description: "Get Single Billing Header.",
+      tags: [`Brand`],
+      description: "Get Single Brand.",
       parameters: [
         {
           name: "id",
           in: "path",
-          description: "ID of Billing header for find.",
+          description: "ID of Brand for find.",
           required: true,
           schema: {
             type: "integer",
@@ -180,15 +225,25 @@ exports.BrandRouteDoc = {
             "application/json": {
               schema: {
                 type: "object",
-                example: [
-                  {
-                    _id: "6536727bea0b2e7b9161d05b",
-                    billing_header_name: "example",
-                    dept_id: 11,
-                    billingheader_id: 14,
-                    department_name: "final test",
+                example: {
+                  data: {
+                    _id: "654b447de5dafce2563e6524",
+                    brand_name: "test2",
+                    category_id: 1,
+                    sub_category_id: 1,
+                    igusername: "Testigusername",
+                    whatsapp: "TestWhatsup",
+                    website: "test",
+                    major_category: "2",
+                    user_id: 1,
+                    created_at: "2023-11-08T08:19:09.566Z",
+                    brand_id: 1,
+                    __v: 0,
+                    updated_at: "2023-11-08T08:36:49.955Z",
+                    projectx_category_name: "category_name",
+                    projectx_subcategory_name: "sub_category_name",
                   },
-                ],
+                },
               },
             },
           },
@@ -216,7 +271,7 @@ exports.BrandRouteDoc = {
                 type: "object",
                 example: {
                   error: "err.message",
-                  message: "Error getting billingheader details",
+                  message: "Error getting Brand details",
                 },
               },
             },
@@ -227,8 +282,8 @@ exports.BrandRouteDoc = {
   },
   "/api/get_brands": {
     get: {
-      tags: [`Brand Module`],
-      description: "Get all Billing Headers.",
+      tags: [`Brand`],
+      description: "Get all Brands.",
       responses: {
         "Positive 200": {
           description: "Fetching operation success.",
@@ -238,18 +293,38 @@ exports.BrandRouteDoc = {
                 type: "object",
                 example: [
                   {
-                    _id: "6536727bea0b2e7b9161d05b",
-                    billing_header_name: "example",
-                    dept_id: 11,
-                    billingheader_id: 14,
-                    department_name: "final test",
+                    _id: "654b447de5dafce2563e6524",
+                    brand_name: "test2",
+                    category_id: 1,
+                    sub_category_id: 1,
+                    igusername: "Testigusername",
+                    whatsapp: "TestWhatsup",
+                    website: "test",
+                    major_category: "2",
+                    user_id: 1,
+                    created_at: "2023-11-08T08:19:09.566Z",
+                    brand_id: 1,
+                    __v: 0,
+                    updated_at: "2023-11-08T08:36:49.955Z",
+                    projectx_category_name: "category_name",
+                    projectx_subcategory_name: "sub_category_name",
                   },
                   {
-                    _id: "65367283ea0b2e7b9161d061",
-                    billing_header_name: "update",
-                    dept_id: 11,
-                    billingheader_id: 16,
-                    department_name: "final test",
+                    _id: "654b447de5dafce2563e6524",
+                    brand_name: "test3",
+                    category_id: 1,
+                    sub_category_id: 1,
+                    igusername: "Testigusername",
+                    whatsapp: "TestWhatsup",
+                    website: "test",
+                    major_category: "2",
+                    user_id: 1,
+                    created_at: "2023-11-08T08:19:09.566Z",
+                    brand_id: 2,
+                    __v: 0,
+                    updated_at: "2023-11-08T08:36:49.955Z",
+                    projectx_category_name: "category_name",
+                    projectx_subcategory_name: "sub_category_name",
                   },
                 ],
               },
@@ -279,7 +354,7 @@ exports.BrandRouteDoc = {
                 type: "object",
                 example: {
                   error: "err.message",
-                  message: "Error getting all billingheaderdata",
+                  message: "Error getting all Brands",
                 },
               },
             },
@@ -290,13 +365,13 @@ exports.BrandRouteDoc = {
   },
   "/api/delete_brand/{id}": {
     delete: {
-      tags: [`Brand Module`],
-      description: "Delete Billing Header.",
+      tags: [`Brand`],
+      description: "Delete Brand.",
       parameters: [
         {
           name: "id",
           in: "path",
-          description: "ID of Billing header to delete",
+          description: "ID of Brand to delete",
           required: true,
           schema: {
             type: "integer",
@@ -313,7 +388,7 @@ exports.BrandRouteDoc = {
                 type: "object",
                 example: {
                   success: true,
-                  message: `billingheader with ID 1 deleted successfully`,
+                  message: `Brand with ID 1 deleted successfully`,
                 },
               },
             },
@@ -327,7 +402,7 @@ exports.BrandRouteDoc = {
                 type: "object",
                 example: {
                   success: true,
-                  message: `billingheader with ID 1 not found`,
+                  message: `Brand with ID 1 not found`,
                 },
               },
             },
@@ -341,7 +416,7 @@ exports.BrandRouteDoc = {
                 type: "object",
                 example: {
                   success: false,
-                  message: "An error occurred while deleting the billingheader",
+                  message: "An error occurred while deleting the Brand",
                   error: "error.message",
                 },
               },

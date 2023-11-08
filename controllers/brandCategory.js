@@ -15,7 +15,7 @@ exports.addBrandCategory = async (req, res) => {
         });
     } catch (err) {
         res.status(500).send({
-            error: err,
+            error: err.message,
             message: "Error adding brandcategory to database",
         });
     }
@@ -34,7 +34,7 @@ exports.getBrandCategorys = async (req, res) => {
     } catch (err) {
         res
             .status(500)
-            .send({ error: err, message: "Error getting all brandcategorydata" });
+            .send({ error: err.message, message: "Error getting all brandcategorydata" });
     }
 };
 
@@ -52,7 +52,7 @@ exports.getBrandCategoryById = async (req, res) => {
       }
     } catch (err) {
       res.status(500).send({
-        error: err,
+        error: err.message,
         message: "Error getting brandCategory details",
       });
     }
@@ -71,7 +71,7 @@ exports.editBrandCategory = async (req, res) => {
         res.status(200).send({ success: true, data: editbrandCategory })
     } catch (err) {
         res.status(500).send({
-            error: err,
+            error: err.message,
             message: "Error updating the brandCategory in the database",
         });
     }

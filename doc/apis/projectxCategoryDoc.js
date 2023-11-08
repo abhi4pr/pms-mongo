@@ -1,8 +1,8 @@
 
-exports.projectxCategoryDoc = {
+exports.projectxCategoryApis = {
   "/api/projectxCategory": {
     post: {
-      tags: [`Projectx Category Module`],
+      tags: [`Projectx Category`],
       description: "Add a Projectx Category.",
       requestBody: {
         content: {
@@ -79,7 +79,7 @@ exports.projectxCategoryDoc = {
       },
     },
     put: {
-      tags: [`Projectx Category Module`],
+      tags: [`Projectx Category`],
       description:
         "Edit a Projectx category with the specified ID. Note if you not want to update any specific field in that case you have to remove that target field from request body.",
       requestBody: {
@@ -176,7 +176,7 @@ exports.projectxCategoryDoc = {
       },
     },
     get: {
-      tags: [`Projectx Category Module`],
+      tags: [`Projectx Category`],
       description: "Get all Projectx Categories.",
       responses: {
         "Positive 200": {
@@ -241,7 +241,7 @@ exports.projectxCategoryDoc = {
   },
   "/api/projectxCategory/{id}": {
     get: {
-      tags: [`Projectx Category Module`],
+      tags: [`Projectx Category`],
       description: "Get Single Projectx Category.",
       parameters: [
         {
@@ -307,7 +307,7 @@ exports.projectxCategoryDoc = {
       },
     },
     delete: {
-      tags: [`Projectx Category Module`],
+      tags: [`Projectx Category`],
       description: "Delete Projectx category.",
       parameters: [
         {

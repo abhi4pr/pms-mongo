@@ -1,8 +1,8 @@
 
-exports.billingHeaderDoc = {
+exports.billingHeaderApis = {
   "/api/add_billingheader": {
     post: {
-      tags: [`Billing Header Module`],
+      tags: [`Billing Header`],
       description: "Add a Billing Header.",
       requestBody: {
         content: {
@@ -55,7 +55,7 @@ exports.billingHeaderDoc = {
   },
   "/api/update_billingheader": {
     put: {
-      tags: [`Billing Header Module`],
+      tags: [`Billing Header`],
       description: "Edit a Billing Header with the specified ID.",
       requestBody: {
         content: {
@@ -127,7 +127,7 @@ exports.billingHeaderDoc = {
 
   "/api/get_single_billingheader/{id}": {
     get: {
-      tags: [`Billing Header Module`],
+      tags: [`Billing Header`],
       description: "Get Single Billing Header.",
       parameters: [
         {
@@ -195,7 +195,7 @@ exports.billingHeaderDoc = {
   },
   "/api/get_all_billingheaders": {
     get: {
-      tags: [`Billing Header Module`],
+      tags: [`Billing Header`],
       description: "Get all Billing Headers.",
       responses: {
         "Positive 200": {
@@ -258,7 +258,7 @@ exports.billingHeaderDoc = {
   },
   "/api/delete_billingheader/{id}": {
     delete: {
-      tags: [`Billing Header Module`],
+      tags: [`Billing Header`],
       description: "Delete Billing Header.",
       parameters: [
         {
