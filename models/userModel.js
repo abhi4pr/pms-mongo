@@ -98,7 +98,7 @@ const userModel = new mongoose.Schema({
     },
     joining_date:{
         type: Date,
-        default: Date.now
+        required:true
     },
     releaving_date:{
         type: Date,
