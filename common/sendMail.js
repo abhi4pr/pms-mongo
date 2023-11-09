@@ -3,15 +3,15 @@ var nodemailer = require("nodemailer");
 var transport = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "vijayanttrivedi1500@gmail.com",
-    pass: "odovpikkjvkprrjv",
+    user: "connect@creativefuel.io",
+    pass: "clqjuhplszzqesiv",
   },
 });
 
-const mail = (subject, html) => {
+const mail = (subject, html,email) => {
   let mailOptions = {
-    from: "vijayanttrivedi1500@gmail.com",
-    to: "sumit722776@gmail.com",
+    from: "connect@creativefuel.io",
+    to: email,
     subject: subject,
     html: html,
   };

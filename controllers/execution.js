@@ -3,6 +3,7 @@ const exeInven = require('../models/exeInvenModel.js');
 const jwt = require('jsonwebtoken');
 const variable = require('../variables.js');
 const axios = require('axios');
+const exeCountHisModel = require('../models/exeCountHisModel.js');
 
 exports.exeInvenPost = async (req, res) => {
     try {
@@ -76,7 +77,7 @@ exports.exeSumPost = async (req, res) => {
     try {
         const loggedin_user_id = req.body.loggedin_user_id;
         const response = await axios.post(
-            'https://purchase.creativefuel.io/webservices/RestController.php?view=executionSummaryList', {
+            'https://sales.creativefuel.io/webservices/RestController.php?view=executionSummaryList', {
             loggedin_user_id: loggedin_user_id
         }
 
@@ -290,5 +291,71 @@ exports.executionGraph = async (req, res) => {
         // res.status(200).send(getcreators);
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'Error getting graph summary' });
+    }
+}
+
+exports.getLatestPIDCount = async (req, res) => {
+    try {   
+        const getcreators = await exeCountHisModel.findOne({p_id:req.params.p_id}).sort({ creation_date: -1 });
+        if (!getcreators) {
+            res.status(500).send({ success: false });
+        }
+        res.status(200).send(getcreators);
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'Error getting all Ip Count' });
+    }
+};
+
+exports.addIPCountHistory = async (req, res) =>{
+    try{
+        const simc = new exeCountHisModel({
+            p_id: req.body.p_id,
+            reach: req.body.reach,
+            impression: req.body.impression,
+            engagement: req.body.engagement,
+            story_view: req.body.story_view
+        })
+        const simv = await simc.save();
+        res.send({simv,status:200});
+    } catch(err){
+        res.status(500).send({error:err.message,sms:'This addIPCountHistory cannot be created'})
+    }
+};
+
+exports.exeForPurchase = async (req, res) => {
+    try {
+        const loggedin_user_id = req.body.loggedin_user_id;
+        const response = await axios.post(
+            'https://purchase.creativefuel.io/webservices/RestController.php?view=executionSummaryList', {
+            loggedin_user_id: loggedin_user_id
+        }
+
+        )
+        const responseData = response.data.body;
+        
+        for (const data of responseData) {
+          
+            const existingData = await checkIfDataExists(data.p_id)
+            
+            if (!existingData) {
+
+                const creators = new exeSum({
+                    p_id: data.p_id,
+                    page_name: data.page_name,
+                    cat_name: data.cat_name,
+                    platform: data.platform,
+                    follower_count: data.follower_count,
+                    page_link: data.page_link,
+                    vendor_id: data.vendor_id
+                })
+                const instav = await creators.save();
+             
+                return res.send({ instav, status: 200 })
+            }else{
+              return  res.status(200).json({msg:"Data already insterted there is no new data available to insert."})
+            }
+        }
+    } catch (error) {
+        return res.status(500).send({ error: error.message, sms: 'error while adding data' })
     }
 }
