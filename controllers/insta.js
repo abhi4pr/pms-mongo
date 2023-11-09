@@ -923,8 +923,18 @@ exports.getDynamicReqAndRes = async (req, res) => {
     try {
         const ReqKey = req.body.request_key;
         const ReqValue = req.body.request_value;
-        const getPosts = await instaP.find({ [ReqKey]: parseInt(ReqValue) });
-        res.status(200).send(getPosts);
+        const flag = req.body.flag;
+        if (flag === 1) {
+            // Return the count of matching documents
+            const count = await instaP.countDocuments({ [ReqKey]: parseInt(ReqValue) });
+          return  res.status(200).json({ count });
+        } else if (flag === 2) {
+            // Return all matching documents
+            const getPosts = await instaP.find({ [ReqKey]: parseInt(ReqValue) });
+            return  res.status(200).json(getPosts);
+        } else {
+           return res.status(400).json({ error: "Invalid flag value" });
+        }
     } catch (error) {
         res.send({ status:500, error: error, sms: "error getting posts from name" });
     }

@@ -6,11 +6,15 @@ const { projectxSubCategoryApis } = require("../apis/projectxSubCategoryDoc");
 const { brandCategoryApis } = require("../apis/brandCategoryDoc");
 const { registerCmpApis } = require("../apis/registerCampaignDoc");
 const { brandMajorCategoryApis } = require("../apis/brandMajorCategoryDoc");
+const { brandSubCategoryApis } = require("../apis/brandSubCategoryDoc");
+const { campaignApis } = require("../apis/campaignDoc");
 
 const mainSchema = {
   ...brandApis,
   ...brandCategoryApis,
   ...brandMajorCategoryApis,
+  ...brandSubCategoryApis,
+  ...campaignApis,
   ...registerCmpApis,
   ...billingHeaderApis,
   ...projectxCategoryApis,
