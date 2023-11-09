@@ -76,7 +76,7 @@ exports.exeSumPost = async (req, res) => {
     try {
         const loggedin_user_id = req.body.loggedin_user_id;
         const response = await axios.post(
-            'https://sales.creativefuel.io/webservices/RestController.php?view=executionSummaryList', {
+            'https://purchase.creativefuel.io/webservices/RestController.php?view=executionSummaryList', {
             loggedin_user_id: loggedin_user_id
         }
 

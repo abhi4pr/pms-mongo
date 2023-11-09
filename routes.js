@@ -51,6 +51,9 @@ const leadtype = require("./controllers/lead.js");
 const leadmast = require("./controllers/lead.js");
 const { verifyToken } = require("./middleware/auth.js");
 
+const assetCategory = require("./controllers/assestsCategory.js");
+const assetSubCategory = require("./controllers/assetsSubCategory.js");
+
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
 });
@@ -825,5 +828,20 @@ router.get(
 );
 router.put("/update_leadmast",  leadmast.editLeadMast);
 router.delete("/delete_leadmast",  leadmast.deleteLeadMast);
+
+
+/* Asset Category Routes */
+router.post("/add_asset_category",  assetCategory.addAssetCategory);
+router.get("/get_all_asset_category", assetCategory.getAssetCategorys);
+router.get("/get_single_asset_category/:category_id",  assetCategory.getSingleAssetCategory);
+router.put("/update_asset_category",  assetCategory.editAssetCategory);
+router.delete("/delete_asset_category/:category_id",  assetCategory.deleteAssetCategory);
+
+/* Asset Sub Category Routes */
+router.post("/add_asset_sub_category",  assetSubCategory.addAssetSubCategory);
+router.get("/get_all_asset_sub_category", assetSubCategory.getAssetSubCategorys);
+router.get("/get_single_asset_sub_category/:sub_category_id",  assetSubCategory.getSingleAssetSubCategory);
+router.put("/update_asset_sub_category",  assetSubCategory.editAssetSubCategory);
+router.delete("/delete_asset_sub_category/:sub_category_id",  assetSubCategory.deleteAssetSubCategory);
 
 module.exports = router;
