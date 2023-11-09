@@ -338,7 +338,7 @@ exports.getAllocationDataByAlloId = async (req, res) => {
 
 exports.editAllocation = async (req, res) => {
     try{
-        const editsim = await simAlloModel.findOneAndUpdate(req.body.allo_id,{
+        const editsim = await simAlloModel.findOneAndUpdate({allo_id:req.body.allo_id},{
             user_id: req.body.user_id,
             sim_id: req.body.sim_id,
             Remarks: req.body.Remarks,
@@ -355,7 +355,7 @@ exports.editAllocation = async (req, res) => {
         }
         res.status(200).send({success:true,data:editsim})
     } catch(err){
-        res.status(500).send({error:err,sms:'Error updating sim allocation'})
+        res.status(500).send({error:err.message,sms:'Error updating sim allocation'})
     }
 };
 

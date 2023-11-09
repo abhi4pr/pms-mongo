@@ -9,6 +9,7 @@ const swaggerDocumantion = require('./doc/swaggerDoc.js');
 const OpenAI = require("openai");
 require('./controllers/autoMail.js');
 
+
 const app = express();
 // app.use(express.json());
 app.use(bodyParser.json());

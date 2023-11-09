@@ -10,6 +10,7 @@ const sittingModel = new mongoose.Schema({
     sitting_ref_no: {
         type: String,
         required: false,
+        unique:true
     },
     sitting_area: {
         type: String,

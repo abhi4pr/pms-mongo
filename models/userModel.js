@@ -495,6 +495,21 @@ const userModel = new mongoose.Schema({
         required: false,
         default:""
 
+    },
+    bank_name:{
+        type: String,
+        required: false,
+        default:""
+    },
+    ifsc_code:{
+        type: String,
+        required: false,
+        default:""
+    },
+    account_no:{
+        type: String,
+        required: false,
+        default:""
     }
 });
 

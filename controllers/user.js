@@ -53,11 +53,11 @@ exports.addUser = [upload, async (req, res) => {
             role_id: req.body.role_id,
             sitting_id: req.body.sitting_id,
             job_type: req.body.job_type,
-            personal_number: req.body.personal_number,
+            PersonalNumber: req.body.personal_number,
             Report_L1: req.body.report_L1,
             Report_L2: req.body.report_L2,
             Report_L3: req.body.report_L3,
-            Personal_email: req.body.Personal_email,
+            PersonalEmail: req.body.Personal_email,
             joining_date: req.body.joining_date,
             releaving_date: req.body.releaving_date,
             level: req.body.level,
@@ -89,7 +89,7 @@ exports.addUser = [upload, async (req, res) => {
             other_upload_validate: req.body.other_upload_validate,
             user_status: req.body.user_status,
             lastupdated: req.body.lastupdated,
-            sub_dept_id: req.body.sub_dept_id,
+            sub_dept_id: req.body.sub_dept_id || 0,
             pan_no: req.body.pan_no,
             uid_no: req.body.uid_no,
             spouse_name: req.body.spouse_name,
@@ -137,7 +137,10 @@ exports.addUser = [upload, async (req, res) => {
             bankPassBook_Cheque: req.file ? req.files.bankPassBook_Cheque[0].filename : '',
             joining_extend_document: req.file ? req.files.joining_extend_document[0].filename : '',
             digital_signature_image: req.file ? req.files.digital_signature_image[0].filename : '',
-            userSalaryStatus: req.body.userSalaryStatus
+            userSalaryStatus: req.body.userSalaryStatus,
+            bank_name: req.body.bank_name,
+            ifsc_code: req.body.ifsc_code,
+            account_no: req.body.account_no
         })
         const simv = await simc.save();
 
@@ -341,7 +344,10 @@ exports.updateUser = [upload1, async (req, res) => {
             bankPassBook_Cheque: req.files && req.files['bankPassBook_Cheque'] && req.files['bankPassBook_Cheque'][0] ? req.files['bankPassBook_Cheque'][0].filename : (existingUser && existingUser.bankPassBook_Cheque) || '',
             joining_extend_document: req.files && req.files['joining_extend_document'] && req.files['joining_extend_document'][0] ? req.files['joining_extend_document'][0].filename : (existingUser && existingUser.joining_extend_document) || '',
             userSalaryStatus: req.body.userSalaryStatus,
-            digital_signature_image: req.files && req.files['digital_signature_image'] && req.files['digital_signature_image'][0] ? req.files['digital_signature_image'][0].filename : (existingUser && existingUser.digital_signature_image) || ''
+            digital_signature_image: req.files && req.files['digital_signature_image'] && req.files['digital_signature_image'][0] ? req.files['digital_signature_image'][0].filename : (existingUser && existingUser.digital_signature_image) || '',
+            bank_name: req.body.bank_name,
+            ifsc_code: req.body.ifsc_code,
+            account_no: req.body.account_no
 
         }, { new: true });
         if (!editsim) {
@@ -592,7 +598,10 @@ exports.getAllUsers = async (req, res) => {
                     },
                     designation_name: "$designation.desi_name",
                     userSalaryStatus: '$userSalaryStatus',
-                    digital_signature_image: "$digital_signature_image"
+                    digital_signature_image: "$digital_signature_image",
+                    bank_name:"$bank_name",
+                    ifsc_code:"$ifsc_code",
+                    account_no:"$account_no"
                 }
             }
         ]).exec();
@@ -844,7 +853,10 @@ exports.getSingleUser = async (req, res) => {
                     Report_L1N: "$reportL1.user_name",
                     Report_L2N: "$reportL2.user_name",
                     Report_L3N: "$reportL3.user_name",
-                    designation_name: "$designation.desi_name"
+                    designation_name: "$designation.desi_name",
+                    bank_name:"$bank_name",
+                    ifsc_code:"$ifsc_code",
+                    account_no:"$account_no"
                 }
             }
         ]).exec();
@@ -898,6 +910,7 @@ exports.deleteUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
     try {
+        // const simc = await userModel.find();
         const simc = await userModel.aggregate([
             {
                 $match: {
@@ -914,12 +927,15 @@ exports.loginUser = async (req, res) => {
                 }
             },
             {
-                $unwind: '$sitting'
+                $unwind: {
+                    path: "$sitting",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $project: {
-                    Sitting_id: '$sitting.sitting_id',
-                    Sitting_ref_no: '$sitting.sitting_ref_no',
+                    sitting_id: '$sitting.sitting_id',
+                    sitting_ref_no: '$sitting.sitting_ref_no',
                     // id: "$id",
                     name: '$user_name',
                     email: '$user_email_id',
@@ -937,6 +953,7 @@ exports.loginUser = async (req, res) => {
                 }
             }
         ]).exec();
+        console.log("data",simc)
 
         console.log("simc", simc[0]?.user_login_password);
         console.log("cdd", req.body.user_login_password)
