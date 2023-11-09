@@ -10,6 +10,7 @@ const roomModel = new mongoose.Schema({
     sitting_ref_no: {
         type: String,
         required: false,
+        unique:true
     },
     roomImage: {
         type: String,
