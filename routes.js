@@ -53,6 +53,7 @@ const { verifyToken } = require("./middleware/auth.js");
 
 const assetCategory = require("./controllers/assestsCategory.js");
 const assetSubCategory = require("./controllers/assetsSubCategory.js");
+const vendor = require("./controllers/vendor.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -575,6 +576,8 @@ router.put(
   upload.single("field_value"),
   user.getUserOtherFields
 );
+
+router.post("/login_user_data",user.loginUserData);
 router.post("/add_reason",  user.addReason);
 router.get("/get_all_reasons",  user.getAllReasons);
 router.post("/add_separation",  user.addSeparation);
@@ -843,5 +846,12 @@ router.get("/get_all_asset_sub_category", assetSubCategory.getAssetSubCategorys)
 router.get("/get_single_asset_sub_category/:sub_category_id",  assetSubCategory.getSingleAssetSubCategory);
 router.put("/update_asset_sub_category",  assetSubCategory.editAssetSubCategory);
 router.delete("/delete_asset_sub_category/:sub_category_id",  assetSubCategory.deleteAssetSubCategory);
+
+/* Vendor Routes */
+router.post("/add_vendor",  vendor.addVendor);
+router.get("/get_all_vendor", vendor.getVendors);
+router.get("/get_single_vendor/:vendor_id",  vendor.getSingleVendor);
+router.put("/update_vendor",  vendor.editVendor);
+router.delete("/delete_vendor/:vendor_id",  vendor.deleteVendor);
 
 module.exports = router;

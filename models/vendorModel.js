@@ -52,7 +52,7 @@ const vendorModel = new mongoose.Schema({
 });
 
 AutoIncrement.initialize(mongoose.connection);
-assetsCategoryModel.plugin(AutoIncrement.plugin, {
+vendorModel.plugin(AutoIncrement.plugin, {
   model: "vendorModels",
   field: "vendor_id",
   startAt: 1,

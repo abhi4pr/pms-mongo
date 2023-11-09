@@ -89,7 +89,7 @@ exports.addUser = [upload, async (req, res) => {
             other_upload_validate: req.body.other_upload_validate,
             user_status: req.body.user_status,
             lastupdated: req.body.lastupdated,
-            sub_dept_id: req.body.sub_dept_id || 0,
+            sub_dept_id: req.body.sub_dept_id == null ? 0 : req.body.sub_dept_id,
             pan_no: req.body.pan_no,
             uid_no: req.body.uid_no,
             spouse_name: req.body.spouse_name,
@@ -1934,5 +1934,33 @@ exports.getAllWfhUsers = async (req, res) => {
         res.status(200).send({ data: modifiedUsers })
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'Error getting all wfh users' })
+    }
+};
+
+
+exports.loginUserData = async (req, res) => {
+    const id = req.body.id;
+    try {
+        const user = await userModel.findOne({ user_id: id });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const userObject = {
+            user_id: user.user_id,
+            user_name: user.user_name,
+            user_designation: user.user_designation,
+        };
+
+        if (user.image) {
+            userObject.image = `http://34.93.135.33:8080/uploads/${user.image}`;
+        } else {
+            userObject.image = null;
+        }
+
+        res.status(200).json(userObject);
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'Error getting loginuserdata' })
     }
 };
