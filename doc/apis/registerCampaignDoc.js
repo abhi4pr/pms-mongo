@@ -21,27 +21,11 @@ const allRegisterCmpData = {
     },
   ],
 };
-const updateRegisterCmpData = {
-  detailing: "",
-  _id: "651c0fd366d6c606096cea1d",
-  brand_id: 343,
-  brnad_dt: "Tue, 10 Oct 2023 20:30:00 GMT",
-  excel_path: "df06441b3479b32922098abc532825d8",
-  commitment: [
-    {
-      selectValue: 79,
-      textValue: "1000",
-    },
-  ],
-  register_campaign_id: 54,
-  __v: 0,
-  download_excel_file: `${constant.base_url}/uploads/df06441b3479b32922098abc532825d8`,
-};
 
-const editRegisterCampaign = {
+module.exports.registerCmpApis = {
   "/api/register_campaign": {
     post: {
-      tags: [`Register Campaign Module`],
+      tags: [`Register Campaign`],
       description: "Edit a Register Campaign with the specified ID.",
       requestBody: {
         content: {
@@ -128,8 +112,9 @@ const editRegisterCampaign = {
       },
     },
     put: {
-      tags: [`Register Campaign Module`],
-      description: "Note: Please do not any empty field if you really want to update a field please fill field otherewise 'Deselelct' the check.",
+      tags: [`Register Campaign`],
+      description:
+        "Note: Please do not any empty field if you really want to update a field please fill field otherewise 'Deselelct' the check.",
       requestBody: {
         content: {
           "multipart/form-data": {
@@ -139,42 +124,50 @@ const editRegisterCampaign = {
                 excel_file: {
                   type: "file",
                   format: "binary",
-                  description: "This is excel for register campaign, if you not want to update please 'Deselelct' the check.",
+                  description:
+                    "This is excel for register campaign, if you not want to update please 'Deselelct' the check.",
                 },
                 brand_id: {
                   type: "string",
                   format: "integer",
-                  description: "Provide Brand model identification id, if you not want to update please 'Deselelct' the check.",
+                  description:
+                    "Provide Brand model identification id, if you not want to update please 'Deselelct' the check.",
                 },
                 register_campaign_id: {
                   type: "string",
                   format: "integer",
-                  description: "Provide register campaign model id which is you want to update and, if you not want to update please 'Deselelct' the check.",
+                  description:
+                    "Provide register campaign model id which is you want to update and, if you not want to update please 'Deselelct' the check.",
                 },
                 exeCmpId: {
                   type: "integer",
                   format: "integer",
-                  description: "Provide exeCampaignModel identification id, if you not want to update please 'Deselelct' the check.",
+                  description:
+                    "Provide exeCampaignModel identification id, if you not want to update please 'Deselelct' the check.",
                 },
                 brnad_dt: {
                   type: "Date",
                   format: "Date",
-                  description: "Provide Date, if you not want to update please 'Deselelct' the check.",
+                  description:
+                    "Provide Date, if you not want to update please 'Deselelct' the check.",
                 },
                 detailing: {
                   type: "string",
                   format: "string",
-                  description: "Provide detailing, if you not want to update please 'Deselelct' the check.",
+                  description:
+                    "Provide detailing, if you not want to update please 'Deselelct' the check.",
                 },
                 commitment: {
                   type: "string",
                   format: "string",
-                  description: "Provide Array of object, if you not want to update please 'Deselelct' the check.",
+                  description:
+                    "Provide Array of object, if you not want to update please 'Deselelct' the check.",
                 },
                 status: {
                   type: "integer",
                   format: "integer",
-                  description: "Provide status, if you not want to update please 'Deselelct' the check.",
+                  description:
+                    "Provide status, if you not want to update please 'Deselelct' the check.",
                 },
               },
             },
@@ -220,7 +213,7 @@ const editRegisterCampaign = {
       },
     },
     get: {
-      tags: [`Register Campaign Module`],
+      tags: [`Register Campaign`],
       description: "Get All Register Campaigns data",
       responses: {
         200: {
@@ -246,7 +239,7 @@ const editRegisterCampaign = {
   },
   "/api/register_campaign/{id}": {
     delete: {
-      tags: [`Register Campaign Module`],
+      tags: [`Register Campaign`],
       description: "Delete Register Campaign",
       parameters: [
         {
@@ -274,9 +267,3 @@ const editRegisterCampaign = {
     },
   },
 };
-
-let registerCmp = {
-  ...editRegisterCampaign,
-};
-
-module.exports = registerCmp;

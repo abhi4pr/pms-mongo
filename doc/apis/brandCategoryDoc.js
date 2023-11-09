@@ -1,26 +1,29 @@
-
-exports.billingHeaderDoc = {
-  "/api/add_billingheader": {
+exports.brandCategoryApis = {
+  "/api/brandCategory": {
     post: {
-      tags: [`Billing Header Module`],
-      description: "Add a Billing Header.",
+      tags: [`Brand Category`],
+      description: "Add a Brand Category data.",
       requestBody: {
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                billing_header_name: {
+                brandCategory_name: {
                   type: "string",
                 },
-                dept_id: {
+                brand_id: {
+                  type: "integer",
+                },
+                created_by: {
                   type: "integer",
                 },
               },
             },
             example: {
-              billing_header_name: "example",
-              dept_id: 1,
+              brandCategory_name: "Entertainment",
+              brand_id: 2,
+              created_by: 1,
             },
           },
         },
@@ -28,57 +31,65 @@ exports.billingHeaderDoc = {
       },
       responses: {
         200: {
-          description: "Bilingheader data created success",
+          description: "Brand Category data created success",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
+                  status: 200,
                   data: {
-                    billing_header_name: "test",
-                    dept_id: 11,
-                    _id: "65366fc9c74638c1d008a2a9",
-                    billingheader_id: 6,
-                    __v: 0,
+                    data: {
+                      brandCategory_name: "Entertainment",
+                      brand_id: 1,
+                      created_by: 1,
+                      _id: "654b608adc0535d84ce7b3ba",
+                      created_date: "2023-11-08T10:18:50.098Z",
+                      brandCategory_id: 1,
+                      __v: 0,
+                    },
+                    message: "brandcategory created success",
                   },
-                  message: "billingheaderdata created success",
                 },
               },
             },
           },
         },
         500: {
-          description: "Error adding billingheaderdata to database",
+          description: "Error adding Brand Category to database",
         },
       },
     },
-  },
-  "/api/update_billingheader": {
     put: {
-      tags: [`Billing Header Module`],
-      description: "Edit a Billing Header with the specified ID.",
+      tags: [`Brand Category`],
+      description: "Edit a Brand Category with the specified ID.",
       requestBody: {
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                billingheader_id: {
+                brandCategory_id: {
                   type: "integer",
                   required: true,
                 },
-                billing_header_name: {
+                brandCategory_name: {
                   type: "string",
                 },
-                dept_id: {
+
+                brand_id: {
+                  type: "integer",
+                },
+                created_by: {
                   type: "integer",
                 },
               },
             },
             example: {
-              billingheader_id: 1,
-              billing_header_name: "example",
-              dept_id: 1,
+              brandCategory_id: 1,
+              brand_id: 2,
+              brandCategory_name: "Test2",
+              created_by: 1,
             },
           },
         },
@@ -93,10 +104,12 @@ exports.billingHeaderDoc = {
                 example: {
                   success: true,
                   data: {
-                    _id: "65367283ea0b2e7b9161d061",
-                    billing_header_name: "update",
-                    dept_id: 11,
-                    billingheader_id: 16,
+                    _id: "654b608adc0535d84ce7b3ba",
+                    brandCategory_name: "Test2",
+                    brand_id: 2,
+                    created_by: 1,
+                    created_date: "2023-11-08T10:18:50.098Z",
+                    brandCategory_id: 1,
                     __v: 0,
                   },
                 },
@@ -104,99 +117,29 @@ exports.billingHeaderDoc = {
             },
           },
         },
-      
-        200: {
-          description: "when your billingheader_id not match any data in db",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: {
-                  success: false,
-                },
-              },
-            },
-          },
-        },
-        500: {
-          description: "Error updating billingheaderdata to database",
-        },
-      },
-    },
-  },
 
-  "/api/get_single_billingheader/{id}": {
-    get: {
-      tags: [`Billing Header Module`],
-      description: "Get Single Billing Header.",
-      parameters: [
-        {
-          name: "id",
-          in: "path",
-          description: "ID of Billing header for find.",
-          required: true,
-          schema: {
-            type: "integer",
-            format: "int64",
-          },
-        },
-      ],
-      responses: {
-        "Positive 200": {
-          description: "Fetching operation success.",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: [
-                  {
-                    _id: "6536727bea0b2e7b9161d05b",
-                    billing_header_name: "example",
-                    dept_id: 11,
-                    billingheader_id: 14,
-                    department_name: "final test",
-                  },
-                ],
-              },
-            },
-          },
-        },
         200: {
-          description: "There is no data available.",
+          description: "when your brandCategory_id not match any data in db",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
                   success: false,
-                  data: {},
-                  message: "No Record found",
+                  message: "Brand Category not found",
                 },
               },
             },
           },
         },
         500: {
-          description: "Error message",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                example: {
-                  error: "err.message",
-                  message: "Error getting billingheader details",
-                },
-              },
-            },
-          },
+          description: "Error updating brand category to database",
         },
       },
     },
-  },
-  "/api/get_all_billingheaders": {
     get: {
-      tags: [`Billing Header Module`],
-      description: "Get all Billing Headers.",
+      tags: [`Brand Category`],
+      description: "Get all Brand Categories.",
       responses: {
         "Positive 200": {
           description: "Fetching operation success.",
@@ -204,22 +147,19 @@ exports.billingHeaderDoc = {
             "application/json": {
               schema: {
                 type: "object",
-                example: [
-                  {
-                    _id: "6536727bea0b2e7b9161d05b",
-                    billing_header_name: "example",
-                    dept_id: 11,
-                    billingheader_id: 14,
-                    department_name: "final test",
-                  },
-                  {
-                    _id: "65367283ea0b2e7b9161d061",
-                    billing_header_name: "update",
-                    dept_id: 11,
-                    billingheader_id: 16,
-                    department_name: "final test",
-                  },
-                ],
+                example: {
+                  data: [
+                    {
+                      _id: "654b608adc0535d84ce7b3ba",
+                      brandCategory_name: "Entertainment",
+                      brand_id: 1,
+                      created_by: 1,
+                      created_date: "2023-11-08T10:18:50.098Z",
+                      brandCategory_id: 1,
+                      __v: 0,
+                    },
+                  ],
+                },
               },
             },
           },
@@ -247,7 +187,7 @@ exports.billingHeaderDoc = {
                 type: "object",
                 example: {
                   error: "err.message",
-                  message: "Error getting all billingheaderdata",
+                  message: "Error getting all Brand Categories.",
                 },
               },
             },
@@ -256,15 +196,83 @@ exports.billingHeaderDoc = {
       },
     },
   },
-  "/api/delete_billingheader/{id}": {
-    delete: {
-      tags: [`Billing Header Module`],
-      description: "Delete Billing Header.",
+  "/api/brandCategory/{id}": {
+    get: {
+      tags: [`Brand Category`],
+      description: "Get Single Brand Category.",
       parameters: [
         {
           name: "id",
           in: "path",
-          description: "ID of Billing header to delete",
+          description: "ID of Brand category for find.",
+          required: true,
+          schema: {
+            type: "integer",
+            format: "int64",
+          },
+        },
+      ],
+      responses: {
+        "Positive 200": {
+          description: "Fetching operation success.",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  data: {
+                    _id: "654b608adc0535d84ce7b3ba",
+                    brandCategory_name: "Test2",
+                    brand_id: 2,
+                    created_by: 1,
+                    created_date: "2023-11-08T10:18:50.098Z",
+                    brandCategory_id: 1,
+                    __v: 0,
+                  },
+                },
+              },
+            },
+          },
+        },
+        200: {
+          description: "There is no data available.",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  success: false,
+                  data: {},
+                  message: "No Record found",
+                },
+              },
+            },
+          },
+        },
+        500: {
+          description: "Error message",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  error: "err.message",
+                  message: "Error getting brandCategory details",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    delete: {
+      tags: [`Brand Category`],
+      description: "Delete Brand Category.",
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          description: "ID of Brand Category to delete",
           required: true,
           schema: {
             type: "integer",
@@ -281,7 +289,7 @@ exports.billingHeaderDoc = {
                 type: "object",
                 example: {
                   success: true,
-                  message: `billingheader with ID 1 deleted successfully`,
+                  message: `Brand Category with ID 1 deleted successfully`,
                 },
               },
             },
@@ -295,7 +303,7 @@ exports.billingHeaderDoc = {
                 type: "object",
                 example: {
                   success: true,
-                  message: `billingheader with ID 1 not found`,
+                  message: `Brand Category with ID 1 not found`,
                 },
               },
             },
@@ -309,7 +317,7 @@ exports.billingHeaderDoc = {
                 type: "object",
                 example: {
                   success: false,
-                  message: "An error occurred while deleting the billingheader",
+                  message: "An error occurred while deleting the Brand Category.",
                   error: "error.message",
                 },
               },

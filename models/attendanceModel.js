@@ -108,6 +108,10 @@ const attendanceModel = new mongoose.Schema({
         type: Number,
         required: false,
         default: 0
+    },
+    invoiceNo:{
+        type: String,
+        default: ""
     }
 });
 

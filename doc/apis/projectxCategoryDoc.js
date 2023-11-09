@@ -1,8 +1,9 @@
-exports.projectxPageCategoryDoc = {
-  "/api/projectxpagecategory": {
+
+exports.projectxCategoryApis = {
+  "/api/projectxCategory": {
     post: {
-      tags: [`Projectx Page Category Module`],
-      description: "Add a Projectx Page Category.",
+      tags: [`Projectx Category`],
+      description: "Add a Projectx Category.",
       requestBody: {
         content: {
           "application/json": {
@@ -12,10 +13,14 @@ exports.projectxPageCategoryDoc = {
                 category_name: {
                   type: "string",
                 },
+                brand_id: {
+                  type: "integer",
+                },
               },
             },
             example: {
               category_name: "example",
+              brand_id: 1,
             },
           },
         },
@@ -23,7 +28,7 @@ exports.projectxPageCategoryDoc = {
       },
       responses: {
         200: {
-          description: "Projectx Page Category data created success",
+          description: "Projectx Category data created success",
           content: {
             "application/json": {
               schema: {
@@ -36,14 +41,14 @@ exports.projectxPageCategoryDoc = {
                     category_id: 199,
                     __v: 0,
                   },
-                  message: "projectx page category created success",
+                  message: "projectxcategory created success",
                 },
               },
             },
           },
         },
         "Err 500": {
-          description: "Error while adding Projectx Page Category to database",
+          description: "Error while adding Projectx Category to database",
           content: {
             "application/json": {
               schema: {
@@ -58,14 +63,14 @@ exports.projectxPageCategoryDoc = {
           },
         },
         500: {
-          description: "Internal server error",
+          description: "Error adding projectxcategory to database",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
                   error: "err.message",
-                  message: "Error adding projectx page category to database",
+                  message: "Error adding projectxcategory to database",
                 },
               },
             },
@@ -74,9 +79,9 @@ exports.projectxPageCategoryDoc = {
       },
     },
     put: {
-      tags: [`Projectx Page Category Module`],
+      tags: [`Projectx Category`],
       description:
-        "Edit a Projectx Page category with the specified ID. Note if you not want to update any specific field in that case you have to remove that target field from request body.",
+        "Edit a Projectx category with the specified ID. Note if you not want to update any specific field in that case you have to remove that target field from request body.",
       requestBody: {
         content: {
           "application/json": {
@@ -90,10 +95,14 @@ exports.projectxPageCategoryDoc = {
                 category_name: {
                   type: "string",
                 },
+                brand_id: {
+                  type: "integer",
+                },
               },
             },
             example: {
               category_name: "example",
+              dept_id: 1,
               id: 1,
             },
           },
@@ -106,24 +115,51 @@ exports.projectxPageCategoryDoc = {
             "application/json": {
               schema: {
                 type: "object",
-                example: { success: true },
+                example: {
+                  success: true,
+                  data: {
+                    _id: "6538e9058d99874f4b998c5a",
+                    brand_id: 343,
+                    category_name: "exampleupdate",
+                    category_id: 199,
+                    __v: 0,
+                  },
+                },
               },
             },
           },
         },
-        404: {
+        200: {
+          description: "Validation error for category name unique",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  status: false,
+                  message: "Category name must be unique",
+                  data: {},
+                },
+              },
+            },
+          },
+        },
+        "Err 200": {
           description: "Category not found with provided ID.",
           content: {
             "application/json": {
               schema: {
                 type: "object",
-                example: { success: false, message: "Page category not found" },
+                example: {
+                  success: false,
+                  message: "projectx category not found",
+                },
               },
             },
           },
         },
         500: {
-          description: "Error adding projectx page category to database",
+          description: "Error adding projectxcategory to database",
           content: {
             "application/json": {
               schema: {
@@ -131,7 +167,7 @@ exports.projectxPageCategoryDoc = {
                 example: {
                   error: "err.message",
                   message:
-                    "Error updating the projectx page category in the database",
+                    "Error updating the projectxcategory in the database",
                 },
               },
             },
@@ -140,8 +176,8 @@ exports.projectxPageCategoryDoc = {
       },
     },
     get: {
-      tags: [`Projectx Page Category Module`],
-      description: "Get all Projectx Page Categories.",
+      tags: [`Projectx Category`],
+      description: "Get all Projectx Categories.",
       responses: {
         "Positive 200": {
           description: "Fetching operation success.",
@@ -194,7 +230,7 @@ exports.projectxPageCategoryDoc = {
                 type: "object",
                 example: {
                   error: "err.message",
-                  message: "Error getting all projectxPageCategory",
+                  message: "Error getting all projectxCategory",
                 },
               },
             },
@@ -203,15 +239,15 @@ exports.projectxPageCategoryDoc = {
       },
     },
   },
-  "/api/projectxpagecategory/{id}": {
+  "/api/projectxCategory/{id}": {
     get: {
-      tags: [`Projectx Page Category Module`],
-      description: "Get Single Projectx page Category.",
+      tags: [`Projectx Category`],
+      description: "Get Single Projectx Category.",
       parameters: [
         {
           name: "id",
           in: "path",
-          description: "ID of Projectx Page Category for find.",
+          description: "ID of Projectx Category for find.",
           required: true,
           schema: {
             type: "integer",
@@ -262,7 +298,7 @@ exports.projectxPageCategoryDoc = {
                 type: "object",
                 example: {
                   error: "err.message",
-                  message: "Error getting projectx page category details.",
+                  message: "Error getting projectxCategorySchema details.",
                 },
               },
             },
@@ -271,13 +307,13 @@ exports.projectxPageCategoryDoc = {
       },
     },
     delete: {
-      tags: [`Projectx Page Category Module`],
-      description: "Delete Projectx Page category.",
+      tags: [`Projectx Category`],
+      description: "Delete Projectx category.",
       parameters: [
         {
           name: "id",
           in: "path",
-          description: "ID of Projectx Page category to delete",
+          description: "ID of Projectx category to delete",
           required: true,
           schema: {
             type: "integer",
@@ -294,21 +330,21 @@ exports.projectxPageCategoryDoc = {
                 type: "object",
                 example: {
                   success: true,
-                  message: `projectx page category  with ID 1 deleted successfully`,
+                  message: `Projectx category with ID 1 deleted successfully`,
                 },
               },
             },
           },
         },
         200: {
-          description: "Error while finding data for Projectx Page category id.",
+          description: "Error while finding data for Projectx category id.",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
                   success: true,
-                  message: `projectx page category  with ID 1 not found`,
+                  message: `Projectx category with ID 1 not found`,
                 },
               },
             },
@@ -323,7 +359,7 @@ exports.projectxPageCategoryDoc = {
                 example: {
                   success: false,
                   message:
-                    "An error occurred while deleting the projectx page category",
+                    "An error occurred while deleting the projectxcategory",
                   error: "error.message",
                 },
               },

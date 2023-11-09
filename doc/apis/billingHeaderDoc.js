@@ -1,46 +1,8 @@
-const brandData = {
-  data: [
-    {
-      _id: "6522cc4b3b2912a12bacbf4d",
-      brand_name: "react test",
-      category_id: 52,
-      sub_category_id: 142,
-      igusername: "react",
-    },
-  ],
-};
 
-// Data used in get profile
-const getBrand = {
-  tags: [`Brand Module`],
-  description: "Get All Brands",
-  responses: {
-    200: {
-      description: "Ok",
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            example: brandData,
-          },
-        },
-      },
-    },
-  },
-
-};
-
-// const BrandRouteDoc = {
-//   "/api/get_brands": {
-//     get: getBrand,
-//   },
-// };
-// module.exports = BrandRouteDoc;
-
-exports.BrandRouteDoc = {
-  "/api/add_brand": {
+exports.billingHeaderApis = {
+  "/api/add_billingheader": {
     post: {
-        tags: [`Brand Module`],
+      tags: [`Billing Header`],
       description: "Add a Billing Header.",
       requestBody: {
         content: {
@@ -91,9 +53,9 @@ exports.BrandRouteDoc = {
       },
     },
   },
-  "/api/edit_brand": {
+  "/api/update_billingheader": {
     put: {
-        tags: [`Brand Module`],
+      tags: [`Billing Header`],
       description: "Edit a Billing Header with the specified ID.",
       requestBody: {
         content: {
@@ -113,7 +75,11 @@ exports.BrandRouteDoc = {
                 },
               },
             },
-            example: brandData,
+            example: {
+              billingheader_id: 1,
+              billing_header_name: "example",
+              dept_id: 1,
+            },
           },
         },
       },
@@ -158,9 +124,10 @@ exports.BrandRouteDoc = {
       },
     },
   },
-  "/api/get_brand/{id}": {
+
+  "/api/get_single_billingheader/{id}": {
     get: {
-        tags: [`Brand Module`],
+      tags: [`Billing Header`],
       description: "Get Single Billing Header.",
       parameters: [
         {
@@ -226,9 +193,9 @@ exports.BrandRouteDoc = {
       },
     },
   },
-  "/api/get_brands": {
+  "/api/get_all_billingheaders": {
     get: {
-        tags: [`Brand Module`],
+      tags: [`Billing Header`],
       description: "Get all Billing Headers.",
       responses: {
         "Positive 200": {
@@ -289,9 +256,9 @@ exports.BrandRouteDoc = {
       },
     },
   },
-  "/api/delete_brand/{id}": {
+  "/api/delete_billingheader/{id}": {
     delete: {
-        tags: [`Brand Module`],
+      tags: [`Billing Header`],
       description: "Delete Billing Header.",
       parameters: [
         {
