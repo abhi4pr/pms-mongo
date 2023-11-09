@@ -42,6 +42,7 @@ const instaBrand = require("./controllers/instaBrand.js");
 const user = require("./controllers/user.js");
 const attendance = require("./controllers/attendance.js");
 const instapage = require("./controllers/instaPage.js");
+const pageUniqueness = require("./controllers/pageUniqueness.js");
 
 const role = require("./controllers/role.js");
 const kra = require("./controllers/kra.js");
@@ -853,5 +854,11 @@ router.get("/get_all_vendor", vendor.getVendors);
 router.get("/get_single_vendor/:vendor_id",  vendor.getSingleVendor);
 router.put("/update_vendor",  vendor.editVendor);
 router.delete("/delete_vendor/:vendor_id",  vendor.deleteVendor);
+/* Page Uniqueness routes for insta */
+router.post("/page_uniqueness",  pageUniqueness.addPageUniqueness);
+router.get("/page_uniqueness",  pageUniqueness.getAllPageUniqueness);
+router.get("/page_uniqueness/:id",  pageUniqueness.getPageUniquenessById);
+router.put("/page_uniqueness",  pageUniqueness.editPageUniqueness);
+router.delete("/page_uniqueness/:id",  pageUniqueness.deletePageUniqueness);
 
 module.exports = router;
