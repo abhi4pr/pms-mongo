@@ -302,7 +302,23 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
         {
           $unwind: "$department",
         },
-
+        {
+          $lookup: {
+            from: "billingheadermodels",
+            localField: "department.dept_id",
+            foreignField: "dept_id",
+            as: "billingheadermodels",
+          },
+        },
+        // {
+        //   $unwind: "$finance",
+        // },
+        {
+          $unwind: {
+            path: "$billingheadermodels",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
         {
           $lookup: {
             from: "usermodels",
@@ -369,6 +385,22 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
             bank_name: "$user.bank_name",
             ifsc_code: "$user.ifsc_code",
             account_no: "$user.account_no",
+            billing_header_name: {
+              $cond: {
+                if: {
+                  $and: [
+                    {
+                      $eq: [
+                        { $type: "$billingheadermodels.billing_header_name" },
+                        "missing",
+                      ],
+                    },
+                  ],
+                },
+                then: "",
+                else: "$billingheadermodels.billing_header_name",
+              },
+            },
             toPay: 1,
             sendToFinance: 1,
             attendence_generated: 1,
@@ -378,7 +410,6 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
             salary_deduction: 1,
             salary: 1,
             dept_name: "$department.dept_name",
-            user_email_id: "$user.user_email",
             pan_no: "$user.pan_no",
             current_address: "$user.current_address",
             invoice_template_no: "$user.invoice_template_no",
