@@ -1401,13 +1401,13 @@ exports.sendUserMail = async (req, res) => {
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                    user: "vijayanttrivedi1500@gmail.com",
-                    pass: "odovpikkjvkprrjv",
+                    user: "connect@creativefuel.io",
+                    pass: "clqjuhplszzqesiv",
                 },
             });
 
             let mailOptions = {
-                from: "vijayanttrivedi1500@gmail.com",
+                from: "connect@creativefuel.io",
                 to: email,
                 subject: subject,
                 html: html,
@@ -1437,13 +1437,13 @@ exports.sendUserMail = async (req, res) => {
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                    user: "vijayanttrivedi1500@gmail.com",
-                    pass: "odovpikkjvkprrjv",
+                    user: "connect@creativefuel.io",
+                    pass: "clqjuhplszzqesiv",
                 },
             });
 
             let mailOptions = {
-                from: "vijayanttrivedi1500@gmail.com",
+                from: "connect@creativefuel.io",
                 to: email,
                 subject: subject,
                 html: html,

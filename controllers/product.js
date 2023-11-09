@@ -456,6 +456,7 @@ exports.addOrderReq = async (req, res) => {
       created_by,
       room_id,
       props1,
+      email
     } = req.body;
 
     //Saved Data into Order Req Table
@@ -486,12 +487,12 @@ exports.addOrderReq = async (req, res) => {
     //Creating Template for sending in mail
     const templatePath = path.join(__dirname, "template1.ejs");
     const template = await fs.promises.readFile(templatePath, "utf-8");
-    // const userName = userDetails.user_name;
-    const userName = "Lalit";
-    // const SittingRefNo = sittingDetails.sitting_ref_no;
-    const SittingRefNo = "cabin 4";
-    // const SittingArea = sittingDetails.sitting_area;
-    const SittingArea = "105";
+    const userName = userDetails.user_name;
+    // const userName = "Lalit";
+    const SittingRefNo = sittingDetails.sitting_ref_no;
+    // const SittingRefNo = "cabin 4";
+    const SittingArea = sittingDetails.sitting_area;
+    // const SittingArea = "105";
 
     const html = ejs.render(template, {
       userName,
@@ -500,7 +501,7 @@ exports.addOrderReq = async (req, res) => {
     });
 
     //Send Mail with Template
-    sendMail("Pantry New Order", html);
+    sendMail("Pantry New Order", html,email);
     return response.returnTrue(
       200,
       req,

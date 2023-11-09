@@ -94,6 +94,9 @@ router.get("/execution_graph", exe.executionGraph);
 router.post("/exe_sum_post", exe.exeSumPost);
 router.get("/get_exe_sum", exe.getExeSum);
 router.put("/edit_exe_sum", exe.editExeSum);
+router.get("/get_single_exe_pid_count",exe.getLatestPIDCount);
+router.post("/add_exe_pid_history",exe.addIPCountHistory);
+router.post("/exe_purchase_post",exe.exeForPurchase);
 
 /*sim api*/
 router.get("/get_all_sims",  sim.getSims); // done
