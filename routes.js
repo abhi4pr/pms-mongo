@@ -803,6 +803,7 @@ router.get("/get_platform_byid/:id", instapage.getPlatformById); //done
 router.get("/get_instapage_byid/:id", instapage.getInstaPageById);
 router.post("/dataforgraph", instapage.dataForGraph);
 router.get("/get_all_instapages", instapage.getAllInstaPages);
+router.post("/instagram",instapage.Instagram);
 
 /* Lead Remark Route */
 router.post("/add_leadremark",  leadremark.addLeadRemark);

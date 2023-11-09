@@ -122,21 +122,21 @@ exports.addUser = [upload, async (req, res) => {
             joining_date_extend_status: req.body.joining_date_extend_status,
             joining_date_extend_reason: req.body.joining_date_extend_reason,
             invoice_template_no: req.body.invoice_template_no,
-            image: req.file ? req.files.image[0].filename : '',
-            UID: req.file ? req.files.UID[0].filename : '',
-            pan: req.file ? req.files.pan[0].filename : '',
-            highest_upload: req.file ? req.files.highest_upload[0].filename : '',
-            other_upload: req.file ? req.files.other_upload[0].filename : '',
-            tenth_marksheet: req.file ? req.files.tenth_marksheet[0].filename : '',
-            twelveth_marksheet: req.file ? req.files.twelveth_marksheet[0].filename : '',
-            UG_Marksheet: req.file ? req.files.UG_Marksheet[0].filename : '',
-            passport: req.file ? req.files.passport[0].filename : '',
-            pre_off_letter: req.file ? req.files.pre_off_letter[0].filename : '',
-            pre_expe_letter: req.file ? req.files.pre_expe_letter[0].filename : '',
-            pre_relieving_letter: req.file ? req.files.pre_relieving_letter[0].filename : '',
-            bankPassBook_Cheque: req.file ? req.files.bankPassBook_Cheque[0].filename : '',
-            joining_extend_document: req.file ? req.files.joining_extend_document[0].filename : '',
-            digital_signature_image: req.file ? req.files.digital_signature_image[0].filename : '',
+            image: req.files.image ? req.files.image[0].filename : '',
+            UID: req.files.UID ? req.files.UID[0].filename : '',
+            pan: req.files.pan ? req.files.pan[0].filename : '',
+            highest_upload: req.files.highest_upload ? req.files.highest_upload[0].filename : '',
+            other_upload: req.files.other_upload ? req.files.other_upload[0].filename : '',
+            tenth_marksheet: req.files.tenth_marksheet ? req.files.tenth_marksheet[0].filename : '',
+            twelveth_marksheet: req.files.twelveth_marksheet ? req.files.twelveth_marksheet[0].filename : '',
+            UG_Marksheet: req.files.UG_Marksheet ? req.files.UG_Marksheet[0].filename : '',
+            passport: req.files.passport ? req.files.passport[0].filename : '',
+            pre_off_letter: req.files.pre_off_letter ? req.files.pre_off_letter[0].filename : '',
+            pre_expe_letter: req.files.pre_expe_letter ? req.files.pre_expe_letter[0].filename : '',
+            pre_relieving_letter: req.files.pre_relieving_letter ? req.files.pre_relieving_letter[0].filename : '',
+            bankPassBook_Cheque: req.files.bankPassBook_Cheque ? req.files.bankPassBook_Cheque[0].filename : '',
+            joining_extend_document: req.files.joining_extend_document ? req.files.joining_extend_document[0].filename : '',
+            digital_signature_image: req.files.digital_signature_image ? req.files.digital_signature_image[0].filename : '',
             userSalaryStatus: req.body.userSalaryStatus,
             bank_name: req.body.bank_name,
             ifsc_code: req.body.ifsc_code,
@@ -1959,7 +1959,7 @@ exports.loginUserData = async (req, res) => {
             userObject.image = null;
         }
 
-        res.status(200).json(userObject);
+        res.status(200).json([userObject]);
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'Error getting loginuserdata' })
     }
