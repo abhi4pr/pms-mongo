@@ -8,6 +8,10 @@ module.exports = tags = [
     description: "Everything about Brand Category",
   },
   {
+    name: "Brand Major Category",
+    description: "Everything about Brand Major Category",
+  },
+  {
     name: "Billing Header",
     description: "Everything about  Billing Header",
   },
