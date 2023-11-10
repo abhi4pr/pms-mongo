@@ -26,7 +26,7 @@ exports.addCampaignCategory = async (req, res) => {
     });
   } catch (err) {
     return res.status(500).send({
-      error: err,
+      error: err.message,
       message: "Error adding campaigncategory to database",
     });
   }
@@ -98,7 +98,10 @@ exports.editCampaignCategory = async (req, res) => {
       { new: true }
     );
     if (!editcampaignCategory) {
-      return res.status(500).send({ success: false });
+      return res.status(500).send( {
+        success: false,
+        message: "Campaign category not found",
+      });
     }
     res.status(200).send({ success: true, data: editcampaignCategory });
   } catch (err) {

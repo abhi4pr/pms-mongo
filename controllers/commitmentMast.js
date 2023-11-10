@@ -24,7 +24,7 @@ exports.addCmt = async (req, res) => {
       200,
       req,
       res,
-      "Commitment creat+ed successfully",
+      "Commitment created successfully",
       savedCmt
     );
   } catch (err) {
@@ -110,7 +110,7 @@ exports.editCmt = async (req, res) => {
       200,
       req,
       res,
-      "Data Fetched Successfully.",
+      "Data update Successfully.",
       editCmtObj
     );
   } catch (err) {

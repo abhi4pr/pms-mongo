@@ -19,6 +19,7 @@ const projectxPageCategorySchema = require("../schemas/projectxPageCategorySchem
 const projectxSubCategorySchema = require("../schemas/projectxSubCategorySchema.js");
 const registerCampaignSchema = require("../schemas/registerCampaignSchema.js");
 const fileUploadSchema = require("../schemas/fileUploadSchema.js");
+const financeSchema = require("../schemas/financeSchema.js");
 const mainSchema = {
   //Create schema for display schema
   Agency: {
@@ -68,6 +69,9 @@ const mainSchema = {
   },
   Execution_Campaign: {
     ...exeCampaignSchema,
+  },
+  Finance: {
+    ...financeSchema,
   },
   File_Upload_Schema_For_Content_Section_Reg: {
     ...fileUploadSchema,

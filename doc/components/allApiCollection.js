@@ -8,6 +8,8 @@ const { registerCmpApis } = require("../apis/registerCampaignDoc");
 const { brandMajorCategoryApis } = require("../apis/brandMajorCategoryDoc");
 const { brandSubCategoryApis } = require("../apis/brandSubCategoryDoc");
 const { campaignApis } = require("../apis/campaignDoc");
+const { campaignCategoryApis } = require("../apis/campaignCategoryDoc");
+const { commitmentApis } = require("../apis/commitmentDoc");
 
 const mainSchema = {
   ...brandApis,
@@ -15,6 +17,8 @@ const mainSchema = {
   ...brandMajorCategoryApis,
   ...brandSubCategoryApis,
   ...campaignApis,
+  ...campaignCategoryApis,
+  ...commitmentApis,
   ...registerCmpApis,
   ...billingHeaderApis,
   ...projectxCategoryApis,

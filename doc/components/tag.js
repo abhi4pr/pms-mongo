@@ -24,6 +24,14 @@ module.exports = tags = [
     description: "Everything about Campaign.",
   },
   {
+    name: "Campaign Category",
+    description: "Everything about Campaign Category.",
+  },
+  {
+    name: "Commitment",
+    description: "Everything about Commitment.",
+  },
+  {
     name: "Projectx Category",
     description: "Everything about  projectx category.",
   },
