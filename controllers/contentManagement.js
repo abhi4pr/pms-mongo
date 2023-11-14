@@ -16,7 +16,7 @@ exports.addcontentManagement = async (req, res) =>{
         const contentManagementv = await contentManagementc.save();
         res.send({contentManagementv,status:200});
     } catch(err){
-        res.status(500).send({error:err,sms:'This contentManagement cannot be created'})
+        res.status(500).send({error:err.message,sms:'This contentManagement cannot be created'})
     }
 };
 
@@ -35,7 +35,7 @@ exports.getcontentManagements = async (req, res) => {
 exports.getContentManagementById = async (req, res) => {
     try {
       const fetchedData = await contentManagementModel.findOne({
-        contentm_id: parseInt(req.params.id),
+        contentM_id: parseInt(req.params.id),
       });
       if (!fetchedData) {
         return res
@@ -46,7 +46,7 @@ exports.getContentManagementById = async (req, res) => {
       }
     } catch (err) {
       res.status(500).send({
-        error: err,
+        error: err.message,
         message: "Error getting contentManagementModel details",
       });
     }
@@ -60,7 +60,7 @@ exports.editcontentManagement = async (req, res) => {
             content_name: req.body.content_name,
             category: req.body.category,
             sub_category: req.body.sub_category,
-            content: req.file.filename,
+            content: req.file?.filename,
             reason: req.body.reason,
             status: req.body.status,
             caption: req.body.caption,
@@ -71,7 +71,7 @@ exports.editcontentManagement = async (req, res) => {
         }
         res.status(200).send({success:true,data:editcontentmanagement})
     } catch(err){
-        res.status(500).send({error:err,sms:'Error updating contentManagement details'})
+        res.status(500).send({error:err.message,sms:'Error updating contentManagement details'})
     }
 };
 

@@ -410,6 +410,11 @@ const userModel = new mongoose.Schema({
         required: false,
         default: ""
     },
+    joining_date_reject_reason: {
+        type: String,
+        required: false,
+        default: ""
+    },
     invoice_template_no: {
         type: Number,
         required: false,

@@ -104,14 +104,19 @@ exports.commitmentApis = {
           content: {
             "application/json": {
               schema: {
-                success: true,
-                message: "Data update Successfully.",
-                data: {
-                  _id: "654deebfc7d38df6989ed54d",
-                  cmtName: "example",
-                  cmtValue: 1,
-                  cmtId: 1,
-                  __v: 0,
+                schema: {
+                  type: "object",
+                  example: {
+                    success: true,
+                    message: "Data update Successfully.",
+                    data: {
+                      _id: "654deebfc7d38df6989ed54d",
+                      cmtName: "example",
+                      cmtValue: 1,
+                      cmtId: 1,
+                      __v: 0,
+                    },
+                  },
                 },
               },
             },

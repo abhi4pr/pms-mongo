@@ -28,6 +28,14 @@ module.exports = tags = [
     description: "Everything about Campaign Category.",
   },
   {
+    name: "Content Management",
+    description: "Everything about Content Management.",
+  },
+  {
+    name: "Content Section for Register Campaign",
+    description: "Everything about Content Section for Register Campaign.",
+  },
+  {
     name: "Commitment",
     description: "Everything about Commitment.",
   },

@@ -448,7 +448,7 @@ router.delete(
 );
 
 /* Content Management Routes */
-router.post("/add_contentMgnt",  contentM.addcontentManagement);
+router.post("/add_contentMgnt",  upload.single("content"),  contentM.addcontentManagement);
 router.get(
   "/get_all_contentMgnts",
   
@@ -459,7 +459,7 @@ router.get(
   
   contentM.getContentManagementById
 );
-router.put("/update_contentMgnt",  contentM.editcontentManagement);
+router.put("/update_contentMgnt",upload.single("content"),  contentM.editcontentManagement);
 router.delete(
   "/delete_contentMgnt/:id",
   
