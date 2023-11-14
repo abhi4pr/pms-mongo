@@ -194,7 +194,8 @@ exports.editContentSectionReg = async (req, res) => {
         { content_section_id: parseInt(req.body.content_section_id) },
         {
           $set: updateObj,
-        }
+        },
+        { new: true }
       );
 
     if (!editContentSectionRegObj) {
