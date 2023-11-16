@@ -66,8 +66,14 @@ exports.editRole = async (req, res) => {
             res.status(500).send({success:false})
         }
         res.status(200).send({success:true,data:editsim})
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error updating role details'})
+    } catch(error){
+        if (error.code === 11000) {
+            // The error code 11000 indicates a duplicate key error (unique constraint violation)
+         return   res.status(500).send({error:error.message,sms:'Role name must be unique. Another role with the same name already exists.'})
+          } else {
+            return  res.status(500).send({error:error.message,sms:'Error when updating role'})
+           
+          }
     }
 };
 
