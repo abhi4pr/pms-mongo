@@ -4,7 +4,7 @@ const assetsSubCategoryModel = require("../models/assetsSubCategoryModel.js");
 exports.addAssetSubCategory = async (req, res) => {
     try {
         const assetssubc = new assetsSubCategoryModel({
-            sub_category_name: req.body.category_name,
+            sub_category_name: req.body.sub_category_name,
             category_id: req.body.category_id,
             description: req.body.description,
             created_by: req.body.created_by,
@@ -45,11 +45,10 @@ exports.getAssetSubCategorys = async (req, res) => {
                         sub_category_name: "$sub_category_name",
                         remark: "$remark",
                         created_by: "$created_by",
-                        created_date: "$created_at",
+                        creation_date: "$creation_date",
                         last_updated_by: "$last_updated_by",
                         last_updated_at: "$last_updated_at",
-                        category_id: "$category_id",
-                        id: "$id",
+                        category_id: "$category_id"
                     },
                 },
             ])
@@ -106,7 +105,7 @@ exports.editAssetSubCategory = async (req, res) => {
         const editsim = await assetsSubCategoryModel.findOneAndUpdate(
             { sub_category_id: parseInt(req.body.sub_category_id) },
             {
-                category_name: req.body.category_name,
+                sub_category_name: req.body.sub_category_name,
                 category_id: req.body.category_id,
                 description: req.body.description,
                 created_by: req.body.created_by,
@@ -138,6 +137,6 @@ exports.deleteAssetSubCategory = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Asset Sub Category not found' })
         }
     }).catch(err => {
-        return res.status(400).json({ success: false, message: err })
+        return res.status(400).json({ success: false, message: err.message })
     })
 };

@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const userModel = require('../models/userModel');
 const fs = require('fs');
 const ejs = require('ejs');
+const path = require("path");
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -40,16 +41,38 @@ async function sendReminderEmail(daysBefore) {
 
   const users = await userModel.find({ joining_date: formattedDate });
 
-  users.forEach((user) => {
-    const templatePath = `controllers/emailtemp${daysBefore}.ejs`;
-    const templateContent = fs.readFileSync(templatePath, 'utf-8');
-    const compiledTemplate = ejs.compile(templateContent);
+  users.forEach(async (user) => {
+  // users.forEach((user) => {
+  // const templatePath = `controllers/emailtemp${daysBefore}.ejs`;
+    // const templateContent = fs.readFileSync(templatePath, 'utf-8');
+    // const compiledTemplate = ejs.compile(templateContent);
 
-    const mailOptions = {
-      from: 'vijayanttrivedi1500@gmail.com',
-      to: user.user_email_id,
-      subject: 'Reminder: Your Joining Date is Approaching',
-      html : compiledTemplate({ formattedDate })
+    // const mailOptions = {
+    //   from: 'vijayanttrivedi1500@gmail.com',
+    //   to: user.user_email_id,
+    //   subject: 'Reminder: Your Joining Date is Approaching',
+    //   html : compiledTemplate({ formattedDate })
+    // };
+
+    const templatePath = path.join(__dirname, `emailtemp${daysBefore}.ejs`);
+    const template = await fs.promises.readFile(templatePath, "utf-8");
+    const name = user.user_name;
+    const html = ejs.render(template, {name} );
+
+    let mailOptions = {
+        from: "vijayanttrivedi1500@gmail.com",
+        to: user.user_email_id,
+        subject: 
+          daysBefore === 0
+          ? "Welcome to CreativeFuel! It's almost time."
+          : daysBefore === 1
+          ? "See you tomorrow! With love, CF"
+          : daysBefore === 2
+          ? "Have you geared up yet? #2daystogo!"
+          : daysBefore === 3
+          ? "the countdown begins! #3daystogo!"
+          : "Your Joining Date is Approaching",
+        html: html
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

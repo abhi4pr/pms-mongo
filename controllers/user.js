@@ -1388,7 +1388,7 @@ exports.userObjectAuth = async (req, res) => {
 
 exports.sendUserMail = async (req, res) => {
     try {
-        const { email, subject, name, password, login_id, status, text } = req.body;
+        const { email, subject, name, password, login_id, status, text, name2 } = req.body;
         const attachment = req.file;
         if (status == "onboarded") {
             const templatePath = path.join(__dirname, "template.ejs");
@@ -1400,6 +1400,40 @@ exports.sendUserMail = async (req, res) => {
                 name,
                 login_id,
                 text,
+            });
+
+            let mailTransporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: "connect@creativefuel.io",
+                    pass: "clqjuhplszzqesiv",
+                },
+            });
+
+            let mailOptions = {
+                from: "connect@creativefuel.io",
+                to: email,
+                subject: subject,
+                html: html,
+                attachments: attachment
+                    ? [
+                        {
+                            filename: attachment.originalname,
+                            path: attachment.path,
+                        },
+                    ]
+                    : [],
+            };
+
+            await mailTransporter.sendMail(mailOptions);
+            res.sendStatus(200);
+        }else if (status == "reportTo") {
+            const templatePath = path.join(__dirname, "reportTo.ejs");
+            const template = await fs.promises.readFile(templatePath, "utf-8");
+
+            const html = ejs.render(template, {
+                name,
+                name2
             });
 
             let mailTransporter = nodemailer.createTransport({
