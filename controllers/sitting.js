@@ -279,7 +279,7 @@ exports.editRoom = async (req, res) => {
         },
       }
     );
-    if (editRoomObj?.roomImage) {
+    if (editRoomObj?.roomImage && roomImage) {
       const result = helper.fileRemove(editRoomObj?.roomImage, "../uploads");
       if (result?.status == false) {
         return res.send(result.msg);
