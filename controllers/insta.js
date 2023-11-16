@@ -280,6 +280,8 @@ exports.editInstaStory = async (req, res) => {
             req.body._id,
             {
                 posttype_decision: req.body.posttype_decision,
+                brand_id: req.body.brand_id,
+                campaign: req.body.campaign,
                 selector_name: req.body.selector_name,
                 interpretor_name: req.body.interpretor_name,
                 auditor_name: req.body.auditor_name,
@@ -919,7 +921,7 @@ exports.countInstaCPModels = async (req, res) => {
     }
 };
 
-exports.getDynamicReqAndRes = async (req, res) => {
+exports.getDynamicReqAndResInstaP = async (req, res) => {
     try {
         const ReqKey = req.body.request_key;
         const ReqValue = req.body.request_value;
@@ -948,7 +950,39 @@ exports.getDynamicReqAndRes = async (req, res) => {
            return res.status(400).json({ error: "Invalid flag value" });
         }
     } catch (error) {
-        res.send({ status:500, error: error, sms: "error getting posts from name" });
+        res.send({ status:500, error: error.message, sms: "error getting posts from name" });
+    }
+};
+exports.getDynamicReqAndResInstaS = async (req, res) => {
+    try {
+        const ReqKey = req.body.request_key;
+        const ReqValue = req.body.request_value;
+        const flag = req.body.flag;
+        const page = req.query?.page;
+        const perPage = req.query?.perPage; 
+        const skip = (page - 1) * perPage;
+
+        if (flag === 1) {
+            // Return the count of matching documents
+            const count = await instaS.countDocuments({ [ReqKey]: parseInt(ReqValue) });
+          return  res.status(200).json({ count });
+        } else if (flag === 2) {
+            // Return all matching documents
+            if(page && perPage){
+
+                const getPosts = await instaS.find({ [ReqKey]: parseInt(ReqValue) }).skip(skip)
+                .limit(perPage);
+                return  res.status(200).json(getPosts);
+            }else{
+                const getPosts = await instaS.find({ [ReqKey]: parseInt(ReqValue) })
+                return  res.status(200).json(getPosts);
+            }
+           
+        } else {
+           return res.status(400).json({ error: "Invalid flag value" });
+        }
+    } catch (error) {
+        res.send({ status:500, error: error.message, sms: "error getting stories from name" });
     }
 };
 
