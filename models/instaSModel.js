@@ -69,6 +69,16 @@ const instaSModel = new mongoose.Schema({
         required: false,
         default: 0
     },
+    brand_id:{
+        type: Number,
+        required: false,
+        default: 0
+    },
+    campaign_id:{
+        type: Number,
+        required: false,
+        default: 0
+    },
     auditor_name:{
         type: Number,
         required: false,
