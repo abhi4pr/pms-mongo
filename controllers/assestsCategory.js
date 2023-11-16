@@ -18,7 +18,14 @@ exports.addAssetCategory = async (req, res) => {
       simv
     );
   } catch (err) {
-    return response.returnFalse(500, req, res, err.message, {});
+    if (err.code === 11000) {
+      // The error code 11000 indicates a duplicate key error (unique constraint violation)
+   return   response.returnFalse(500, req, res, "Category name must be unique. Another category with the same name already exists.'", {});
+
+    } else {
+      return response.returnFalse(500, req, res, err.message, {});
+    }
+   
   }
 };
 
@@ -78,7 +85,13 @@ exports.editAssetCategory = async (req, res) => {
     }
     return response.returnTrue(200, req, res, "Updation Successfully", editsim);
   } catch (err) {
-    return response.returnFalse(500, req, res, err.message, {});
+    if (err.code === 11000) {
+      // The error code 11000 indicates a duplicate key error (unique constraint violation)
+      return response.returnFalse(500, req, res, "Category name must be unique. Another category with the same name already exists.'", {});
+
+    } else {
+      return response.returnFalse(500, req, res, err.message, {});
+    }
   }
 };
 

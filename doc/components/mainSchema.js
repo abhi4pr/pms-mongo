@@ -20,6 +20,21 @@ const projectxSubCategorySchema = require("../schemas/projectxSubCategorySchema.
 const registerCampaignSchema = require("../schemas/registerCampaignSchema.js");
 const fileUploadSchema = require("../schemas/fileUploadSchema.js");
 const financeSchema = require("../schemas/financeSchema.js");
+const instaBotMSchema = require("../schemas/instaBotMSchema.js");
+const hashTagSchema = require("../schemas/hashTagSchema.js");
+const instaBotWSchema = require("../schemas/instaBotWSchema.js");
+const instaBotYSchema = require("../schemas/instaBotYSchema.js");
+const instaBrandSchema = require("../schemas/instaBrandSchema.js");
+const keywordSchema = require("../schemas/keywordSchema.js");
+const instaTypeSchema = require("../schemas/instaTypeSchema.js");
+const jobResponsibilitiesSchema = require("../schemas/jobResponsibilitiesSchema.js");
+const kraTransSchema = require("../schemas/kraTransSchema.js");
+const leadSchema = require("../schemas/leadSchema.js");
+const leadTypeSchema = require("../schemas/leadTypeSchema.js");
+const logoBrandSchema = require("../schemas/logoBrandSchema.js");
+const orderDeliverySchema = require("../schemas/orderDeliverySchema.js");
+const objSchema = require("../schemas/objSchema.js");
+const mentionSchema = require("../schemas/mentionSchema.js");
 const mainSchema = {
   //Create schema for display schema
   Agency: {
@@ -76,6 +91,42 @@ const mainSchema = {
   File_Upload_Schema_For_Content_Section_Reg: {
     ...fileUploadSchema,
   },
+  Hash_Tag: {
+    ...hashTagSchema,
+  },
+  Insta_Bot_M: {
+    ...instaBotMSchema,
+  },
+  Insta_Bot_W: {
+    ...instaBotWSchema,
+  },
+  Insta_Bot_Y: {
+    ...instaBotYSchema,
+  },
+  Insta_Brand: {
+    ...instaBrandSchema,
+  },
+  Insta_Type: {
+    ...instaTypeSchema,
+  },
+  Keyword: {
+    ...keywordSchema,
+  },
+  kra_Trans: {
+    ...kraTransSchema,
+  },
+  Job_Responsibilities: {
+    ...jobResponsibilitiesSchema,
+  },
+  Lead: {
+    ...leadSchema,
+  },
+  Lead_Type: {
+    ...leadTypeSchema,
+  },
+  Logo_Brand: {
+    ...logoBrandSchema,
+  },
   Projectx_Sub_Category: {
     ...projectxSubCategorySchema,
   },
@@ -87,6 +138,15 @@ const mainSchema = {
   },
   Register_Campaign: {
     ...registerCampaignSchema,
+  },
+  Order_Delivery_Schema: {
+    ...orderDeliverySchema,
+  },
+  Obj_Schema: {
+    ...objSchema,
+  },
+  Mention_Schema: {
+    ...mentionSchema,
   },
 };
 module.exports = mainSchema;
