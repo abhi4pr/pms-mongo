@@ -1,13 +1,18 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const variable = require('../variables.js');
-// const AutoIncrement = require('mongoose-auto-increment');
+const AutoIncrement = require('mongoose-auto-increment');
 
 const exeSumModel = new mongoose.Schema({
     // creator_id:{
     //     type: Number,
     //     required: true
     // },
+    id: { 
+        type: Number,
+        required: true,
+        unique: true,
+    },
     sale_booking_execution_id: {
         type: Number,
         required: false,
@@ -127,12 +132,59 @@ const exeSumModel = new mongoose.Schema({
         required: false,
         default: ""
     },
+    sales_executive_name: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    page_ids: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    service_id: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    service_name: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    execution_excel: {
+        type: String,
+        default: ""
+    },
+    total_paid_amount: {
+        type: Number,
+        default: 0
+    },
+    credit_approval_amount: {
+        type: Number,
+        default: 0
+    },
+    credit_approval_date: {
+        type: Date
+    },
+    credit_approval_by: {
+        type: String,
+        default: ""
+    },
+    campaign_amount_without_gst: {
+        type: Number,
+        default: 0
+    },
+    start_date:{
+        type: Date,
+        default:""
+    }
 });
 
-// AutoIncrement.initialize(mongoose.connection);
-// exeSumModel.plugin(
-//     AutoIncrement.plugin, 
-//     { model: 'exeSumModels', field: 'creator_id', startAt: 1, incrementBy: 1 }
-// );
+AutoIncrement.initialize(mongoose.connection);
+exeSumModel.plugin(
+    AutoIncrement.plugin, 
+    { model: 'exeSumModels', field: 'id', startAt: 1, incrementBy: 1 }
+);
 
 module.exports = mongoose.model('exeSumModel', exeSumModel);

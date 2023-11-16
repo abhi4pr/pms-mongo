@@ -76,7 +76,8 @@ const instaPModel = new mongoose.Schema({
     postUrl:{
         type: String,
         required: false,
-        default: ""
+        default: "",
+        unique: true
     },
     postImage:{
         type: String,
@@ -127,6 +128,29 @@ const instaPModel = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    hashTag: {
+        type: String,
+        required: false
+    },
+    mentions: {
+        type: String,
+        required: false
+    },
+    selector_date:{
+        type: Date,
+        required: false,
+        default: ""
+    },
+    interpretor_date:{
+        type: Date,
+        required: false,
+        default: ""
+    },
+    auditor_date:{
+        type: Date,
+        required: false,
+        default: ""
+    }
 });
 
 // AutoIncrement.initialize(mongoose.connection);
