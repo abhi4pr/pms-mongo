@@ -18,7 +18,14 @@ exports.addDepartment = async (req, res) => {
       simv
     );
   } catch (err) {
-    return response.returnFalse(500, req, res, err.message, {});
+    if (err.code === 11000) {
+      // The error code 11000 indicates a duplicate key error (unique constraint violation)
+   return   response.returnFalse(500, req, res, "'Department name must be unique. Another department with the same name already exists.'", {});
+
+    } else {
+      return response.returnFalse(500, req, res, err.message, {});
+    }
+    
   }
 };
 
@@ -78,13 +85,20 @@ exports.editDepartment = async (req, res) => {
     }
     return response.returnTrue(200, req, res, "Updation Successfully", editsim);
   } catch (err) {
-    return response.returnFalse(500, req, res, err.message, {});
+    if (err.code === 11000) {
+      // The error code 11000 indicates a duplicate key error (unique constraint violation)
+      return  response.returnFalse(500, req, res, "'Department name must be unique. Another department with the same name already exists.'", {});
+
+    } else {
+      return response.returnFalse(500, req, res, err.message, {});
+    }
   }
 };
 
 exports.deleteDepartment = async (req, res) =>{
   departmentModel.deleteOne({id:req.params.dept_id}).then(item =>{
-      if(item){
+
+      if(item?.deletedCount !== 0){
           return res.status(200).json({success:true, message:'Department deleted'})
       }else{
           return res.status(404).json({success:false, message:'Department not found'})

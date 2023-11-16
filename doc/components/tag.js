@@ -1,5 +1,9 @@
 module.exports = tags = [
   {
+    name: "Insta Api's",
+    description: "Everything about Instagram api's.",
+  },
+  {
     name: "Brand",
     description: "Everything about  User's",
   },

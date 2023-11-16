@@ -924,14 +924,26 @@ exports.getDynamicReqAndRes = async (req, res) => {
         const ReqKey = req.body.request_key;
         const ReqValue = req.body.request_value;
         const flag = req.body.flag;
+        const page = req.query?.page;
+        const perPage = req.query?.perPage; 
+        const skip = (page - 1) * perPage;
+
         if (flag === 1) {
             // Return the count of matching documents
             const count = await instaP.countDocuments({ [ReqKey]: parseInt(ReqValue) });
           return  res.status(200).json({ count });
         } else if (flag === 2) {
             // Return all matching documents
-            const getPosts = await instaP.find({ [ReqKey]: parseInt(ReqValue) });
-            return  res.status(200).json(getPosts);
+            if(page && perPage){
+
+                const getPosts = await instaP.find({ [ReqKey]: parseInt(ReqValue) }).skip(skip)
+                .limit(perPage);
+                return  res.status(200).json(getPosts);
+            }else{
+                const getPosts = await instaP.find({ [ReqKey]: parseInt(ReqValue) })
+                return  res.status(200).json(getPosts);
+            }
+           
         } else {
            return res.status(400).json({ error: "Invalid flag value" });
         }
@@ -980,5 +992,59 @@ exports.getAvgFrqOfPost = async (req, res) => {
         res.status(200).send(query);
     } catch (error) {
         res.send({ status:500, error: error.message, sms: "error getting posts from name" });
+    }
+};
+
+
+exports.getAnalytics = async (req, res) => {
+    try {
+  
+    const query = await instaP.aggregate([
+        {
+            $match: {
+                posttype_decision: { $gt: 1 },
+                interpretor_decision: 1
+            }
+        },
+      
+        {
+            $group: {
+                _id: "$todayComment",
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $sort: {
+                count: -1,
+                 _id : 1
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                today_comment_max: { $first: "$_id" },
+                today_comment_max_count: { $first: "$count" },
+                today_comment_min: { $last: "$_id" },
+                today_comment_min_count: { $last: "$count" }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                today_comment_max: 1,
+                today_comment_max_count: 1,
+                today_comment_min: 1,
+                today_comment_min_count: 1
+            }
+        }
+    ]) 
+    if(query.length !== 0){
+
+      return  res.status(200).send(query[0]);
+    }else{
+        return  res.send({ status:200, message: "No record found." });
+    }
+    } catch (error) {
+      return  res.send({ status:500, error: error.message, message: "Error getting analytics." });
     }
 };
