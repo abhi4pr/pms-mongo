@@ -35,6 +35,7 @@ const logoBrandSchema = require("../schemas/logoBrandSchema.js");
 const orderDeliverySchema = require("../schemas/orderDeliverySchema.js");
 const objSchema = require("../schemas/objSchema.js");
 const mentionSchema = require("../schemas/mentionSchema.js");
+const pageUniquenessSchema = require("../schemas/pageUniquenessSchema.js");
 const mainSchema = {
   //Create schema for display schema
   Agency: {
@@ -135,6 +136,9 @@ const mainSchema = {
   },
   Projectx_Category: {
     ...projectxCategorySchema,
+  },
+  Page_Uniqueness: {
+    ...pageUniquenessSchema,
   },
   Register_Campaign: {
     ...registerCampaignSchema,

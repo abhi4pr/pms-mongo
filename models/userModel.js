@@ -241,7 +241,7 @@ const userModel = new mongoose.Schema({
         type: String,
         required: false,
         default: "Active"
-    },
+    },      
     lastupdated: {
         type: Date,
         default: Date.now

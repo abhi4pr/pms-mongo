@@ -5,17 +5,40 @@ exports.instaApis = {
       description:
         "Get Analytics for insta post Based on some condition where posttype decision is greater than 1 and interpretor decision is equal to 1.",
       responses: {
-        200: {
+        "Positive 200": {
           description: "Fetching operation success.",
           content: {
             "application/json": {
               schema: {
                 type: "object",
                 example: {
-                  today_comment_max: 0,
-                  today_comment_max_count: 14511,
-                  today_comment_min: 215,
-                  today_comment_min_count: 1,
+                  campaignId: {
+                    max_id: 354,
+                    max_count: 12,
+                    min_id: 54,
+                    min_count: 1,
+                  },
+                  brandId: {
+                    max_id: 123,
+                    max_count: 16,
+                    min_id: 12,
+                    min_count: 1,
+                  },
+                },
+              },
+            },
+          },
+        },
+        200: {
+          description:
+            "There is data not full fill condition and also there is chance that data not available in db.",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                example: {
+                  status: 200,
+                  message: "No record found.",
                 },
               },
             },
@@ -117,13 +140,13 @@ exports.instaApis = {
                     postType: "REEL",
                     creatorName: "justengineerslife",
                     allComments: 0,
-                    todayComment: 0,
+                    brand_id: 0,
                     pastComment: 0,
                     allLike: 2,
-                    todayLike: 0,
+                    campaign_id: 0,
                     pastLike: 0,
                     allView: 156,
-                    todayView: 0,
+                    agency_id: 0,
                     pastView: 0,
                     title: "Ache log❤️",
                     postedOn: "2023-10-09 01:36:08",
