@@ -44,6 +44,10 @@ module.exports = tags = [
     description: "Everything about Commitment.",
   },
   {
+    name: "Document",
+    description: "Everything about Document master.",
+  },
+  {
     name: "Projectx Category",
     description: "Everything about  projectx category.",
   },

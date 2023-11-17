@@ -515,6 +515,31 @@ const userModel = new mongoose.Schema({
         type: String,
         required: false,
         default:""
+    },
+    guardian_name :{
+        type: String,
+        required: false,
+        default:""
+    },
+    guardian_address :{
+        type: String,
+        required: false,
+        default:""
+    },
+    relation_with_guardian :{
+        type: String,
+        required: false,
+        default:""
+    },
+    gaurdian_number :{
+        type: Number,
+        required: false,
+        default:0
+    },
+    emergency_contact:{
+        type: Number,
+        required: false,
+        default:0
     }
 });
 

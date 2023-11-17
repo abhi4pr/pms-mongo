@@ -56,6 +56,7 @@ const assetCategory = require("./controllers/assestsCategory.js");
 const assetSubCategory = require("./controllers/assetsSubCategory.js");
 const vendor = require("./controllers/vendor.js");
 const coc = require("./controllers/cocManagement.js");
+const documentController = require("./controllers/document.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -874,5 +875,13 @@ router.post("/add_coc", coc.addCoc);
 router.get("/get_all_cocs", coc.getAllCocs);
 router.get("/get_single_coc/:_id", coc.getSingleCoc);
 router.put("/update_coc", coc.editCoc);
+
+module.exports = router;
+/* Document master */
+router.post("/add_doc",  documentController.addDocument);
+router.get("/get_all_docs",  documentController.getDocs);
+router.get("/get_doc/:id",  documentController.getDoc);
+router.put("/update_doc",  documentController.editDoc);
+router.delete("/delete_doc/:id",  documentController.deleteDoc);
 
 module.exports = router;
