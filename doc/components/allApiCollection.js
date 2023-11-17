@@ -13,6 +13,7 @@ const { commitmentApis } = require("../apis/commitmentDoc");
 const { contentManagementApis } = require("../apis/contentManagement");
 const { contentSectionRegApis } = require("../apis/contentSectionRegCmpDoc");
 const { instaApis } = require("../apis/instaDoc");
+const { documenentMastApis } = require("../apis/documentDoc");
 
 const mainSchema = {
   ...instaApis,
@@ -25,6 +26,7 @@ const mainSchema = {
   ...commitmentApis,
   ...contentManagementApis,
   ...contentSectionRegApis,
+  ...documenentMastApis,
   ...registerCmpApis,
   ...billingHeaderApis,
   ...projectxCategoryApis,

@@ -140,7 +140,12 @@ exports.addUser = [upload, async (req, res) => {
             userSalaryStatus: req.body.userSalaryStatus,
             bank_name: req.body.bank_name,
             ifsc_code: req.body.ifsc_code,
-            account_no: req.body.account_no
+            account_no: req.body.account_no,
+            guardian_name: req.body.guardian_name,
+            guardian_address: req.body.guardian_address,
+            relation_with_guardian: req.body.relation_with_guardian,
+            gaurdian_number: req.body.gaurdian_number,
+            emergency_contact: req.body.emergency_contact
         })
         const simv = await simc.save();
 
@@ -348,7 +353,12 @@ exports.updateUser = [upload1, async (req, res) => {
             digital_signature_image: req.files && req.files['digital_signature_image'] && req.files['digital_signature_image'][0] ? req.files['digital_signature_image'][0].filename : (existingUser && existingUser.digital_signature_image) || '',
             bank_name: req.body.bank_name,
             ifsc_code: req.body.ifsc_code,
-            account_no: req.body.account_no
+            account_no: req.body.account_no,
+            guardian_name: req.body.guardian_name,
+            guardian_address: req.body.guardian_address,
+            relation_with_guardian: req.body.relation_with_guardian,
+            gaurdian_number: req.body.gaurdian_number,
+            emergency_contact: req.body.emergency_contact
 
         }, { new: true });
         if (!editsim) {
@@ -603,7 +613,12 @@ exports.getAllUsers = async (req, res) => {
                     digital_signature_image: "$digital_signature_image",
                     bank_name:"$bank_name",
                     ifsc_code:"$ifsc_code",
-                    account_no:"$account_no"
+                    account_no:"$account_no",
+                    guardian_name:"$guardian_name",
+                    guardian_address:"$guardian_address",
+                    relation_with_guardian:"$relation_with_guardian",
+                    gaurdian_number:"$gaurdian_number",
+                    emergency_contact:"$emergency_contact"
                 }
             }
         ]).exec();
@@ -859,7 +874,12 @@ exports.getSingleUser = async (req, res) => {
                     designation_name: "$designation.desi_name",
                     bank_name:"$bank_name",
                     ifsc_code:"$ifsc_code",
-                    account_no:"$account_no"
+                    account_no:"$account_no",
+                    guardian_name:"$guardian_name",
+                    guardian_address:"$guardian_address",
+                    relation_with_guardian:"$relation_with_guardian",
+                    gaurdian_number:"$gaurdian_number",
+                    emergency_contact:"$emergency_contact"
                 }
             }
         ]).exec();
@@ -1159,7 +1179,12 @@ exports.deliveryUser = async (req, res) => {
                     pre_expe_letter: ImageUrl + '$pre_expe_letter',
                     pre_relieving_letter: ImageUrl + '$pre_relieving_letter',
                     bankPassBook_Cheque: ImageUrl + '$bankPassBook_Cheque',
-                    joining_extend_document: ImageUrl + '$joining_extend_document'
+                    joining_extend_document: ImageUrl + '$joining_extend_document',
+                    guardian_name:"$guardian_name",
+                    guardian_address:"$guardian_address",
+                    relation_with_guardian:"$relation_with_guardian",
+                    gaurdian_number:"$gaurdian_number",
+                    emergency_contact:"$emergency_contact"
                 }
             }
         ]).exec();
