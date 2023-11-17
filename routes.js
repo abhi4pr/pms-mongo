@@ -55,6 +55,7 @@ const { verifyToken } = require("./middleware/auth.js");
 const assetCategory = require("./controllers/assestsCategory.js");
 const assetSubCategory = require("./controllers/assetsSubCategory.js");
 const vendor = require("./controllers/vendor.js");
+const coc = require("./controllers/cocManagement.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -867,5 +868,11 @@ router.get("/page_uniqueness",  pageUniqueness.getAllPageUniqueness);
 router.get("/page_uniqueness/:id",  pageUniqueness.getPageUniquenessById);
 router.put("/page_uniqueness",  pageUniqueness.editPageUniqueness);
 router.delete("/page_uniqueness/:id",  pageUniqueness.deletePageUniqueness);
+
+/* coc routes */
+router.post("/add_coc", coc.addCoc);
+router.get("/get_all_cocs", coc.getAllCocs);
+router.get("/get_single_coc/:_id", coc.getSingleCoc);
+router.put("/update_coc", coc.editCoc);
 
 module.exports = router;
