@@ -296,7 +296,7 @@ exports.updateUser = [upload1, async (req, res) => {
             other_upload_validate: req.body.other_upload_validate,
             user_status: req.body.user_status,
             lastupdated: req.body.lastupdated,
-            sub_dept_id: req.body.sub_dept_id,
+            sub_dept_id: isNaN(req.body.sub_dept_id) ? 0 : req.body.sub_dept_id,
             pan_no: req.body.pan_no,
             uid_no: req.body.uid_no,
             spouse_name: req.body.spouse_name,

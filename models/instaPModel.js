@@ -23,7 +23,7 @@ const instaPModel = new mongoose.Schema({
         required: false,
         default: 0
     },
-    todayComment: {
+    brand_id: {
         type: Number,
         required: false,
         default: 0
@@ -38,7 +38,7 @@ const instaPModel = new mongoose.Schema({
         required: false,
         default: 0
     },
-    todayLike:{
+    campaign_id:{
         type: Number,
         required: false,
         default: 0
@@ -53,7 +53,7 @@ const instaPModel = new mongoose.Schema({
         required: false,
         default: 0
     },
-    todayView:{
+    agency_id:{
         type: Number,
         required: false,
         default: 0

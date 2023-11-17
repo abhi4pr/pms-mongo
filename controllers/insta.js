@@ -126,13 +126,13 @@ exports.trackPost = async (req, res) => {
         //         postType: req.body.data.post_type,
         //         creatorName: req.body.data.creator.username,
         //         allComments: req.body.data.comments_count.overall,
-        //         todayComment: req.body.data.comments_count.today,
+        //         brand_id: req.body.data.comments_count.today,
         //         pastComment: req.body.data.comments_count.vs_previous,
         //         allLike: req.body.data.likes_count.overall,
-        //         todayLike: req.body.data.likes_count.today,
+        //         campaign_id: req.body.data.likes_count.today,
         //         pastLike: req.body.data.likes_count.vs_previous,
         //         allView: req.body.data.views_count.overall,
-        //         todayView: req.body.data.views_count.today,
+        //         agency_id: req.body.data.views_count.today,
         //         pastView: req.body.data.views_count.vs_previous,
         //         title: req.body.data.title,
         //         postedOn: req.body.data.posted_at,
@@ -155,13 +155,13 @@ exports.trackPost = async (req, res) => {
             postType: req.body.data.post_type,
             creatorName: req.body.data.creator.username,
             allComments: req.body.data.comments_count.overall,
-            todayComment: req.body.data.comments_count.today,
+            brand_id: req.body.data.comments_count.today,
             pastComment: req.body.data.comments_count.vs_previous,
             allLike: req.body.data.likes_count.overall,
-            todayLike: req.body.data.likes_count.today,
+            campaign_id: req.body.data.likes_count.today,
             pastLike: req.body.data.likes_count.vs_previous,
             allView: req.body.data.views_count.overall,
-            todayView: req.body.data.views_count.today,
+            agency_id: req.body.data.views_count.today,
             pastView: req.body.data.views_count.vs_previous,
             title: req.body.data.title,
             postedOn: req.body.data.posted_at,
@@ -250,9 +250,9 @@ exports.editInsta = async (req, res) => {
                 auditor_decision: req.body.auditor_decision,
                 interpretor_decision: req.body.interpretor_decision,
                 selector_decision: req.body.selector_decision,
-                todayComment: req.body.todayComment,
-                todayLike: req.body.todayLike,
-                todayView: req.body.todayView,
+                brand_id: req.body.brand_id,
+                campaign_id: req.body.campaign_id,
+                agency_id: req.body.agency_id,
                 pastComment: req.body.pastComment,
                 pastLike: req.body.pastLike,
                 pastView: req.body.pastView,
@@ -281,7 +281,7 @@ exports.editInstaStory = async (req, res) => {
             {
                 posttype_decision: req.body.posttype_decision,
                 brand_id: req.body.brand_id,
-                campaign: req.body.campaign,
+                campaign_id: req.body.campaign_id,
                 selector_name: req.body.selector_name,
                 interpretor_name: req.body.interpretor_name,
                 auditor_name: req.body.auditor_name,
@@ -1035,44 +1035,100 @@ exports.getAnalytics = async (req, res) => {
   
     const query = await instaP.aggregate([
         {
-            $match: {
-                posttype_decision: { $gt: 1 },
-                interpretor_decision: 1
-            }
-        },
-      
-        {
-            $group: {
-                _id: "$todayComment",
-                count: { $sum: 1 }
-            }
+          $match: {
+            posttype_decision: { $gt: 1 },
+            interpretor_decision: 1
+          }
         },
         {
-            $sort: {
-                count: -1,
-                 _id : 1
-            }
-        },
-        {
-            $group: {
-                _id: null,
-                today_comment_max: { $first: "$_id" },
-                today_comment_max_count: { $first: "$count" },
-                today_comment_min: { $last: "$_id" },
-                today_comment_min_count: { $last: "$count" }
-            }
+          $facet: {
+            byCampaignId: [
+                {
+                    $match: {
+                      campaign_id : { $ne : 0 },
+                    }
+                },
+              {
+                $group: {
+                  _id: "$campaign_id",
+                  count: { $sum: 1 }
+                }
+              },
+              {
+                $sort: {
+                  count: -1,
+                  _id: 1
+                }
+              },
+              {
+                $group: {
+                  _id: null,
+                  max_id: { $first: "$_id" },
+                  max_count: { $first: "$count" },
+                  min_id: { $last: "$_id" },
+                  min_count: { $last: "$count" }
+                }
+              },
+              
+              {
+                $project: {
+                  _id: 0,
+                  max_id: 1,
+                  max_count: 1,
+                  min_id: 1,
+                  min_count: 1
+                }
+              }
+            ],
+            byBrandId:[
+                {
+                    $match: {
+                        brand_id : { $ne : 0 },
+                    }
+                },
+                {
+                  $group: {
+                    _id: "$brand_id",
+                    count: { $sum: 1 }
+                  }
+                },
+                {
+                  $sort: {
+                    count: -1,
+                    _id: 1
+                  }
+                },
+                {
+                  $group: {
+                    _id: null,
+                    max_id: { $first: "$_id" },
+                    max_count: { $first: "$count" },
+                    min_id: { $last: "$_id" },
+                    min_count: { $last: "$count" }
+                  }
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    max_id: 1,
+                    max_count: 1,
+                    min_id: 1,
+                    min_count: 1
+                  }
+                }
+              ]
+          }
         },
         {
             $project: {
-                _id: 0,
-                today_comment_max: 1,
-                today_comment_max_count: 1,
-                today_comment_min: 1,
-                today_comment_min_count: 1
+              campaignId: { $arrayElemAt: ["$byCampaignId", 0] },
+              brandId: { $arrayElemAt: ["$byBrandId", 0] }
             }
-        }
-    ]) 
-    if(query.length !== 0){
+          }
+      ]);
+      console.log(query)
+      
+    if(query.length !== 0 && Object.keys(query[0]).length !== 0 ){
 
       return  res.status(200).send(query[0]);
     }else{
