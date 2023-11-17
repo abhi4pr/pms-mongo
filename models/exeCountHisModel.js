@@ -26,6 +26,24 @@ const exeCountHisModel = new mongoose.Schema({
     required: false,
     default:0
   },
+  stats_for:{
+    type: String,
+    required: false,
+    default: ""
+  },
+  start_date:{
+    type: Date,
+    required: false
+  },
+  end_date:{
+    type: Date,
+    required: false
+  },
+  media:{
+    type: String,
+    required: false,
+    default: ""
+  },
   creation_date: {
     type: Date,
     default: Date.now,

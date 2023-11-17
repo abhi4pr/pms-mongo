@@ -313,7 +313,11 @@ exports.addIPCountHistory = async (req, res) =>{
             reach: req.body.reach,
             impression: req.body.impression,
             engagement: req.body.engagement,
-            story_view: req.body.story_view
+            story_view: req.body.story_view,
+            stats_for: req.body.stats_for,
+            start_date: req.body.start_date,
+            end_date: req.body.end_date,
+            media: req.file.filename ?? ""
         })
         const simv = await simc.save();
         res.send({simv,status:200});
