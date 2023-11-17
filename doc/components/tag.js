@@ -59,4 +59,8 @@ module.exports = tags = [
     name: "Register Campaign",
     description: "Everything about Register Campaign",
   },
+  {
+    name: "User",
+    description: "Everything about User.",
+  },
 ];

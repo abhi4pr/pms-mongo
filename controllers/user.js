@@ -14,6 +14,7 @@ const bcrypt = require("bcrypt");
 const fs = require("fs");
 const ejs = require('ejs');
 const nodemailer = require("nodemailer");
+const sendMail = require("../common/sendMail.js");
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "image", maxCount: 1 },
@@ -2025,5 +2026,28 @@ exports.loginUserData = async (req, res) => {
         res.status(200).json([userObject]);
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'Error getting loginuserdata' })
+    }
+};
+
+exports.forgotPass = async (req, res) => {
+    const email = req.body.user_email_id;
+    try {
+        const user = await userModel.findOne({ user_email_id: email }, 'user_login_password');
+        if (!user) {
+            return res.status(200).json({ message: "User not found with this email id." });
+        }
+
+        const templatePath = path.join(__dirname, "forgotemailtemp.ejs");
+            const template = await fs.promises.readFile(templatePath, "utf-8");
+            const html = ejs.render(template, {
+                email,
+              password : user?.user_login_password
+            
+            });
+       sendMail("Forgot password", html,email);
+       return  res.status(200).send({  message: 'Successfully Sent email.' })
+
+    } catch (err) {
+       return  res.status(500).send({ error: err.message, message: 'Error Sending Mail' })
     }
 };
