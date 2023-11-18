@@ -152,6 +152,7 @@ exports.trackPost = async (req, res) => {
         // })
 
         const creators = new instaP({
+            handle: req.body.data?.handle ?? "",
             postType: req.body.data.post_type,
             creatorName: req.body.data.creator.username,
             allComments: req.body.data.comments_count.overall,
@@ -180,7 +181,7 @@ exports.trackPost = async (req, res) => {
         res.send({ instav, status: 200 });
 
     } catch (error) {
-        res.status(500).send({ error: error, sms: "error while adding data" });
+        res.status(500).send({ error: error.message, sms: "error while adding data" });
     }
 };
 

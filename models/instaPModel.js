@@ -132,6 +132,11 @@ const instaPModel = new mongoose.Schema({
         type: String,
         required: false
     },
+    handle: {
+        type: String,
+        required: false,
+        default:""
+    },
     mentions: {
         type: String,
         required: false
