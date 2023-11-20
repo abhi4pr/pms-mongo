@@ -108,6 +108,7 @@ exports.getFinances = async (req, res) => {
           invoice_template_no: "$user_data.invoice_template_no",
           dept_name: "$dept_data.dept_name",
           image_url: { $concat: [financeImagesBaseUrl, "$screenshot"] },
+          digital_signature_image:"$user_data.digital_signature_image"
         },
       },
     ]);
