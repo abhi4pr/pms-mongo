@@ -36,6 +36,11 @@ const orderDeliverySchema = require("../schemas/orderDeliverySchema.js");
 const objSchema = require("../schemas/objSchema.js");
 const mentionSchema = require("../schemas/mentionSchema.js");
 const pageUniquenessSchema = require("../schemas/pageUniquenessSchema.js");
+const roleSchema = require("../schemas/roleSchema.js");
+const productPropsSchema = require("../schemas/productPropsSchema.js");
+const responsibilitySchema = require("../schemas/responsibilitySchema.js");
+const reasonSchema = require("../schemas/reasonSchema.js");
+const documentSchema = require("../schemas/documentSchema.js");
 const mainSchema = {
   //Create schema for display schema
   Agency: {
@@ -82,6 +87,9 @@ const mainSchema = {
   },
   Designation: {
     ...designationSchema,
+  },
+  Document: {
+    ...documentSchema,
   },
   Execution_Campaign: {
     ...exeCampaignSchema,
@@ -140,8 +148,20 @@ const mainSchema = {
   Page_Uniqueness: {
     ...pageUniquenessSchema,
   },
+  Product_Props: {
+    ...productPropsSchema,
+  },
   Register_Campaign: {
     ...registerCampaignSchema,
+  },
+  Role: {
+    ...roleSchema,
+  },
+  Reason: {
+    ...reasonSchema,
+  },
+  Responsibiltiy: {
+    ...responsibilitySchema,
   },
   Order_Delivery_Schema: {
     ...orderDeliverySchema,

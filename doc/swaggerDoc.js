@@ -4,7 +4,7 @@ const apis = require("./components/allApiCollection");
 const mainServers = require("./components/mainServers");
 
 const swaggerDocumantion = {
-  openapi: "3.0.3",
+  openapi: "3.0.0",
   info: {
     // title: "Jarvis Mongo API Hub",
     version: "1.0.0",
