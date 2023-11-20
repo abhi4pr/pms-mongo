@@ -122,11 +122,12 @@ exports.getObjectMasts = async (req, res) => {
           as: "data",
         },
       },
-
       {
-        $unwind: "$data",
+        $unwind: {
+          path: "$data",
+          preserveNullAndEmptyArrays: true,
+        },
       },
-
       {
         $project: {
           obj_id:"$obj_id",
