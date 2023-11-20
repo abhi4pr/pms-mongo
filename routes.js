@@ -877,6 +877,7 @@ router.post("/add_coc", coc.addCoc);
 router.get("/get_all_cocs", coc.getAllCocs);
 router.get("/get_single_coc/:_id", coc.getSingleCoc);
 router.put("/update_coc", coc.editCoc);
+router.get("/get_coc_history/:_id", coc.getCocHistory);
 
 module.exports = router;
 /* Document master */

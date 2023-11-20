@@ -4,23 +4,29 @@ const AutoIncrement = require("mongoose-auto-increment");
 const cocModel = new mongoose.Schema({
   display_sequence: {
     type: Number,
-    required: true,
-    unique: true
+    required: true
   },
   heading: {
     type: String,
-    required: true,
-    unique: true
+    required: true
+  },
+  heading_desc: {
+    type: String,
+    required: true
   },
   sub_heading: {
     type: String,
     required: false,
     default: "",
   },
+  sub_heading_desc: {
+    type: String,
+    required: true
+  },
   sub_heading_sequence: {
     type: Number,
-    required: false,
-    default: 0.0,
+    required: true,
+    unique: true,
   },
   description: {
     type: String,

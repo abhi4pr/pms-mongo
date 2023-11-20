@@ -6,7 +6,9 @@ exports.addCoc = async (req, res) =>{
         const simc = new cocModel({
             display_sequence: req.body.display_sequence,
             heading: req.body.heading,
+            heading_desc: req.body.heading_desc,
             sub_heading: req.body.sub_heading,
+            sub_heading_desc: req.body.sub_heading_desc,
             sub_heading_sequence: req.body.sub_heading_sequence,
             description: req.body.description,
             remarks: req.body.remarks,
@@ -47,7 +49,9 @@ exports.editCoc = async (req, res) => {
         const editsim = await cocModel.findByIdAndUpdate(req.body._id,{
             display_sequence: req.body.display_sequence,
             heading: req.body.heading,
+            heading_desc: req.body.heading_desc,
             sub_heading: req.body.sub_heading,
+            sub_heading_desc: req.body.sub_heading_desc,
             sub_heading_sequence: req.body.sub_heading_sequence,
             description: req.body.description,
             remarks: req.body.remarks,
@@ -82,3 +86,12 @@ exports.deleteCoc = async (req, res) =>{
         return res.status(400).json({success:false, message:err})
     })
 };
+
+exports.getCocHistory = async (req, res) => {
+    try {
+        const cocData = await cocHisModel.find({coc_id: req.params._id})
+        res.status(200).send({data:cocData})
+    } catch (error) {
+        res.status(500).send({error:error.message, sms:'error getting coc history'})
+    }
+}
