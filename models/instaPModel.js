@@ -155,6 +155,14 @@ const instaPModel = new mongoose.Schema({
         type: Date,
         required: false,
         default: ""
+    },
+    createdAt:{
+        type: Date,
+        default: Date.now()
+    },
+    updatedAt:{
+        type: Date,
+        default: Date.now()
     }
 });
 
