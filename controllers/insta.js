@@ -1139,3 +1139,44 @@ exports.getAnalytics = async (req, res) => {
       return  res.send({ status:500, error: error.message, message: "Error getting analytics." });
     }
 };
+
+
+exports.getDynamicMultiReqAndResInsta = async (req, res) => {
+    try {
+        const { model, request_key_1, request_key_2, request_value_1, request_value_2, flag } = req.body;
+        const page = req.query?.page;
+        const perPage = req.query?.perPage;
+        const skip = (page - 1) * perPage;
+
+        if (![1, 2].includes(model)) {
+            return res.status(200).json({ message: "Invalid model value, you should provide 1 or 2, 1 for post and 2 for story." });
+        }
+
+        const modelCollection = model === 1 ? instaP : instaS;
+
+        if (flag !== 1 && flag !== 2) {
+            return res.status(200).json({ message: "Invalid flag value, you should provide 1 or 2, 1 for count and 2 for all data." });
+        }
+
+        const countQuery = { [request_key_1]: parseInt(request_value_1), [request_key_2]: parseInt(request_value_2) };
+        const dataQuery = { [request_key_1]: parseInt(request_value_1), [request_key_2]: parseInt(request_value_2) };
+
+        if (flag === 1) {
+            const count = await modelCollection.countDocuments(countQuery);
+            return res.status(200).json({ count });
+        } else if (flag === 2) {
+            let getPosts;
+
+            if (page && perPage) {
+                getPosts = await modelCollection.find(dataQuery).skip(skip).limit(perPage);
+            } else {
+                getPosts = await modelCollection.find(dataQuery);
+            }
+
+            return res.status(200).json(getPosts);
+        }
+
+    } catch (error) {
+        res.status(500).json({ status: 500, error: error.message, sms: "Internal server error." });
+    }
+};
