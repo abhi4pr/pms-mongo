@@ -363,3 +363,12 @@ exports.exeForPurchase = async (req, res) => {
         return res.status(500).send({ error: error.message, sms: 'error while adding data' })
     }
 }
+
+exports.getExeIpCountHistory = async (req, res) => {
+    try {
+        const cocData = await exeCountHisModel.find({p_id: req.params.p_id})
+        res.status(200).send({data:cocData})
+    } catch (error) {
+        res.status(500).send({error:error.message, sms:'error getting stats history for this page'})
+    }
+}
