@@ -368,6 +368,7 @@ exports.updateUser = [upload1, async (req, res) => {
             ctc: req.body.ctc,
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files && req.files['annexure_pdf'] && req.files['annexure_pdf'][0] ? req.files['annexure_pdf'][0].filename : (existingUser && existingUser.annexure_pdf) || '',
+            profileflag: req.body.profileflag 
 
         }, { new: true });
         if (!editsim) {
@@ -629,7 +630,8 @@ exports.getAllUsers = async (req, res) => {
                     gaurdian_number:"$gaurdian_number",
                     emergency_contact:"$emergency_contact",
                     ctc:"$ctc",
-                    offer_letter_send:"$offer_letter_send"
+                    offer_letter_send:"$offer_letter_send",
+                    annexure_pdf:"$annexure_pdf"
                 }
             }
         ]).exec();
@@ -655,7 +657,7 @@ exports.getAllUsers = async (req, res) => {
             bankPassBook_Cheque_url: user.bankPassBook_Cheque ? userImagesBaseUrl + user.bankPassBook_Cheque : null,
             joining_extend_document_url: user.joining_extend_document ? userImagesBaseUrl + user.joining_extend_document : null,
             digital_signature_image_url: user.digital_signature_image ? userImagesBaseUrl + user.digital_signature_image : null,
-            annexure_pdf: user.annexure_pdf ? userImagesBaseUrl + user.annexure_pdf : null
+            annexure_pdf_url: user.annexure_pdf ? userImagesBaseUrl + user.annexure_pdf : null
         }));
         if (dataWithImageUrl?.length === 0) {
             res
