@@ -540,6 +540,21 @@ const userModel = new mongoose.Schema({
         type: Number,
         required: false,
         default:0
+    },
+    ctc:{
+        type: Number,
+        required: false,
+        default:0
+    },
+    offer_letter_send:{
+        type: Boolean,
+        required: false,
+        default:false
+    },
+    annexure_pdf:{
+        type: String,
+        required: false,
+        default:""
     }
 });
 
