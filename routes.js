@@ -92,6 +92,7 @@ router.post("/get_stories_from_name",insta.getStorysFromName);
 router.post("/creator_name_count_for_stories", insta.creatorNameCountForStory);
 router.post("/selector_name_count_instas", insta.selectorNameCountInstaS);
 router.post("/selector_name_count_instap", insta.selectorNameCountInstaP);
+router.post("/count_posted_on", insta.countBasedOnPostedOn);
 /*execution api*/
 router.post("/exe_inven_post", exe.exeInvenPost);
 router.get("/get_exe_inventory", exe.getExeInventory);

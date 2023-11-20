@@ -20,6 +20,11 @@ const projectxSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  page_category_id: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   projectx_user_id: {
     type: Number,
     required: true,
