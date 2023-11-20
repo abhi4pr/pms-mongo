@@ -555,6 +555,11 @@ const userModel = new mongoose.Schema({
         type: String,
         required: false,
         default:""
+    },
+    profileflag:{
+        type: Number,
+        required: false,
+        default:0
     }
 });
 
