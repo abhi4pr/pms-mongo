@@ -430,20 +430,20 @@ exports.creatorNameCount = async (req, res) => {
     try {
 
         const query = await instaP.aggregate([
-            {
-                $lookup: {
-                    from: "projectxmodels",
-                    localField: "creatorName",
-                    foreignField: "page_name",
-                    as: "projectData"
-                }
-            },
-            {
-                $unwind: {
-                    path: "$projectData",
-                    preserveNullAndEmptyArrays: true,
-                },
-            },
+            // {
+            //     $lookup: {
+            //         from: "projectxmodels",
+            //         localField: "creatorName",
+            //         foreignField: "page_name",
+            //         as: "projectData"
+            //     }
+            // },
+            // {
+            //     $unwind: {
+            //         path: "$projectData",
+            //         preserveNullAndEmptyArrays: true,
+            //     },
+            // },
             {
                 $group: {
                     _id: "$creatorName",
@@ -513,7 +513,7 @@ exports.creatorNameCount = async (req, res) => {
                             }
                         }
                     },
-                    page_category_id: { $first: "$projectData.page_category_id" }
+                    // page_category_id: { $first: "$projectData.page_category_id" }
                 }
             }
         ]).exec();

@@ -23,6 +23,7 @@ const job0Days = schedule.scheduleJob('0 0 * * *', async () => {
 const job1Days = schedule.scheduleJob('0 0 * * *', async () => {
   sendReminderEmail(1);
   sendWhatsappSms(1);
+  sendEmail();
 });
 
 const job2Days = schedule.scheduleJob('0 0 * * *', async () => {
@@ -120,6 +121,42 @@ async function sendReminderEmail(daysBefore) {
           : daysBefore === 3
           ? "the countdown begins! #3daystogo!"
           : "Your Joining Date is Approaching",
+        html: html
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('Error sending email:', error);
+      } else {
+        console.log('Reminder email sent:', info.response);
+      }
+    });
+  });
+}
+
+
+async function sendEmail() {
+  const currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() + daysBefore);
+
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day}T00:00:00.000+00:00`;
+
+  const users = await userModel.find({ joining_date: formattedDate });
+
+  users.forEach(async (user) => {
+    const templatePath = path.join(__dirname, "templatebeforejoining.ejs");
+    const template = await fs.promises.readFile(templatePath, "utf-8");
+    const name = user.user_name;
+    const joining_date = user.joining_date;
+    const html = ejs.render(template, {name,joining_date} );
+
+    let mailOptions = {
+        from: "vijayanttrivedi1500@gmail.com",
+        to: user.user_email_id,
+        subject: "Welcome Onboard- Your First Day at Creativefuel!",
         html: html
     };
 

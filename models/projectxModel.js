@@ -10,6 +10,7 @@ const projectxSchema = new mongoose.Schema({
   page_name: {
     type: String,
     required: true,
+    unique:true
   },
   page_id: {
     type: Number,
