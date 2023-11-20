@@ -1160,3 +1160,124 @@ exports.getDynamicMultiReqAndResInsta = async (req, res) => {
         res.status(500).json({ status: 500, error: error.message, sms: "Internal server error." });
     }
 };
+
+exports.countBasedOnPostedOn = async (req, res) => {
+    
+    const { startDate, endDate, selectData, model } = req.body;
+    const startDateParse = new Date(startDate);
+    const endDateParse = new Date(endDate);
+    
+    
+    if (![1, 2].includes(selectData)) {
+        return res.status(200).json({ message: "Invalid selectData value, you should provide 1 or 2, 2 for all data fetch and 1 for particular date range data." });
+    }
+
+    if (![1, 2].includes(model)) {
+        return res.status(200).json({ message: "Invalid model value, you should provide 1 or 2, 1 for post and 2 for story." });
+    }
+    
+    const modelCollection = model === 1 ? instaP : instaS;
+    
+    const createDateRangeQuery = (field) => [
+        {
+            $match: {
+                [field]: { $exists: true, $ne: "" } // Filter out documents where the field is empty or doesn't exist
+            }
+        },
+        {
+            $project: {
+                date: {
+                    $dateFromString: {
+                        dateString: {
+                            $substr: [`$${field}`, 0, 10] // Extract the first 10 characters (date portion)
+                        },
+                        format: "%Y-%m-%d"
+                    }
+                }
+            }
+        },
+        {
+            $match: {
+                date: {
+                    $gte: new Date(startDateParse.toISOString()),
+                    $lte: new Date(endDateParse.toISOString())
+                }
+            }
+        },
+        {
+            $group: {
+                _id: "$date",
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                date: {
+                    $dateToString: { format: "%Y-%m-%d", date: "$_id" }
+                },
+                count: 1
+            }
+        }
+    ];
+
+    const createWithoutDateRangeQuery = (field)=> [
+        {
+            $match: {
+                [field]: { $exists: true, $ne: "" } // Filter out documents where the field is empty or doesn't exist
+            }
+        },
+        {
+            $project: {
+                date: {
+                    $dateFromString: {
+                        dateString: {
+                            $substr: [`$${field}`, 0, 10] // Extract the first 10 characters (date portion)
+                        },
+                        format: "%Y-%m-%d"
+                    }
+                }
+            }
+        },
+        {
+            $group: {
+              _id: `$date`, 
+              count: { $sum: 1 } 
+            }
+          },
+          {
+            $project: {
+                _id: 0,
+                date: {
+                    $dateToString: { format: "%Y-%m-%d", date: "$_id" }
+                },
+                count: 1
+            }
+        }
+    ]
+    
+    const dateRangeQueryInstap = createDateRangeQuery("postedOn");
+    const withoutDateRangeQueryInstap = createWithoutDateRangeQuery("postedOn");
+    const dateRangeQueryInstas = createDateRangeQuery("savedOn");
+    const withoutDateRangeQueryInstas = createWithoutDateRangeQuery("savedOn");
+    
+    const finalDateRangeQuery = model === 1 ? dateRangeQueryInstap : dateRangeQueryInstas;
+    const finalWithoutDateRangeQuery = model === 1 ? withoutDateRangeQueryInstap : withoutDateRangeQueryInstas;
+    try {
+    let query;
+
+        if (selectData === 1) {
+            query = await modelCollection.aggregate(finalDateRangeQuery).sort({ date: -1 });
+        } else if (selectData === 2) {
+            query = await modelCollection.aggregate(finalWithoutDateRangeQuery).sort({ date: -1 });
+        }
+    
+        if (!query) {
+            return res.status(200).send({ success: false, data: {}, message: "Something went wrong" });
+        }
+        return res.status(200).send({ success: true, data: query });
+
+    } catch (error) {
+          res.status(500).send({ status: 500, error: error.message, message: "Internal server error." });
+    }
+};
