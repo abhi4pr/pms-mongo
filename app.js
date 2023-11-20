@@ -47,7 +47,7 @@ mongoose
     dbName: "instaDB",
   })
   .then(() => {
-    console.log("DB connected");
+    console.log(`DB connected : ${vari.MONGODB}`);
   })
   .catch((err) => {
     console.log(err);

@@ -151,35 +151,39 @@ exports.trackPost = async (req, res) => {
         //     res.send({ instav, status: 200 });
         // })
 
-        const creators = new instaP({
-            handle: req.body.data?.handle ?? "",
-            postType: req.body.data.post_type,
-            creatorName: req.body.data.creator.username,
-            allComments: req.body.data.comments_count.overall,
-            brand_id: req.body.data.comments_count.today,
-            pastComment: req.body.data.comments_count.vs_previous,
-            allLike: req.body.data.likes_count.overall,
-            campaign_id: req.body.data.likes_count.today,
-            pastLike: req.body.data.likes_count.vs_previous,
-            allView: req.body.data.views_count.overall,
-            agency_id: req.body.data.views_count.today,
-            pastView: req.body.data.views_count.vs_previous,
-            title: req.body.data.title,
-            postedOn: req.body.data.posted_at,
-            postUrl: req.body.data.post_url,
-            postImage: req.body.data.display_url[0],
-            shortCode: req.body.shortcode,
-            posttype_decision: req.body.posttype_decision,
-            selector_name: req.body.selector_name,
-            interpretor_name: req.body.interpretor_name,
-            auditor_name: req.body.auditor_name,
-            auditor_decision: req.body.auditor_decision,
-            interpretor_decision: req.body.interpretor_decision,
-            selector_decision: req.body.selector_decision,
-        });
-        const instav = await creators.save();
-        res.send({ instav, status: 200 });
-
+        let check = await instaP.findOne({shortCode: req.body.shortcode})
+        if (!check){
+            const creators = new instaP({
+                handle: req.body.data?.handle ?? "",
+                postType: req.body.data.post_type,
+                creatorName: req.body.data.creator.username,
+                allComments: req.body.data.comments_count.overall,
+                brand_id: req.body.data.comments_count.today,
+                pastComment: req.body.data.comments_count.vs_previous,
+                allLike: req.body.data.likes_count.overall,
+                campaign_id: req.body.data.likes_count.today,
+                pastLike: req.body.data.likes_count.vs_previous,
+                allView: req.body.data.views_count.overall,
+                agency_id: req.body.data.views_count.today,
+                pastView: req.body.data.views_count.vs_previous,
+                title: req.body.data.title,
+                postedOn: req.body.data.posted_at,
+                postUrl: req.body.data.post_url,
+                postImage: req.body.data.display_url[0],
+                shortCode: req.body.shortcode,
+                posttype_decision: req.body.posttype_decision,
+                selector_name: req.body.selector_name,
+                interpretor_name: req.body.interpretor_name,
+                auditor_name: req.body.auditor_name,
+                auditor_decision: req.body.auditor_decision,
+                interpretor_decision: req.body.interpretor_decision,
+                selector_decision: req.body.selector_decision,
+            });
+            const instav = await creators.save();
+            res.send({ instav, status: 200 });
+        }else{
+            res.send({ instav : {}, status: 200, message: "short code must be unique" });
+        }
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "error while adding data" });
     }
@@ -261,7 +265,8 @@ exports.editInsta = async (req, res) => {
                 mentions: req.body.mentions,
                 selector_date: req.body.selector_date,
                 interpretor_date: req.body.interpretor_date,
-                auditor_date: req.body.auditor_date
+                auditor_date: req.body.auditor_date,
+                updatedAt: Date.now()
             },
             { new: true }
         );
