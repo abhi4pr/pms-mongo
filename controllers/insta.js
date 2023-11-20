@@ -9,6 +9,7 @@ const axios = require("axios");
 const constant = require("../common/constant.js");
 const fs = require('fs');
 const path = require('path');
+const projectxModel = require("../models/projectxModel.js");
 
 exports.trackCreator = async (req, res) => {
     try {
@@ -121,7 +122,7 @@ exports.trackPost = async (req, res) => {
         // })
         // .then(async (response) => {
         //     response.data.pipe(fs.createWriteStream(filePath));
-            
+
         //     const creators = new instaP({
         //         postType: req.body.data.post_type,
         //         creatorName: req.body.data.creator.username,
@@ -151,8 +152,8 @@ exports.trackPost = async (req, res) => {
         //     res.send({ instav, status: 200 });
         // })
 
-        let check = await instaP.findOne({shortCode: req.body.shortcode})
-        if (!check){
+        let check = await instaP.findOne({ shortCode: req.body.shortcode })
+        if (!check) {
             const creators = new instaP({
                 handle: req.body.data?.handle ?? "",
                 postType: req.body.data.post_type,
@@ -181,8 +182,8 @@ exports.trackPost = async (req, res) => {
             });
             const instav = await creators.save();
             res.send({ instav, status: 200 });
-        }else{
-            res.send({ instav : {}, status: 200, message: "short code must be unique" });
+        } else {
+            res.send({ instav: {}, status: 200, message: "short code must be unique" });
         }
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "error while adding data" });
@@ -297,7 +298,7 @@ exports.editInstaStory = async (req, res) => {
                 selector_date: req.body.selector_date,
                 interpretor_date: req.body.interpretor_date,
                 auditor_date: req.body.auditor_date,
-                image_url:req.body.image_url
+                image_url: req.body.image_url
             },
             { new: true }
         );
@@ -314,8 +315,8 @@ exports.editInstaStory = async (req, res) => {
 exports.getStorysFromName = async (req, res) => {
     try {
         const creatorName = req.body.creatorName;
-        const page = req.query.page || 1; 
-        const perPage = req.query.perPage || 50; 
+        const page = req.query.page || 1;
+        const perPage = req.query.perPage || 50;
         const skip = (page - 1) * perPage;
 
         const getStorys = await instaS
@@ -357,7 +358,7 @@ exports.creatorNameCountForStory = async (req, res) => {
                     },
                     decision_2_count: {
                         $sum: {
-                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}
+                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0 }
                         }
                     },
                     decision_1_count: {
@@ -374,7 +375,7 @@ exports.creatorNameCountForStory = async (req, res) => {
             }
         ]).exec();
         const sortOrder = req.body.sortOrder;
-      
+
         switch (sortOrder) {
             case 0:
                 query.sort((a, b) => b.decision_0_count - a.decision_0_count);
@@ -427,7 +428,22 @@ exports.postTypeDecCount = async (req, res) => {
 
 exports.creatorNameCount = async (req, res) => {
     try {
+
         const query = await instaP.aggregate([
+            {
+                $lookup: {
+                    from: "projectxmodels",
+                    localField: "creatorName",
+                    foreignField: "page_name",
+                    as: "projectData"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$projectData",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
             {
                 $group: {
                     _id: "$creatorName",
@@ -439,7 +455,7 @@ exports.creatorNameCount = async (req, res) => {
                     },
                     decision_2_count: {
                         $sum: {
-                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}
+                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0 }
                         }
                     },
                     decision_1_count: {
@@ -454,95 +470,54 @@ exports.creatorNameCount = async (req, res) => {
                     },
                     selector_decision_1_count: {
                         $sum: {
-                          $cond: {
-                            if: { $eq: ["$posttype_decision", 1] }, 
-                            then: {
-                              $cond: {
-                                if: { $eq: ["$selector_decision", 1] }, 
-                                then: 1, 
-                                else: 0 
-                              }
-                            },
-                            else: 0 
-                          }
+                            $cond: {
+                                if: { $eq: ["$posttype_decision", 1] },
+                                then: {
+                                    $cond: {
+                                        if: { $eq: ["$selector_decision", 1] },
+                                        then: 1,
+                                        else: 0
+                                    }
+                                },
+                                else: 0
+                            }
                         }
-                      },
+                    },
                     selector_decision_2_count: {
                         $sum: {
-                          $cond: {
-                            if: { $eq: ["$posttype_decision", 1] }, 
-                            then: {
-                              $cond: {
-                                if: { $eq: ["$selector_decision", 2] }, 
-                                then: 1, 
-                                else: 0 
-                              }
-                            },
-                            else: 0 
-                          }
+                            $cond: {
+                                if: { $eq: ["$posttype_decision", 1] },
+                                then: {
+                                    $cond: {
+                                        if: { $eq: ["$selector_decision", 2] },
+                                        then: 1,
+                                        else: 0
+                                    }
+                                },
+                                else: 0
+                            }
                         }
-                      },
+                    },
                     selector_decision_3_count: {
                         $sum: {
-                          $cond: {
-                            if: { $eq: ["$posttype_decision", 1] }, 
-                            then: {
-                              $cond: {
-                                if: { $eq: ["$selector_decision", 3] }, 
-                                then: 1, 
-                                else: 0 
-                              }
-                            },
-                            else: 0 
-                          }
+                            $cond: {
+                                if: { $eq: ["$posttype_decision", 1] },
+                                then: {
+                                    $cond: {
+                                        if: { $eq: ["$selector_decision", 3] },
+                                        then: 1,
+                                        else: 0
+                                    }
+                                },
+                                else: 0
+                            }
                         }
-                      },
+                    },
+                    page_category_id: { $first: "$projectData.page_category_id" }
                 }
             }
         ]).exec();
         const sortOrder = req.body.sortOrder;
-        // const distinctPosts = await instaP.aggregate([
-        //     {
-        //         $group: {
-        //             _id: "$postUrl",
-        //             data: { $first: "$$ROOT" },
-        //         },
-        //     },
-        //     {
-        //         $replaceRoot: { newRoot: "$data" },
-        //     },
-        // ]);
-
-        // const result = {};
-        // distinctPosts.forEach((item) => {
-        //     const { creatorName, posttype_decision } = item;
-
-        //     if (!result[creatorName]) {
-        //         result[creatorName] = {
-        //             _id: creatorName,
-        //             decision_2_count: 0,
-        //             decision_1_count: 0,
-        //             decision_0_count: 0,
-        //         };
-        //     }
-
-        //     switch (posttype_decision) {
-        //         case 0:
-        //             result[creatorName]["decision_0_count"]++;
-        //             break;
-        //         case 1:
-        //             result[creatorName]["decision_1_count"]++;
-        //             break;
-        //         case 2:
-        //             result[creatorName]["decision_2_count"]++;
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        // });
-
-        // const finalResult = Object.values(result);
-
         switch (sortOrder) {
             case 0:
                 query.sort((a, b) => b.decision_0_count - a.decision_0_count);
@@ -580,7 +555,7 @@ exports.creatorStoriesCount = async (req, res) => {
                     },
                     decision_2_count: {
                         $sum: {
-                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}
+                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0 }
                         }
                     },
                     decision_1_count: {
@@ -595,49 +570,49 @@ exports.creatorStoriesCount = async (req, res) => {
                     },
                     selector_decision_1_count: {
                         $sum: {
-                          $cond: {
-                            if: { $eq: ["$posttype_decision", 1] }, 
-                            then: {
-                              $cond: {
-                                if: { $eq: ["$selector_decision", 1] }, 
-                                then: 1, 
-                                else: 0 
-                              }
-                            },
-                            else: 0 
-                          }
+                            $cond: {
+                                if: { $eq: ["$posttype_decision", 1] },
+                                then: {
+                                    $cond: {
+                                        if: { $eq: ["$selector_decision", 1] },
+                                        then: 1,
+                                        else: 0
+                                    }
+                                },
+                                else: 0
+                            }
                         }
-                      },
+                    },
                     selector_decision_2_count: {
                         $sum: {
-                          $cond: {
-                            if: { $eq: ["$posttype_decision", 1] }, 
-                            then: {
-                              $cond: {
-                                if: { $eq: ["$selector_decision", 2] }, 
-                                then: 1, 
-                                else: 0 
-                              }
-                            },
-                            else: 0 
-                          }
+                            $cond: {
+                                if: { $eq: ["$posttype_decision", 1] },
+                                then: {
+                                    $cond: {
+                                        if: { $eq: ["$selector_decision", 2] },
+                                        then: 1,
+                                        else: 0
+                                    }
+                                },
+                                else: 0
+                            }
                         }
-                      },
+                    },
                     selector_decision_3_count: {
                         $sum: {
-                          $cond: {
-                            if: { $eq: ["$posttype_decision", 1] }, 
-                            then: {
-                              $cond: {
-                                if: { $eq: ["$selector_decision", 3] }, 
-                                then: 1, 
-                                else: 0 
-                              }
-                            },
-                            else: 0 
-                          }
+                            $cond: {
+                                if: { $eq: ["$posttype_decision", 1] },
+                                then: {
+                                    $cond: {
+                                        if: { $eq: ["$selector_decision", 3] },
+                                        then: 1,
+                                        else: 0
+                                    }
+                                },
+                                else: 0
+                            }
                         }
-                      },
+                    },
                 }
             }
         ]).exec();
@@ -667,92 +642,92 @@ exports.creatorStoriesCount = async (req, res) => {
 };
 exports.selectorNameCountInstaP = async (req, res) => {
     try {
-        const {  selectData, startDate,endDate} = req.body
-        let startDateParse = new Date(startDate); 
+        const { selectData, startDate, endDate } = req.body
+        let startDateParse = new Date(startDate);
         let endDateParse = new Date(endDate);
         // const startDate = new Date("2023-01-01"); 
         // const endDate = new Date("2023-12-31");
         //Flag 2 for all data fetch and flag 1 for perticular date range data fetch
-        if(selectData === 1){
+        if (selectData === 1) {
             const query = await instaP.aggregate([
                 {
                     $match: {
-                      selector_date: {
-                        $gte: startDateParse, 
-                        $lte: endDateParse    
-                      }
+                        selector_date: {
+                            $gte: startDateParse,
+                            $lte: endDateParse
+                        }
                     }
-                  },
+                },
                 {
                     $group: {
-                      _id: "$selector_name", 
-                      count: { $sum: 1 } 
+                        _id: "$selector_name",
+                        count: { $sum: 1 }
                     }
-                  }
+                }
             ]).exec();
-            
-        res.status(200).send({ success: true, data: query });
-        }else if (selectData === 2){
+
+            res.status(200).send({ success: true, data: query });
+        } else if (selectData === 2) {
             const query = await instaP.aggregate([
                 {
                     $group: {
-                      _id: "$selector_name", 
-                      count: { $sum: 1 } 
+                        _id: "$selector_name",
+                        count: { $sum: 1 }
                     }
-                  }
+                }
             ]).exec();
-            
-        res.status(200).send({ success: true, data: query });
-        }else{
+
+            res.status(200).send({ success: true, data: query });
+        } else {
             res.status(200).send({ success: false, message: "Please provide valid selectData" });
         }
-        
+
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "something went wrong" });
     }
 };
 exports.selectorNameCountInstaS = async (req, res) => {
     try {
-        const {  selectData, startDate,endDate} = req.body
-        let startDateParse = new Date(startDate); 
+        const { selectData, startDate, endDate } = req.body
+        let startDateParse = new Date(startDate);
         let endDateParse = new Date(endDate);
         // const startDate = new Date("2023-01-01"); 
         // const endDate = new Date("2023-12-31");
         //Flag 2 for all data fetch and flag 1 for perticular date range data fetch
-        if(selectData === 1){
+        if (selectData === 1) {
             const query = await instaS.aggregate([
                 {
                     $match: {
-                      selector_date: {
-                        $gte: startDateParse, 
-                        $lte: endDateParse    
-                      }
+                        selector_date: {
+                            $gte: startDateParse,
+                            $lte: endDateParse
+                        }
                     }
-                  },
+                },
                 {
                     $group: {
-                      _id: "$selector_name", 
-                      count: { $sum: 1 } 
+                        _id: "$selector_name",
+                        count: { $sum: 1 }
                     }
-                  }
+                }
             ]).exec();
-            
-        res.status(200).send({ success: true, data: query });
-        }else if (selectData === 2){
+
+            res.status(200).send({ success: true, data: query });
+        } else if (selectData === 2) {
             const query = await instaS.aggregate([
                 {
                     $group: {
-                      _id: "$selector_name", 
-                      count: { $sum: 1 } 
+                        _id: "$selector_name",
+                        count: { $sum: 1 }
                     }
-                  }
+                }
             ]).exec();
-            
-        res.status(200).send({ success: true, data: query });
-        }else{
+
+            res.status(200).send({ success: true, data: query });
+        } else {
             res.status(200).send({ success: false, message: "Please provide valid selectData" });
         }
-        
+
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "something went wrong" });
     }
@@ -760,8 +735,8 @@ exports.selectorNameCountInstaS = async (req, res) => {
 exports.getPostsFromName = async (req, res) => {
     try {
         const creatorName = req.body.creatorName;
-        const page = req.query.page || 1; 
-        const perPage = req.query.perPage || 50; 
+        const page = req.query.page || 1;
+        const perPage = req.query.perPage || 50;
         const skip = (page - 1) * perPage;
 
         const getPosts = await instaP
@@ -802,19 +777,19 @@ exports.trackStory = async (req, res) => {
     try {
         // console.log("story api", req.body);
         if (req.body) {
-              for (const data of req.body?.story_data?.stories) {
-                let check = await instaS.findOne({shortcode:data?.shortcode})
-                if(!check){
+            for (const data of req.body?.story_data?.stories) {
+                let check = await instaS.findOne({ shortcode: data?.shortcode })
+                if (!check) {
                     const creators = new instaS({
-                        creatorName : req.body?.handle,
-                        mediaCont : req.body?.story_data?.media_count,
+                        creatorName: req.body?.handle,
+                        mediaCont: req.body?.story_data?.media_count,
                         expiredAt: req.body?.story_data?.expiry_at,
                         savedOn: data?.taken_at,
                         shortcode: data?.shortcode,
                         links: data?.links,
                         hashtags: data?.hashtags,
-                        mentions:data?.mentions,
-                        locations:data?.locations, 
+                        mentions: data?.mentions,
+                        locations: data?.locations,
                         music: data?.music,
                         posttype_decision: req.body?.posttype_decision,
                         selector_name: req.body?.selector_name,
@@ -825,14 +800,14 @@ exports.trackStory = async (req, res) => {
                         selector_decision: req.body?.selector_decision,
                         image_url: data?.image_url,
                     })
-                     await creators.save();
+                    await creators.save();
                 }
-              }  
-              return res.send({status:200,sms:"Stories created successfully."})
-          }else{
-          return  res.send({status:200,sms:"Please provide request body."})
-          }
-       
+            }
+            return res.send({ status: 200, sms: "Stories created successfully." })
+        } else {
+            return res.send({ status: 200, sms: "Please provide request body." })
+        }
+
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "error while adding data" });
     }
@@ -841,7 +816,7 @@ exports.trackStory = async (req, res) => {
 exports.getStories = async (req, res) => {
     try {
         const page = req.query.page || 1;
-        const perPage = req.query.perPage || 50; 
+        const perPage = req.query.perPage || 50;
         const skip = (page - 1) * perPage;
 
         const getStorys = await instaS.find({}).skip(skip)
@@ -915,9 +890,9 @@ exports.countInstaCPModels = async (req, res) => {
             resObj.data = {
                 instap_count: response
             }
-        }else{
+        } else {
             resObj.message = "Provide valid flag"
-            return res.status(200).json(resObj); 
+            return res.status(200).json(resObj);
         }
         return res.status(200).json(resObj);
 
@@ -933,30 +908,30 @@ exports.getDynamicReqAndResInstaP = async (req, res) => {
         const ReqValue = req.body.request_value;
         const flag = req.body.flag;
         const page = req.query?.page;
-        const perPage = req.query?.perPage; 
+        const perPage = req.query?.perPage;
         const skip = (page - 1) * perPage;
 
         if (flag === 1) {
             // Return the count of matching documents
             const count = await instaP.countDocuments({ [ReqKey]: parseInt(ReqValue) });
-          return  res.status(200).json({ count });
+            return res.status(200).json({ count });
         } else if (flag === 2) {
             // Return all matching documents
-            if(page && perPage){
+            if (page && perPage) {
 
                 const getPosts = await instaP.find({ [ReqKey]: parseInt(ReqValue) }).skip(skip)
-                .limit(perPage);
-                return  res.status(200).json(getPosts);
-            }else{
+                    .limit(perPage);
+                return res.status(200).json(getPosts);
+            } else {
                 const getPosts = await instaP.find({ [ReqKey]: parseInt(ReqValue) })
-                return  res.status(200).json(getPosts);
+                return res.status(200).json(getPosts);
             }
-           
+
         } else {
-           return res.status(400).json({ error: "Invalid flag value" });
+            return res.status(400).json({ error: "Invalid flag value" });
         }
     } catch (error) {
-        res.send({ status:500, error: error.message, sms: "error getting posts from name" });
+        res.send({ status: 500, error: error.message, sms: "error getting posts from name" });
     }
 };
 exports.getDynamicReqAndResInstaS = async (req, res) => {
@@ -965,55 +940,55 @@ exports.getDynamicReqAndResInstaS = async (req, res) => {
         const ReqValue = req.body.request_value;
         const flag = req.body.flag;
         const page = req.query?.page;
-        const perPage = req.query?.perPage; 
+        const perPage = req.query?.perPage;
         const skip = (page - 1) * perPage;
 
         if (flag === 1) {
             // Return the count of matching documents
             const count = await instaS.countDocuments({ [ReqKey]: parseInt(ReqValue) });
-          return  res.status(200).json({ count });
+            return res.status(200).json({ count });
         } else if (flag === 2) {
             // Return all matching documents
-            if(page && perPage){
+            if (page && perPage) {
 
                 const getPosts = await instaS.find({ [ReqKey]: parseInt(ReqValue) }).skip(skip)
-                .limit(perPage);
-                return  res.status(200).json(getPosts);
-            }else{
+                    .limit(perPage);
+                return res.status(200).json(getPosts);
+            } else {
                 const getPosts = await instaS.find({ [ReqKey]: parseInt(ReqValue) })
-                return  res.status(200).json(getPosts);
+                return res.status(200).json(getPosts);
             }
-           
+
         } else {
-           return res.status(400).json({ error: "Invalid flag value" });
+            return res.status(400).json({ error: "Invalid flag value" });
         }
     } catch (error) {
-        res.send({ status:500, error: error.message, sms: "error getting stories from name" });
+        res.send({ status: 500, error: error.message, sms: "error getting stories from name" });
     }
 };
 
 exports.getAvgFrqOfPost = async (req, res) => {
     try {
-    //underworing-----------------------------------------------------
-  
-    const query = await instaP.aggregate([
-    //   {
-    //     $match: {
-    //       postedOn: {
-    //         $gte: startOfCurrentDate, // Match documents with "postedOn" greater than or equal to the start of the current date
-    //         $lt: endOfCurrentDate,     // Match documents with "postedOn" less than the end of the current date
-    //       }
-    //     }
-    //   },
+        //underworing-----------------------------------------------------
+
+        const query = await instaP.aggregate([
+            //   {
+            //     $match: {
+            //       postedOn: {
+            //         $gte: startOfCurrentDate, // Match documents with "postedOn" greater than or equal to the start of the current date
+            //         $lt: endOfCurrentDate,     // Match documents with "postedOn" less than the end of the current date
+            //       }
+            //     }
+            //   },
             {
                 $group: {
                     _id: "$creatorName",
                     index: { $first: "$_id" },
-                    maxPostedOn: { $max: "$postedOn" }, 
-      minPostedOn: { $min: "$postedOn" },
+                    maxPostedOn: { $max: "$postedOn" },
+                    minPostedOn: { $min: "$postedOn" },
                     decision_2_count: {
                         $sum: {
-                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0}
+                            $cond: { if: { $eq: ["$posttype_decision", 2] }, then: 1, else: 0 }
                         }
                     },
                     decision_1_count: {
@@ -1031,117 +1006,117 @@ exports.getAvgFrqOfPost = async (req, res) => {
         ]).exec();
         res.status(200).send(query);
     } catch (error) {
-        res.send({ status:500, error: error.message, sms: "error getting posts from name" });
+        res.send({ status: 500, error: error.message, sms: "error getting posts from name" });
     }
 };
 
 
 exports.getAnalytics = async (req, res) => {
     try {
-  
-    const query = await instaP.aggregate([
-        {
-          $match: {
-            posttype_decision: { $gt: 1 },
-            interpretor_decision: 1
-          }
-        },
-        {
-          $facet: {
-            byCampaignId: [
-                {
-                    $match: {
-                      campaign_id : { $ne : 0 },
-                    }
-                },
-              {
-                $group: {
-                  _id: "$campaign_id",
-                  count: { $sum: 1 }
-                }
-              },
-              {
-                $sort: {
-                  count: -1,
-                  _id: 1
-                }
-              },
-              {
-                $group: {
-                  _id: null,
-                  max_id: { $first: "$_id" },
-                  max_count: { $first: "$count" },
-                  min_id: { $last: "$_id" },
-                  min_count: { $last: "$count" }
-                }
-              },
-              
-              {
-                $project: {
-                  _id: 0,
-                  max_id: 1,
-                  max_count: 1,
-                  min_id: 1,
-                  min_count: 1
-                }
-              }
-            ],
-            byBrandId:[
-                {
-                    $match: {
-                        brand_id : { $ne : 0 },
-                    }
-                },
-                {
-                  $group: {
-                    _id: "$brand_id",
-                    count: { $sum: 1 }
-                  }
-                },
-                {
-                  $sort: {
-                    count: -1,
-                    _id: 1
-                  }
-                },
-                {
-                  $group: {
-                    _id: null,
-                    max_id: { $first: "$_id" },
-                    max_count: { $first: "$count" },
-                    min_id: { $last: "$_id" },
-                    min_count: { $last: "$count" }
-                  }
-                },
-                {
-                  $project: {
-                    _id: 0,
-                    max_id: 1,
-                    max_count: 1,
-                    min_id: 1,
-                    min_count: 1
-                  }
-                }
-              ]
-          }
-        },
-        {
-            $project: {
-              campaignId: { $arrayElemAt: ["$byCampaignId", 0] },
-              brandId: { $arrayElemAt: ["$byBrandId", 0] }
-            }
-          }
-      ]);
-      console.log(query)
-      
-    if(query.length !== 0 && Object.keys(query[0]).length !== 0 ){
 
-      return  res.status(200).send(query[0]);
-    }else{
-        return  res.send({ status:200, message: "No record found." });
-    }
+        const query = await instaP.aggregate([
+            {
+                $match: {
+                    posttype_decision: { $gt: 1 },
+                    interpretor_decision: 1
+                }
+            },
+            {
+                $facet: {
+                    byCampaignId: [
+                        {
+                            $match: {
+                                campaign_id: { $ne: 0 },
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: "$campaign_id",
+                                count: { $sum: 1 }
+                            }
+                        },
+                        {
+                            $sort: {
+                                count: -1,
+                                _id: 1
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                max_id: { $first: "$_id" },
+                                max_count: { $first: "$count" },
+                                min_id: { $last: "$_id" },
+                                min_count: { $last: "$count" }
+                            }
+                        },
+
+                        {
+                            $project: {
+                                _id: 0,
+                                max_id: 1,
+                                max_count: 1,
+                                min_id: 1,
+                                min_count: 1
+                            }
+                        }
+                    ],
+                    byBrandId: [
+                        {
+                            $match: {
+                                brand_id: { $ne: 0 },
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: "$brand_id",
+                                count: { $sum: 1 }
+                            }
+                        },
+                        {
+                            $sort: {
+                                count: -1,
+                                _id: 1
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                max_id: { $first: "$_id" },
+                                max_count: { $first: "$count" },
+                                min_id: { $last: "$_id" },
+                                min_count: { $last: "$count" }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                max_id: 1,
+                                max_count: 1,
+                                min_id: 1,
+                                min_count: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $project: {
+                    campaignId: { $arrayElemAt: ["$byCampaignId", 0] },
+                    brandId: { $arrayElemAt: ["$byBrandId", 0] }
+                }
+            }
+        ]);
+        console.log(query)
+
+        if (query.length !== 0 && Object.keys(query[0]).length !== 0) {
+
+            return res.status(200).send(query[0]);
+        } else {
+            return res.send({ status: 200, message: "No record found." });
+        }
     } catch (error) {
-      return  res.send({ status:500, error: error.message, message: "Error getting analytics." });
+        return res.send({ status: 500, error: error.message, message: "Error getting analytics." });
     }
 };
 

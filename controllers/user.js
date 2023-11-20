@@ -31,7 +31,8 @@ const upload = multer({ dest: "uploads/" }).fields([
     { name: "pre_relieving_letter", maxCount: 1 },
     { name: "bankPassBook_Cheque", maxCount: 1 },
     { name: "joining_extend_document", maxCount: 1 },
-    { name: "digital_signature_image", maxCount: 1 }
+    { name: "digital_signature_image", maxCount: 1 },
+    { name:  "annexure_pdf", maxCount:1 }
 ]);
 
 exports.addUser = [upload, async (req, res) => {
@@ -146,7 +147,10 @@ exports.addUser = [upload, async (req, res) => {
             guardian_address: req.body.guardian_address,
             relation_with_guardian: req.body.relation_with_guardian,
             gaurdian_number: req.body.gaurdian_number,
-            emergency_contact: req.body.emergency_contact
+            emergency_contact: req.body.emergency_contact,
+            ctc: req.body.ctc,
+            offer_letter_send: req.body.offer_letter_send,
+            annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : ''
         })
         const simv = await simc.save();
 
@@ -237,7 +241,8 @@ const upload1 = multer({ dest: "uploads/" }).fields([
     { name: "pre_relieving_letter", maxCount: 1 },
     { name: "bankPassBook_Cheque", maxCount: 1 },
     { name: "joining_extend_document", maxCount: 1 },
-    { name: "digital_signature_image", maxCount: 1 }
+    { name: "digital_signature_image", maxCount: 1 },
+    { name:  "annexure_pdf", maxCount:1 }
 ]);
 exports.updateUser = [upload1, async (req, res) => {
     try {
@@ -359,7 +364,10 @@ exports.updateUser = [upload1, async (req, res) => {
             guardian_address: req.body.guardian_address,
             relation_with_guardian: req.body.relation_with_guardian,
             gaurdian_number: req.body.gaurdian_number,
-            emergency_contact: req.body.emergency_contact
+            emergency_contact: req.body.emergency_contact,
+            ctc: req.body.ctc,
+            offer_letter_send: req.body.offer_letter_send,
+            annexure_pdf: req.files && req.files['annexure_pdf'] && req.files['annexure_pdf'][0] ? req.files['annexure_pdf'][0].filename : (existingUser && existingUser.annexure_pdf) || '',
 
         }, { new: true });
         if (!editsim) {
@@ -619,7 +627,9 @@ exports.getAllUsers = async (req, res) => {
                     guardian_address:"$guardian_address",
                     relation_with_guardian:"$relation_with_guardian",
                     gaurdian_number:"$gaurdian_number",
-                    emergency_contact:"$emergency_contact"
+                    emergency_contact:"$emergency_contact",
+                    ctc:"$ctc",
+                    offer_letter_send:"$offer_letter_send"
                 }
             }
         ]).exec();
@@ -644,7 +654,8 @@ exports.getAllUsers = async (req, res) => {
             Pre_relieving_letter_url: user.pre_relieving_letter ? userImagesBaseUrl + user.pre_relieving_letter : null,
             bankPassBook_Cheque_url: user.bankPassBook_Cheque ? userImagesBaseUrl + user.bankPassBook_Cheque : null,
             joining_extend_document_url: user.joining_extend_document ? userImagesBaseUrl + user.joining_extend_document : null,
-            digital_signature_image_url: user.digital_signature_image ? userImagesBaseUrl + user.digital_signature_image : null
+            digital_signature_image_url: user.digital_signature_image ? userImagesBaseUrl + user.digital_signature_image : null,
+            annexure_pdf: user.annexure_pdf ? userImagesBaseUrl + user.annexure_pdf : null
         }));
         if (dataWithImageUrl?.length === 0) {
             res
@@ -880,7 +891,9 @@ exports.getSingleUser = async (req, res) => {
                     guardian_address:"$guardian_address",
                     relation_with_guardian:"$relation_with_guardian",
                     gaurdian_number:"$gaurdian_number",
-                    emergency_contact:"$emergency_contact"
+                    emergency_contact:"$emergency_contact",
+                    ctc:"$ctc",
+                    offer_letter_send:"$offer_letter_send"
                 }
             }
         ]).exec();
@@ -906,6 +919,7 @@ exports.getSingleUser = async (req, res) => {
             bankPassBook_Cheque_url: user.bankPassBook_Cheque ? userImagesBaseUrl + user.bankPassBook_Cheque : null,
             joining_extend_document_url: user.joining_extend_document ? userImagesBaseUrl + user.joining_extend_document : null,
             digital_signature_image_url: user.digital_signature_image ? userImagesBaseUrl + user.digital_signature_image : null,
+            annexure_pdf: user.annexure_pdf ? userImagesBaseUrl + user.annexure_pdf : null
         }));
         if (dataWithImageUrl?.length === 0) {
             res
