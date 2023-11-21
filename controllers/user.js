@@ -8,6 +8,7 @@ const userOtherFieldModel = require('../models/userOtherFieldModel.js');
 const reasonModel = require('../models/reasonModel.js');
 const separationModel = require('../models/separationModel.js');
 const attendanceModel = require('../models/attendanceModel.js');
+const userLoginHisModel = require('../models/userLoginHisModel.js')
 const objModel = require('../models/objModel.js');
 const constant = require('../common/constant.js');
 const bcrypt = require("bcrypt");
@@ -45,7 +46,7 @@ exports.addUser = [upload, async (req, res) => {
             user_name: req.body.user_name,
             user_designation: req.body.user_designation,
             user_email_id: req.body.user_email_id,
-            user_login_id: req.body.user_login_id,
+            user_login_id: req.body.user_login_id.toLowerCase().trim(),
             user_login_password: encryptedPass,
             user_report_to_id: req.body.user_report_to_id,
             user_contact_no: req.body.user_contact_no,
@@ -959,7 +960,7 @@ exports.loginUser = async (req, res) => {
         const simc = await userModel.aggregate([
             {
                 $match: {
-                    user_login_id: req.body.user_login_id,
+                    user_login_id: req.body.user_login_id.toLowerCase().trim(),
                     // user_login_password:req.body.user_login_password
                 }
             },
@@ -998,10 +999,7 @@ exports.loginUser = async (req, res) => {
                 }
             }
         ]).exec();
-        console.log("data",simc)
-
-        console.log("simc", simc[0]?.user_login_password);
-        console.log("cdd", req.body.user_login_password)
+        
         if (simc.length === 0) {
             return res.status(500).send({ success: false })
         }
@@ -1025,6 +1023,15 @@ exports.loginUser = async (req, res) => {
                 constant.SECRET_KEY_LOGIN,
                 { expiresIn: constant.CONST_VALIDATE_SESSION_EXPIRE }
             );
+
+            if(simc[0].onboard_status == 2){                
+                const saveDataObj = {
+                    user_id: simc[0].id,
+                    user_email_id: simc[0].email
+                };
+                await userLoginHisModel.create(saveDataObj);
+            }
+
             return res.status(200).send({ token, user: simc[0] })
         } else {
             return res.status(200).send({ sms: 'Invalid Password' })
