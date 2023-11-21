@@ -151,7 +151,8 @@ exports.addUser = [upload, async (req, res) => {
             ctc: req.body.ctc,
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : '',
-            profileflag : req.body.profileflag || 0
+            profileflag : req.body.profileflag || 0,
+            nick_name : req.body.nick_name
         })
         const simv = await simc.save();
 
@@ -369,7 +370,8 @@ exports.updateUser = [upload1, async (req, res) => {
             ctc: req.body.ctc,
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files && req.files['annexure_pdf'] && req.files['annexure_pdf'][0] ? req.files['annexure_pdf'][0].filename : (existingUser && existingUser.annexure_pdf) || '',
-            profileflag: req.body.profileflag 
+            profileflag: req.body.profileflag,
+            nick_name: req.body.nick_name 
 
         }, { new: true });
         if (!editsim) {
@@ -632,7 +634,8 @@ exports.getAllUsers = async (req, res) => {
                     emergency_contact:"$emergency_contact",
                     ctc:"$ctc",
                     offer_letter_send:"$offer_letter_send",
-                    annexure_pdf:"$annexure_pdf"
+                    annexure_pdf:"$annexure_pdf",
+                    nick_name: "$nick_name"
                 }
             }
         ]).exec();
@@ -896,7 +899,8 @@ exports.getSingleUser = async (req, res) => {
                     gaurdian_number:"$gaurdian_number",
                     emergency_contact:"$emergency_contact",
                     ctc:"$ctc",
-                    offer_letter_send:"$offer_letter_send"
+                    offer_letter_send:"$offer_letter_send",
+                    nick_name: "$nick_name"
                 }
             }
         ]).exec();
