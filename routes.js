@@ -105,7 +105,7 @@ router.get("/get_single_exe_pid_count",exe.getLatestPIDCount);
 router.post("/add_exe_pid_history",upload.single("media"),exe.addIPCountHistory);
 router.post("/exe_purchase_post",exe.exeForPurchase);
 router.get("/get_exe_ip_count_history/:p_id", exe.getExeIpCountHistory);
-router.delete("/delete_exe_ip_count_history/:p_id", exe.deleteExeIpCountHistory);
+router.delete("/delete_exe_ip_count_history/:_id", exe.deleteExeIpCountHistory);
 
 
 /*sim api*/

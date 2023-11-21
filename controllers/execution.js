@@ -376,7 +376,7 @@ exports.getExeIpCountHistory = async (req, res) => {
 exports.deleteExeIpCountHistory = async (req, res) => {
     try {
         const deletedHistory = await exeCountHisModel.findByIdAndUpdate(
-          req.params.p_id,
+          req.params._id,
           { isDeleted: true },
           { new: true }
         );

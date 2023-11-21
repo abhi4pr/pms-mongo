@@ -48,7 +48,8 @@ exports.getAssetSubCategorys = async (req, res) => {
                         creation_date: "$creation_date",
                         last_updated_by: "$last_updated_by",
                         last_updated_at: "$last_updated_at",
-                        category_id: "$category_id"
+                        category_id: "$category_id",
+                        description:"$description"
                     },
                 },
             ])
@@ -88,7 +89,8 @@ exports.getSingleAssetSubCategory = async (req, res) => {
                         category_id: "$category_id",
                         id: "$id",
                         created_by: "$created_by",
-                        last_updated_by: "$last_updated_by"
+                        last_updated_by: "$last_updated_by",
+                        description:"$description"
                     },
                 },
             ])
