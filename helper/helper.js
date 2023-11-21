@@ -24,7 +24,7 @@ module.exports = {
 
       const templatePath = path.join(
         __dirname,
-        "../templates/offerLaterTemplate.ejs"
+        "../templates/offerLetterTemplate.ejs"
       );
       const template = await fs.promises.readFile(templatePath, "utf-8");
 
@@ -62,7 +62,7 @@ module.exports = {
       //Save pdf at mention path
       const outputPath = path.join(
         __dirname,
-        `../uploads/offerLaterPdf/${pdfFileName} Offer Later.pdf`
+        `../uploads/offerLetterPdf/${pdfFileName} Offer Letter.pdf`
       );
 
       // Generate PDF
