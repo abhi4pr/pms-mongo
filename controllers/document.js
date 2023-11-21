@@ -1,4 +1,5 @@
 const documentModel = require("../models/documentModel");
+const documentHisModel = require("../models/documentHisModel");
 const response = require("../common/response.js");
 
 exports.addDocument = async (req, res) => {
@@ -83,6 +84,15 @@ exports.editDoc = async (req, res) => {
     if (!editDocObj) {
       return response.returnFalse(200, req, res, "No record found");
     }
+
+    const simc = new documentHisModel({
+      user_id: req.body.user_id,
+      doc_id: req.body.doc_id,
+      doc_file: req?.file?.filename,
+      status: req.body.status,
+      updated_by: req.body.updated_by
+    })
+    await simc.save();
 
     return response.returnTrue(
       200,

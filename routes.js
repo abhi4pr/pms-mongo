@@ -888,7 +888,7 @@ module.exports = router;
 router.post("/add_doc",  documentController.addDocument);
 router.get("/get_all_docs",  documentController.getDocs);
 router.get("/get_doc/:id",  documentController.getDoc);
-router.put("/update_doc",  documentController.editDoc);
+router.put("/update_doc", upload.single("doc_file"), documentController.editDoc);
 router.delete("/delete_doc/:id",  documentController.deleteDoc);
 
 module.exports = router;
