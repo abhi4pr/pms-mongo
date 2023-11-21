@@ -560,7 +560,12 @@ const userModel = new mongoose.Schema({
         type: Number,
         required: false,
         default:0
-    }
+    },
+    nick_name:{
+        type: String,
+        required: false,
+        default:""
+    },
 });
 
 AutoIncrement.initialize(mongoose.connection);
