@@ -42,6 +42,7 @@ exports.getAssetSubCategorys = async (req, res) => {
                     $project: {
                         _id: 1,
                         category_name: "$category.category_name",
+                        sub_category_id:"$sub_category_id",
                         sub_category_name: "$sub_category_name",
                         remark: "$remark",
                         created_by: "$created_by",
@@ -85,6 +86,7 @@ exports.getSingleAssetSubCategory = async (req, res) => {
                     $project: {
                         _id: 1,
                         category_name: "$category.dept_name",
+                        sub_category_id:"$sub_category_id",
                         sub_category_name: "$sub_category_name",
                         category_id: "$category_id",
                         id: "$id",

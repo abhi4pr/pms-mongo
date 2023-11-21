@@ -57,6 +57,7 @@ const assetSubCategory = require("./controllers/assetsSubCategory.js");
 const vendor = require("./controllers/vendor.js");
 const coc = require("./controllers/cocManagement.js");
 const documentController = require("./controllers/document.js");
+const assetsImage = require("./controllers/assetsImage.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -883,12 +884,18 @@ router.get("/get_single_coc/:_id", coc.getSingleCoc);
 router.put("/update_coc", coc.editCoc);
 router.get("/get_coc_history/:_id", coc.getCocHistory);
 
-module.exports = router;
 /* Document master */
 router.post("/add_doc",  documentController.addDocument);
 router.get("/get_all_docs",  documentController.getDocs);
 router.get("/get_doc/:id",  documentController.getDoc);
 router.put("/update_doc", upload.single("doc_file"), documentController.editDoc);
 router.delete("/delete_doc/:id",  documentController.deleteDoc);
+
+/* Assets Images master */
+router.post("/add_assets_images",  assetsImage.addAssetImage);
+router.get("/get_all_assets_images",  assetsImage.getAllAssetsImages);
+router.get("/get_single_assets_image/:asset_image_id",  assetsImage.getSingleAssetsImage);
+router.put("/update_assets_images",  assetsImage.updateAssetImage);
+router.delete("/delete_assets_images/:asset_image_id",  assetsImage.deleteAssetImage);
 
 module.exports = router;
