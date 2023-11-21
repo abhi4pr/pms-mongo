@@ -398,7 +398,7 @@ const userModel = new mongoose.Schema({
     joining_date_extend: {
         type: Date,
         required: false,
-        default: Date.now
+        default: ""
     },
     joining_date_extend_status: {
         type: String,
@@ -566,6 +566,11 @@ const userModel = new mongoose.Schema({
         required: false,
         default:""
     },
+    offer_later_date:{
+        type: Date,
+        required: false,
+        default:""
+    }
 });
 
 AutoIncrement.initialize(mongoose.connection);
