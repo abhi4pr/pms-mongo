@@ -47,6 +47,7 @@ exports.getAllAssetsImages = async (req, res) => {
             },
             {
                 $project: {
+                    asset_image_id:"$asset_image_id",
                     sim_id: "$sim_id",
                     img1:"$img1",
                     img2:"$img2",
@@ -101,6 +102,7 @@ exports.getSingleAssetsImage = async (req, res) => {
             },
             {
                 $project: {
+                    asset_image_id:"$asset_image_id",
                     sim_id: "$sim_id",
                     img1:"$img1",
                     img2:"$img2",
@@ -140,7 +142,7 @@ const upload1 = multer({ dest: "uploads/assets" }).fields([
 ]);
 exports.updateAssetImage = [upload1, async (req, res) => {
     try {
-        const editassetimage = await userModel.findOneAndUpdate({ asset_image_id: parseInt(req.body.asset_image_id) }, {
+        const editassetimage = await assetsImagesModel.findOneAndUpdate({ asset_image_id: parseInt(req.body.asset_image_id) }, {
             sim_id: req.body.sim_id,
             img1: req.files && req.files['img1'] && req.files['img1'][0] ? req.files['img1'][0].filename : '',
             img2: req.files && req.files['img2'] && req.files['img2'][0] ? req.files['img2'][0].filename : '',
