@@ -16,6 +16,7 @@ const fs = require("fs");
 const ejs = require('ejs');
 const nodemailer = require("nodemailer");
 const sendMail = require("../common/sendMail.js");
+const helper = require('../helper/helper.js');
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "image", maxCount: 1 },
@@ -153,9 +154,16 @@ exports.addUser = [upload, async (req, res) => {
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : '',
             profileflag : req.body.profileflag,
-            nick_name : req.body.nick_name
+            nick_name : req.body.nick_name,
+            offer_later_date: req.body.offer_later_date,
+            annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : ''
         })
         const simv = await simc.save();
+
+        // Genreate a pdf file for offer later
+        if (simv?.offer_letter_send) {
+          helper.generateOfferLaterPdf(simv)
+        } 
 
         const joining = simv.joining_date;
         const convertDate = new Date(joining);
@@ -378,7 +386,10 @@ exports.updateUser = [upload1, async (req, res) => {
         if (!editsim) {
             return res.status(500).send({ success: false })
         }
-
+        // Genreate a pdf file for offer later
+        if (editsim?.joining_date_extend) {
+            helper.generateOfferLaterPdf(editsim)
+            } 
         return res.status(200).send({ success: true, data: editsim })
     } catch (err) {
         return res.status(500).send({ error: err.message, sms: 'Error updating user details' })
