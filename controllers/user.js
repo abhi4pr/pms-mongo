@@ -152,7 +152,7 @@ exports.addUser = [upload, async (req, res) => {
             ctc: req.body.ctc,
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : '',
-            profileflag : req.body.profileflag || 0,
+            profileflag : req.body.profileflag,
             nick_name : req.body.nick_name
         })
         const simv = await simc.save();
@@ -636,6 +636,7 @@ exports.getAllUsers = async (req, res) => {
                     ctc:"$ctc",
                     offer_letter_send:"$offer_letter_send",
                     annexure_pdf:"$annexure_pdf",
+                    profileflag:"$profileflag",
                     nick_name: "$nick_name"
                 }
             }
@@ -901,6 +902,7 @@ exports.getSingleUser = async (req, res) => {
                     emergency_contact:"$emergency_contact",
                     ctc:"$ctc",
                     offer_letter_send:"$offer_letter_send",
+                    profileflag:"$profileflag",
                     nick_name: "$nick_name"
                 }
             }
