@@ -150,7 +150,8 @@ exports.addUser = [upload, async (req, res) => {
             emergency_contact: req.body.emergency_contact,
             ctc: req.body.ctc,
             offer_letter_send: req.body.offer_letter_send,
-            annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : ''
+            annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : '',
+            profileflag : req.body.profileflag || 0
         })
         const simv = await simc.save();
 
