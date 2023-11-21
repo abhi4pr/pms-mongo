@@ -488,6 +488,7 @@ exports.getSalaryByFilter = async (req, res) => {
 
 exports.getSalaryByUserId = async (req, res) => {
   try {
+    const imageUrl = "http://34.93.135.33:8080/uploads/";
     const getcreators = await attendanceModel
       .aggregate([
         {
@@ -582,7 +583,6 @@ exports.getSalaryByUserId = async (req, res) => {
             status_: "$fn.status_",
             reference_no: "$fn.reference_no",
             pay_date: "$fn.pay_date",
-            screenshot: "$fn.screenshot",
             amount: "$fn.amount",
             invoice_template_no: "$user.invoice_template_no",
             dept_name: "$department.dept_name",
@@ -610,6 +610,9 @@ exports.getSalaryByUserId = async (req, res) => {
             salary_deduction: "$salary_deduction",
             salary: "$salary",
             attendence_id: "$attendence_id",
+            screenshot: {
+              $concat: [imageUrl, "$fn.screenshot"]
+            },
           },
         },
       ])

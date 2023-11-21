@@ -372,3 +372,21 @@ exports.getExeIpCountHistory = async (req, res) => {
         res.status(500).send({error:error.message, sms:'error getting stats history for this page'})
     }
 }
+
+exports.deleteExeIpCountHistory = async (req, res) => {
+    try {
+        const deletedHistory = await exeCountHisModel.findByIdAndUpdate(
+          req.params.p_id,
+          { isDeleted: true },
+          { new: true }
+        );
+    
+        if (!deletedHistory) {
+          return res.status(404).json({ message: 'History not found' });
+        }
+    
+        res.json(deletedHistory);
+      } catch (error) {
+        res.status(500).json({ message: 'Internal Server Error' });
+      }
+}
