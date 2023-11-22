@@ -176,6 +176,11 @@ const exeCountHisModel = new mongoose.Schema({
     type: Number,
     required: false,
     default: 0
+  },
+  quater:{
+    type: String,
+    required: false,
+    default: ""
   }
 
 });
