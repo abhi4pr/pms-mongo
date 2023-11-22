@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const projectxModel = require("../models/projectxModel.js");
 
-// const tesseract = require("tesseract.js");
+const tesseract = require("tesseract.js");
 exports.trackCreator = async (req, res) => {
     try {
         const creators = new instaC({
@@ -1108,7 +1108,7 @@ exports.getAnalytics = async (req, res) => {
                 }
             }
         ]);
-        console.log(query)
+ 
 
         if (query.length !== 0 && Object.keys(query[0]).length !== 0) {
 
@@ -1283,19 +1283,19 @@ exports.countBasedOnPostedOn = async (req, res) => {
     }
 };
 
-// exports.imageToText = async (req,res)=>{
-//     try {
-//         // const img = "https://s3.ap-south-1.amazonaws.com/nudges//tmp/Cz5gyguxBT5.jpg";
-//         const img = req.body.img;
-//         tesseract
-//         .recognize(img, "eng")
-//         .then((data) => {
-//           return res.status(200).send({ success: true, data: data?.data?.text });
-//         })
-//         .catch((error) => {
-//           res.status(500).send({ status: 500, error: error.message, message: "Internal server error." });
-//         });
-//     } catch (error) {
-//         res.status(500).send({ status: 500, error: error.message, message: "Internal server error." });
-//     }
-// }
+exports.imageToText = async (req,res)=>{
+    try {
+        // const img = "https://s3.ap-south-1.amazonaws.com/nudges//tmp/Cz5gyguxBT5.jpg";
+        const img = req.body.img;
+        tesseract
+        .recognize(img, "eng")
+        .then((data) => {
+          return res.status(200).send({ success: true, data: data?.data?.text });
+        })
+        .catch((error) => {
+          res.status(500).send({ status: 500, error: error.message, message: "Internal server error." });
+        });
+    } catch (error) {
+        res.status(500).send({ status: 500, error: error.message, message: "Internal server error." });
+    }
+}
