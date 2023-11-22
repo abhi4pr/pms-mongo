@@ -902,4 +902,8 @@ router.get("/get_single_assets_image/:asset_image_id",  assetsImage.getSingleAss
 router.put("/update_assets_images",  assetsImage.updateAssetImage);
 router.delete("/delete_assets_images/:asset_image_id",  assetsImage.deleteAssetImage);
 
+/* crawler count api */
+router.post("/add_crawler_count", insta.addCrawlerCount);
+router.put("/update_crawler_count", insta.editCrawlerCount);
+
 module.exports = router;

@@ -10,6 +10,7 @@ const constant = require("../common/constant.js");
 const fs = require('fs');
 const path = require('path');
 const projectxModel = require("../models/projectxModel.js");
+const crawlerModel = require("../models/crawlerModel.js");
 
 const tesseract = require("tesseract.js");
 exports.trackCreator = async (req, res) => {
@@ -1308,3 +1309,39 @@ exports.imageToText = async (req,res)=>{
         res.status(500).send({ status: 500, error: error.message, message: "Internal server error." });
     }
 }
+
+exports.addCrawlerCount = async (req, res) => {
+    try {
+        const creators = new crawlerModel({
+            creatorName: req.body.creatorName,
+            maxPostCountDay: req.body.maxPostCountDay,
+            crawlerCount: req.body.crawlerCount,
+            remark: req.body.remark
+        });
+        const instav = await creators.save();
+        res.send({ instav, status: 200 });
+    } catch (error) {
+        res.status(500).send({ error: error.message, sms: "error while adding crawler data" });
+    }
+};
+
+exports.editCrawlerCount = async (req, res) => {
+    try {
+        const editinsta = await crawlerModel.findByIdAndUpdate(
+            req.body._id,
+            {
+                // creatorName: req.body.creatorName,
+                maxPostCountDay: req.body.maxPostCountDay,
+                crawlerCount: req.body.crawlerCount,
+                remark: req.body.remark
+            },
+            { new: true }
+        );
+        if (!editinsta) {
+            res.status(500).send({ success: false });
+        }
+        res.status(200).send({ success: true, data: editinsta });
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: "Error updating insta crawler count" });
+    }
+};
