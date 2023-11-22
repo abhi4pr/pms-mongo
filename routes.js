@@ -64,7 +64,7 @@ router.get("/", (req, res) => {
 });
 
 /*insta api*/
-// router.post("/image_to_text", insta.imageToText)
+router.post("/image_to_text", insta.imageToText)
 router.post("/get_dynamic_key_value", insta.getDynamicReqAndResInstaP)
 router.post("/get_dynamic_multiple__key_value", insta.getDynamicMultiReqAndResInsta)
 router.post("/get_dynamic_key_value_instas", insta.getDynamicReqAndResInstaS)

@@ -59,7 +59,7 @@ exports.getAllAssetsImages = async (req, res) => {
                 }
             }
         ]).exec();
-        const assetImagesBaseUrl = "http://34.93.135.33:8080/uploads/assets";
+        const assetImagesBaseUrl = "http://34.93.135.33:8080/uploads/assets/";
         const dataWithImageUrl = assetsdata.map((assetimage) => ({
             ...assetimage,
             img1_url: assetimage.img1 ? assetImagesBaseUrl + assetimage.img1 : null,
@@ -114,7 +114,7 @@ exports.getSingleAssetsImage = async (req, res) => {
                 }
             }
         ]).exec();
-        const assetImagesBaseUrl = "http://34.93.135.33:8080/uploads/assets";
+        const assetImagesBaseUrl = "http://34.93.135.33:8080/uploads/assets/";
         const dataWithImageUrl = assetsdata.map((assetimage) => ({
             ...assetimage,
             img1_url: assetimage.img1 ? assetImagesBaseUrl + assetimage.img1 : null,
