@@ -64,6 +64,36 @@ const simModel = new mongoose.Schema({
         type: Number,
         required: true
     },
+    category_id: {
+        type: Number,
+        required: true
+    },
+    sub_category_id: {
+        type: Number,
+        required: true
+    },
+    vendor_id: {
+        type: Number,
+        required: true
+    },
+    inWarranty:{
+        type: String,
+        required: false,
+        default: ""
+    },
+    warrantyDate: {
+        type: Date,
+        default: ""
+    },
+    dateOfPurchase: {
+        type: Date,
+        default: ""
+    },
+    selfAuditPeriod: {
+        type: String,
+        required: false,
+        default: ""
+    }
 });
 
 AutoIncrement.initialize(mongoose.connection);

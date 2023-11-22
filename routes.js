@@ -104,7 +104,7 @@ router.get("/get_exe_sum", exe.getExeSum);
 router.put("/edit_exe_sum", exe.editExeSum);
 router.get("/get_single_exe_pid_count",exe.getLatestPIDCount);
 // router.post("/add_exe_pid_history",exe.addIPCountHistory);
-router.post("/add_exe_pid_history",upload.single("media"),exe.addIPCountHistory);
+router.post("/add_exe_pid_history",exe.addIPCountHistory);
 router.post("/exe_purchase_post",exe.exeForPurchase);
 router.get("/get_exe_ip_count_history/:p_id", exe.getExeIpCountHistory);
 router.delete("/delete_exe_ip_count_history/:_id", exe.deleteExeIpCountHistory);
@@ -892,7 +892,7 @@ router.get("/get_all_docs",  documentController.getDocs);
 router.get("/get_doc/:id",  documentController.getDoc);
 router.put("/update_doc", documentController.editDoc);
 router.delete("/delete_doc/:id",  documentController.deleteDoc);
-router.post("/add_doc_history",  documentController.addHistoryDoc);
+router.post("/add_doc_history",upload.fields([ { name: 'doc_file', maxCount: 10}]),documentController.addHistoryDoc);
 router.put("/update_doc_history",  documentController.editHistoryDoc);
 
 /* Assets Images master */

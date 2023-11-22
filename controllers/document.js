@@ -42,7 +42,7 @@ exports.getDocs = async (req, res) => {
   try {
     const docs = await documentModel.find();
     if (docs.length === 0) {
-      return response.returnFalse(200, req, res, "No record found",[]);
+      return response.returnFalse(200, req, res, "No record found", []);
     } else {
       return response.returnTrue(
         200,
@@ -60,7 +60,7 @@ exports.getDoc = async (req, res) => {
   try {
     const doc = await documentModel.findById(req?.params?.id);
     if (!doc) {
-      return response.returnFalse(200, req, res, "No record found",{});
+      return response.returnFalse(200, req, res, "No record found", {});
     } else {
       return response.returnTrue(200, req, res, "Data Fetch Successfully", doc);
     }
@@ -131,34 +131,42 @@ exports.deleteDoc = async (req, res) => {
   }
 };
 
-exports.addHistoryDoc = async (req, res) =>{
-  try{
+exports.addHistoryDoc = async (req, res) => {
+  try {
+    const files = req.files.doc_file;
+    const savedDocuments = [];
+    
+    for (const file of files) {
       const simc = new documentHisModel({
         user_id: req.body.user_id,
         doc_id: req.body.doc_id,
-        doc_file_name: req?.file?.filename,
+        doc_file: file.filename,
         status: req.body.status,
         updated_by: req.body.updated_by
-      })
+      });
+
       const simv = await simc.save();
-      res.send({simv, status:200});
-  } catch(err){
-      res.status(500).send({error:err.message, sms:'error while adding doc history'})
+      savedDocuments.push(simv);
+    }
+    res.send({ documents: savedDocuments, status: 200 });
+
+  } catch (err) {
+    res.status(500).send({ error: err.message, sms: 'error while adding doc history' })
   }
 };
 
 exports.editHistoryDoc = async (req, res) => {
-  try{
-      const editsim = await documentHisModel.findByIdAndUpdate(req.body._id,{
-        user_id: req.body.user_id,
-        // doc_id: req.body.doc_id,
-        doc_file_name: req?.file?.filename,
-        status: req.body.status,
-        updated_by: req.body.updated_by
-      }, { new: true })
+  try {
+    const editsim = await documentHisModel.findByIdAndUpdate(req.body._id, {
+      user_id: req.body.user_id,
+      // doc_id: req.body.doc_id,
+      doc_file_name: req?.file?.filename,
+      status: req.body.status,
+      updated_by: req.body.updated_by
+    }, { new: true })
 
-      res.status(200).send({success:true, data:editsim})
-  } catch(err){
-      res.status(500).send({error:err.message, sms:'Error updating doc history'})
+    res.status(200).send({ success: true, data: editsim })
+  } catch (err) {
+    res.status(500).send({ error: err.message, sms: 'Error updating doc history' })
   }
 };
