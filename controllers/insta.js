@@ -180,6 +180,9 @@ exports.trackPost = async (req, res) => {
                 auditor_decision: req.body.auditor_decision,
                 interpretor_decision: req.body.interpretor_decision,
                 selector_decision: req.body.selector_decision,
+                music_info : req.body.data?.music_info,
+                location : req.body.data?.location,
+                sponsored : req.body.data?.sponsored,
             });
             const instav = await creators.save();
             res.send({ instav, status: 200 });

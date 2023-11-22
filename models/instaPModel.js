@@ -163,7 +163,22 @@ const instaPModel = new mongoose.Schema({
     updatedAt:{
         type: Date,
         default: Date.now()
-    }
+    },
+    music_info: {
+        type: Object, 
+        required: false,
+        default: "" 
+    },
+    location: {
+        type: Object,
+        required: false,
+        default: "" 
+    },
+    sponsored: {
+        type: Boolean, 
+        required: false,
+        default: null
+    },
 });
 
 // AutoIncrement.initialize(mongoose.connection);

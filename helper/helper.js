@@ -70,7 +70,7 @@ module.exports = {
       //   if (err) console.error(err);
       // });
       // Generate PDF with Puppeteer
-      const browser = await puppeteer.launch({ headless: "new" });
+      const browser = await puppeteer.launch({headless: "true", executablePath: "/usr/bin/chromium"});
       const page = await browser.newPage();
       await page.setContent(html);
       await page.pdf({ path: outputPath, format: "A4" });
