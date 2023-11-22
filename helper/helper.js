@@ -2,7 +2,8 @@
 const fs = require("fs");
 const ejs = require("ejs");
 const path = require("path");
-const pdf = require("html-pdf");
+// const pdf = require("html-pdf");
+const puppeteer = require("puppeteer");
 
 //db models
 const designationModel = require("../models/designationModel.js");
@@ -64,11 +65,16 @@ module.exports = {
         __dirname,
         `../uploads/offerLetterPdf/${pdfFileName} Offer Letter.pdf`
       );
-
-      // Generate PDF
-      pdf.create(html).toFile(outputPath, (err, res) => {
-        if (err) console.error(err);
-      });
+      // // Generate PDF
+      // pdf.create(html).toFile(outputPath, (err, res) => {
+      //   if (err) console.error(err);
+      // });
+      // Generate PDF with Puppeteer
+      const browser = await puppeteer.launch({ headless: "new" });
+      const page = await browser.newPage();
+      await page.setContent(html);
+      await page.pdf({ path: outputPath, format: "A4" });
+      await browser.close();
     } catch (error) {
       console.log("PDF GENERATE ERR FOR OFFER LATER:", error.message);
     }

@@ -1139,8 +1139,8 @@ exports.getDynamicMultiReqAndResInsta = async (req, res) => {
             return res.status(200).json({ message: "Invalid flag value, you should provide 1 or 2, 1 for count and 2 for all data." });
         }
 
-        const countQuery = { [request_key_1]: parseInt(request_value_1), [request_key_2]: parseInt(request_value_2) };
-        const dataQuery = { [request_key_1]: parseInt(request_value_1), [request_key_2]: parseInt(request_value_2) };
+        const countQuery = { [request_key_1]: request_value_1, [request_key_2]: request_value_2 };
+        const dataQuery = { [request_key_1]: request_value_1, [request_key_2]: request_value_2 };
 
         if (flag === 1) {
             const count = await modelCollection.countDocuments(countQuery);
