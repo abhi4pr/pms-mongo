@@ -740,8 +740,14 @@ exports.getPostsFromName = async (req, res) => {
         const perPage = req.query.perPage || 50;
         const skip = (page - 1) * perPage;
 
+        let matchCondition = {creatorName: creatorName}
+        
+        if(req.body.posttype_decision !== 111){
+            matchCondition.posttype_decision = req.body.posttype_decision
+        }
+
         const getPosts = await instaP
-            .find({ creatorName: creatorName, posttype_decision: req.body.posttype_decision })
+            .find(matchCondition)
             .sort({ postedOn: -1 })
             .skip(skip)
             .limit(perPage);

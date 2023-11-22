@@ -121,4 +121,9 @@ module.exports = {
 
     return `${monthYear}/${userId}/${nextIncrement}`;
   },
+
+  generateRandomPassword: () => {
+    const randomString = Math.random().toString(36).slice(-6);
+    return randomString;
+  },
 };

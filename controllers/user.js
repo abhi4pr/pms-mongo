@@ -2078,15 +2078,28 @@ exports.forgotPass = async (req, res) => {
             return res.status(200).json({ message: "User not found with this email id." });
         }
 
+        const getRandomPassword = helper.generateRandomPassword();
+
+        const encryptedPass = await bcrypt.hash(getRandomPassword, 10);
+
+        const updatePass = await userModel.findOneAndUpdate({ user_email_id: req.body.user_email_id }, {
+            user_login_password: encryptedPass
+        });
+
         const templatePath = path.join(__dirname, "forgotemailtemp.ejs");
-            const template = await fs.promises.readFile(templatePath, "utf-8");
-            const html = ejs.render(template, {
-                email,
-              password : user?.user_login_password
-            
-            });
-       sendMail("Forgot password", html,email);
-       return  res.status(200).send({  message: 'Successfully Sent email.' })
+        const template = await fs.promises.readFile(templatePath, "utf-8");
+        const html = ejs.render(template, {
+            email,
+            password : getRandomPassword
+        
+        });
+
+        if(updatePass){
+            sendMail("Forgot password", html,email);
+        }else{
+            return res.status(500).send({sms:'email couldn not send'});
+        }
+        return res.status(200).send({  message: 'Successfully Sent email.' })
 
     } catch (err) {
        return  res.status(500).send({ error: err.message, message: 'Error Sending Mail' })
