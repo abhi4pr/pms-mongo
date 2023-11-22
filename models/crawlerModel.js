@@ -3,7 +3,7 @@ const AutoIncrement = require("mongoose-auto-increment");
 
 const crawlerModel = new mongoose.Schema({
   creatorName: {
-    type: Number,
+    type: String,
     required: true,
     unique: [true,'creatorName is required and unique']
   },

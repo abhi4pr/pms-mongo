@@ -353,7 +353,8 @@ exports.addIPCountHistory = [upload, async (req, res) => {
             Age_35_44_percent: req.body.Age_35_44_percent,
             Age_45_54_percent: req.body.Age_45_54_percent,
             Age_55_64_percent: req.body.Age_55_64_percent,
-            Age_65_plus_percent: req.body.Age_65_plus_percent    
+            Age_65_plus_percent: req.body.Age_65_plus_percent,
+            quater: req.body.quater    
         })
         const simv = await simc.save();
     
