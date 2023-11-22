@@ -608,6 +608,7 @@ router.post(
   user.sendMailAllWfoUser
 );
 router.get("/get_all_wfh_users",  user.getAllWfhUsers);
+router.get("/get_all_login_history", user.getLoginHistory);
 
 /* attendance */
 router.post("/add_attendance",  attendance.addAttendance);
@@ -889,8 +890,10 @@ router.get("/get_coc_history/:_id", coc.getCocHistory);
 router.post("/add_doc",  documentController.addDocument);
 router.get("/get_all_docs",  documentController.getDocs);
 router.get("/get_doc/:id",  documentController.getDoc);
-router.put("/update_doc", upload.single("doc_file"), documentController.editDoc);
+router.put("/update_doc", documentController.editDoc);
 router.delete("/delete_doc/:id",  documentController.deleteDoc);
+router.post("/add_doc_history",  documentController.addHistoryDoc);
+router.put("/update_doc_history",  documentController.editHistoryDoc);
 
 /* Assets Images master */
 router.post("/add_assets_images",  assetsImage.addAssetImage);

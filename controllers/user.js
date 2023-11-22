@@ -2092,3 +2092,12 @@ exports.forgotPass = async (req, res) => {
        return  res.status(500).send({ error: err.message, message: 'Error Sending Mail' })
     }
 };
+
+exports.getLoginHistory = async (req, res) => {
+    try {
+        const dataa = await userLoginHisModel.find({});
+        res.status(200).send({data:dataa})
+    } catch (error) {
+        res.status(500).send({error: error.message, sms:"error getting user login history"})
+    }
+}

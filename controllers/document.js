@@ -85,15 +85,6 @@ exports.editDoc = async (req, res) => {
       return response.returnFalse(200, req, res, "No record found");
     }
 
-    const simc = new documentHisModel({
-      user_id: req.body.user_id,
-      doc_id: req.body.doc_id,
-      doc_file: req?.file?.filename,
-      status: req.body.status,
-      updated_by: req.body.updated_by
-    })
-    await simc.save();
-
     return response.returnTrue(
       200,
       req,
@@ -137,5 +128,37 @@ exports.deleteDoc = async (req, res) => {
     }
   } catch (err) {
     return response.returnFalse(500, req, res, err.message, {});
+  }
+};
+
+exports.addHistoryDoc = async (req, res) =>{
+  try{
+      const simc = new documentHisModel({
+        user_id: req.body.user_id,
+        doc_id: req.body.doc_id,
+        doc_file_name: req?.file?.filename,
+        status: req.body.status,
+        updated_by: req.body.updated_by
+      })
+      const simv = await simc.save();
+      res.send({simv, status:200});
+  } catch(err){
+      res.status(500).send({error:err.message, sms:'error while adding doc history'})
+  }
+};
+
+exports.editHistoryDoc = async (req, res) => {
+  try{
+      const editsim = await documentHisModel.findByIdAndUpdate(req.body._id,{
+        user_id: req.body.user_id,
+        // doc_id: req.body.doc_id,
+        doc_file_name: req?.file?.filename,
+        status: req.body.status,
+        updated_by: req.body.updated_by
+      }, { new: true })
+
+      res.status(200).send({success:true, data:editsim})
+  } catch(err){
+      res.status(500).send({error:err.message, sms:'Error updating doc history'})
   }
 };
