@@ -13,7 +13,16 @@ const userLoginHisModel = new mongoose.Schema({
   login_date: {
     type: Date,
     default: Date.now,
+  },
+  log_out_date: {
+    type: Date,
+    default: "",
+  },
+  duration :{
+    type: String,
+    default :""
   }
+  
 });
 
 module.exports = mongoose.model("userLoginHisModel", userLoginHisModel);

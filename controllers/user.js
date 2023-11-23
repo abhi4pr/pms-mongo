@@ -11,6 +11,7 @@ const attendanceModel = require('../models/attendanceModel.js');
 const userLoginHisModel = require('../models/userLoginHisModel.js')
 const objModel = require('../models/objModel.js');
 const constant = require('../common/constant.js');
+const response = require("../common/response");
 const bcrypt = require("bcrypt");
 const fs = require("fs");
 const ejs = require('ejs');
@@ -795,6 +796,7 @@ exports.getSingleUser = async (req, res) => {
             },
             {
                 $project: {
+                    offer_later_pdf_url: "$offer_later_pdf_url",
                     user_id: "$user_id",
                     user_name: "$user_name",
                     user_designation: "$user_designation",
@@ -1003,13 +1005,14 @@ exports.loginUser = async (req, res) => {
                     role_id: '$role_id',
                     id: "$user_id",
                     name: "$user_name",
-                    email: "$user_email_id",
+                    // email: "$user_email_id",
                     // sitting_id: '$sitting_id',
                     room_id: '$room_id',
                     user_status: '$user_status',
                     user_login_password: '$user_login_password',
                     onboard_status: '$onboard_status',
-                    id: '$user_id'
+                    id: '$user_id',
+                    user_login_id: '$user_login_id'
                 }
             }
         ]).exec();
@@ -1044,7 +1047,7 @@ exports.loginUser = async (req, res) => {
             if(simc[0].onboard_status == 2){                
                 const saveDataObj = {
                     user_id: simc[0].id,
-                    user_email_id: simc[0].email
+                    user_email_id: simc[0].email || simc[0].user_login_id
                 };
                 await userLoginHisModel.create(saveDataObj);
                 if(simc[0].first_login_flag == false){
@@ -2135,5 +2138,24 @@ exports.getAllFirstLoginUsers = async(req, res) => {
         res.status(200).send({ results: delv })
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'error getting all user who logged in first time' })
+    }
+}
+
+exports.logOut = async (req, res) => {
+    try {
+        const  { user_id } = req.body
+        const userLoginHistory = await userLoginHisModel.findOne({user_id : user_id});
+        if(!userLoginHistory ) {
+           return resopnse.ret
+        }
+        const dateString = "2023-11-23T06:16:06.581+00:00";
+        const timestamp = Date.parse(dateString);
+        console.log(Math.floor(timestamp / 1000)); 
+        console.log(Math.floor(Date.now() / 1000))
+        console.log(Math.floor(Date.now() / 1000) - Math.floor(timestamp / 1000))
+        
+        console.log(formatTime(Math.floor(Date.now() / 1000) - Math.floor(timestamp / 1000)))
+    } catch (error) {
+        res.status(500).send({error: error.message, message:"Internal server error"})
     }
 }

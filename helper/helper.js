@@ -2,13 +2,13 @@
 const fs = require("fs");
 const ejs = require("ejs");
 const path = require("path");
-// const pdf = require("html-pdf");
 const puppeteer = require("puppeteer");
 
 //db models
 const designationModel = require("../models/designationModel.js");
 const userModel = require("../models/userModel.js");
 const attendanceModel = require("../models/attendanceModel.js");
+const { base_url } = require("../common/constant.js");
 
 module.exports = {
   generateOfferLaterPdf: async (empData) => {
@@ -65,16 +65,24 @@ module.exports = {
         __dirname,
         `../uploads/offerLetterPdf/${pdfFileName} Offer Letter.pdf`
       );
-      // // Generate PDF
-      // pdf.create(html).toFile(outputPath, (err, res) => {
-      //   if (err) console.error(err);
-      // });
+
       // Generate PDF with Puppeteer
+      // const browser = await puppeteer.launch({headless: "true"});  // For Localhsot
       const browser = await puppeteer.launch({headless: "true", executablePath: "/usr/bin/chromium"});
       const page = await browser.newPage();
       await page.setContent(html);
       await page.pdf({ path: outputPath, format: "A4" });
       await browser.close();
+
+        await userModel.findOneAndUpdate(
+          { user_id: empData?.user_id },
+          {
+            $set :{
+              offer_later_pdf_url  :  `${base_url}/uploads/offerLetterPdf/${pdfFileName} Offer Letter.pdf`
+            }
+          }
+        );
+       
     } catch (error) {
       console.log("PDF GENERATE ERR FOR OFFER LATER:", error.message);
     }
