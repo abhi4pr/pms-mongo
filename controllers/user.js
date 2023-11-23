@@ -995,6 +995,7 @@ exports.loginUser = async (req, res) => {
                 $project: {
                     sitting_id: '$sitting.sitting_id',
                     sitting_ref_no: '$sitting.sitting_ref_no',
+                    first_login_flag: '$first_login_flag',
                     // id: "$id",
                     name: '$user_name',
                     email: '$user_email_id',
@@ -1037,12 +1038,22 @@ exports.loginUser = async (req, res) => {
                 { expiresIn: constant.CONST_VALIDATE_SESSION_EXPIRE }
             );
 
+            var currentDate = new Date();
+            var formattedDateTime = currentDate.toLocaleString();
+
             if(simc[0].onboard_status == 2){                
                 const saveDataObj = {
                     user_id: simc[0].id,
                     user_email_id: simc[0].email
                 };
                 await userLoginHisModel.create(saveDataObj);
+                if(simc[0].first_login_flag == false){
+                    await userModel.findOneAndUpdate({ user_login_id: req.body.user_login_id.toLowerCase().trim() }, {
+                        first_login_flag: true,
+                        notify_hr: true,
+                        first_login_time: formattedDateTime
+                    });
+                }
             }
 
             return res.status(200).send({ token, user: simc[0] })
@@ -2112,5 +2123,17 @@ exports.getLoginHistory = async (req, res) => {
         res.status(200).send({data:dataa})
     } catch (error) {
         res.status(500).send({error: error.message, sms:"error getting user login history"})
+    }
+}
+
+exports.getAllFirstLoginUsers = async(req, res) => {
+    try {
+        const delv = await userModel.find({ first_login_flag: true })
+        if (!delv) {
+            res.status(500).send({ success: false })
+        }
+        res.status(200).send({ results: delv })
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'error getting all user who logged in first time' })
     }
 }

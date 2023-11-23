@@ -570,6 +570,21 @@ const userModel = new mongoose.Schema({
         type: Date,
         required: false,
         default:""
+    },
+    first_login_flag:{
+        type: Boolean,
+        required: false,
+        default: false
+    },
+    notify_hr:{
+        type: Boolean,
+        required: false,
+        default: false
+    },
+    first_login_time:{
+        type: String,
+        required: false,
+        default: ""
     }
 });
 
