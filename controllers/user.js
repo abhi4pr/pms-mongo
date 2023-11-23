@@ -2131,7 +2131,7 @@ exports.getLoginHistory = async (req, res) => {
 
 exports.getAllFirstLoginUsers = async(req, res) => {
     try {
-        const delv = await userModel.find({ first_login_flag: true })
+        const delv = await userModel.find({ notify_hr: true })
         if (!delv) {
             res.status(500).send({ success: false })
         }
