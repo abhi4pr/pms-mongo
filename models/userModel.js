@@ -585,6 +585,11 @@ const userModel = new mongoose.Schema({
         type: String,
         required: false,
         default: ""
+    },
+    offer_later_pdf_url:{
+        type: String,
+        required: false,
+        default:""
     }
 });
 
