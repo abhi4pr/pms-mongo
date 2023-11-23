@@ -905,5 +905,7 @@ router.delete("/delete_assets_images/:asset_image_id",  assetsImage.deleteAssetI
 /* crawler count api */
 router.post("/add_crawler_count", insta.addCrawlerCount);
 router.put("/update_crawler_count", insta.editCrawlerCount);
+router.get("/get_all_crawlers", insta.getAllCrawler);
+router.get("/get_single_crawler/:_id", insta.getSingleCrawler);
 
 module.exports = router;

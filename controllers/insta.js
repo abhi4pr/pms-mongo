@@ -1345,3 +1345,23 @@ exports.editCrawlerCount = async (req, res) => {
         res.status(500).send({ error: err.message, sms: "Error updating insta crawler count" });
     }
 };
+
+exports.getAllCrawler = async (req, res) => {
+    try{
+        const simc = await crawlerModel.find({});
+        if(!simc){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send({data:simc})
+    } catch(err){
+        res.status(500).send({error:err.message,sms:'Error getting all crawlers datas'})
+    }
+};
+exports.getSingleCrawler = async (req, res) =>{
+    try {
+        const user = await crawlerModel.findById(req.params._id);
+        res.status(200).send({data:user})
+    } catch (error) {
+        res.status(500).send({error:error.message,sms:'Error getting single crawler data'})
+    }
+};
