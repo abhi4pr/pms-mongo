@@ -555,6 +555,7 @@ router.put("/update_user_auth",  user.updateUserAuth);
 router.delete("/delete_user_auth",  user.deleteUserAuth);
 router.get("/get_all_user_auth",  user.allUserAuthDetail);
 router.post("/login_user", user.loginUser);
+router.post("/log_out", user.logOut);
 router.post("/get_delivery_boy",  user.deliveryBoy);  //done
 router.get("/get_delivery_user",  user.deliveryUser);
 router.get(

@@ -2144,18 +2144,31 @@ exports.getAllFirstLoginUsers = async(req, res) => {
 exports.logOut = async (req, res) => {
     try {
         const  { user_id } = req.body
-        const userLoginHistory = await userLoginHisModel.findOne({user_id : user_id});
+        const userLoginHistory = await userLoginHisModel.findOne({user_id : user_id},'login_date');
         if(!userLoginHistory ) {
-           return resopnse.ret
+           return response.returnFalse(200,req,res,"No record found for this user in login history", {})
         }
-        const dateString = "2023-11-23T06:16:06.581+00:00";
-        const timestamp = Date.parse(dateString);
-        console.log(Math.floor(timestamp / 1000)); 
-        console.log(Math.floor(Date.now() / 1000))
-        console.log(Math.floor(Date.now() / 1000) - Math.floor(timestamp / 1000))
-        
-        console.log(formatTime(Math.floor(Date.now() / 1000) - Math.floor(timestamp / 1000)))
+        const timestamp = Date.parse(userLoginHistory?.login_date);
+        let formatedLoginTime = Math.floor(timestamp / 1000)
+        let formatedCurrentTime= Math.floor(Date.now() / 1000)
+       
+        let diffInSecound = formatedCurrentTime - formatedLoginTime
+
+        let updateLoginHistoryData = await userLoginHisModel.findOneAndUpdate({user_id : user_id},
+            {
+                $set:{
+                    duration : diffInSecound,
+                    log_out_date : Date.now()
+                }
+            },
+            {
+                new : true
+            })
+        if(!updateLoginHistoryData){
+            return response.returnTrue ( 200 , req, res, "Something went wrong no login history found.",{})
+        }
+        return response.returnTrue ( 200 , req, res, "Successfully capture login duration time",updateLoginHistoryData)
     } catch (error) {
-        res.status(500).send({error: error.message, message:"Internal server error"})
+        return response.returnTrue ( 500 , req, res, "Internal Server Error",{})
     }
 }

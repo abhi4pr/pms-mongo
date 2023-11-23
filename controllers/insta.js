@@ -1134,7 +1134,7 @@ exports.getAnalytics = async (req, res) => {
 
 exports.getDynamicMultiReqAndResInsta = async (req, res) => {
     try {
-        const { model, request_key_1, request_key_2, request_value_1, request_value_2, flag } = req.body;
+        const { model, request_key_1, request_key_2, request_value_1, request_value_2, flag, matchCondition } = req.body;
         const page = req.query?.page;
         const perPage = req.query?.perPage;
         const skip = (page - 1) * perPage;
@@ -1151,6 +1151,12 @@ exports.getDynamicMultiReqAndResInsta = async (req, res) => {
 
         const countQuery = { [request_key_1]: request_value_1, [request_key_2]: request_value_2 };
         const dataQuery = { [request_key_1]: request_value_1, [request_key_2]: request_value_2 };
+
+        if (matchCondition) {
+            // Spread the contents of matchCondition into countQuery and dataQuery
+            Object.assign(countQuery, matchCondition);
+            Object.assign(dataQuery, matchCondition);
+        }
 
         if (flag === 1) {
             const count = await modelCollection.countDocuments(countQuery);
