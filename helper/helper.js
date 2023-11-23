@@ -68,26 +68,37 @@ module.exports = {
 
       // Generate PDF with Puppeteer
       // const browser = await puppeteer.launch({headless: "true"});  // For Localhsot
-      const browser = await puppeteer.launch({headless: "true", executablePath: "/usr/bin/chromium"});
+      const browser = await puppeteer.launch({
+        headless: "true",
+        executablePath: "/usr/bin/chromium",
+      });
       const page = await browser.newPage();
       await page.setContent(html);
       await page.pdf({ path: outputPath, format: "A4" });
       await browser.close();
 
-        await userModel.findOneAndUpdate(
-          { user_id: empData?.user_id },
-          {
-            $set :{
-              offer_later_pdf_url  :  `${base_url}/uploads/offerLetterPdf/${pdfFileName} Offer Letter.pdf`
-            }
-          }
-        );
-       
+      await userModel.findOneAndUpdate(
+        { user_id: empData?.user_id },
+        {
+          $set: {
+            offer_later_pdf_url: `${base_url}/uploads/offerLetterPdf/${pdfFileName} Offer Letter.pdf`,
+          },
+        }
+      );
     } catch (error) {
       console.log("PDF GENERATE ERR FOR OFFER LATER:", error.message);
     }
   },
 
+  formateSecoundTime: (seconds) => {
+    const days = Math.floor(seconds / (3600 * 24));
+    seconds -= days * 3600 * 24;
+    const hrs = Math.floor(seconds / 3600);
+    seconds -= hrs * 3600;
+    const mnts = Math.floor(seconds / 60);
+    seconds -= mnts * 60;
+    return `${days} days, ${hrs} hours, ${mnts} minutes, and ${seconds} seconds`;
+  },
   fileRemove: (filename, foldername) => {
     const folder = path.join(__dirname, foldername);
     const fileName = filename;
