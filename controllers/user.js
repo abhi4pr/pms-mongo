@@ -1050,13 +1050,13 @@ exports.loginUser = async (req, res) => {
                     user_email_id: simc[0].email || simc[0].user_login_id
                 };
                 await userLoginHisModel.create(saveDataObj);
-                if(simc[0].first_login_flag == false){
-                    await userModel.findOneAndUpdate({ user_login_id: req.body.user_login_id.toLowerCase().trim() }, {
-                        first_login_flag: true,
-                        notify_hr: true,
-                        first_login_time: formattedDateTime
-                    });
-                }
+                // if(simc[0].first_login_flag == false){
+                //     await userModel.findOneAndUpdate({ user_login_id: req.body.user_login_id.toLowerCase().trim() }, {
+                //         first_login_flag: true,
+                //         notify_hr: true,
+                //         first_login_time: formattedDateTime
+                //     });
+                // }
             }
 
             return res.status(200).send({ token, user: simc[0] })
