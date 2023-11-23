@@ -571,6 +571,21 @@ const userModel = new mongoose.Schema({
         required: false,
         default:""
     },
+    offer_later_acceptance_date:{
+        type: Date,
+        required: false,
+        default:""
+    },
+    offer_later_status:{
+        type: Boolean,
+        required: false,
+        default:false
+    },
+    offer_later_reject_reason:{
+        type: String,
+        required: false,
+        default:""
+    },
     offer_later_pdf_url:{
         type: String,
         required: false,
