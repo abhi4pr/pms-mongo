@@ -61,10 +61,15 @@ const assetsImage = require("./controllers/assetsImage.js");
 const notification = require("./controllers/notifications.js");
 const userDocManagement = require("./controllers/userDocManagement.js");
 
+const campaignPlanController=require('./controllers/operationExecution/campaignPlanController.js')
+
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
 });
 
+
+/*operation+execution api*/
+  router.post('/campaignplan',campaignPlanController.createPlan)
 /*insta api*/
 router.post("/image_to_text", insta.imageToText)
 router.post("/get_dynamic_key_value", insta.getDynamicReqAndResInstaP)
