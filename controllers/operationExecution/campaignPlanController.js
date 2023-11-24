@@ -12,14 +12,26 @@ exports.createPlan=catchAsync(async (req,res,next) => {
             campaignId,
             
             campaignName,
+            postRemaining:pages[i].postPerPage,
            ...pages[i]
 
         }
         const result=await CampaignPlanModel.create(data)
+  
+        
     }
 
     const doc=await CampaignPlanModel.find({campaignId: campaignId})
     res.send({ data: doc, status: 200 });
     //validation is remaining
 
+})
+
+exports.getPlan=catchAsync(async (req,res,next) => {
+    const id=req.params.id
+    const result=await CampaignPlanModel.find({campaignId: id})
+    if(!result) {
+        return next(new appError(404,"Campaign not found"))
+    }
+    res.send({ data: result, status: 200})
 })

@@ -51,6 +51,22 @@ exports.getRegisterCampaigns = async (req, res) => {
   }
 };
 
+exports.getSingleRegisterCampign=async(req,res,next) => {
+  try {
+    const campaign=await  registerCamapign.findById(req.params.id)
+    if (!campaign) {
+      res
+        .status(200)
+        .send({ success: true, data: [], message: constant.NO_RECORD_FOUND });
+    } 
+    return res.status(200).send({ success: true, data: campaign });
+  } catch (err) {
+    res
+    .status(500)
+    .send({ error: err.message, message: "Error getting all Campaigns" });
+  }
+}
+
 exports.editRegisterCampaign = async (req, res) => {
   try {
     const editRegisterCampaignObj = await registerCamapign.findOneAndUpdate(
