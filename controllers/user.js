@@ -381,14 +381,17 @@ exports.updateUser = [upload1, async (req, res) => {
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files && req.files['annexure_pdf'] && req.files['annexure_pdf'][0] ? req.files['annexure_pdf'][0].filename : (existingUser && existingUser.annexure_pdf) || '',
             profileflag: req.body.profileflag,
-            nick_name: req.body.nick_name 
+            nick_name: req.body.nick_name ,
+            offer_later_acceptance_date: req.body.offer_later_acceptance_date,
+            offer_later_status: req.body.offer_later_status, 
+            offer_later_reject_reason: req.body.offer_later_reject_reason 
 
         }, { new: true });
         if (!editsim) {
             return res.status(500).send({ success: false })
         }
         // Genreate a pdf file for offer later
-        if (editsim?.joining_date_extend) {
+        if (editsim?.offer_later_status == true && (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== "") )) {
             helper.generateOfferLaterPdf(editsim)
             } 
         return res.status(200).send({ success: true, data: editsim })
@@ -797,6 +800,9 @@ exports.getSingleUser = async (req, res) => {
             {
                 $project: {
                     offer_later_pdf_url: "$offer_later_pdf_url",
+                    offer_later_acceptance_date: "$offer_later_acceptance_date",
+                    offer_later_status: "$offer_later_status",
+                    offer_later_reject_reason: "$offer_later_reject_reason",
                     user_id: "$user_id",
                     user_name: "$user_name",
                     user_designation: "$user_designation",

@@ -6,6 +6,8 @@
 <!-- reportTo -->
 <!-- startDate -->
 <!-- ctc -->
+<!-- digitalSignature -->
+<!-- offerLaterAcceptanceDate -->
 <!-- ------------------------------------------------------------------------ -->
 <!DOCTYPE html>
 <html lang="en">
@@ -245,9 +247,13 @@
           I confirm that I am not breaching any terms or provisions of any
           prior agreement or arrangement by accepting this offer.
         </p>
+        <img
+        src="<%= digitalSignature %>"
+        alt="" />
         <p>
           <%= empName %><br />
-            <%= permanentAddress %>
+            <%= permanentAddress %><br/>
+             Date <%= offerLaterAcceptanceDate %>
         </p>
       </div>
       <div>
