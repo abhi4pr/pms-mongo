@@ -8,6 +8,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocumantion = require("./doc/swaggerDoc.js");
 const OpenAI = require("openai");
 const { swaggerConfig } = require("./doc/swaggerConfig.js");
+const errorController=require('./controllers/errorController.js')
 
 require("./controllers/autoMail.js");
 
@@ -39,6 +40,8 @@ app.post("/chat", async (req, res) => {
   });
   res.status(200).send(completion.choices[0].text);
 });
+
+app.use(errorController)
 // mongoose.set('debug', true);
 mongoose
   .connect(vari.MONGODB, {
