@@ -25,6 +25,10 @@ const campaignSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+  status:{
+    type:String,
+    enum:['active', 'inactive']
+  },
   updated_date: {
     type: Date,
   },
