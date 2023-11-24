@@ -9,6 +9,8 @@ const swaggerDocumantion = require("./doc/swaggerDoc.js");
 const OpenAI = require("openai");
 const { swaggerConfig } = require("./doc/swaggerConfig.js");
 const errorController=require('./controllers/errorController.js')
+const swaggerAccessManagement=require('./controllers/swaggerDocumentaion/swaggerAccessManagement.js');
+const { checkDevAuthentication } = require("./middleware/swaggerMiddleware.js");
 
 require("./controllers/autoMail.js");
 
@@ -24,29 +26,25 @@ app.use("/api", routes);
 // Code for  swagger in working stag
 
 // Route for displaying the login form
-// app.get('/loginDoc', (req, res) => {
-//   res.sendFile(__dirname + '/uploads/assets/index.html');
-// });
-// let isAuthenticated
-// // Handle login
-// app.post('/loginDoc', (req, res) => {
-//   const { username, password } = req.body;
-//   isAuthenticated = true;
-//   res.redirect('/api-docs');
-// });
-// // Middleware to check if the user is authenticated
-// function checkAuthentication(req, res, next) {
-//   if (isAuthenticated) {
-//     next();
-//   } else {
-//     res.redirect('/loginDoc');
-//   }
-// }
+app.get('/loginDoc', (req, res) => {
+  res.sendFile(__dirname + '/uploads/assets/index.html');
+});
+let isAuthenticated
+// Handle login
+app.post('/loginDoc',swaggerAccessManagement.devLogin );
+// Middleware to check if the user is authenticated
+function checkAuthentication(req, res, next) {
+  if (isAuthenticated) {
+    next();
+  } else {
+    res.redirect('/loginDoc');
+  }
+}
 
 // end
 app.use(
-  "/api-docs",
-  // checkAuthentication,
+  "/api-docs/:token",
+  checkDevAuthentication,
   swaggerUi.serve,
   swaggerUi.setup(swaggerDocumantion, swaggerConfig)
 );

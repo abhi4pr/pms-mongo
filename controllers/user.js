@@ -392,7 +392,7 @@ exports.updateUser = [upload1, async (req, res) => {
             return res.status(500).send({ success: false })
         }
         // Genreate a pdf file for offer later
-        if (editsim?.offer_later_status == true && (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== "") )) {
+        if (editsim?.offer_later_status == true || (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== "") )) {
             helper.generateOfferLaterPdf(editsim)
             } 
         return res.status(200).send({ success: true, data: editsim })
