@@ -9,7 +9,9 @@ exports.upload = multer({
 //Generate actual fileName with view functionality
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    if (file.fieldname === "Product_image") {
+    if (file.fieldname === "doc_image") {
+      cb(null, "./uploads/userDocuments");
+    } else if (file.fieldname === "Product_image") {
       cb(null, "./uploads/productImage");
     } else if (file.fieldname === "content_sec_file") {
       cb(null, "./uploads/contentSecFiles");
