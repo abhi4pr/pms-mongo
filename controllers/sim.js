@@ -5,7 +5,7 @@ const userModel = require('../models/userModel.js');
 exports.addSim = async (req, res) => {
     try {
         const simc = new simModel({
-            asset_id: req.body.sim_no,
+            sim_no: req.body.sim_no,
             Remarks: req.body.remark,
             created_by: req.body.created_by,
             status: req.body.status,
@@ -20,14 +20,14 @@ exports.addSim = async (req, res) => {
             dateOfPurchase: req.body.dateOfPurchase,
             selfAuditPeriod: req.body.selfAuditPeriod,
             selfAuditUnit: req.body.selfAuditUnit,
-            invoiceCopy: req.file.filename,
+            invoiceCopy: req.file?.filename,
             assetsValue: req.body.assetsValue,
             assetsCurrentValue: req.body.assetsCurrentValue
         })
         const simv = await simc.save();
         res.send({ simv, status: 200 });
     } catch (err) {
-        res.status(500).send({ error: err, sms: 'This sim cannot be created' })
+        res.status(500).send({ error: err.message, sms: 'This sim cannot be created' })
     }
 };
 
@@ -112,10 +112,11 @@ exports.addSim = async (req, res) => {
 
 exports.getSims = async (req, res) => {
     try {
+        const assetsImagesUrl = 'http://34.93.135.33:8080/uploads/'
         const simc = await simModel.aggregate([
             {
                 $lookup: {
-                    from: 'assetsCategorymodels',
+                    from: 'assetscategorymodels',
                     localField: 'category_id',
                     foreignField: 'category_id',
                     as: 'category'
@@ -129,7 +130,7 @@ exports.getSims = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: 'assetsSubCategorymodels',
+                    from: 'assetssubcategorymodels',
                     localField: 'sub_category_id',
                     foreignField: 'sub_category_id',
                     as: 'subcategory'
@@ -172,7 +173,8 @@ exports.getSims = async (req, res) => {
             {
                 $project: {
                     _id: "$_id",
-                    sim_no: "$sim_no",
+                    sim_id: "$sim_id",
+                    asset_id: "$sim_no",
                     status: "$status",
                     asset_type: "$s_type",
                     assetsName: "$assetsName",
@@ -185,13 +187,15 @@ exports.getSims = async (req, res) => {
                     dateOfPurchase: "$dateOfPurchase",
                     selfAuditPeriod: "$selfAuditPeriod",
                     selfAuditUnit: "$selfAuditUnit",
-                    invoiceCopy: "invoiceCopy",
+                    invoiceCopy: "$invoiceCopy",
                     assetsValue: "$assetsValue",
                     created_by: "$created_by",
                     assetsCurrentValue: "$assetsCurrentValue",
                     category_name: "$category.category_name",
-                    sub_category_name: "$category.sub_category_name",
+                    sub_category_name: "$subcategory.sub_category_name",
+                    vendor_name: "$vendor.vendor_name",
                     created_by_name: "$user.user_name",
+                    invoiceCopy_url: { $concat: [assetsImagesUrl, '$invoiceCopy'] },
                     date_difference: {
                         $cond: [
                             {
@@ -244,18 +248,7 @@ exports.getSingleSim = async (req, res) => {
 exports.editSim = async (req, res) => {
     try {
         const editsim = await simModel.findOneAndUpdate({ sim_id: req.body.id }, {
-            // sim_no: req.body.sim_no,
-            // provider: req.body.provider,
-            // Remarks: req.body.remark,
-            // created_by: req.body.created_by,
-            // status: req.body.status,
-            // register: req.body.register,
-            // mobileNumber: req.body.mobilenumber,
-            // s_type: req.body.s_type,
-            // desi: req.body.desi_id,
-            // dept: req.body.dept_id,
-            // type: req.body.type
-            asset_id: req.body.sim_no,
+            sim_no: req.body.sim_no,
             Remarks: req.body.remark,
             created_by: req.body.created_by,
             status: req.body.status,
@@ -279,7 +272,7 @@ exports.editSim = async (req, res) => {
         }
         res.status(200).send({ success: true, data: editsim })
     } catch (err) {
-        res.status(500).send({ error: err, sms: 'Error updating sim details' })
+        res.status(500).send({ error: err.message, sms: 'Error updating sim details' })
     }
 };
 

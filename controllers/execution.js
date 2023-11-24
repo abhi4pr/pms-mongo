@@ -392,12 +392,8 @@ const upload1 = multer({ dest: "uploads/" }).fields([
 
 exports.updateIPCountHistory = [upload1, async (req, res) => {
     try {
-        const existingIPCountHistory = await exeCountHisModel.findOne({ p_id: req.body.p_id });
-        if (!existingIPCountHistory) {
-            return res.status(404).send({ success: false, message: 'IPCountHistory not found' });
-        }
-
-        const editIPCountHistory = await exeCountHisModel.findOneAndUpdate({ p_id: req.body.p_id }, {
+       
+        const editIPCountHistory = await exeCountHisModel.findOneAndUpdate({ _id: req.body._id }, {
             reach: req.body.reach,
             impression: req.body.impression,
             engagement: req.body.engagement,
@@ -405,13 +401,13 @@ exports.updateIPCountHistory = [upload1, async (req, res) => {
             stats_for: req.body.stats_for,
             start_date: req.body.start_date,
             end_date: req.body.end_date,
-            media:req.files && req.files[' media'] && req.files[' media'][0] ? req.files[' media'][0].filename : (existingIPCountHistory && existingIPCountHistory. media) || '',
-            reach_impression_upload_image: req.files && req.files['reach_impression_upload_image'] && req.files['reach_impression_upload_image'][0] ? req.files['reach_impression_upload_image'][0].filename : (existingIPCountHistory && existingIPCountHistory.reach_impression_upload_image) || '',
-            engagement_upload_image: req.files && req.files[' engagement_upload_image'] && req.files[' engagement_upload_image'][0] ? req.files[' engagement_upload_image'][0].filename : (existingIPCountHistory && existingIPCountHistory. engagement_upload_image) || '',
-            story_view_upload_image: req.files && req.files['story_view_upload_image'] && req.files['story_view_upload_image'][0] ? req.files['story_view_upload_image'][0].filename : (existingIPCountHistory && existingIPCountHistory.story_view_upload_image) || '',
-            story_view_upload_video: req.files && req.files['story_view_upload_video'] && req.files['story_view_upload_video'][0] ? req.files['story_view_upload_video'][0].filename : (existingIPCountHistory && existingIPCountHistory.story_view_upload_video) || '',
-            city_image_upload: req.files && req.files['city_image_upload'] && req.files['city_image_upload'][0] ? req.files['city_image_upload'][0].filename : (existingIPCountHistory && existingIPCountHistory.city_image_upload) || '',
-            Age_upload: req.files && req.files['Age_upload'] && req.files['Age_upload'][0] ? req.files['Age_upload'][0].filename : (existingIPCountHistory && existingIPCountHistory.Age_upload) || '',
+            media:req.files && req.files['media'] && req.files['media'][0] ? req.files['media'][0].filename : '',
+            reach_impression_upload_image: req.files && req.files['reach_impression_upload_image'] && req.files['reach_impression_upload_image'][0] ? req.files['reach_impression_upload_image'][0].filename : '',
+            engagement_upload_image: req.files && req.files[' engagement_upload_image'] && req.files[' engagement_upload_image'][0] ? req.files[' engagement_upload_image'][0].filename :'',
+            story_view_upload_image: req.files && req.files['story_view_upload_image'] && req.files['story_view_upload_image'][0] ? req.files['story_view_upload_image'][0].filename : '',
+            story_view_upload_video: req.files && req.files['story_view_upload_video'] && req.files['story_view_upload_video'][0] ? req.files['story_view_upload_video'][0].filename : '',
+            city_image_upload: req.files && req.files['city_image_upload'] && req.files['city_image_upload'][0] ? req.files['city_image_upload'][0].filename : '',
+            Age_upload: req.files && req.files['Age_upload'] && req.files['Age_upload'][0] ? req.files['Age_upload'][0].filename : '',
             city1_name: req.body.city1_name,
             city2_name: req.body.city2_name,
             city3_name: req.body.city3_name,
@@ -443,7 +439,8 @@ exports.updateIPCountHistory = [upload1, async (req, res) => {
             percentage_country3_name: req.body.percentage_country3_name,
             percentage_country4_name: req.body.percentage_country4_name,
             percentage_country5_name: req.body.percentage_country5_name,
-            country_image_upload: req.files && req.files['country_image_upload'] && req.files['country_image_upload'][0] ? req.files['country_image_upload'][0].filename : (existingIPCountHistory && existingIPCountHistory.country_image_upload) || ''
+            country_image_upload: req.files && req.files['country_image_upload'] && req.files['country_image_upload'][0] ? req.files['country_image_upload'][0].filename : '',
+            stats_update_flag: true
         }, { new: true });
         if (!editIPCountHistory) {
             return res.status(500).send({ success: false })

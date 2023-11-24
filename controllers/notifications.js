@@ -19,7 +19,7 @@ exports.addNotification = async (req, res) =>{
 
 exports.getAllUnredenNotifications = async (req, res) => {
     try{
-        const simc = await notificationModel.find({readen: false});
+        const simc = await notificationModel.find({readen: false}).limit(5).sort({creation_date : -1});
         const count = simc.length;
 
         if(!simc){
