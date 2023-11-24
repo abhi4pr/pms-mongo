@@ -19,8 +19,33 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cors());
 app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use("/api", routes);
+
+// Code for  swagger in working stag
+
+// Route for displaying the login form
+// app.get('/loginDoc', (req, res) => {
+//   res.sendFile(__dirname + '/uploads/assets/index.html');
+// });
+// let isAuthenticated
+// // Handle login
+// app.post('/loginDoc', (req, res) => {
+//   const { username, password } = req.body;
+//   isAuthenticated = true;
+//   res.redirect('/api-docs');
+// });
+// // Middleware to check if the user is authenticated
+// function checkAuthentication(req, res, next) {
+//   if (isAuthenticated) {
+//     next();
+//   } else {
+//     res.redirect('/loginDoc');
+//   }
+// }
+
+// end
 app.use(
   "/api-docs",
+  // checkAuthentication,
   swaggerUi.serve,
   swaggerUi.setup(swaggerDocumantion, swaggerConfig)
 );

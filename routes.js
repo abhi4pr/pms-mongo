@@ -59,6 +59,7 @@ const coc = require("./controllers/cocManagement.js");
 const documentController = require("./controllers/document.js");
 const assetsImage = require("./controllers/assetsImage.js");
 const notification = require("./controllers/notifications.js");
+const userDocManagement = require("./controllers/userDocManagement.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -915,8 +916,15 @@ router.get("/get_single_crawler/:_id", insta.getSingleCrawler);
 
 /* notifications api */
 router.post("/add_notification", notification.addNotification);
+router.get("/get_all_unreden_notifications", notification.getAllUnredenNotifications);
 router.get("/get_all_notifications", notification.getAllNotifications);
-router.get("/update_notification", notification.editNotification);
-router.put("/delete_notification/:_id", notification.deleteNotification)
+router.put("/update_notification", notification.editNotification);
+router.delete("/delete_notification/:_id", notification.deleteNotification)
+/* user doc  */
+router.post("/add_user_doc",upload1.single("doc_image"), userDocManagement.addUserDoc);
+router.put("/update_user_doc",upload1.single("doc_image"), userDocManagement.editDoc);
+router.get("/get_user_doc/:id", userDocManagement.getUserDoc);
+router.get("/get_user_doc", userDocManagement.getUserDoc);
+router.delete("/delete_user_doc/:id", userDocManagement.deleteDoc);
 
 module.exports = router;

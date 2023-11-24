@@ -17,9 +17,22 @@ exports.addNotification = async (req, res) =>{
     }
 };
 
-exports.getAllNotifications = async (req, res) => {
+exports.getAllUnredenNotifications = async (req, res) => {
     try{
         const simc = await notificationModel.find({readen: false});
+        const count = simc.length;
+
+        if(!simc){
+            res.status(500).send({success:false})
+        }
+        res.status(200).send({data:simc})
+    } catch(err){
+        res.status(500).send({error:err.message, sms:'Error getting all notifications'})
+    }
+};
+exports.getAllNotifications = async (req, res) => {
+    try{
+        const simc = await notificationModel.find();
         const count = simc.length;
 
         if(!simc){
