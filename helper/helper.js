@@ -9,6 +9,7 @@ const designationModel = require("../models/designationModel.js");
 const userModel = require("../models/userModel.js");
 const attendanceModel = require("../models/attendanceModel.js");
 const { base_url } = require("../common/constant.js");
+const constant = require("../common/constant.js");
 
 module.exports = {
   generateOfferLaterPdf: async (empData) => {
@@ -33,9 +34,14 @@ module.exports = {
       const isJoiningDateExtended = empData.joining_date_extend !== null;
 
       // Generate Pdf file name
-      const pdfFileName = isJoiningDateExtended
+      let pdfFileName = isJoiningDateExtended
         ? `${empData?.user_name} Extend`
         : empData?.user_name;
+      let digitalSignature;
+      if (empData?.digital_signature_image) {
+        pdfFileName += " Signed";
+        digitalSignature = `${constant.base_url}/uploads/${empData?.digital_signature_image}`;
+      }
 
       // Formate Date
       const inputDate = new Date(startDate);
@@ -48,6 +54,16 @@ module.exports = {
         "en-IN",
         options
       ).format(empData?.offer_later_date);
+      let formattedOfferLaterAcceptanceDate;
+      if (
+        empData?.offer_later_acceptance_date &&
+        empData?.offer_later_acceptance_date !== ""
+      ) {
+        formattedOfferLaterAcceptanceDate = new Intl.DateTimeFormat(
+          "en-IN",
+          options
+        ).format(empData?.offer_later_acceptance_date);
+      }
 
       //Pass data into template
       const html = ejs.render(template, {
@@ -58,6 +74,8 @@ module.exports = {
         reportTo: reportToData?.user_name,
         startDate: formattedStartDate,
         ctc: empData?.ctc,
+        digitalSignature: digitalSignature ?? "",
+        offerLaterAcceptanceDate: formattedOfferLaterAcceptanceDate ?? "",
       });
 
       //Save pdf at mention path
