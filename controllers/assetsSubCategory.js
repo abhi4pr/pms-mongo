@@ -172,7 +172,7 @@ exports.getAssetSubCategoryFromCategoryId = async (req, res) => {
                         category_name: "$category.category_name",
                         sub_category_name: "$sub_category_name",
                         category_id: "$category_id",
-                        id: "$id",
+                        sub_category_id: "$sub_category_id",
                     },
                 },
             ])
