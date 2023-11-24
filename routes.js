@@ -109,13 +109,15 @@ router.post("/add_exe_pid_history",exe.addIPCountHistory);
 router.post("/exe_purchase_post",exe.exeForPurchase);
 router.get("/get_exe_ip_count_history/:p_id", exe.getExeIpCountHistory);
 router.delete("/delete_exe_ip_count_history/:_id", exe.deleteExeIpCountHistory);
+router.put("/edit_exe_ip_count_history", exe.updateIPCountHistory);
+router.post("/get_percentage", exe.getPercentage);
 
 
 /*sim api*/
 router.get("/get_all_sims",  sim.getSims); // done
-router.post("/add_sim",  sim.addSim);  //done
+router.post("/add_sim", upload.single("invoiceCopy"), sim.addSim);  //done
 router.get("/get_single_sim/:id",  sim.getSingleSim); // done
-router.put("/update_sim",  sim.editSim); //done
+router.put("/update_sim", upload.single("invoiceCopy"), sim.editSim); //done
 router.delete("/delete_sim/:id",  sim.deleteSim); //done
 router.post("/add_sim_allocation",  sim.addAllocation); //done
 router.get("/get_all_allocations",  sim.getAllocations);

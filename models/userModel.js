@@ -373,7 +373,7 @@ const userModel = new mongoose.Schema({
     current_pin_code: {
         type: Number,
         required: false,
-        default: 0
+        default: null
     },
     permanent_address: {
         type: String,
@@ -393,7 +393,7 @@ const userModel = new mongoose.Schema({
     permanent_pin_code: {
         type: Number,
         required: false,
-        default: 0
+        default: null
     },
     joining_date_extend: {
         type: Date,
@@ -534,12 +534,12 @@ const userModel = new mongoose.Schema({
     gaurdian_number :{
         type: Number,
         required: false,
-        default:0
+        default: null
     },
     emergency_contact:{
         type: Number,
         required: false,
-        default:0
+        default: null
     },
     ctc:{
         type: Number,

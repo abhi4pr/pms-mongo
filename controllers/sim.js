@@ -2,82 +2,208 @@ const simModel = require('../models/simModel.js');
 const simAlloModel = require('../models/simAlloModel.js')
 const userModel = require('../models/userModel.js');
 
-exports.addSim = async (req, res) =>{
-    try{
+exports.addSim = async (req, res) => {
+    try {
         const simc = new simModel({
-            sim_no: req.body.sim_no,
-            provider: req.body.provider,
+            asset_id: req.body.sim_no,
             Remarks: req.body.remark,
             created_by: req.body.created_by,
             status: req.body.status,
-            register: req.body.register,
-            mobileNumber: req.body.mobileNumber,
-            s_type: req.body.s_type,
-            desi: req.body.desi_id,
-            dept: req.body.dept_id,
-            type: req.body.type
+            asset_type: req.body.s_type,
+            assetsName: req.body.assetsName,
+            assetsOtherID: req.body.assetsOtherID,
+            category_id: req.body.category_id,
+            sub_category_id: req.body.sub_category_id,
+            vendor_id: req.body.vendor_id,
+            inWarranty: req.body.inWarranty,
+            warrantyDate: req.body.warrantyDate,
+            dateOfPurchase: req.body.dateOfPurchase,
+            selfAuditPeriod: req.body.selfAuditPeriod,
+            selfAuditUnit: req.body.selfAuditUnit,
+            invoiceCopy: req.file.filename,
+            assetsValue: req.body.assetsValue,
+            assetsCurrentValue: req.body.assetsCurrentValue
         })
         const simv = await simc.save();
-        res.send({simv,status:200});
-    } catch(err){
-        res.status(500).send({error:err,sms:'This sim cannot be created'})
+        res.send({ simv, status: 200 });
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'This sim cannot be created' })
     }
 };
 
+// exports.getSims = async (req, res) => {
+//     try{
+//         const simc = await simModel.aggregate([
+//             {
+//                 $lookup: {
+//                     from: 'departmentmodels',
+//                     localField: 'dept',
+//                     foreignField: 'dept_id',
+//                     as: 'department'
+//                 }
+//             },
+//             {
+//                 $unwind: '$department'
+//             },
+//             {
+//                 $lookup: {
+//                     from: 'designationmodels',
+//                     localField: 'desi',
+//                     foreignField: 'desi_id',
+//                     as: 'designation'
+//                 }
+//             },
+//             {
+//                 $unwind: '$designation'
+//             },
+//             {
+//                 $project: {
+//                     department_name: '$department.dept_name',
+//                     designation: '$designation.desi_name',
+//                     _id: "$_id",
+//                     sim_no: "$sim_no",
+//                     provider: "$provider",
+//                     Remarks: "$Remarks",
+//                     created_by: "$created_by",
+//                     status: "$status",
+//                     register: "$register",
+//                     mobileNumber: "$mobileNumber",
+//                     s_type: "$s_type",
+//                     desi: "$desi",
+//                     dept: "$dept",
+//                     sim_id: "$sim_id",
+//                     type: "$type",
+//                     date_difference: {
+//                         $cond: [
+//                           {
+//                             $and: [
+//                               { $eq: ["$status", "Allocated"] },
+//                               { $eq: ["$allocation.submitted_at", null] }
+//                             ]
+//                           },
+//                           {
+//                             $subtract: [new Date(), "$Last_updated_date"]
+//                           },
+//                           null
+//                         ]
+//                     }
+//                 }
+//             }
+//         ]).exec();
+
+//         const uniqueIds = new Set();
+//         const uniqueData = simc.filter(item => {
+//             const id = item._id.toString();
+//             if (!uniqueIds.has(id)) {
+//                 uniqueIds.add(id);
+//                 return true;
+//             }
+//             return false;
+//         });
+
+//         if(!simc){
+//             res.status(500).send({success:false})
+//         }
+//         res.status(200).send({data:uniqueData})
+//     } catch(err){
+//         res.status(500).send({error:err.message,sms:'Error getting all sim datas'})
+//     }
+// };
+
 exports.getSims = async (req, res) => {
-    try{
+    try {
         const simc = await simModel.aggregate([
             {
                 $lookup: {
-                    from: 'departmentmodels',
-                    localField: 'dept',
-                    foreignField: 'dept_id',
-                    as: 'department'
+                    from: 'assetsCategorymodels',
+                    localField: 'category_id',
+                    foreignField: 'category_id',
+                    as: 'category'
                 }
             },
             {
-                $unwind: '$department'
+                $unwind: {
+                    path: "$category",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $lookup: {
-                    from: 'designationmodels',
-                    localField: 'desi',
-                    foreignField: 'desi_id',
-                    as: 'designation'
+                    from: 'assetsSubCategorymodels',
+                    localField: 'sub_category_id',
+                    foreignField: 'sub_category_id',
+                    as: 'subcategory'
                 }
             },
             {
-                $unwind: '$designation'
+                $unwind: {
+                    path: "$subcategory",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'vendormodels',
+                    localField: 'vendor_id',
+                    foreignField: 'vendor_id',
+                    as: 'vendor'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$vendor",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'created_by',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $project: {
-                    department_name: '$department.dept_name',
-                    designation: '$designation.desi_name',
                     _id: "$_id",
                     sim_no: "$sim_no",
-                    provider: "$provider",
-                    Remarks: "$Remarks",
-                    created_by: "$created_by",
                     status: "$status",
-                    register: "$register",
-                    mobileNumber: "$mobileNumber",
-                    s_type: "$s_type",
-                    desi: "$desi",
-                    dept: "$dept",
-                    sim_id: "$sim_id",
-                    type: "$type",
+                    asset_type: "$s_type",
+                    assetsName: "$assetsName",
+                    assetsOtherID: "$assetsOtherID",
+                    category_id: "$category_id",
+                    sub_category_id: "$sub_category_id",
+                    vendor_id: "$vendor_id",
+                    inWarranty: "$inWarranty",
+                    warrantyDate: "$warrantyDate",
+                    dateOfPurchase: "$dateOfPurchase",
+                    selfAuditPeriod: "$selfAuditPeriod",
+                    selfAuditUnit: "$selfAuditUnit",
+                    invoiceCopy: "invoiceCopy",
+                    assetsValue: "$assetsValue",
+                    created_by: "$created_by",
+                    assetsCurrentValue: "$assetsCurrentValue",
+                    category_name: "$category.category_name",
+                    sub_category_name: "$category.sub_category_name",
+                    created_by_name: "$user.user_name",
                     date_difference: {
                         $cond: [
-                          {
-                            $and: [
-                              { $eq: ["$status", "Allocated"] },
-                              { $eq: ["$allocation.submitted_at", null] }
-                            ]
-                          },
-                          {
-                            $subtract: [new Date(), "$Last_updated_date"]
-                          },
-                          null
+                            {
+                                $and: [
+                                    { $eq: ["$status", "Allocated"] },
+                                    { $eq: ["$allocation.submitted_at", null] }
+                                ]
+                            },
+                            {
+                                $subtract: [new Date(), "$Last_updated_date"]
+                            },
+                            null
                         ]
                     }
                 }
@@ -94,65 +220,83 @@ exports.getSims = async (req, res) => {
             return false;
         });
 
-        if(!simc){
-            res.status(500).send({success:false})
+        if (!simc) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({data:uniqueData})
-    } catch(err){
-        res.status(500).send({error:err.message,sms:'Error getting all sim datas'})
+        res.status(200).send({ data: uniqueData })
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'Error getting all sim datas' })
     }
 };
 
 exports.getSingleSim = async (req, res) => {
-    try{
-        const singlesim = await simModel.findOne({sim_id:parseInt(req.params.id)});
-        if(!singlesim){
-            return res.status(500).send({success:false})
+    try {
+        const singlesim = await simModel.findOne({ sim_id: parseInt(req.params.id) });
+        if (!singlesim) {
+            return res.status(500).send({ success: false })
         }
-        res.status(200).send({data:singlesim});
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error getting sim details'})
+        res.status(200).send({ data: singlesim });
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error getting sim details' })
     }
 };
 
 exports.editSim = async (req, res) => {
-    try{
-        const editsim = await simModel.findOneAndUpdate({sim_id:req.body.id},{
-            sim_no: req.body.sim_no,
-            provider: req.body.provider,
+    try {
+        const editsim = await simModel.findOneAndUpdate({ sim_id: req.body.id }, {
+            // sim_no: req.body.sim_no,
+            // provider: req.body.provider,
+            // Remarks: req.body.remark,
+            // created_by: req.body.created_by,
+            // status: req.body.status,
+            // register: req.body.register,
+            // mobileNumber: req.body.mobilenumber,
+            // s_type: req.body.s_type,
+            // desi: req.body.desi_id,
+            // dept: req.body.dept_id,
+            // type: req.body.type
+            asset_id: req.body.sim_no,
             Remarks: req.body.remark,
             created_by: req.body.created_by,
             status: req.body.status,
-            register: req.body.register,
-            mobileNumber: req.body.mobilenumber,
-            s_type: req.body.s_type,
-            desi: req.body.desi_id,
-            dept: req.body.dept_id,
-            type: req.body.type
+            asset_type: req.body.s_type,
+            assetsName: req.body.assetsName,
+            assetsOtherID: req.body.assetsOtherID,
+            category_id: req.body.category_id,
+            sub_category_id: req.body.sub_category_id,
+            vendor_id: req.body.vendor_id,
+            inWarranty: req.body.inWarranty,
+            warrantyDate: req.body.warrantyDate,
+            dateOfPurchase: req.body.dateOfPurchase,
+            selfAuditPeriod: req.body.selfAuditPeriod,
+            selfAuditUnit: req.body.selfAuditUnit,
+            invoiceCopy: req.file?.filename,
+            assetsValue: req.body.assetsValue,
+            assetsCurrentValue: req.body.assetsCurrentValue
         }, { new: true })
-        if(!editsim){
-            res.status(500).send({success:false})
+        if (!editsim) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({success:true,data:editsim})
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error updating sim details'})
+        res.status(200).send({ success: true, data: editsim })
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error updating sim details' })
     }
 };
 
-exports.deleteSim = async (req, res) =>{
-    simModel.deleteOne({sim_id:req.params.id}).then(item =>{
-        if(item){
-            return res.status(200).json({success:true, message:'sim deleted'})
-        }else{
-            return res.status(404).json({success:false, message:'sim not found'})
+exports.deleteSim = async (req, res) => {
+    simModel.deleteOne({ sim_id: req.params.id }).then(item => {
+        if (item) {
+            return res.status(200).json({ success: true, message: 'sim deleted' })
+        } else {
+            return res.status(404).json({ success: false, message: 'sim not found' })
         }
-    }).catch(err=>{
-        return res.status(400).json({success:false, message:err})
+    }).catch(err => {
+        return res.status(400).json({ success: false, message: err })
     })
 };
 
-exports.addAllocation = async (req, res) =>{
-    try{
+exports.addAllocation = async (req, res) => {
+    try {
         const simc = new simAlloModel({
             user_id: req.body.user_id,
             sim_id: req.body.sim_id,
@@ -166,14 +310,14 @@ exports.addAllocation = async (req, res) =>{
             submitted_at: req.body.submitted_at
         })
         const simv = await simc.save();
-        res.send({simv,status:200});
-    } catch(err){
-        res.status(500).send({error:err,sms:'This sim cannot allocate'})
+        res.send({ simv, status: 200 });
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'This sim cannot allocate' })
     }
 };
 
 exports.getAllocations = async (req, res) => {
-    try{
+    try {
         const simc = await simAlloModel.aggregate([
             {
                 $lookup: {
@@ -228,10 +372,10 @@ exports.getAllocations = async (req, res) => {
             },
             {
                 $lookup: {
-                  from: "designationmodels",
-                  localField: "user.user_designation",
-                  foreignField: "desi_id",
-                  as: "designation"
+                    from: "designationmodels",
+                    localField: "user.user_designation",
+                    foreignField: "desi_id",
+                    as: "designation"
                 }
             },
             // {
@@ -268,20 +412,20 @@ exports.getAllocations = async (req, res) => {
                 }
             }
         ]).exec();
-        if(!simc){
-            res.status(500).send({success:false})
+        if (!simc) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({data:simc})
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error getting all sim allocatinos'})
+        res.status(200).send({ data: simc })
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error getting all sim allocatinos' })
     }
 };
 
 exports.getAllocationDataByAlloId = async (req, res) => {
-    try{
+    try {
         const simc = await simAlloModel.aggregate([
             {
-                $match:{ allo_id: parseInt(req.params.id)}
+                $match: { allo_id: parseInt(req.params.id) }
             },
             {
                 $lookup: {
@@ -327,18 +471,18 @@ exports.getAllocationDataByAlloId = async (req, res) => {
             }
         ]).exec();
 
-        if(!simc){
-            res.status(500).send({success:false})
+        if (!simc) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({data:simc[0]})
-    } catch(err){
-        res.status(500).send({error:err.message,sms:'Error getting all sim datas'})
+        res.status(200).send({ data: simc[0] })
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'Error getting all sim datas' })
     }
 };
 
 exports.editAllocation = async (req, res) => {
-    try{
-        const editsim = await simAlloModel.findOneAndUpdate({allo_id:req.body.allo_id},{
+    try {
+        const editsim = await simAlloModel.findOneAndUpdate({ allo_id: req.body.allo_id }, {
             user_id: req.body.user_id,
             sim_id: req.body.sim_id,
             Remarks: req.body.Remarks,
@@ -350,32 +494,32 @@ exports.editAllocation = async (req, res) => {
             deleted_status: req.body.deleted_status,
             submitted_at: req.body.submitted_at
         }, { new: true })
-        if(!editsim){
-            res.status(500).send({success:false})
+        if (!editsim) {
+            res.status(500).send({ success: false })
         }
-        res.status(200).send({success:true,data:editsim})
-    } catch(err){
-        res.status(500).send({error:err.message,sms:'Error updating sim allocation'})
+        res.status(200).send({ success: true, data: editsim })
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'Error updating sim allocation' })
     }
 };
 
-exports.deleteAllocation = async (req, res) =>{
-    simAlloModel.deleteOne(req.params.allo_id).then(item =>{
-        if(item){
-            return res.status(200).json({success:true, message:'sim allocation deleted'})
-        }else{
-            return res.status(404).json({success:false, message:'sim allocation not found'})
+exports.deleteAllocation = async (req, res) => {
+    simAlloModel.deleteOne(req.params.allo_id).then(item => {
+        if (item) {
+            return res.status(200).json({ success: true, message: 'sim allocation deleted' })
+        } else {
+            return res.status(404).json({ success: false, message: 'sim allocation not found' })
         }
-    }).catch(err=>{
-        return res.status(400).json({success:false, message:err})
+    }).catch(err => {
+        return res.status(400).json({ success: false, message: err })
     })
 };
 
 exports.getSimAllocationDataById = async (req, res) => {
-    try{
+    try {
         const simc = await simAlloModel.aggregate([
             {
-                $match:{sim_id:parseInt(req.params.id),deleted_status:0}
+                $match: { sim_id: parseInt(req.params.id), deleted_status: 0 }
             },
             {
                 $lookup: {
@@ -417,11 +561,11 @@ exports.getSimAllocationDataById = async (req, res) => {
                 }
             }
         ]).exec();
-        if(!simc){
-            res.status(500).send({success:false})
+        if (!simc) {
+            res.status(500).send({ success: false })
         }
         res.status(200).send(simc)
-    } catch(err){
-        res.status(500).send({error:err,sms:'Error getting all sim allocatinos'})
+    } catch (err) {
+        res.status(500).send({ error: err, sms: 'Error getting all sim allocatinos' })
     }
 };

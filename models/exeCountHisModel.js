@@ -181,6 +181,70 @@ const exeCountHisModel = new mongoose.Schema({
     type: String,
     required: false,
     default: ""
+  },
+  profile_visit:{
+    type: Number,
+    required: false,
+    default: 0
+  },
+  country1_name:{
+    type: String,
+    required: false,
+    default: ""
+  },
+  country2_name:{
+    type: String,
+    required: false,
+    default: ""
+  },
+  country3_name:{
+    type: String,
+    required: false,
+    default: ""
+  },
+  country4_name:{
+    type: String,
+    required: false,
+    default: ""
+  },
+  country5_name:{
+    type: String,
+    required: false,
+    default: ""
+  },
+  percentage_country1_name:{
+    type: Number,
+    required: false,
+    default: 0
+  },
+  percentage_country2_name:{
+    type: Number,
+    required: false,
+    default: 0
+  },
+  percentage_country3_name:{
+    type: Number,
+    required: false,
+    default: 0
+  },
+  percentage_country4_name:{
+    type: Number,
+    required: false,
+    default: 0
+  },
+  percentage_country5_name:{
+    type: Number,
+    required: false,
+    default: 0
+  },
+  country_image_upload:{
+    type: String,
+    required: false,
+    default: ""
+  },
+  stats_update_flag: {
+    type: Boolean,
+    default: false
   }
 
 });
