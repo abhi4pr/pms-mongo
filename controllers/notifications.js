@@ -25,7 +25,7 @@ exports.getAllNotifications = async (req, res) => {
         if(!simc){
             res.status(500).send({success:false})
         }
-        res.status(200).send({data:{...simc,count:count}})
+        res.status(200).send({data:simc})
     } catch(err){
         res.status(500).send({error:err.message, sms:'Error getting all notifications'})
     }
