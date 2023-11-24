@@ -314,7 +314,8 @@ const upload = multer({ dest: "uploads/" }).fields([
     { name: "story_view_upload_image", maxCount: 1 },
     { name: "story_view_upload_video", maxCount: 1 },
     { name: "city_image_upload", maxCount: 1 },
-    { name: "Age_upload", maxCount: 1 }
+    { name: "Age_upload", maxCount: 1 },
+    { name:"country_image_upload", maxCount: 1 }
 ]);
 
 exports.addIPCountHistory = [upload, async (req, res) => {
@@ -354,7 +355,20 @@ exports.addIPCountHistory = [upload, async (req, res) => {
             Age_45_54_percent: req.body.Age_45_54_percent,
             Age_55_64_percent: req.body.Age_55_64_percent,
             Age_65_plus_percent: req.body.Age_65_plus_percent,
-            quater: req.body.quater    
+            quater: req.body.quater,
+            profile_visit: req.body.profile_visit,
+            country1_name: req.body.country1_name,
+            country2_name: req.body.country2_name,
+            country3_name: req.body.country3_name,
+            country4_name: req.body.country4_name,
+            country5_name: req.body.country5_name,
+            percentage_country1_name: req.body.percentage_country1_name,
+            percentage_country2_name: req.body.percentage_country1_name,
+            percentage_country3_name: req.body.percentage_country3_name,
+            percentage_country4_name: req.body.percentage_country4_name,
+            percentage_country5_name: req.body.percentage_country5_name,
+            country_image_upload:req.files.country_image_upload ? req.files.country_image_upload[0].filename : '',
+            stats_update_flag: true
         })
         const simv = await simc.save();
     
@@ -362,6 +376,82 @@ exports.addIPCountHistory = [upload, async (req, res) => {
 
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'This asset Images data cannot be created' })
+    }
+}];
+
+const upload1 = multer({ dest: "uploads/" }).fields([
+    { name: "media", maxCount: 1 },
+    { name: "reach_impression_upload_image", maxCount: 1 },
+    { name: "engagement_upload_image", maxCount: 1 },
+    { name: "story_view_upload_image", maxCount: 1 },
+    { name: "story_view_upload_video", maxCount: 1 },
+    { name: "city_image_upload", maxCount: 1 },
+    { name: "Age_upload", maxCount: 1 },
+    { name:"country_image_upload", maxCount: 1 }
+]);
+
+exports.updateIPCountHistory = [upload1, async (req, res) => {
+    try {
+        const existingIPCountHistory = await exeCountHisModel.findOne({ p_id: req.body.p_id });
+        if (!existingIPCountHistory) {
+            return res.status(404).send({ success: false, message: 'IPCountHistory not found' });
+        }
+
+        const editIPCountHistory = await exeCountHisModel.findOneAndUpdate({ p_id: req.body.p_id }, {
+            reach: req.body.reach,
+            impression: req.body.impression,
+            engagement: req.body.engagement,
+            story_view: req.body.story_view,
+            stats_for: req.body.stats_for,
+            start_date: req.body.start_date,
+            end_date: req.body.end_date,
+            media:req.files.media ? req.files.media[0].filename : '',
+            reach_impression_upload_image: req.files && req.files['reach_impression_upload_image'] && req.files['reach_impression_upload_image'][0] ? req.files['reach_impression_upload_image'][0].filename : (existingIPCountHistory && existingIPCountHistory.reach_impression_upload_image) || '',
+            engagement_upload_image: req.files && req.files[' engagement_upload_image'] && req.files[' engagement_upload_image'][0] ? req.files[' engagement_upload_image'][0].filename : (existingIPCountHistory && existingIPCountHistory. engagement_upload_image) || '',
+            story_view_upload_image: req.files && req.files['story_view_upload_image'] && req.files['story_view_upload_image'][0] ? req.files['story_view_upload_image'][0].filename : (existingIPCountHistory && existingIPCountHistory.story_view_upload_image) || '',
+            story_view_upload_video: req.files && req.files['story_view_upload_video'] && req.files['story_view_upload_video'][0] ? req.files['story_view_upload_video'][0].filename : (existingIPCountHistory && existingIPCountHistory.story_view_upload_video) || '',
+            city_image_upload: req.files && req.files['city_image_upload'] && req.files['city_image_upload'][0] ? req.files['city_image_upload'][0].filename : (existingIPCountHistory && existingIPCountHistory.city_image_upload) || '',
+            Age_upload: req.files && req.files['Age_upload'] && req.files['Age_upload'][0] ? req.files['Age_upload'][0].filename : (existingIPCountHistory && existingIPCountHistory.Age_upload) || '',
+            city1_name: req.body.city1_name,
+            city2_name: req.body.city2_name,
+            city3_name: req.body.city3_name,
+            city4_name: req.body.city4_name,
+            city5_name: req.body.city5_name,
+            percentage_city1_name: req.body.percentage_city1_name,
+            percentage_city2_name: req.body.percentage_city1_name,
+            percentage_city3_name: req.body.percentage_city3_name,
+            percentage_city4_name: req.body.percentage_city4_name,
+            percentage_city5_name: req.body.percentage_city5_name,
+            male_percent: req.body.male_percent,
+            female_percent: req.body.female_percent,
+            Age_13_17_percent: req.body.Age_13_17_percent,
+            Age_18_24_percent: req.body.Age_18_24_percent,
+            Age_25_34_percent: req.body.Age_25_34_percent,
+            Age_35_44_percent: req.body.Age_35_44_percent,
+            Age_45_54_percent: req.body.Age_45_54_percent,
+            Age_55_64_percent: req.body.Age_55_64_percent,
+            Age_65_plus_percent: req.body.Age_65_plus_percent,
+            quater: req.body.quater,
+            profile_visit: req.body.profile_visit,
+            country1_name: req.body.country1_name,
+            country2_name: req.body.country2_name,
+            country3_name: req.body.country3_name,
+            country4_name: req.body.country4_name,
+            country5_name: req.body.country5_name,
+            percentage_country1_name: req.body.percentage_country1_name,
+            percentage_country2_name: req.body.percentage_country1_name,
+            percentage_country3_name: req.body.percentage_country3_name,
+            percentage_country4_name: req.body.percentage_country4_name,
+            percentage_country5_name: req.body.percentage_country5_name,
+            country_image_upload: req.files && req.files['country_image_upload'] && req.files['country_image_upload'][0] ? req.files['country_image_upload'][0].filename : (existingIPCountHistory && existingIPCountHistory.country_image_upload) || ''
+        }, { new: true });
+        if (!editIPCountHistory) {
+            return res.status(500).send({ success: false })
+        }
+
+        return res.status(200).send({ success: true, data: editIPCountHistory })
+    } catch (err) {
+        return res.status(500).send({ error: err.message, sms: 'Error updating user details' })
     }
 }];
 
@@ -416,7 +506,7 @@ exports.exeForPurchase = async (req, res) => {
 
 exports.getExeIpCountHistory = async (req, res) => {
     try {
-        const cocData = await exeCountHisModel.find({p_id: req.params.p_id}).lean();
+        const cocData = await exeCountHisModel.find({p_id: req.params.p_id , stats_update_flag : true}).lean();
         const exeImagesBaseUrl = "http://34.93.135.33:8080/uploads/";
         const dataWithImageUrl = cocData.map((exe) => ({
             ...exe,
@@ -426,7 +516,8 @@ exports.getExeIpCountHistory = async (req, res) => {
             story_view_upload_image_url: exe.story_view_upload_image ? exeImagesBaseUrl + exe.story_view_upload_image : null,
             story_view_upload_video_url: exe.story_view_upload_video ? exeImagesBaseUrl + exe.story_view_upload_video : null,
             city_image_upload_url: exe.city_image_upload ? exeImagesBaseUrl + exe.city_image_upload : null,
-            Age_upload_url: exe.Age_upload ? exeImagesBaseUrl + exe.Age_upload : null
+            Age_upload_url: exe.Age_upload ? exeImagesBaseUrl + exe.Age_upload : null,
+            country_image_upload_url: exe.country_image_upload ? exeImagesBaseUrl + exe.country_image_upload : null
         }));
         if (dataWithImageUrl?.length === 0) {
             res
@@ -458,3 +549,89 @@ exports.deleteExeIpCountHistory = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
       }
 }
+
+
+exports.getPercentage = async (req, res) => {
+    try {
+      const latestEntry = await exeCountHisModel
+        .findOne({
+          p_id: parseInt(req.body.p_id),
+        })
+        .sort({ creation_date: -1 })
+        .exec();
+  
+      if (latestEntry) {
+        let count = 0;
+        const relevantFields = [
+            'reach',
+            'impression',
+            'engagement',
+            'story_view',
+            'stats_for',
+            'start_date',
+            'end_date',
+            'media',
+            'creation_date',
+            'isDeleted',
+            'reach_impression_upload_image',
+            'engagement_upload_image',
+            'story_view_upload_image',
+            'story_view_upload_video',
+            'city1_name',
+            'city2_name',
+            'city3_name',
+            'city4_name',
+            'city5_name',
+            'percentage_city1_name',
+            'percentage_city2_name',
+            'percentage_city3_name',
+            'percentage_city4_name',
+            'percentage_city5_name',
+            'city_image_upload',
+            'male_percent',
+            'female_percent',
+            'Age_13_17_percent',
+            'Age_upload',
+            'Age_18_24_percent',
+            'Age_25_34_percent',
+            'Age_35_44_percent',
+            'Age_45_54_percent',
+            'Age_55_64_percent',
+            'Age_65_plus_percent',
+            'quater',
+            'profile_visit',
+            'country1_name',
+            'country2_name',
+            'country3_name',
+            'country4_name',
+            'country5_name',
+            'percentage_country1_name',
+            'percentage_country2_name',
+            'percentage_country3_name',
+            'percentage_country4_name',
+            'percentage_country5_name',
+            'country_image_upload',
+            'stats_update_flag'
+        ];
+  
+        for (const field of relevantFields) {
+          if (
+            latestEntry[field] !== null &&
+            latestEntry[field] !== '' &&
+            latestEntry[field] !== 0
+          ) {
+            count++;
+          }
+        }
+
+        const totalPercentage = (count/50)*100; 
+        res.status(200).send({ latestEntry, totalPercentage: totalPercentage });
+      } else {
+        res.status(404).json({ message: 'Latest Entry not found' });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
+  

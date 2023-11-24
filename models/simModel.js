@@ -12,10 +12,6 @@ const simModel = new mongoose.Schema({
         required: true,
         unique: true
     },
-    provider: {
-        type: String,
-        required: true
-    },
     Remarks: {
         type: String,
         required: false,
@@ -29,40 +25,20 @@ const simModel = new mongoose.Schema({
         type: String,
         default: "",
     },
-    register: {
-        type: String,
-        default: ""
-    },
-    mobileNumber: {
-        type: Number,
-        required: true,
-        unique: true
-    },
-    type: {
-        type: String,
-        required: false,
-        default: ""
-    },
     s_type: {
         type: String,
         required: false,
         default: ""
     },
-    Creation_date: {
-        type: Date,
-        default: Date.now
+    assetsName: {
+        type: String,
+        required: false,
+        default: ""
     },
-    Last_updated_date:{
-        type: Date,
-        default: Date.now
-    },
-    desi: {
+    assetsOtherID: {
         type: Number,
-        required: true
-    },
-    dept: {
-        type: Number,
-        required: true
+        required: false,
+        default : 0
     },
     category_id: {
         type: Number,
@@ -93,7 +69,45 @@ const simModel = new mongoose.Schema({
         type: String,
         required: false,
         default: ""
-    }
+    },
+    selfAuditUnit: {
+        type: String,
+        required: false,
+        default:""
+    },
+    hrAuditPeriod: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    hrAuditUnit: {
+        type: String,
+        required: false,
+        default:""
+    },
+    invoiceCopy:{
+        type: String,
+        required: false,
+        default:""
+    },
+    assetsValue: {
+        type: Number,
+        required: false,
+        default:0
+    },
+    assetsCurrentValue: {
+        type: Number,
+        required: false,
+        default:0
+    },
+    Creation_date: {
+        type: Date,
+        default: Date.now
+    },
+    Last_updated_date:{
+        type: Date,
+        default: Date.now
+    },
 });
 
 AutoIncrement.initialize(mongoose.connection);
