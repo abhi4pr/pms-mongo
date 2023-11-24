@@ -878,6 +878,7 @@ router.get("/get_all_asset_sub_category", assetSubCategory.getAssetSubCategorys)
 router.get("/get_single_asset_sub_category/:sub_category_id",  assetSubCategory.getSingleAssetSubCategory);
 router.put("/update_asset_sub_category",  assetSubCategory.editAssetSubCategory);
 router.delete("/delete_asset_sub_category/:sub_category_id",  assetSubCategory.deleteAssetSubCategory);
+router.get("/get_sub_category_from_categroyid/:category_id",assetSubCategory.getAssetSubCategoryFromCategoryId);
 
 /* Vendor Routes */
 router.post("/add_vendor",  vendor.addVendor);

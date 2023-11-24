@@ -42,7 +42,7 @@ exports.getAssetSubCategorys = async (req, res) => {
                     $project: {
                         _id: 1,
                         category_name: "$category.category_name",
-                        sub_category_id:"$sub_category_id",
+                        sub_category_id: "$sub_category_id",
                         sub_category_name: "$sub_category_name",
                         remark: "$remark",
                         created_by: "$created_by",
@@ -50,7 +50,7 @@ exports.getAssetSubCategorys = async (req, res) => {
                         last_updated_by: "$last_updated_by",
                         last_updated_at: "$last_updated_at",
                         category_id: "$category_id",
-                        description:"$description"
+                        description: "$description"
                     },
                 },
             ])
@@ -86,13 +86,13 @@ exports.getSingleAssetSubCategory = async (req, res) => {
                     $project: {
                         _id: 1,
                         category_name: "$category.dept_name",
-                        sub_category_id:"$sub_category_id",
+                        sub_category_id: "$sub_category_id",
                         sub_category_name: "$sub_category_name",
                         category_id: "$category_id",
                         id: "$id",
                         created_by: "$created_by",
                         last_updated_by: "$last_updated_by",
-                        description:"$description"
+                        description: "$description"
                     },
                 },
             ])
@@ -143,4 +143,42 @@ exports.deleteAssetSubCategory = async (req, res) => {
     }).catch(err => {
         return res.status(400).json({ success: false, message: err.message })
     })
+};
+
+exports.getAssetSubCategoryFromCategoryId = async (req, res) => {
+    try {
+        const singlesim = await assetsSubCategoryModel
+            .aggregate([
+                {
+                    $match: { category_id: parseInt(req.params.category_id) },
+                },
+                {
+                    $lookup: {
+                        from: "assetscategorymodels",
+                        localField: "category_id",
+                        foreignField: "category_id",
+                        as: "category",
+                    },
+                },
+                {
+                    $unwind: {
+                        path: "$category",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        category_name: "$category.category_name",
+                        sub_category_name: "$sub_category_name",
+                        category_id: "$category_id",
+                        id: "$id",
+                    },
+                },
+            ])
+            .exec();
+        return res.status(200).send(singlesim);
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
 };
