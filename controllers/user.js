@@ -9,6 +9,7 @@ const reasonModel = require('../models/reasonModel.js');
 const separationModel = require('../models/separationModel.js');
 const attendanceModel = require('../models/attendanceModel.js');
 const userLoginHisModel = require('../models/userLoginHisModel.js')
+const notificationModel = require('../models/notificationModel.js')
 const objModel = require('../models/objModel.js');
 const constant = require('../common/constant.js');
 const response = require("../common/response");
@@ -1010,7 +1011,7 @@ exports.loginUser = async (req, res) => {
                     dept_id: '$dept_id',
                     role_id: '$role_id',
                     id: "$user_id",
-                    name: "$user_name",
+                    // name: "$user_name",
                     // email: "$user_email_id",
                     // sitting_id: '$sitting_id',
                     room_id: '$room_id',
@@ -1056,13 +1057,19 @@ exports.loginUser = async (req, res) => {
                     user_email_id: simc[0].email || simc[0].user_login_id
                 };
                 await userLoginHisModel.create(saveDataObj);
-                // if(simc[0].first_login_flag == false){
-                //     await userModel.findOneAndUpdate({ user_login_id: req.body.user_login_id.toLowerCase().trim() }, {
-                //         first_login_flag: true,
-                //         notify_hr: true,
-                //         first_login_time: formattedDateTime
-                //     });
-                // }
+                if(simc[0].first_login_flag == false){
+                    await userModel.findOneAndUpdate({ user_login_id: req.body.user_login_id.toLowerCase().trim() }, {
+                        first_login_flag: true,
+                        first_login_time: formattedDateTime
+                    });
+                    const sms = new notificationModel({
+                        user_id: simc[0].id,
+                        notification_title: "New Candidate has been logged in",
+                        notification_message: `${simc[0].name} has been loggedin on ${formattedDateTime}`,
+                        created_by: simc[0].id
+                    })
+                    await sms.save();
+                }
             }
 
             return res.status(200).send({ token, user: simc[0] })

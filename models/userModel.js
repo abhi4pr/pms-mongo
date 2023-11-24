@@ -590,6 +590,16 @@ const userModel = new mongoose.Schema({
         type: String,
         required: false,
         default:""
+    },
+    first_login_flag: {
+        type: Number,
+        required: false,
+        default: false
+    },
+    sms_time:{
+        type: Date,
+        required: false,
+        default: ""
     }
 });
 

@@ -405,7 +405,7 @@ exports.updateIPCountHistory = [upload1, async (req, res) => {
             stats_for: req.body.stats_for,
             start_date: req.body.start_date,
             end_date: req.body.end_date,
-            media:req.files.media ? req.files.media[0].filename : '',
+            media:req.files && req.files[' media'] && req.files[' media'][0] ? req.files[' media'][0].filename : (existingIPCountHistory && existingIPCountHistory. media) || '',
             reach_impression_upload_image: req.files && req.files['reach_impression_upload_image'] && req.files['reach_impression_upload_image'][0] ? req.files['reach_impression_upload_image'][0].filename : (existingIPCountHistory && existingIPCountHistory.reach_impression_upload_image) || '',
             engagement_upload_image: req.files && req.files[' engagement_upload_image'] && req.files[' engagement_upload_image'][0] ? req.files[' engagement_upload_image'][0].filename : (existingIPCountHistory && existingIPCountHistory. engagement_upload_image) || '',
             story_view_upload_image: req.files && req.files['story_view_upload_image'] && req.files['story_view_upload_image'][0] ? req.files['story_view_upload_image'][0].filename : (existingIPCountHistory && existingIPCountHistory.story_view_upload_image) || '',
