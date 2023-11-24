@@ -10,6 +10,10 @@ const notificationModel = new mongoose.Schema({
     type: String,
     required: true
   },
+  notification_message: {
+    type: String,
+    required: true
+  },
   notification_show: {
     type: Boolean,
     required: false,

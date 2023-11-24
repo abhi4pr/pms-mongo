@@ -58,6 +58,7 @@ const vendor = require("./controllers/vendor.js");
 const coc = require("./controllers/cocManagement.js");
 const documentController = require("./controllers/document.js");
 const assetsImage = require("./controllers/assetsImage.js");
+const notification = require("./controllers/notifications.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -909,5 +910,11 @@ router.post("/add_crawler_count", insta.addCrawlerCount);
 router.put("/update_crawler_count", insta.editCrawlerCount);
 router.get("/get_all_crawlers", insta.getAllCrawler);
 router.get("/get_single_crawler/:_id", insta.getSingleCrawler);
+
+/* notifications api */
+router.post("/add_notification", notification.addNotification);
+router.get("/get_all_notifications", notification.getAllNotifications);
+router.get("/update_notification", notification.editNotification);
+router.put("/delete_notification/:_id", notification.deleteNotification)
 
 module.exports = router;
