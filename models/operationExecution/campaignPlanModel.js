@@ -18,6 +18,10 @@ const campaignPlanSchema = new mongoose.Schema({
         type:String,
         required:[true,'post per page is required']
     },
+    postRemaining:{
+        type:String,
+        default:this.postPerPage
+    },  
     campaignName:{
         type:String,
         required:[true,"campign name is required"]

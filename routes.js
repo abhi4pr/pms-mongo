@@ -70,6 +70,7 @@ router.get("/", (req, res) => {
 
 /*operation+execution api*/
   router.post('/campaignplan',campaignPlanController.createPlan)
+  router.get('/campaignplan/:id',campaignPlanController.getPlan)
 /*insta api*/
 router.post("/image_to_text", insta.imageToText)
 router.post("/get_dynamic_key_value", insta.getDynamicReqAndResInstaP)
@@ -256,6 +257,7 @@ router.post(
 router.get("/register_campaign", registerCampaign.getRegisterCampaigns);
 router.put("/register_campaign",  upload.single("excel_file"), registerCampaign.editRegisterCampaign);
 router.delete("/register_campaign/:id", registerCampaign.deleteRegisterCmp);
+router.get("/register_campaign/:id", registerCampaign.getSingleRegisterCampign);
 
 //Hash Tag
 router.post("/hash_tag",  hashTag.addHashTag);
