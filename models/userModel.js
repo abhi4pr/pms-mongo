@@ -13,11 +13,13 @@ const userModel = new mongoose.Schema({
     user_email_id:{
         type: String,
         required: false,
+        unique: true,
         default: ""
     },
     user_login_id:{
         type: String,
         required: false,
+        unique: true,
         default: ""
     },
     user_login_password:{
@@ -39,6 +41,7 @@ const userModel = new mongoose.Schema({
     user_contact_no:{
         type: Number,
         required: false,
+        unique: true,
         default: 0
     },
     dept_id:{
@@ -74,6 +77,7 @@ const userModel = new mongoose.Schema({
     PersonalNumber:{
         type: Number,
         required: false,
+        unique: true,
         default: 0
     },
     Report_L1:{
@@ -94,6 +98,7 @@ const userModel = new mongoose.Schema({
     PersonalEmail:{
         type: String,
         required: false,
+        unique: true,
         default: ""
     },
     joining_date:{

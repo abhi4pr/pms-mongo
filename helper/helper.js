@@ -10,6 +10,7 @@ const userModel = require("../models/userModel.js");
 const attendanceModel = require("../models/attendanceModel.js");
 const { base_url } = require("../common/constant.js");
 const constant = require("../common/constant.js");
+const notificationModel = require("../models/notificationModel.js");
 
 module.exports = {
   generateOfferLaterPdf: async (empData) => {
@@ -41,6 +42,14 @@ module.exports = {
       if (empData?.digital_signature_image) {
         pdfFileName += " Signed";
         digitalSignature = `${constant.base_url}/uploads/${empData?.digital_signature_image}`;
+        
+        const sms = new notificationModel({
+            user_id: simc[0].id,
+            notification_title: "Candidate has accepted offer letter",
+            notification_message: `${simc[0].name} has been loggedin on ${formattedDateTime}`,
+            created_by: simc[0].id
+        })
+        await sms.save();
       }
 
       // Formate Date
