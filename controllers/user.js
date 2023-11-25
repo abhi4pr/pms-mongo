@@ -13,10 +13,12 @@ const notificationModel = require('../models/notificationModel.js')
 const objModel = require('../models/objModel.js');
 const constant = require('../common/constant.js');
 const response = require("../common/response");
+const documentModel = require("../models/documentModel");
 const bcrypt = require("bcrypt");
 const fs = require("fs");
 const ejs = require('ejs');
 const nodemailer = require("nodemailer");
+const userDocManagmentModel = require("../models/userDocManagementModel.js");
 const sendMail = require("../common/sendMail.js");
 const helper = require('../helper/helper.js');
 
@@ -164,7 +166,18 @@ exports.addUser = [upload, async (req, res) => {
 
         // Genreate a pdf file for offer later
         if (simv?.offer_letter_send) {
-          helper.generateOfferLaterPdf(simv)
+          helper.generateOfferLaterPdf(simv);
+
+        //Generate documents for respective user id
+        const docs = await documentModel.find();
+        if(docs.length !== 0){
+            const newDocuments = docs.map(item => ({
+                doc_id: item._id,
+                user_id: simv?.user_id,
+            }));
+            await userDocManagmentModel.insertMany(newDocuments);
+        }
+        //End Generate documents for respective user id
         } 
 
         const joining = simv.joining_date;

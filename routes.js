@@ -932,8 +932,8 @@ router.delete("/delete_notification/:_id", notification.deleteNotification)
 /* user doc  */
 router.post("/add_user_doc",upload1.single("doc_image"), userDocManagement.addUserDoc);
 router.put("/update_user_doc",upload1.single("doc_image"), userDocManagement.editDoc);
-router.get("/get_user_doc/:id", userDocManagement.getUserDoc);
-router.get("/get_user_doc", userDocManagement.getUserDoc);
+// router.post("/get_user_doc/:id", userDocManagement.getUserDoc);
+router.post("/get_user_doc", userDocManagement.getUserDoc);
 router.delete("/delete_user_doc/:id", userDocManagement.deleteDoc);
 
 //Swagger Route
