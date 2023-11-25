@@ -491,15 +491,14 @@ exports.exeForPurchase = async (req, res) => {
     }
 }
 
-// exports.getExeIpCountHistory = async (req, res) => {
-//     try {
-//         const cocData = await exeCountHisModel.find({p_id: req.params.p_id});
-//         console.log("data",cocData);
-//         res.status(200).send({data:cocData})
-//     } catch (error) {
-//         res.status(500).send({error:error.message, sms:'error getting stats history for this page'})
-//     }
-// }
+exports.getAllExeHistory = async (req, res) => {
+    try {
+        const cocData = await exeSum.find({});
+        res.status(200).send({data:cocData})
+    } catch (error) {
+        res.status(500).send({error:error.message, sms:'error getting all data of exe summary'})
+    }
+}
 
 exports.getExeIpCountHistory = async (req, res) => {
     try {
@@ -567,9 +566,6 @@ exports.getPercentage = async (req, res) => {
             'stats_for',
             'start_date',
             'end_date',
-            'media',
-            'creation_date',
-            'isDeleted',
             'reach_impression_upload_image',
             'engagement_upload_image',
             'story_view_upload_image',
@@ -607,8 +603,7 @@ exports.getPercentage = async (req, res) => {
             'percentage_country3_name',
             'percentage_country4_name',
             'percentage_country5_name',
-            'country_image_upload',
-            'stats_update_flag'
+            'country_image_upload'
         ];
   
         for (const field of relevantFields) {
@@ -621,7 +616,7 @@ exports.getPercentage = async (req, res) => {
           }
         }
 
-        const totalPercentage = (count/50)*100; 
+        const totalPercentage = (count/45)*100; 
         res.status(200).send({ latestEntry, totalPercentage: totalPercentage });
       } else {
         res.status(404).json({ message: 'Latest Entry not found' });
@@ -632,3 +627,16 @@ exports.getPercentage = async (req, res) => {
     }
   };
   
+exports.getStatUpdateFlag = async (req, res) => {
+    try {
+      const latestEntry = await exeCountHisModel.findOne({ p_id: req.params.p_id, isDeleted:false }).sort({ creation_date: -1 }).exec();
+  
+      if (latestEntry) {
+        res.status(200).send({ latestEntry });
+      } else {
+        res.status(404).json({ message: 'Latest Entry not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ error:error.message, message: 'Internal Server Error' });
+    }
+};

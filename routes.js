@@ -119,7 +119,8 @@ router.get("/get_exe_ip_count_history/:p_id", exe.getExeIpCountHistory);
 router.delete("/delete_exe_ip_count_history/:_id", exe.deleteExeIpCountHistory);
 router.put("/edit_exe_ip_count_history", exe.updateIPCountHistory);
 router.post("/get_percentage", exe.getPercentage);
-
+router.get("/get_all_exe_ip_history", exe.getAllExeHistory)
+router.get("/get_stats_update_flag/:p_id", exe.getStatUpdateFlag);
 
 /*sim api*/
 router.get("/get_all_sims",  sim.getSims); // done
