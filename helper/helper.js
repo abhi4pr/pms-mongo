@@ -44,10 +44,10 @@ module.exports = {
         digitalSignature = `${constant.base_url}/uploads/${empData?.digital_signature_image}`;
         
         const sms = new notificationModel({
-            user_id: simc[0].id,
+            user_id: empData?.user_id,
             notification_title: "Candidate has accepted offer letter",
-            notification_message: `${simc[0].name} has been loggedin on ${formattedDateTime}`,
-            created_by: simc[0].id
+            notification_message: `${empData?.user_name} has been loggedin on ${formattedDateTime}`,
+            created_by: empData?.created_by
         })
         await sms.save();
       }

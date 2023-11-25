@@ -14,7 +14,7 @@ exports.checkDevAuthentication = async(req, res, next) => {
     if (error) {
       if (error.name === "TokenExpiredError") {
         // await 
-        return res.redirect("/loginDoc");
+        return res.redirect("/doc-login");
       }
       return res.status(200).json({ Message: "TOKEN UNAUTHORIZED" });
     }

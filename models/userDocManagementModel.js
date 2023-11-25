@@ -14,8 +14,8 @@ const userDocSchema = new mongoose.Schema({
     default: "",
   },
   doc_id: {
-    type: String,
-    default: "",
+    type: mongoose.Types.ObjectId,
+    ref: "documentModel",
   },
   doc_image: {
     type: String,

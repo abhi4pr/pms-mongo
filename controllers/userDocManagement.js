@@ -45,9 +45,31 @@ exports.addUserDoc = async (req, res) => {
 
 exports.getUserDoc = async (req, res) => {
   try {
-    let userDocId = req.params?.id;
+    let userDocId = req.body?._id;
+    let user_id = req.body?.user_id;
+    let matchCondition = {};
 
-    let aggregationPipeline = [
+    if (user_id) {
+      matchCondition.user_id = parseInt(user_id);
+    }
+    if (userDocId) {
+      matchCondition._id = mongoose.Types.ObjectId(userDocId);
+    }
+    let docs = await userDocManagmentModel.aggregate([
+      {
+        $match: matchCondition,
+      },
+      {
+        $lookup: {
+          from: "documentmodels",
+          localField: "doc_id",
+          foreignField: "_id",
+          as: "document",
+        },
+      },
+      {
+        $unwind: "$document",
+      },
       {
         $addFields: {
           doc_image_url: {
@@ -64,15 +86,7 @@ exports.getUserDoc = async (req, res) => {
           },
         },
       },
-    ];
-
-    if (userDocId) {
-      aggregationPipeline.unshift({
-        $match: { _id: mongoose.Types.ObjectId(userDocId) },
-      });
-    }
-
-    let docs = await userDocManagmentModel.aggregate(aggregationPipeline);
+    ]);
 
     if (docs?.length === 0) {
       return response.returnFalse(200, req, res, "No record found", []);
