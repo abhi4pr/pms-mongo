@@ -97,6 +97,66 @@
       .checkDevelopers {
         cursor: pointer;
       }
+
+      .user-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .user-table th,
+      .user-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      .user-table th {
+        background-color: #f4f4f4;
+      }
+
+      .action-buttons button {
+        padding: 5px 10px;
+        margin-right: 5px;
+        border-radius: 4px;
+        border: none;
+        background-color: #4caf50;
+        color: white;
+        cursor: pointer;
+      }
+
+      .action-buttons button:hover {
+        background-color: #45a049;
+      }
+
+      .cardInner {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .table-container {
+        overflow-x: auto; /* Enable horizontal scrolling */
+        margin-bottom: 20px; /* Add some space below the table */
+      }
+
+      .user-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .user-table th,
+      .user-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      .user-table th {
+        background-color: #f4f4f4;
+      }
       .checkDevelopers {
         /* Base styling */
         display: inline-block;
@@ -129,84 +189,12 @@
         transform: scale(0.95);
       }
 
-      /* Sidebar Styling */
-      .sidebar {
-        width: 250px;
-        background-color: #343a40;
-        color: white;
-        height: 100vh;
-        position: fixed;
-        left: 0;
-        top: 0;
-        padding: 20px;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-      }
 
-      /* Logo Styling */
-      .sidebar-logo {
-        text-align: center;
-        margin-bottom: 30px;
-        padding: 10px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .sidebar-logo img {
-        max-width: 100%;
-        height: auto;
-        transition: transform 0.3s ease;
-      }
-
-      .sidebar-logo img:hover {
-        transform: scale(1.1);
-      }
-
-      /* Link Styling */
-      .checkDevelopers {
-        display: block;
-        padding: 10px 20px;
-        margin: 10px 0;
-        text-decoration: none;
-        color: #fff;
-        background-color: transparent;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-        font-weight: bold;
-      }
-
-      .checkDevelopers:hover {
-        background-color: #007bff;
-        color: #ffffff;
-        transform: translateX(10px);
-      }
-
-      /* Responsive adjustments */
-      @media (max-width: 768px) {
-        .sidebar {
-          width: 100%;
-          height: auto;
-          position: relative;
-          box-shadow: none;
-        }
-
-        .checkDevelopers:hover {
-          transform: none;
-        }
-        .main-content {
-    margin-left: 250px; /* Same as the sidebar width */
-    padding: 20px;
-    overflow: auto; /* In case the content is too wide */
-}
-
-@media (max-width: 768px) {
-    .main-content {
-        margin-left: 0; /* Sidebar becomes a top bar on smaller screens */
-    }
-}
-      }
     </style>
   </head>
   <body>
     <div class="sidebar">
+      <!-- Sidebar content -->
       <div class="sidebar-logo">
         <img src="/uploads/assets/logo-light.png" alt="Logo" />
       </div>
@@ -214,18 +202,19 @@
       <a href="/doc-access" class="checkDevelopers"> Add Developer </a>
       <a href="/doc-user" class="checkDevelopers"> Developers List </a>
     </div>
-    <div class="main-content">
+    <div class="main">
       <div class="header">
-        <h1>User Management</h1>
+        <h1>Developer Management</h1>
       </div>
+     
       <div class="card">
-        <!-- User table from previous example -->
         <div class="form-container">
-          <form>
+          <form action="/add-developer" method="post">
             <div class="form-field">
               <label for="email">Email:</label>
               <input
                 type="text"
+                required
                 id="email"
                 name="email"
                 placeholder="Enter email"
@@ -235,6 +224,7 @@
               <label for="phone">Phone:</label>
               <input
                 type="text"
+                required
                 id="phone"
                 name="phone"
                 placeholder="Enter phone number"
@@ -244,6 +234,7 @@
               <label for="name">Name:</label>
               <input
                 type="text"
+                required
                 id="name"
                 name="name"
                 placeholder="Enter name"
@@ -254,20 +245,13 @@
               <select id="status" name="status">
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
-                <!-- Add more status options here if needed -->
               </select>
             </div>
             <input type="submit" value="Submit" class="form-submit" />
-            <button onclick="location.href='/doc-login';" class="form-submit">
-              Return to login
-            </button>
           </form>
         </div>
-        <!-- Add more card content if needed -->
       </div>
-      <!-- Additional main content can go here -->
     </div>
-
-    <!-- JavaScript for populating the table goes here -->
+    
   </body>
 </html>

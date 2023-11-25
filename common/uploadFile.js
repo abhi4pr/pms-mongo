@@ -9,7 +9,9 @@ exports.upload = multer({
 //Generate actual fileName with view functionality
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    if (file.fieldname === "doc_image") {
+    if (file.fieldname === "imageToServer") {
+      cb(null, "./uploads/Brand_s Avatar");
+    } else if (file.fieldname === "doc_image") {
       cb(null, "./uploads/userDocuments");
     } else if (file.fieldname === "Product_image") {
       cb(null, "./uploads/productImage");
@@ -20,7 +22,7 @@ const storage = multer.diskStorage({
     }
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, file.originalname);
   },
 });
 
