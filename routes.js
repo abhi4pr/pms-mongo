@@ -60,6 +60,7 @@ const documentController = require("./controllers/document.js");
 const assetsImage = require("./controllers/assetsImage.js");
 const notification = require("./controllers/notifications.js");
 const userDocManagement = require("./controllers/userDocManagement.js");
+const swaggerAccessManagement = require("./controllers/swaggerDocumentaion/swaggerAccessManagement.js");
 
 const campaignPlanController=require('./controllers/operationExecution/campaignPlanController.js')
 
@@ -935,4 +936,6 @@ router.get("/get_user_doc/:id", userDocManagement.getUserDoc);
 router.get("/get_user_doc", userDocManagement.getUserDoc);
 router.delete("/delete_user_doc/:id", userDocManagement.deleteDoc);
 
+//Swagger Route
+router.post("/add_dev_data", swaggerAccessManagement.addDevData); 
 module.exports = router;
