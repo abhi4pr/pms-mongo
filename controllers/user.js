@@ -2085,7 +2085,7 @@ exports.getAllWfhUsers = async (req, res) => {
 
 
 exports.loginUserData = async (req, res) => {
-    const id = req.body.id;
+    const id = req.body.user_id;
     try {
         const user = await userModel.findOne({ user_id: id });
 
