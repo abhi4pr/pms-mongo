@@ -15,6 +15,14 @@
         display: flex;
         height: 100vh;
       }
+
+      /* .sidebar {
+        width: 200px;
+        background: #376730;
+        color: white;
+        padding: 20px;
+        height: 700px;
+      } */
       .sidebar {
         width: 200px;
         background-image: url("https://img.freepik.com/free-vector/simple-blue-abstract-background-vector-business_53876-161575.jpg"); /* Replace with your image path */
@@ -245,7 +253,7 @@
         margin-left: 15px;
       }
       /* Style the dropdown containers */
-      #statusFilter,
+      #roleFilter,
       #departmentFilter {
         padding: 7px 9px;
         border-radius: 4px;
@@ -257,15 +265,15 @@
       }
 
       /* Styling for the dropdown options */
-      #statusFilter option,
+      #roleFilter option,
       #departmentFilter option {
         padding: 18px 30px; /* Adjusted padding for options */
       }
 
       /* Additional styles for hover and focus states */
-      #statusFilter:hover,
+      #roleFilter:hover,
       #departmentFilter:hover,
-      #statusFilter:focus,
+      #roleFilter:focus,
       #departmentFilter:focus {
         border-color: #888;
       }
@@ -310,22 +318,12 @@
       <div class="card">
         <div>
           <input type="text" id="searchInput" placeholder="Search Name..." />
-          <select id="statusFilter" required>
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-          <select id="departmentFilter" required>
-            <option value="">All Department</option>
-            <option value="Back-End">Back-End</option>
-            <option value="Front-End">Front-End</option>
-            <option value="Other">Other</option>
+          <select id="roleFilter" required>
+            <option value="all">All Role</option>
+            <option value="Admin">Admin</option>
+            <option value="Developer">Developer</option>
           </select>
           <button id="resetFilterBtn">Reset Filters</button>
-          <!-- <button id="addDevbtn"><i class="fas fa-plus-square"></i></button> -->
-          <a href="/doc-access" id="addDevbtn">
-            <i class="fas fa-plus-square"></i
-          ></a>
         </div>
 
         <div class="table-container">
@@ -333,11 +331,11 @@
             <thead>
               <tr>
                 <th>S.No</th>
-                <th>Email</th>
-                <th>Phone</th>
                 <th>Name</th>
-                <th>Department</th>
-                <th>Status</th>
+                <th>Role</th>
+                <th>Login</th>
+                <th>Logout</th>
+                <th>Duration</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -358,21 +356,20 @@
       // Get the token from the URL
       const urlParts = window.location.pathname.split("/");
       const token = urlParts[urlParts.length - 1];
+
       // Select the links by class
       const links = document.querySelectorAll(".checkDevelopers");
-      const link2 = document.getElementById("addDevbtn");
-      link2.href += "/" + token;
+
       // Append the token to each link
       links.forEach((link) => {
         link.href += "/" + token;
       });
 
-      /* Handle feature when user close tab */
       window.addEventListener("beforeunload", function (event) {
+        // Call your logout API
         navigator.sendBeacon(`/doc-logout/${token}`); // Using sendBeacon for asynchronous request
       });
 
-      /* Handle if not activity perform on page like no key press or mouse */
       let inactivityTime = function () {
         let time;
         window.onload = resetTimer;
@@ -403,9 +400,7 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-
-        /* Create Api Call */
-        fetch(`/doc-users/${token}`) 
+        fetch(`/dev-login-history/${token}`) // Replace with your API endpoint
           .then((response) => response.json())
           .then((data) => {
             const tableBody = document
@@ -415,22 +410,15 @@
               let row = tableBody.insertRow();
               row.innerHTML = `
                             <td>${index + 1}</td>
-                            <td>${user.email}</td>
-                            <td>${user.phone}</td>
                             <td>${user.name}</td>
-                            <td>${user.department}</td>
-                            <td style="${
-                              user.status === "Inactive"
-                                ? "color: red;"
-                                : "color: green;"
-                            }">${user.status}</td>
+                            <td>${user.role === 1 ? "Admin" : "Developer"}</td>
+                            <td>${user.login_date}</td>
+                            <td>${user.logout_date}</td>
+                            <td>${user.duration}</td>
                             <td class="action-buttons">
-                                <a href='/dev-update/${
-                                  user._id
-                                }/${token}' ><i class="fas fa-pencil-alt"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
-                                <button class="delete-btn" data-userid="${
-                                  user._id
-                                }"  onmouseover="this.style.backgroundColor='#e96364'; this.style.color='white';"
+                           <button class="delete-btn" data-userid="${
+                             user._id
+                           }"  onmouseover="this.style.backgroundColor='#e96364'; this.style.color='white';"
         onmouseout="this.style.backgroundColor='initial'; this.style.color='initial';"
         style="background-color: initial; color: initial; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"><i class="fas fa-trash-alt"></i></button>
                             </td>
@@ -441,19 +429,15 @@
             }
           })
           .catch((error) => console.error("Error:", error));
-
-
-        /* Create Funtion for Handle filter for table */
+        // Add event listener for search input
         function filterTable() {
           const searchTerm = document
             .getElementById("searchInput")
             .value.toLowerCase();
-          const selectedStatus = document
-            .getElementById("statusFilter")
+          const selectedRole = document
+            .getElementById("roleFilter")
             .value.toLowerCase();
-          const selectedDepartment = document
-            .getElementById("departmentFilter")
-            .value.toLowerCase();
+
           const rows = document
             .getElementById("userTable")
             .getElementsByTagName("tbody")[0].rows;
@@ -462,14 +446,12 @@
 
           for (let i = 0; i < rows.length; i++) {
             let row = rows[i];
-            let name = row.cells[3].textContent.toLowerCase(); // Assuming name is in the 4th cell
-            let department = row.cells[4].textContent.toLowerCase(); // Assuming department is in the 5th cell
-            let status = row.cells[5].textContent.toLowerCase(); // Assuming status is in the 6th cell
+            let name = row.cells[1].textContent.toLowerCase(); // Assuming name is in the 4th cell
+            let role = row.cells[2].textContent.toLowerCase(); // Assuming role is in the 6th cell
+
             if (
               (name.includes(searchTerm) || searchTerm === "") &&
-              (department.includes(selectedDepartment) ||
-                selectedDepartment === "") &&
-              (status === selectedStatus || selectedStatus === "all")
+              (role === selectedRole || selectedRole === "all")
             ) {
               row.style.display = "";
               visibleRowCount++;
@@ -482,48 +464,20 @@
             visibleRowCount > 10 ? "block" : "none";
         }
 
-        /* Event Delegation for Delete Buttons */
-        document
-          .getElementById("userTable")
-          .addEventListener("click", function (event) {
-            if (event.target && event.target.classList.contains("delete-btn")) {
-              const userId = event.target.getAttribute("data-userid");
-              fetch(`/delete-dev/${userId}/${token}`, {
-                method: "DELETE",
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  console.log("User deleted:", data);
-                  // Optionally remove the user's row from the table
-                  if (data.success === false) {
-                    alert("Error deleting user: " + data.message);
-                  } else {
-                    event.target.closest("tr").remove();
-                    window.location.href = `/doc-user/${token}`;
-                  }
-                })
-                .catch((error) => alert(error));
-            }
-          });
-
-        /*   Events  */
         document
           .getElementById("searchInput")
           .addEventListener("input", filterTable);
         document
-          .getElementById("statusFilter")
-          .addEventListener("change", filterTable);
-        document
-          .getElementById("departmentFilter")
+          .getElementById("roleFilter")
           .addEventListener("change", filterTable);
         document
           .getElementById("resetFilterBtn")
           .addEventListener("click", function () {
             // Clear the search input
             document.getElementById("searchInput").value = "";
+
             // Reset the dropdown to its default state (assuming 'all' is the default)
-            document.getElementById("statusFilter").value = "all";
-            document.getElementById("departmentFilter").value = "";
+            document.getElementById("roleFilter").value = "all";
             // Reapply the filter to show all rows
             filterTable();
           });

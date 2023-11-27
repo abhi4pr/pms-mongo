@@ -167,18 +167,18 @@ exports.addUser = [upload, async (req, res) => {
         // Genreate a pdf file for offer later
         if (simv?.offer_letter_send) {
           helper.generateOfferLaterPdf(simv);
-
-        //Generate documents for respective user id
-        const docs = await documentModel.find();
-        if(docs.length !== 0){
-            const newDocuments = docs.map(item => ({
-                doc_id: item._id,
-                user_id: simv?.user_id,
-            }));
-            await userDocManagmentModel.insertMany(newDocuments);
-        }
-        //End Generate documents for respective user id
+    
         } 
+         //Generate documents for respective user id
+         const docs = await documentModel.find();
+         if(docs.length !== 0){
+             const newDocuments = docs.map(item => ({
+                 doc_id: item._id,
+                 user_id: simv?.user_id,
+             }));
+             await userDocManagmentModel.insertMany(newDocuments);
+         }
+         //End Generate documents for respective user id
 
         const joining = simv.joining_date;
         const convertDate = new Date(joining);
@@ -544,6 +544,7 @@ exports.getAllUsers = async (req, res) => {
                 $project: {
                     user_id: "$user_id",
                     user_name: "$user_name",
+                    offer_later_status: "$offer_later_status",
                     user_designation: "$user_designation",
                     user_email_id: "$user_email_id",
                     user_login_id: "$user_login_id",

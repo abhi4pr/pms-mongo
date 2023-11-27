@@ -1,10 +1,15 @@
 const { default: mongoose } = require("mongoose");
+const constant = require("../../common/constant");
 
 const swaggerAccessSchema = new mongoose.Schema({
   email: {
     type: String,
     unique : true,
     default: "",
+  },
+  role: {
+    type: Number,
+    default: constant.SWAGGER_DEVELOPER,
   },
   phone: {
     type: String,
@@ -17,6 +22,10 @@ const swaggerAccessSchema = new mongoose.Schema({
   status: {
     type: String,
     default: "Active",
+  },
+  department: {
+    type: String,
+    default: "",
   },
 
 });

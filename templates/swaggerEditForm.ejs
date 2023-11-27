@@ -240,7 +240,7 @@
       <div class="sidebar-logo"></div>
       <div class="sidebar-links">
         <a href="/api-docs" class="checkDevelopers"> Documentation &nbsp;</a>
-        <a href="/login-history" class="checkDevelopers">  Developer Login History &nbsp; </a>
+        <!-- <a href="/doc-access" class="checkDevelopers"> Add Developer &nbsp; </a> -->
         <a href="/doc-user" class="checkDevelopers"> Developers List </a>
       </div>
       <img
@@ -265,6 +265,7 @@
                 id="email"
                 name="email"
                 placeholder="Enter email"
+                disabled
               />
               <div
                 id="emailError"
@@ -318,7 +319,7 @@
               </select>
             </div>
 
-            <input type="submit" value="Submit" class="form-submit" />
+            <input type="submit" value="Update" class="form-submit" />
           </form>
         </div>
       </div>
@@ -355,6 +356,7 @@
       // Get the token from the URL
       const urlParts = window.location.pathname.split("/");
       const token = urlParts[urlParts.length - 1];
+      const developerId = urlParts[urlParts.length - 2];
 
       // Select the links by class
       const links = document.querySelectorAll(".checkDevelopers");
@@ -363,6 +365,27 @@
       links.forEach((link) => {
         link.href += "/" + token;
       });
+
+      // Replace with the actual developer ID and endpoint
+      // const developerId = /* get developer id from URL or other sources */
+      const fetchDeveloperDataEndpoint = `/dev-data/${developerId}/${token}`;
+
+      fetch(fetchDeveloperDataEndpoint)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data?.success) {
+            document.getElementById("email").value = data.data.email;
+            document.getElementById("phone").value = data.data.phone;
+            document.getElementById("name").value = data.data.name;
+            document.getElementById("dept").value = data.data.department;
+            document.getElementById("status").value = data.data.status;
+          } else {
+            alert("Error fetching data: " + data?.message);
+          }
+        })
+        .catch((error) => {
+          alert("Error fetching developer data: " + error);
+        });
 
       document
         .getElementById("developerForm")
@@ -377,8 +400,8 @@
             department: document.getElementById("dept").value,
           };
 
-          fetch(`/add-developer/${token}`, {
-            method: "POST",
+          fetch(`/dev-data-update/${developerId}/${token}`, {
+            method: "PUT",
             headers: {
               "Content-Type": "application/json",
             },
@@ -387,13 +410,13 @@
             .then((response) => response.json())
             .then((data) => {
               if (data?.success === false) {
-                alert("Error while saving data :" + data?.message);
+                alert("Error while updating data :" + data?.message);
               } else {
                 window.location.href = `/doc-user/${token}`;
               }
             })
             .catch((error) => {
-              alert("Error while saving data :" + error);
+              alert("Error while updating data :" + error);
             });
         });
     </script>

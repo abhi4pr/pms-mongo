@@ -12,7 +12,14 @@ exports.addInstaBrand = async (req, res) => {
             whatsApp,
             userId,
             majorCategory,
-            website
+            website,
+            rating,
+            campaign_count,
+            post_count,
+            temp1,
+            temp2,
+            temp3,
+            youtube
         } = req.body;
 
         const instabrandObj = new instaBrandSchema({
@@ -25,7 +32,14 @@ exports.addInstaBrand = async (req, res) => {
             whatsApp,
             userId,
             majorCategory,
-            website
+            website,
+            rating,
+            campaign_count,
+            post_count,
+            temp1,
+            temp2,
+            temp3,
+            youtube
         });
 
         const savedInstaBrand = await instabrandObj.save();
@@ -87,7 +101,14 @@ exports.editInstaBrand = async (req, res) => {
             whatsApp,
             userId,
             majorCategory,
-            website
+            website,
+            rating,
+            campaign_count,
+            post_count,
+            temp1,
+            temp2,
+            temp3,
+            youtube
         } = req.body;
 
         const editInstaBrandObj = await instaBrandSchema.findOneAndUpdate(
@@ -104,6 +125,13 @@ exports.editInstaBrand = async (req, res) => {
                     userId,
                     majorCategory,
                     website,
+                    rating,
+                    campaign_count,
+                    post_count,
+                    temp1,
+                    temp2,
+                    temp3,
+                    youtube,
                     updated_at: Date.now(),
                 },
             },
