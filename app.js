@@ -31,22 +31,32 @@ app.use("/api", routes);
 app.get('/doc-login', (req, res) => {
   res.sendFile(__dirname + '/uploads/assets/index.html');
 });
-app.get('/doc-access', (req, res) => {
+app.get('/doc-access/:token',checkDevAuthentication, (req, res) => {
   return res.render('swaggerAccessForm');
 });
-app.get('/doc-user', (req, res) => {
+app.get('/doc-user/:token',checkDevAuthentication, (req, res) => {
   return res.render('userList');
+});
+app.get('/login-history/:token',checkDevAuthentication, (req, res) => {
+  return res.render('swaggerDevLoginHistory');
+});
+app.get('/dev-update/:id/:token',checkDevAuthentication, (req, res) => {
+  return res.render('swaggerEditForm');
 });
 // Handle login
 app.post('/doc-login',swaggerAccessManagement.devLogin );
-app.post('/add-developer',swaggerAccessManagement.addDevData );
-app.get('/doc-users',swaggerAccessManagement.getDevData );
-app.delete('/delete-dev',swaggerAccessManagement.deleteDev );
+app.post('/doc-logout/:token',checkDevAuthentication,swaggerAccessManagement.devLogout );
+app.post('/add-developer/:token',checkDevAuthentication,swaggerAccessManagement.addDevData );
+app.get('/doc-users/:token',checkDevAuthentication,swaggerAccessManagement.getDevData );
+app.get('/dev-login-history/:token',checkDevAuthentication,swaggerAccessManagement.getDevLoginHis );
+app.get('/dev-data/:id/:token',checkDevAuthentication,swaggerAccessManagement.getDevSingleData );
+app.put('/dev-data-update/:id/:token',checkDevAuthentication,swaggerAccessManagement.updateDevData );
+app.delete('/delete-dev/:id/:token',checkDevAuthentication,swaggerAccessManagement.deleteDev );
 
 // end
 app.use(
-  "/api-docs",
-  // checkDevAuthentication,
+  "/api-docs/:token",
+  checkDevAuthentication,
   swaggerUi.serve,
   swaggerUi.setup(swaggerDocumantion, swaggerConfig)
 );

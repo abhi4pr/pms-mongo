@@ -179,6 +179,16 @@ const instaPModel = new mongoose.Schema({
         required: false,
         default: null
     },
+    rating: {
+        type: Number, 
+        required: false,
+        default: 0
+    },
+    crone_trak: {   
+        type: Number, 
+        required: false,
+        default: 0 // 1 mean tracked and 0 mean not tracked
+    },
 });
 
 // AutoIncrement.initialize(mongoose.connection);

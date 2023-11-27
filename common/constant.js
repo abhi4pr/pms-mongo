@@ -6,6 +6,8 @@ module.exports = Object.freeze({
   INSTA_C_MODELS: 1,
   INSTA_P_MODELS: 2,
   ADMIN_ROLE: 1,
+  SWAGGER_ADMIN: 1,
+  SWAGGER_DEVELOPER: 2,
 
   /* JWT  */
   SECRET_KEY_LOGIN:"thisissecret12",

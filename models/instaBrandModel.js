@@ -48,6 +48,42 @@ const instaBrandSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  rating: {
+    type: Number,
+    required: false,
+    default : 0
+  },
+  campaign_count: {
+    type: Number,
+    required: false,
+    default :0
+  },
+  post_count: {
+    type: Number,
+    required: false,
+    default :0
+  },
+  temp1: {
+    type: Number,
+    required: false,
+    default :0
+  },
+  temp2: {
+    type: Number,
+    required: false,
+    default :0
+  },
+  temp3: {
+    type: String,
+    required: false,
+    default :""
+  },
+  youtube: {
+    type: String,
+    required: false,
+    default :""
+  },
+
   updatedAt: {
     type: Date,
   },

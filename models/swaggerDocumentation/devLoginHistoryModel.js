@@ -7,16 +7,24 @@ const devLoginHisModel = new mongoose.Schema({
     ref: "swaggerAccessModel",
   },
   login_date: {
-    type: Date,
-    default: Date.now,
+    type: String,
+    default: Math.floor(Date.now() / 1000) ,
+  },
+  token: {
+    type: String,
+    default:"" ,
+  },
+  duration: {
+    type: String,
+    default:"" ,
+  },
+  logout_date: {
+    type: String,
+    default:"",
   },
   isLoggedIn: {
     type: Boolean,
     default: false
-  },
-  token : {
-    type : String,
-    default : ""
   }
 });
 
