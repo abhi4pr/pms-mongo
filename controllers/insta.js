@@ -1414,59 +1414,59 @@ exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
          
           
 
-        //   postDataRespecticBrand?.map(async(item)=>{
-        //     const trackCreatorParams = {
-        //         connector: "instagram",
-        //         shortcode: item.shortCode,
-        //         cron_expression: "*/30 * * * *",
-        //     };
-        //     const response = await axios.post(
-        //         "https://app.ylytic.com/ylytic/admin/api/v1/track_post",
-        //         trackCreatorParams,
-        //         {
-        //             headers: {
-        //                 Authorization: `Bearer ${token}`,
-        //                 "Content-Type": "application/json",
-        //             },
-        //         }
-        //     );
-        //     if(response.data){
+          postDataRespecticBrand?.map(async(item)=>{
+            const trackCreatorParams = {
+                connector: "instagram",
+                shortcode: item.shortCode,
+                cron_expression: "*/30 * * * *",
+            };
+            const response = await axios.post(
+                "https://app.ylytic.com/ylytic/admin/api/v1/track_post",
+                trackCreatorParams,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            if(response.data){
 
-        //         const savingRes = new instaPostAnalyticsModel({
-        //             handle: response.data.data?.handle ?? "",
-        //             postType: response.data.data.post_type,
-        //             creatorName: response.data.data.creator.username,
-        //             allComments: response.data.data.comments_count.overall,
-        //             brand_id: response.data.data.comments_count.today,
-        //             pastComment: response.data.data.comments_count.vs_previous,
-        //             allLike: response.data.data.likes_count.overall,
-        //             campaign_id: response.data.data.likes_count.today,
-        //             pastLike: response.data.data.likes_count.vs_previous,
-        //             allView:response.data.data.views_count.overall,
-        //             agency_id: response.data.data.views_count.today,
-        //             pastView: response.data.data.views_count.vs_previous,
-        //             title: response.data.data.title,
-        //             postedOn: response.data.data.posted_at,
-        //             postUrl: response.data.data.post_url,
-        //             postImage: response.data.data.display_url[0],
-        //             shortCode: response.data.shortcode,
-        //             posttype_decision:response.data.posttype_decision,
-        //             selector_name: response.data.selector_name,
-        //             interpretor_name: response.data.interpretor_name,
-        //             auditor_name: response.data.auditor_name,
-        //             auditor_decision: response.data.auditor_decision,
-        //             interpretor_decision: response.data.interpretor_decision,
-        //             selector_decision: response.data.selector_decision,
-        //             music_info :response.data.data?.music_info,
-        //             location :response.data.data?.location,
-        //             sponsored :response.data.data?.sponsored,
-        //         });
-        //          await savingRes.save()
-        //          /* update insta p model post mean that are tracked */
-        //         //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
-        //     }
-        // })
-        return res.send(postDataRespecticBrand)
+                const savingRes = new instaPostAnalyticsModel({
+                    handle: response.data.data?.handle ?? "",
+                    postType: response.data.data.post_type,
+                    creatorName: response.data.data.creator.username,
+                    allComments: response.data.data.comments_count.overall,
+                    brand_id: response.data.data.comments_count.today,
+                    pastComment: response.data.data.comments_count.vs_previous,
+                    allLike: response.data.data.likes_count.overall,
+                    campaign_id: response.data.data.likes_count.today,
+                    pastLike: response.data.data.likes_count.vs_previous,
+                    allView:response.data.data.views_count.overall,
+                    agency_id: response.data.data.views_count.today,
+                    pastView: response.data.data.views_count.vs_previous,
+                    title: response.data.data.title,
+                    postedOn: response.data.data.posted_at,
+                    postUrl: response.data.data.post_url,
+                    postImage: response.data.data.display_url[0],
+                    shortCode: response.data.shortcode,
+                    posttype_decision:response.data.posttype_decision,
+                    selector_name: response.data.selector_name,
+                    interpretor_name: response.data.interpretor_name,
+                    auditor_name: response.data.auditor_name,
+                    auditor_decision: response.data.auditor_decision,
+                    interpretor_decision: response.data.interpretor_decision,
+                    selector_decision: response.data.selector_decision,
+                    music_info :response.data.data?.music_info,
+                    location :response.data.data?.location,
+                    sponsored :response.data.data?.sponsored,
+                });
+                 await savingRes.save()
+                 /* update insta p model post mean that are tracked */
+                //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+            }
+        })
+        // return res.send(postDataRespecticBrand)
         return res.status(200).json({message : "Operation Successful.", success : true})
     } catch (error) {
         res.status(500).send({error:error.message,message:'Internal server error'})
