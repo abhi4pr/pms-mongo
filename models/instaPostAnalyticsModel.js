@@ -1,13 +1,8 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const variable = require('../variables.js');
-// const AutoIncrement = require('mongoose-auto-increment');
 
-const instaPModel = new mongoose.Schema({
-    // post_id:{
-    //     type: Number,
-    //     required: true
-    // },
+const instaPostAnalyticsModel = new mongoose.Schema({
     postType:{
         type: String,
         required: false,
@@ -186,10 +181,4 @@ const instaPModel = new mongoose.Schema({
     },
 });
 
-// AutoIncrement.initialize(mongoose.connection);
-// instaPModel.plugin(
-//     AutoIncrement.plugin, 
-//     { model: 'instaPModels', field: 'post_id', startAt: 1, incrementBy: 1 }
-// );
-
-module.exports = mongoose.model('instaPModel', instaPModel);
+module.exports = mongoose.model('instaPostAnalyticsModel', instaPostAnalyticsModel);
