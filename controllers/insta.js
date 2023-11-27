@@ -1371,3 +1371,17 @@ exports.getSingleCrawler = async (req, res) =>{
         res.status(500).send({error:error.message,sms:'Error getting single crawler data'})
     }
 };
+exports.uploadImageToServer = async (req, res) =>{
+    try {
+        let image = req.file?.filename 
+        console.log(image)
+        if(image){
+
+            return  res.status(200).send({message : "Image uploaded...."})
+        }else{
+            return  res.status(200).send({message : "Provide image...."})
+        }
+    } catch (error) {
+        res.status(500).send({error:error.message,sms:'Internal server error'})
+    }
+};

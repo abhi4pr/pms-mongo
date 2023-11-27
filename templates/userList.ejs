@@ -1,49 +1,46 @@
-
-
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Dashboard</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            height: 100vh;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        height: 100vh;
+      }
 
-        .sidebar {
-            width: 200px;
-            background: #333;
-            color: white;
-            padding: 20px;
-            height: 700px;
-        }
+      .sidebar {
+        width: 200px;
+        background: #333;
+        color: white;
+        padding: 20px;
+        height: 700px;
+      }
 
-        .main {
-            flex-grow: 1;
-            padding: 20px;
-            background: #f2f2f2;
-        }
+      .main {
+        flex-grow: 1;
+        padding: 20px;
+        background: #f2f2f2;
+      }
 
-        .header {
-            background-color: #51bd99;
-            color: white;
-            padding: 10px 20px;
-            text-align: left;
-        }
+      .header {
+        background-color: #51bd99;
+        color: white;
+        padding: 10px 20px;
+        text-align: left;
+      }
 
-        .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            /* margin-bottom: 20px; */
-        }
+      .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        /* margin-bottom: 20px; */
+      }
 
-
-        .form-container {
+      .form-container {
         margin: auto;
 
         background: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
@@ -89,172 +86,200 @@
       }
 
       .sidebar-logo {
-    text-align: center;
-    margin-bottom: 20px;
-}
+        text-align: center;
+        margin-bottom: 20px;
+      }
 
-.sidebar-logo img {
-    max-width: 100%; /* Ensures the logo is responsive and fits the sidebar */
-    height: auto;
-}
-.checkDevelopers {
-    cursor: pointer;
-}
+      .sidebar-logo img {
+        max-width: 100%; /* Ensures the logo is responsive and fits the sidebar */
+        height: auto;
+      }
+      .checkDevelopers {
+        cursor: pointer;
+      }
 
+      .user-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-.user-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+      .user-table th,
+      .user-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
 
-        .user-table th, .user-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
+      .user-table th {
+        background-color: #f4f4f4;
+      }
 
-        .user-table th {
-            background-color: #f4f4f4;
-        }
+      .action-buttons button {
+        padding: 5px 10px;
+        margin-right: 5px;
+        border-radius: 4px;
+        border: none;
+        background-color: #4caf50;
+        color: white;
+        cursor: pointer;
+      }
 
-        .action-buttons button {
-            padding: 5px 10px;
-            margin-right: 5px;
-            border-radius: 4px;
-            border: none;
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-        }
+      .action-buttons button:hover {
+        background-color: #45a049;
+      }
 
-        .action-buttons button:hover {
-            background-color: #45a049;
-        }
-        
       .cardInner {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
 
+      .table-container {
+        max-height: 550px;
+        overflow-y: auto;
+        border: 1px solid #ddd; /* Optional, for border */
+      }
 
-.table-container {
-    overflow-x: auto; /* Enable horizontal scrolling */
-    margin-bottom: 20px; /* Add some space below the table */
-}
+      .user-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-.user-table {
-    width: 100%;
-    border-collapse: collapse;
-}
+      .user-table th,
+      .user-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
 
-.user-table th, .user-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
+      /* Additional styling for headers and rows for better visibility */
+      .user-table thead {
+        background-color: #f2f2f2;
+      }
 
-.user-table th {
-    background-color: #f4f4f4;
-}
-.checkDevelopers {
-    /* Base styling */
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 5px;
-    text-decoration: none;
-    color: #fff;
-    background-color: #007bff;
-    border: 2px solid transparent;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+      .user-table tbody tr:nth-child(odd) {
+        background-color: #fff;
+      }
 
-.checkDevelopers:hover {
-    /* Hover styling */
-    background-color: #0056b3;
-    color: #ffe600;
-    border-color: #ffe600;
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
+      .user-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      .checkDevelopers {
+        /* Base styling */
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        text-decoration: none;
+        color: #fff;
+        background-color: #007bff;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
 
-.checkDevelopers:active {
-    /* Active/Clicked styling */
-    background-color: #003580;
-    color: #ffc107;
-    border-color: #ffc107;
-    transform: scale(0.95);
-}
+      .checkDevelopers:hover {
+        /* Hover styling */
+        background-color: #0056b3;
+        color: #ffe600;
+        border-color: #ffe600;
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
 
+      .checkDevelopers:active {
+        /* Active/Clicked styling */
+        background-color: #003580;
+        color: #ffc107;
+        border-color: #ffc107;
+        transform: scale(0.95);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="sidebar">
-        <!-- Sidebar content -->
-        <div class="sidebar-logo">
-            <img src="/uploads/assets/logo-light.png" alt="Logo">
-        </div>
-        <a href='/doc-login' class="checkDevelopers">
-            Doc Login
-        </a>
-        <a href='/doc-access' class="checkDevelopers">
-            Add Developer
-        </a>
-        <a href='/doc-user' class="checkDevelopers">
-            Developers List
-        </a>
-       
+      <!-- Sidebar content -->
+      <div class="sidebar-logo">
+        <img src="/uploads/assets/logo-light.png" alt="Logo" />
+      </div>
+      <a href="/doc-login" class="checkDevelopers"> Doc Login </a>
+      <a href="/doc-access" class="checkDevelopers"> Add Developer </a>
+      <a href="/doc-user" class="checkDevelopers"> Developers List </a>
     </div>
     <div class="main">
-        <div class="header">
-            <h1>User Management</h1>
+      <div class="header">
+        <h1>Developer Management</h1>
+      </div>
+      <div class="card">
+        <div class="table-container">
+          <table class="user-table" id="userTable">
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Table data -->
+            </tbody>
+          </table>
         </div>
-        <div class="card">
-            <div class="cardInner">
-                <table class="user-table" id="userTable">
-                    <thead>
-                        <tr>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+      </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('/doc-users') // Replace with your API endpoint
-                .then(response => response.json())
-                .then(data => {
-                    const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
-                    data.data.forEach(user => {
-                        let row = tableBody.insertRow();
-                        row.innerHTML = `
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch("/doc-users") // Replace with your API endpoint
+          .then((response) => response.json())
+          .then((data) => {
+            const tableBody = document
+              .getElementById("userTable")
+              .getElementsByTagName("tbody")[0];
+            data.data.forEach((user, index) => {
+              let row = tableBody.insertRow();
+              row.innerHTML = `
+                            <td>${index + 1}</td>
                             <td>${user.email}</td>
                             <td>${user.phone}</td>
                             <td>${user.name}</td>
                             <td>${user.status}</td>
                             <td class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
+                                <button >Edit</button>
+                                <button class="delete-btn" data-userid="${
+                                  user._id
+                                }">Delete</button>
                             </td>
                         `;
-                    });
-                })
-                .catch(error => console.error('Error:', error));
+            });
+          })
+          .catch((error) => console.error("Error:", error));
+      });
+      // Event Delegation for Delete Buttons
+      document
+        .getElementById("userTable")
+        .addEventListener("click", function (event) {
+          if (event.target && event.target.classList.contains("delete-btn")) {
+            const userId = event.target.getAttribute("data-userid");
+            // Call your API to delete the user
+            fetch(`/delete-dev/${userId}`, {
+              method: "DELETE",
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                console.log("User deleted:", data);
+                // Optionally remove the user's row from the table
+                event.target.closest("tr").remove();
+              })
+              .catch((error) => console.error("Error deleting user:", error));
+          }
         });
     </script>
-</body>
+  </body>
 </html>

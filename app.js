@@ -39,7 +39,9 @@ app.get('/doc-user', (req, res) => {
 });
 // Handle login
 app.post('/doc-login',swaggerAccessManagement.devLogin );
+app.post('/add-developer',swaggerAccessManagement.addDevData );
 app.get('/doc-users',swaggerAccessManagement.getDevData );
+app.delete('/delete-dev',swaggerAccessManagement.deleteDev );
 
 // end
 app.use(
