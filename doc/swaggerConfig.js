@@ -286,6 +286,35 @@ module.exports.swaggerConfig = {
           );
           tryItOutSection.scrollIntoView({ behavior: "smooth" });
         });
+
+      // Get the token from the URL
+      const urlParts = window.location.pathname.split("/");
+      const token = urlParts[urlParts.length - 1];
+
+      
+      /* Handle if not activity perform on page like no key press or mouse */
+      let inactivityTime = function () {
+        let time;
+        window.onload = resetTimer;
+        // Events that reset the timer
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+
+        function logout() {
+          // Call your logout API
+          fetch(`/doc-logout/${token}`, { method: "POST" }) // Replace with your actual logout API call
+            .then(() => (window.location.href = `/doc-login`))
+            .catch((err) => console.error("Error:", err));
+        }
+
+        function resetTimer() {
+          clearTimeout(time);
+          // Set timeout for 1 hour (3600000 ms)
+          time = setTimeout(logout, 3600000);
+        }
+      };
+
+      inactivityTime(); // Initialize the inactivity timer function
     },
   },
 };

@@ -73,77 +73,81 @@ exports.addAttendance = async (req, res) => {
         dept_id: req.body.dept,
       });
 
-      for (const user of check2) {
-        var work_days;
-        const joining = user.joining_date;
-        const convertDate = new Date(joining);
-        const extractDate = convertDate.getDate();
-        const joiningMonth = String(convertDate.getUTCMonth() + 1).padStart(
-          2,
-          "0"
-        );
-        const joiningYear = String(convertDate.getUTCFullYear());
-        const mergeJoining = parseInt(joiningMonth + joiningYear);
 
-        const monthNumber = monthNameToNumber(month);
-
-        const mergeJoining1 = `${monthNumber}` + `${year}`;
-
-        if (mergeJoining == mergeJoining1) {
-          work_days = 31 - extractDate;
-        } else {
-          work_days = 30;
-        }
-        const userExistsInAttendance = await doesUserExistInAttendance(
-          user.user_id,
-          req.body.month,
-          req.body.year
-        );
-        if (!userExistsInAttendance) {
-          const presentDays = work_days - 0;
-          const perdaysal = user.salary / 30;
-          const totalSalary = perdaysal * presentDays;
-          const netSalary = totalSalary;
-          const tdsDeduction = (netSalary * user.tds_per) / 100;
-          const ToPay = netSalary - tdsDeduction;
-          const salary = user.salary;
-          let invoiceNo = await createNextInvoiceNumber(user.user_id);
-          const creators = new attendanceModel({
-            dept: user.dept_id,
-            user_id: user.user_id,
-            invoiceNo: invoiceNo,
-            user_name: user.user_name,
-            noOfabsent: 0,
-            month: req.body.month,
-            year: req.body.year,
-            bonus: 0,
-            total_salary: user.salary && user.salary.toFixed(2),
-            tds_deduction: tdsDeduction && tdsDeduction.toFixed(2),
-            net_salary: netSalary && netSalary.toFixed(2),
-            toPay: ToPay && ToPay.toFixed(2),
-            remark: "",
-            Created_by: req.body.user_id,
-            salary,
-          });
-          // const creators = new attendanceModel({
-          //     dept: req.body.dept,
-          //     user_id: req.body.user_id,
-          //     user_name: req.body.user_name,
-          //     noOfabsent: 0,
-          //     month: req.body.month,
-          //     year: req.body.year,
-          //     bonus: 0,
-          //     total_salary: user.salary,
-          //     tds_deduction: tdsDeduction,
-          //     net_salary: netSalary,
-          //     toPay: ToPay,
-          //     remark: '',
-          //     created_by: req.body.user_id
-          // });
-          const instav = await creators.save();
-        }
-        res.send({ status: 200 });
-      }
+      // for (const user of check2) {
+        check2.map(async(user)=>{
+          var work_days;
+          const joining = user.joining_date;
+          const convertDate = new Date(joining);
+          const extractDate = convertDate.getDate();
+          const joiningMonth = String(convertDate.getUTCMonth() + 1).padStart(
+            2,
+            "0"
+          );
+          const joiningYear = String(convertDate.getUTCFullYear());
+          const mergeJoining = parseInt(joiningMonth + joiningYear);
+  
+          const monthNumber = monthNameToNumber(month);
+  
+          const mergeJoining1 = `${monthNumber}` + `${year}`;
+  
+          if (mergeJoining == mergeJoining1) {
+            work_days = 31 - extractDate;
+          } else {
+            work_days = 30;
+          }
+          const userExistsInAttendance = await doesUserExistInAttendance(
+            user.user_id,
+            req.body.month,
+            req.body.year
+          );
+          if (!userExistsInAttendance) {
+            const presentDays = work_days - 0;
+            const perdaysal = user.salary / 30;
+            const totalSalary = perdaysal * presentDays;
+            const netSalary = totalSalary;
+            const tdsDeduction = (netSalary * user.tds_per) / 100;
+            const ToPay = netSalary - tdsDeduction;
+            const salary = user.salary;
+            let invoiceNo = await createNextInvoiceNumber(user.user_id);
+            const creators = new attendanceModel({
+              dept: user.dept_id,
+              user_id: user.user_id,
+              invoiceNo: invoiceNo,
+              user_name: user.user_name,
+              noOfabsent: 0,
+              month: req.body.month,
+              year: req.body.year,
+              bonus: 0,
+              total_salary: user.salary && user.salary.toFixed(2),
+              tds_deduction: tdsDeduction && tdsDeduction.toFixed(2),
+              net_salary: netSalary && netSalary.toFixed(2),
+              toPay: ToPay && ToPay.toFixed(2),
+              remark: "",
+              Created_by: req.body.user_id,
+              salary,
+            });
+            // const creators = new attendanceModel({
+            //     dept: req.body.dept,
+            //     user_id: req.body.user_id,
+            //     user_name: req.body.user_name,
+            //     noOfabsent: 0,
+            //     month: req.body.month,
+            //     year: req.body.year,
+            //     bonus: 0,
+            //     total_salary: user.salary,
+            //     tds_deduction: tdsDeduction,
+            //     net_salary: netSalary,
+            //     toPay: ToPay,
+            //     remark: '',
+            //     created_by: req.body.user_id
+            // });
+            const instav = await creators.save();
+          }
+          res.send({ status: 200 });
+   
+        })
+            //  }
     } else if (
       req.body.user_id == check1[0].user_id &&
       req.body.month == check1[0].month &&

@@ -364,6 +364,35 @@
         link.href += "/" + token;
       });
 
+
+      window.addEventListener("beforeunload", function (event) {
+        // Call your logout API
+        navigator.sendBeacon(`/doc-logout/${token}`); // Using sendBeacon for asynchronous request
+      });
+
+      let inactivityTime = function () {
+        let time;
+        window.onload = resetTimer;
+        // Events that reset the timer
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+
+        function logout() {
+          // Call your logout API
+          fetch(`/doc-logout/${token}`, { method: "POST" }) // Replace with your actual logout API call
+            .then(() => (window.location.href = `/doc-login`))
+            .catch((err) => console.error("Error:", err));
+        }
+
+        function resetTimer() {
+          clearTimeout(time);
+          // Set timeout for 1 hour (3600000 ms)
+          time = setTimeout(logout, 3600000);
+        }
+      };
+
+      inactivityTime(); // Initialize the inactivity timer function
+
       document
         .getElementById("developerForm")
         .addEventListener("submit", function (event) {

@@ -353,6 +353,56 @@
     </div>
 
     <script>
+      
+function formatTime(seconds) {
+  const days = Math.floor(seconds / 86400); // 1 day = 24 * 60 * 60 seconds
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  const timeComponents = [];
+  
+  if (days > 0) {
+    timeComponents.push(`${days}d`);
+  }
+
+  if (hours > 0) {
+    timeComponents.push(`${hours}h`);
+  }
+
+  if (minutes > 0) {
+    timeComponents.push(`${minutes}m`);
+  }
+
+  if (remainingSeconds > 0) {
+    timeComponents.push(`${remainingSeconds}s`);
+  }
+
+  const formattedTime = timeComponents.join(' ');
+
+  return formattedTime;
+}
+
+function formatDateFromSeconds(seconds) {
+ 
+  const milliseconds = seconds * 1000; // Convert seconds to milliseconds
+  const date = new Date(milliseconds);
+
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+  const year = date.getFullYear();
+
+  let hours = date.getHours();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = (hours % 12) || 12; // Convert to 12-hour format
+
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const secondsFormatted = date.getSeconds().toString().padStart(2, '0');
+
+  const formattedDateTime = `${day}-${month}-${year} ${hours}:${minutes}:${secondsFormatted} ${ampm}`;
+
+  return formattedDateTime;
+}
       // Get the token from the URL
       const urlParts = window.location.pathname.split("/");
       const token = urlParts[urlParts.length - 1];
@@ -412,9 +462,9 @@
                             <td>${index + 1}</td>
                             <td>${user.name}</td>
                             <td>${user.role === 1 ? "Admin" : "Developer"}</td>
-                            <td>${user.login_date}</td>
-                            <td>${user.logout_date}</td>
-                            <td>${user.duration}</td>
+                            <td>${formatDateFromSeconds(user.login_date)}</td>
+                            <td>${user.logout_date ?formatDateFromSeconds(user.logout_date) : ""}</td>
+                            <td>${formatTime(user.duration)}</td>
                             <td class="action-buttons">
                            <button class="delete-btn" data-userid="${
                              user._id

@@ -229,6 +229,7 @@ exports.devLogout = async (req, res) => {
     const decoded = jwt.decode(token, { complete: true });
     let id = decoded.payload.login_id;
     let loginInfo = await devLoginHistoryModel.findById(id);
+   
     if (!loginInfo) {
       return response.returnFalse(200, req, res, "No login hostory find.");
     }
