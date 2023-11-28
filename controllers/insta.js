@@ -1418,7 +1418,7 @@ exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
             const trackCreatorParams = {
                 connector: "instagram",
                 shortcode: item.shortCode,
-                cron_expression: "*/30 * * * *",
+                cron_expression: "*/3 * * * *",
             };
             const response = await axios.post(
                 "https://app.ylytic.com/ylytic/admin/api/v1/track_post",
@@ -1430,45 +1430,87 @@ exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
                     },
                 }
             );
-            if(response.data){
+            // if(response.data){
 
-                const savingRes = new instaPostAnalyticsModel({
-                    handle: response.data.data?.handle ?? "",
-                    postType: response.data.data.post_type,
-                    creatorName: response.data.data.creator.username,
-                    allComments: response.data.data.comments_count.overall,
-                    brand_id: response.data.data.comments_count.today,
-                    pastComment: response.data.data.comments_count.vs_previous,
-                    allLike: response.data.data.likes_count.overall,
-                    campaign_id: response.data.data.likes_count.today,
-                    pastLike: response.data.data.likes_count.vs_previous,
-                    allView:response.data.data.views_count.overall,
-                    agency_id: response.data.data.views_count.today,
-                    pastView: response.data.data.views_count.vs_previous,
-                    title: response.data.data.title,
-                    postedOn: response.data.data.posted_at,
-                    postUrl: response.data.data.post_url,
-                    postImage: response.data.data.display_url[0],
-                    shortCode: response.data.shortcode,
-                    posttype_decision:response.data.posttype_decision,
-                    selector_name: response.data.selector_name,
-                    interpretor_name: response.data.interpretor_name,
-                    auditor_name: response.data.auditor_name,
-                    auditor_decision: response.data.auditor_decision,
-                    interpretor_decision: response.data.interpretor_decision,
-                    selector_decision: response.data.selector_decision,
-                    music_info :response.data.data?.music_info,
-                    location :response.data.data?.location,
-                    sponsored :response.data.data?.sponsored,
-                });
-                 await savingRes.save()
-                 /* update insta p model post mean that are tracked */
-                //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
-            }
+            //     const savingRes = new instaPostAnalyticsModel({
+            //         handle: response.data.data?.handle ?? "",
+            //         postType: response.data.data.post_type,
+            //         creatorName: response.data.data.creator.username,
+            //         allComments: response.data.data.comments_count.overall,
+            //         brand_id: response.data.data.comments_count.today,
+            //         pastComment: response.data.data.comments_count.vs_previous,
+            //         allLike: response.data.data.likes_count.overall,
+            //         campaign_id: response.data.data.likes_count.today,
+            //         pastLike: response.data.data.likes_count.vs_previous,
+            //         allView:response.data.data.views_count.overall,
+            //         agency_id: response.data.data.views_count.today,
+            //         pastView: response.data.data.views_count.vs_previous,
+            //         title: response.data.data.title,
+            //         postedOn: response.data.data.posted_at,
+            //         postUrl: response.data.data.post_url,
+            //         postImage: response.data.data.display_url[0],
+            //         shortCode: response.data.shortcode,
+            //         posttype_decision:response.data.posttype_decision,
+            //         selector_name: response.data.selector_name,
+            //         interpretor_name: response.data.interpretor_name,
+            //         auditor_name: response.data.auditor_name,
+            //         auditor_decision: response.data.auditor_decision,
+            //         interpretor_decision: response.data.interpretor_decision,
+            //         selector_decision: response.data.selector_decision,
+            //         music_info :response.data.data?.music_info,
+            //         location :response.data.data?.location,
+            //         sponsored :response.data.data?.sponsored,
+            //     });
+            //      await savingRes.save()
+            //      /* update insta p model post mean that are tracked */
+            //     //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+            // }
         })
         // return res.send(postDataRespecticBrand)
-        return res.status(200).json({message : "Operation Successful.", success : true})
+        res.status(response.status).json(response.data);
     } catch (error) {
         res.status(500).send({error:error.message,message:'Internal server error'})
     }
 };
+
+exports.insertDataIntoPostAnalytics = async (req,res)=>{
+    try {
+       
+            const savingRes = new instaPostAnalyticsModel({
+                handle: req.body.data?.handle ?? "",
+                postType: req.body.data.post_type,
+                creatorName: req.body.data.creator.username,
+                allComments: req.body.data.comments_count.overall,
+                brand_id: req.body.data.comments_count.today,
+                pastComment: req.body.data.comments_count.vs_previous,
+                allLike: req.body.data.likes_count.overall,
+                campaign_id: req.body.data.likes_count.today,
+                pastLike: req.body.data.likes_count.vs_previous,
+                allView: req.body.data.views_count.overall,
+                agency_id: req.body.data.views_count.today,
+                pastView: req.body.data.views_count.vs_previous,
+                title: req.body.data.title,
+                postedOn: req.body.data.posted_at,
+                postUrl: req.body.data.post_url,
+                postImage: req.body.data.display_url[0],
+                shortCode: req.body.shortcode,
+                posttype_decision: req.body.posttype_decision,
+                selector_name: req.body.selector_name,
+                interpretor_name: req.body.interpretor_name,
+                auditor_name: req.body.auditor_name,
+                auditor_decision: req.body.auditor_decision,
+                interpretor_decision: req.body.interpretor_decision,
+                selector_decision: req.body.selector_decision,
+                music_info : req.body.data?.music_info,
+                location : req.body.data?.location,
+                sponsored : req.body.data?.sponsored,
+            });
+            const result =  await savingRes.save()
+             /* update insta p model post mean that are tracked */
+            //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+            res.send({ result, status: 200 });
+       
+    } catch (error) {
+        res.status(500).send({ error: error.message, sms: "error while adding data" });
+    }
+}
