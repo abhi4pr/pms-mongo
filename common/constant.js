@@ -12,7 +12,7 @@ module.exports = Object.freeze({
   /* JWT  */
   SECRET_KEY_LOGIN:"thisissecret12",
   SECRET_KEY_DOC_LOGIN:"docloginsect1234d",
-  CONST_VALIDATE_SESSION_EXPIRE_DOC:"1m",
+  CONST_VALIDATE_SESSION_EXPIRE_DOC:"1h",
   CONST_VALIDATE_SESSION_EXPIRE: '24h',
 
   /* Response messages */ 
