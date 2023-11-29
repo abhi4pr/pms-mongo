@@ -453,8 +453,8 @@ exports.getSalaryByFilter = async (req, res) => {
           {
             $lookup: {
               from: "departmentmodels",
-              localField: "dept_id",
-              foreignField: "dept",
+              localField: "dept",
+              foreignField: "dept_id",
               as: "department",
             },
           },
@@ -902,6 +902,9 @@ exports.allDeptsOfWfh = async (req, res) => {
             total_salary: 1,
             user_count: 1,
           },
+        },
+        {
+          $sort: { dept_id: 1 } 
         },
       ])
       .exec();
