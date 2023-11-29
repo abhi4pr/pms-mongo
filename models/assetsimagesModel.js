@@ -8,7 +8,7 @@ const assetsImagesModel = new mongoose.Schema({
   },
   sim_id: {
     type: Number,
-    required: true
+    required: true,
   },
   uploaded_date: {
     type: Date,
@@ -38,7 +38,12 @@ const assetsImagesModel = new mongoose.Schema({
     type: Number,
     required: false,
     default: 0,
-  }
+  },
+  type: {
+    type: String,
+    required: false,
+    default: "",
+  },
 });
 
 AutoIncrement.initialize(mongoose.connection);

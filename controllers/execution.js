@@ -322,6 +322,7 @@ exports.addIPCountHistory = [upload, async (req, res) => {
     try {
         const simc = new exeCountHisModel({
             p_id: req.body.p_id,
+            user_id: req.body.user_id,
             reach: req.body.reach,
             impression: req.body.impression,
             engagement: req.body.engagement,
