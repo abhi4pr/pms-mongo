@@ -62,16 +62,15 @@ const notification = require("./controllers/notifications.js");
 const userDocManagement = require("./controllers/userDocManagement.js");
 const swaggerAccessManagement = require("./controllers/swaggerDocumentaion/swaggerAccessManagement.js");
 
-const campaignPlanController=require('./controllers/operationExecution/campaignPlanController.js')
+const campaignPlanController = require("./controllers/operationExecution/campaignPlanController.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
 });
 
-
 /*operation+execution api*/
-  router.post('/campaignplan',campaignPlanController.createPlan)
-  router.get('/campaignplan/:id',campaignPlanController.getPlan)
+router.post("/campaignplan", campaignPlanController.createPlan);
+router.get("/campaignplan/:id", campaignPlanController.getPlan);
 /*insta api*/
 router.post("/upload_img_on_server",upload1.single("imageToServer"), insta.uploadImageToServer)
 router.post("/add_tracked_post",insta.insertDataIntoPostAnalytics)
@@ -98,11 +97,11 @@ router.get("/creator_insights", insta.creatorInsights);
 router.get("/cfinstaapi", insta.cfInstaApi);
 router.post("/countinstacp", insta.countInstaCPModels);
 // router.get("/countinstacp", insta.countInstaCPModels);
-router.post("/get_all_posts_by_id", insta.getPostsByDecNum)
+router.post("/get_all_posts_by_id", insta.getPostsByDecNum);
 router.get("/get_avg_frq_of_post", insta.getAvgFrqOfPost);
 router.get("/get_all_stories", insta.getStories);
-router.put("/update_insta_story",insta.editInstaStory);
-router.post("/get_stories_from_name",insta.getStorysFromName);
+router.put("/update_insta_story", insta.editInstaStory);
+router.post("/get_stories_from_name", insta.getStorysFromName);
 router.post("/creator_name_count_for_stories", insta.creatorNameCountForStory);
 router.post("/selector_name_count_instas", insta.selectorNameCountInstaS);
 router.post("/selector_name_count_instap", insta.selectorNameCountInstaP);
@@ -114,87 +113,82 @@ router.get("/execution_graph", exe.executionGraph);
 router.post("/exe_sum_post", exe.exeSumPost);
 router.get("/get_exe_sum", exe.getExeSum);
 router.put("/edit_exe_sum", exe.editExeSum);
-router.get("/get_single_exe_pid_count",exe.getLatestPIDCount);
+router.get("/get_single_exe_pid_count", exe.getLatestPIDCount);
 // router.post("/add_exe_pid_history",exe.addIPCountHistory);
-router.post("/add_exe_pid_history",exe.addIPCountHistory);
-router.post("/exe_purchase_post",exe.exeForPurchase);
+router.post("/add_exe_pid_history", exe.addIPCountHistory);
+router.post("/exe_purchase_post", exe.exeForPurchase);
 router.get("/get_exe_ip_count_history/:p_id", exe.getExeIpCountHistory);
 router.delete("/delete_exe_ip_count_history/:_id", exe.deleteExeIpCountHistory);
 router.put("/edit_exe_ip_count_history", exe.updateIPCountHistory);
 router.post("/get_percentage", exe.getPercentage);
-router.get("/get_all_exe_ip_history", exe.getAllExeHistory)
+router.get("/get_all_exe_ip_history", exe.getAllExeHistory);
 router.get("/get_stats_update_flag/:p_id", exe.getStatUpdateFlag);
 
 /*sim api*/
-router.get("/get_all_sims",  sim.getSims); // done
-router.post("/add_sim", upload.single("invoiceCopy"), sim.addSim);  //done
-router.get("/get_single_sim/:id",  sim.getSingleSim); // done
+router.get("/get_all_sims", sim.getSims); // done
+router.post("/add_sim", upload.single("invoiceCopy"), sim.addSim); //done
+router.get("/get_single_sim/:id", sim.getSingleSim); // done
 router.put("/update_sim", upload.single("invoiceCopy"), sim.editSim); //done
-router.delete("/delete_sim/:id",  sim.deleteSim); //done
-router.post("/add_sim_allocation",  sim.addAllocation); //done
-router.get("/get_all_allocations",  sim.getAllocations);
-router.get("/get_allocation_by_alloid/:id", sim.getAllocationDataByAlloId)
-router.get("/get_allocation_data_by_id/:id", sim.getSimAllocationDataById)
-router.put("/update_allocationsim",  sim.editAllocation);
-router.delete("/delete_allocation/:id",  sim.deleteAllocation);
+router.delete("/delete_sim/:id", sim.deleteSim); //done
+router.post("/add_sim_allocation", sim.addAllocation); //done
+router.get("/get_all_allocations", sim.getAllocations);
+router.get("/get_allocation_by_alloid/:id", sim.getAllocationDataByAlloId);
+router.get("/get_allocation_data_by_id/:id", sim.getSimAllocationDataById);
+router.put("/update_allocationsim", sim.editAllocation);
+router.delete("/delete_allocation/:id", sim.deleteAllocation);
+router.get("/alldataofsimallocment", sim.alldataofsimallocment);
 
 /* logo brand */
-router.post("/add_logo_brand",  logoBrand.addLogoBrand);
-router.get("/get_all_logo_brands",  logoBrand.getLogoBrands);
+router.post("/add_logo_brand", logoBrand.addLogoBrand);
+router.get("/get_all_logo_brands", logoBrand.getLogoBrands);
 router.get(
   "/get_single_logobrand/:id",
-  
+
   logoBrand.getSingleLogoBrand
 );
-router.put("/update_logo_brand",  logoBrand.editLogoBrand);
-router.delete("/delete_logo_brand/:id",  logoBrand.deleteLogoBrand);
+router.put("/update_logo_brand", logoBrand.editLogoBrand);
+router.delete("/delete_logo_brand/:id", logoBrand.deleteLogoBrand);
 
 /* department */
-router.post("/add_department",  department.addDepartment);//Done
-router.get("/get_all_departments",  department.getDepartments);//Done
+router.post("/add_department", department.addDepartment); //Done
+router.get("/get_all_departments", department.getDepartments); //Done
 router.get(
   "/get_single_department/:id",
-  
+
   department.getSingleDepartment
-);//not used
-router.put("/update_department",  department.editDepartment);//Done
-router.delete(
-  "/delete_department/:id",
-  department.deleteDepartment
-);//Done
+); //not used
+router.put("/update_department", department.editDepartment); //Done
+router.delete("/delete_department/:id", department.deleteDepartment); //Done
 
 /* sub department */
-router.post("/add_sub_department",  department.addSubDepartment);//Done
-router.get("/get_all_sub_departments",  department.getSubDepartments);//Done
-router.put("/update_sub_department",  department.editSubDepartment);//Done
+router.post("/add_sub_department", department.addSubDepartment); //Done
+router.get("/get_all_sub_departments", department.getSubDepartments); //Done
+router.put("/update_sub_department", department.editSubDepartment); //Done
 router.delete(
   "/delete_sub_department/:id",
-  
+
   department.deleteSubDepartment
-);//Done
+); //Done
 router.get(
   "/get_subdept_from_dept/:dept_id",
-  
+
   department.getSubDepartmentsFromDeptId
-);//Done
+); //Done
 router.get(
   "/get_subdept_from_id/:id",
-  
+
   department.getSubDepartmentsFromId
-);//Done
+); //Done
 
 /* designation */
-router.post("/add_designation",  designation.addDesignation);//Done
-router.put("/update_designation",  designation.editDesignation);//Done
+router.post("/add_designation", designation.addDesignation); //Done
+router.put("/update_designation", designation.editDesignation); //Done
 router.get(
   "/get_single_designation/:desi_id",
   designation.getSingleDesignation
-);//Done
-router.delete(
-  "/delete_designation/:desi_id",
-  designation.deleteDesignation
-);//Done
-router.get("/get_all_designations",  designation.getDesignations);//Done
+); //Done
+router.delete("/delete_designation/:desi_id", designation.deleteDesignation); //Done
+router.get("/get_all_designations", designation.getDesignations); //Done
 
 //brand routes
 router.post("/add_brand", brand.addBrand);
@@ -260,50 +254,54 @@ router.post(
   registerCampaign.addRegisterCampaign
 );
 router.get("/register_campaign", registerCampaign.getRegisterCampaigns);
-router.put("/register_campaign",  upload.single("excel_file"), registerCampaign.editRegisterCampaign);
+router.put(
+  "/register_campaign",
+  upload.single("excel_file"),
+  registerCampaign.editRegisterCampaign
+);
 router.delete("/register_campaign/:id", registerCampaign.deleteRegisterCmp);
 router.get("/register_campaign/:id", registerCampaign.getSingleRegisterCampign);
 
 //Hash Tag
-router.post("/hash_tag",  hashTag.addHashTag);
-router.get("/hash_tag",  hashTag.getHashTags);
-router.put("/hash_tag_edit",  hashTag.editHashTag);
-router.delete("/hash_tag/:id",  hashTag.deleteHashTag);
+router.post("/hash_tag", hashTag.addHashTag);
+router.get("/hash_tag", hashTag.getHashTags);
+router.put("/hash_tag_edit", hashTag.editHashTag);
+router.delete("/hash_tag/:id", hashTag.deleteHashTag);
 
 //Keyword
-router.post("/keyword",  keyword.addKeyword);
-router.get("/keyword",  keyword.getKeywords);
-router.get("/keyword/:id",  keyword.getKeyword);
-router.put("/keyword",  keyword.editKeyword);
-router.delete("/keyword/:id",  keyword.deleteKeyword);
+router.post("/keyword", keyword.addKeyword);
+router.get("/keyword", keyword.getKeywords);
+router.get("/keyword/:id", keyword.getKeyword);
+router.put("/keyword", keyword.editKeyword);
+router.delete("/keyword/:id", keyword.deleteKeyword);
 
 //Mentions
-router.post("/mention",  mention.addMention);
-router.get("/mention",  mention.getMentions);
-router.get("/mention/:id",  mention.getMention);
-router.put("/mention",  mention.editMention);
-router.delete("/mention/:id",  mention.deleteMention);
+router.post("/mention", mention.addMention);
+router.get("/mention", mention.getMentions);
+router.get("/mention/:id", mention.getMention);
+router.put("/mention", mention.editMention);
+router.delete("/mention/:id", mention.deleteMention);
 
 //InstaBotY
-router.post("/bot_y",  instaBotY.addBotY);
-router.get("/bot_y",  instaBotY.getBotYs);
-router.get("/bot_y/:id",  instaBotY.getBotY);
-router.put("/bot_y",  instaBotY.editBotY);
-router.delete("/bot_y/:id",  instaBotY.deleteBotY);
+router.post("/bot_y", instaBotY.addBotY);
+router.get("/bot_y", instaBotY.getBotYs);
+router.get("/bot_y/:id", instaBotY.getBotY);
+router.put("/bot_y", instaBotY.editBotY);
+router.delete("/bot_y/:id", instaBotY.deleteBotY);
 
 //InstaBotM
-router.post("/bot_m",  instaBotM.addBotM);
-router.get("/bot_m",  instaBotM.getBotMs);
-router.get("/bot_m/:id",  instaBotM.getBotM);
-router.put("/bot_m",  instaBotM.editBotM);
-router.delete("/bot_m/:id",  instaBotM.deleteBotM);
+router.post("/bot_m", instaBotM.addBotM);
+router.get("/bot_m", instaBotM.getBotMs);
+router.get("/bot_m/:id", instaBotM.getBotM);
+router.put("/bot_m", instaBotM.editBotM);
+router.delete("/bot_m/:id", instaBotM.deleteBotM);
 
 //InstaBotW
-router.post("/bot_w",  instaBotW.addBotW);
-router.get("/bot_w",  instaBotW.getBotWs);
-router.get("/bot_w/:id",  instaBotW.getBotW);
-router.put("/bot_w",  instaBotW.editBotW);
-router.delete("/bot_w/:id",  instaBotW.deleteBotW);
+router.post("/bot_w", instaBotW.addBotW);
+router.get("/bot_w", instaBotW.getBotWs);
+router.get("/bot_w/:id", instaBotW.getBotW);
+router.put("/bot_w", instaBotW.editBotW);
+router.delete("/bot_w/:id", instaBotW.deleteBotW);
 
 //Projectx Category
 router.post("/projectxCategory", projectxCategory.addProjectxCategory);
@@ -355,33 +353,33 @@ router.delete("/content/:id", contentType.deleteContentType);
 /* finance */
 router.post(
   "/add_finance",
-  
+
   upload.single("screenshot"),
   finance.addFinance
 );
-router.get("/get_finances",  finance.getFinances);
+router.get("/get_finances", finance.getFinances);
 router.put(
   "/edit_finance",
-  
+
   upload.single("screenshot"),
   finance.editFinance
 );
-router.delete("/delete_finance",  finance.deleteFinance);
+router.delete("/delete_finance", finance.deleteFinance);
 
 /* Sitting Routes */
-router.post("/add_sitting",  sitting.addSitting);
-router.get("/get_all_sittings",  sitting.getSittings);
-router.get("/get_single_sitting/:id",  sitting.getSingleSitting);
-router.put("/update_sitting",  sitting.editSitting);
-router.delete("/delete_sitting/:id",  sitting.deleteSitting);
-router.get("/not_alloc_sitting",sitting.getNotAllocSitting);
+router.post("/add_sitting", sitting.addSitting);
+router.get("/get_all_sittings", sitting.getSittings);
+router.get("/get_single_sitting/:id", sitting.getSingleSitting);
+router.put("/update_sitting", sitting.editSitting);
+router.delete("/delete_sitting/:id", sitting.deleteSitting);
+router.get("/not_alloc_sitting", sitting.getNotAllocSitting);
 
 /* Sitting Routes */
-router.post("/add_room",upload.single("room_image"),  sitting.addRoom);
-router.put("/update_room",upload.single("room_image"),  sitting.editRoom);
-router.get("/get_all_rooms",  sitting.getRooms);
-router.get("/get_room/:id",  sitting.getRoomById);
-router.delete("/delete_room/:id",  sitting.deleteRoom);
+router.post("/add_room", upload.single("room_image"), sitting.addRoom);
+router.put("/update_room", upload.single("room_image"), sitting.editRoom);
+router.get("/get_all_rooms", sitting.getRooms);
+router.get("/get_room/:id", sitting.getRoomById);
+router.delete("/delete_room/:id", sitting.deleteRoom);
 
 /* Agency Routes */
 router.post("/add_agency", agency.addAgency);
@@ -391,129 +389,137 @@ router.put("/update_agency", agency.editAgency);
 router.delete("/delete_agency/:id", agency.deleteAgency);
 
 /* Object Mast */
-router.post("/add_obj",  objectMast.addObjectMast);
-router.get("/get_all_objs",  objectMast.getObjectMasts);
-router.get("/objdata/:obj_id",  objectMast.getObjectMastById);
-router.put("/obj_update",  objectMast.editObjectMast);
-router.delete("/obj_delete/:obj_id",  objectMast.deleteObjectMast);
+router.post("/add_obj", objectMast.addObjectMast);
+router.get("/get_all_objs", objectMast.getObjectMasts);
+router.get("/objdata/:obj_id", objectMast.getObjectMastById);
+router.put("/obj_update", objectMast.editObjectMast);
+router.delete("/obj_delete/:obj_id", objectMast.deleteObjectMast);
 
 /* role */
-router.post("/add_role",  role.addRole);
-router.get("/get_all_roles",  role.getRoles);
-router.put("/update_role",  role.editRole);
-router.delete("/delete_role/:role_id",  role.deleteRole);
+router.post("/add_role", role.addRole);
+router.get("/get_all_roles", role.getRoles);
+router.put("/update_role", role.editRole);
+router.delete("/delete_role/:role_id", role.deleteRole);
 
 /* Announcement */
-router.post("/add_annomastpost",  announcement.addAnnouncement);
+router.post("/add_annomastpost", announcement.addAnnouncement);
 router.get(
   "/get_all_announcementdatas",
-  
+
   announcement.getAnnouncements
 );
 router.get(
   "/get_single_announcement/:id",
-  
+
   announcement.getAnnoncementById
 );
 router.delete(
   "/delete_annomastdelete/:id",
-  
+
   announcement.deleteAnnoncement
 );
-router.put("/update_annomastput",  announcement.editAnnoncement);
+router.put("/update_annomastput", announcement.editAnnoncement);
 
 /* job responsibility */
 router.post(
   "/add_job_responsibility",
-  
+
   responsibility.addJobResponsibility
 );
 router.get(
   "/get_all_jobresponsibilitys",
-  
+
   responsibility.getJobResposibilities
 );
 router.get(
   "/get_single_jobresponsibility/:id",
-  
+
   responsibility.getSingleJobResponsibility
 );
 router.put(
   "/update_jobresponsibility",
-  
+
   responsibility.editJobResponsibility
 );
 router.delete(
   "/delete_jobresponsibility/:id",
-  
+
   responsibility.deleteJobResponsibility
 );
 
 router.post(
   "/add_responsibility",
-  
+
   responsibility.addResponsibility
 );
 router.get(
   "/get_all_responsibilitys",
-  
+
   responsibility.getResposibilities
 );
 router.get(
   "/get_single_responsibility/:id",
-  
+
   responsibility.getSingleResposibility
 );
 router.put(
   "/edit_responsibility/:id",
-  
+
   responsibility.editResponsibility
 );
 router.delete(
   "/delete_responsibility/:id",
-  
+
   responsibility.deleteResponsibility
 );
 
 /* Content Management Routes */
-router.post("/add_contentMgnt",  upload.single("content"),  contentM.addcontentManagement);
+router.post(
+  "/add_contentMgnt",
+  upload.single("content"),
+  contentM.addcontentManagement
+);
 router.get(
   "/get_all_contentMgnts",
-  
+
   contentM.getcontentManagements
 );
 router.get(
   "/get_single_contentMgnt/:id",
-  
+
   contentM.getContentManagementById
 );
-router.put("/update_contentMgnt",upload.single("content"),  contentM.editcontentManagement);
+router.put(
+  "/update_contentMgnt",
+  upload.single("content"),
+  contentM.editcontentManagement
+);
 router.delete(
   "/delete_contentMgnt/:id",
-  
+
   contentM.deletecontentManagement
 );
 
 /* BillingHeader Routes */
-router.post("/add_billingheader",  billingheader.addBillingHeader);
+router.post("/add_billingheader", billingheader.addBillingHeader);
 router.get(
   "/get_all_billingheaders",
-  
+
   billingheader.getBillingHeaders
 );
 router.get(
   "/get_single_billingheader/:id",
-  
+
   billingheader.getBillingHeaderById
 );
 router.put(
   "/update_billingheader",
-  
+
   billingheader.editBillingHeader
 );
 router.delete(
   "/delete_billingheader/:id",
-  
+
   billingheader.deleteBillingHeader
 );
 
@@ -561,126 +567,126 @@ router.delete("/insta_brand/:id", instaBrand.deleteInstaBrand);
 /* user */
 router.post("/add_user", user.addUser);
 router.post("/forgot_pass", user.forgotPass);
-router.put("/update_user",  user.updateUser);
-router.get("/get_wfh_user/:dept_id",  user.getWFHUsersByDept); 
-router.get("/get_all_users",  user.getAllUsers);
-router.get("/get_single_user/:id",  user.getSingleUser);
-router.delete("/delete_user/:id",  user.deleteUser);
-router.post("/add_user_auth",  user.addUserAuth);
-router.put("/update_user_auth",  user.updateUserAuth);
-router.delete("/delete_user_auth",  user.deleteUserAuth);
-router.get("/get_all_user_auth",  user.allUserAuthDetail);
+router.put("/update_user", user.updateUser);
+router.get("/get_wfh_user/:dept_id", user.getWFHUsersByDept);
+router.get("/get_all_users", user.getAllUsers);
+router.get("/get_single_user/:id", user.getSingleUser);
+router.delete("/delete_user/:id", user.deleteUser);
+router.post("/add_user_auth", user.addUserAuth);
+router.put("/update_user_auth", user.updateUserAuth);
+router.delete("/delete_user_auth", user.deleteUserAuth);
+router.get("/get_all_user_auth", user.allUserAuthDetail);
 router.post("/login_user", user.loginUser);
 router.post("/log_out", user.logOut);
-router.post("/get_delivery_boy",  user.deliveryBoy);  //done
-router.get("/get_delivery_user",  user.deliveryUser);
+router.post("/get_delivery_boy", user.deliveryBoy); //done
+router.get("/get_delivery_user", user.deliveryUser);
 router.get(
   "/get_single_delivery_boy_by_room/:room_id",
-  
+
   user.deliveryBoyByRoom
 ); //done
 router.get(
   "/get_single_user_auth_detail/:Juser_id",
-  
+
   user.getSingleUserAuthDetail
 );
-router.get("/get_user_object_auth",  user.userObjectAuth);
+router.get("/get_user_object_auth", user.userObjectAuth);
 router.post(
   "/add_send_user_mail",
   upload.single("attachment"),
-  
+
   user.sendUserMail
 );
 router.post(
   "/get_user_job_responsibility",
-  
+
   user.getUserJobResponsibility
 );
-router.get("/get_user_by_deptid/:id",  user.getUserByDeptId);
-router.get("/get_user_other_fields/:user_id",  user.getUserOtherFields);
+router.get("/get_user_by_deptid/:id", user.getUserByDeptId);
+router.get("/get_user_other_fields/:user_id", user.getUserOtherFields);
 router.post(
   "/add_user_other_field",
-  
+
   upload.single("field_value"),
   user.addUserOtherField
 );
 router.put(
   "/update_user_other_fields/:id",
-  
+
   upload.single("field_value"),
   user.getUserOtherFields
 );
 
-router.post("/login_user_data",user.loginUserData);
-router.post("/add_reason",  user.addReason);
-router.get("/get_all_reasons",  user.getAllReasons);
-router.post("/add_separation",  user.addSeparation);
-router.get("/get_all_separations",  user.getAllSeparations);
-router.get("/get_single_separation/:id",  user.getSingleSeparation);
-router.put("/update_separation",  user.updateSeparation);
+router.post("/login_user_data", user.loginUserData);
+router.post("/add_reason", user.addReason);
+router.get("/get_all_reasons", user.getAllReasons);
+router.post("/add_separation", user.addSeparation);
+router.get("/get_all_separations", user.getAllSeparations);
+router.get("/get_single_separation/:id", user.getSingleSeparation);
+router.put("/update_separation", user.updateSeparation);
 router.post(
   "/add_send_mail_all_wfo_user",
-  
+
   upload.single("attachment"),
   user.sendMailAllWfoUser
 );
-router.get("/get_all_wfh_users",  user.getAllWfhUsers);
+router.get("/get_all_wfh_users", user.getAllWfhUsers);
 router.get("/get_all_login_history", user.getLoginHistory);
 // router.get("/get_first_time_login_users", user.getAllFirstLoginUsers)
 
 /* attendance */
-router.post("/add_attendance",  attendance.addAttendance);
+router.post("/add_attendance", attendance.addAttendance);
 router.post(
   "/get_salary_by_id_month_year",
-  
+
   attendance.getSalaryByDeptIdMonthYear
 );
-router.post("/get_salary_by_filter",  attendance.getSalaryByFilter);
+router.post("/get_salary_by_filter", attendance.getSalaryByFilter);
 router.post(
   "/get_attendance_by_userid",
-  
+
   attendance.getSalaryByUserId
 );
-router.get("/get_wfh_user_count",  attendance.countWfhUsers);
+router.get("/get_wfh_user_count", attendance.countWfhUsers);
 router.post(
   "/get_salary_count_by_dept_year",
-  
+
   attendance.getSalaryCountByDeptYear
 );
 router.get(
   "/get_salary_count_by_year",
-  
+
   attendance.getSalaryCountByYear
 );
 router.post(
   "/new_joiners",
-  
+
   attendance.newJoiners
 );
 router.get(
   "/all_attendence_mast_data",
-  
+
   attendance.allAttendenceMastData
 );
 router.post(
   "/left_employees",
-  
+
   attendance.leftEmployees
 );
 router.post(
   "/dept_id_with_wfh",
-  
+
   attendance.deptIdWithWfh
 );
-router.get("/get_total_salary", attendance.totalSalary)
+router.get("/get_total_salary", attendance.totalSalary);
 // router.get("/get_all_dept_with_wfh", attendance.allDeptWithWfh)
-router.put("/update_salary", attendance.updateSalary)
-router.put("/update_attendence_status", attendance.updateAttendenceStatus)
-router.get("/get_month_year_data", attendance.getMonthYearData)
-router.post("/get_distinct_depts", attendance.getDistinctDepts)
-router.post("/check_salary_status", attendance.checkSalaryStatus)
-router.get("/all_departments_of_wfh", attendance.allDeptsOfWfh)
-router.get("/dept_with_wfh", attendance.deptWithWFH)
+router.put("/update_salary", attendance.updateSalary);
+router.put("/update_attendence_status", attendance.updateAttendenceStatus);
+router.get("/get_month_year_data", attendance.getMonthYearData);
+router.post("/get_distinct_depts", attendance.getDistinctDepts);
+router.post("/check_salary_status", attendance.checkSalaryStatus);
+router.get("/all_departments_of_wfh", attendance.allDeptsOfWfh);
+router.get("/dept_with_wfh", attendance.deptWithWFH);
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
@@ -695,125 +701,125 @@ router.delete("/delete_commitment/:id", cmtController.deleteCmt);
 router.post(
   "/add_product",
   upload.single("Product_image"), //upload1
-  
+
   productController.addProduct
 ); //done
 router.put(
   "/update_productupdate",
-  upload.single("Product_image"),  //upload1
-  
+  upload.single("Product_image"), //upload1
+
   productController.editProduct
 ); //done
 router.get(
   "/get_single_productdata/:id",
-  
+
   productController.getProductById
 ); //done
 router.get(
   "/get_all_products",
-  
+
   productController.getProduct
 ); //done
 router.delete(
   "/delete_productdelete/:id",
-  
+
   productController.deleteProductById
 ); //done
 //Product props
-router.post("/add_proppost",  productController.addProductProps); //done
+router.post("/add_proppost", productController.addProductProps); //done
 router.get(
   "/get_single_propsdata/:product_id",
-  
+
   productController.getProductPropsByProductId
 ); //done
 router.put(
   "/update_propsdataupdate/:id",
-  
+
   productController.editProductProps
 ); // build in sql but not used in react
 router.delete(
   "/delete_propdelete/:id",
-  
+
   productController.deleteProductProp
 ); //done
 
 // Order Delivery api's
 router.post(
   "/add_orderdelivery",
-  
+
   productController.addOrderDelivery
 ); // build in sql but not used in react
 router.get(
   "/get_all_orderdelivery",
-  
+
   productController.getAllOrderDeliveries
 ); // build in sql but not used in react
 
 //Order Req api's
-router.post("/add_orderreq",  productController.addOrderReq); //done
+router.post("/add_orderreq", productController.addOrderReq); //done
 router.post(
   "/get_orderrequest",
-  
+
   productController.getOrderReqByOrderId
 ); // build in sql but not used in react
-router.put("/update_orderrequest",  productController.editOrderReq); //done
+router.put("/update_orderrequest", productController.editOrderReq); //done
 router.put(
   "/update_statusupdatebymanager",
-  
+
   productController.statusUpdateByManager
-);  //build in sql but not used in react
+); //build in sql but not used in react
 router.put(
   "/update_orderrequesttransbyman",
-  
+
   productController.statusUpdateByManager
 ); // build in sql but not used in react
 router.delete(
   "/delete_orderreqdelete",
-  
+
   productController.deleteOrderReqById
-);  // build in sql but not used in react
-router.get("/get_LastOrderId",  productController.getLastOrderId); //done
+); // build in sql but not used in react
+router.get("/get_LastOrderId", productController.getLastOrderId); //done
 router.get(
   "/get_single_deliveredorders/:id",
-  
+
   productController.delivereOrdersById
-);  // build in sql but not used in react
+); // build in sql but not used in react
 router.get(
   "/get_single_pendingorders/:id",
-  
+
   productController.pendingOrdersById
-);  //done
+); //done
 router.post(
   "/add_userorderrequest",
-  
+
   productController.orderRequestsForUser
 ); // build in sql but not used in react
 router.get(
   "/get_all_orderreqdata",
-  
+
   productController.allOrderReqData
 ); //done
 router.get(
   "/get_single_orderreqshistory/:user_id",
-  
+
   productController.orderReqHistory
 ); //done
 router.post(
   "/add_orderreqs",
-  
+
   productController.getOrderReqsBasedOnFilter
 ); //done
-router.post("/add_transreq",  productController.addTransferReq); //done
+router.post("/add_transreq", productController.addTransferReq); //done
 router.get(
   "/get_all_transreq",
-  
+
   productController.getAllTransferReq
 ); //done
 
 /* KRA Routes */
-router.post("/add_kra",  kra.addKra);
-router.get("/get_single_kra/:user_id",  kra.getJobResponById);
-router.get("/get_all_kras",  kra.getKras);
+router.post("/add_kra", kra.addKra);
+router.get("/get_single_kra/:user_id", kra.getJobResponById);
+router.get("/get_all_kras", kra.getKras);
 
 /* instapage routes */
 router.post("/add_instapage", instapage.addIp); //done
@@ -838,65 +844,82 @@ router.get("/get_platform_byid/:id", instapage.getPlatformById); //done
 router.get("/get_instapage_byid/:id", instapage.getInstaPageById);
 router.post("/dataforgraph", instapage.dataForGraph);
 router.get("/get_all_instapages", instapage.getAllInstaPages);
-router.post("/instagram",instapage.Instagram);
+router.post("/instagram", instapage.Instagram);
 
 /* Lead Remark Route */
-router.post("/add_leadremark",  leadremark.addLeadRemark);
-router.get("/get_all_leadremarks",  leadremark.getLeadRemarks);
-router.put("/update_leadremark",  leadremark.editLeadRemark);
+router.post("/add_leadremark", leadremark.addLeadRemark);
+router.get("/get_all_leadremarks", leadremark.getLeadRemarks);
+router.put("/update_leadremark", leadremark.editLeadRemark);
 
 /* Lead Route */
-router.post("/add_lead",  lead.addLead);
-router.get("/get_all_leads",  lead.getLeads);
-router.get("/get_single_lead/:lead_id",  lead.getLeadById);
-router.put("/update_lead",  lead.editLead);
-router.delete("/delete_lead",  lead.deleteLead);
+router.post("/add_lead", lead.addLead);
+router.get("/get_all_leads", lead.getLeads);
+router.get("/get_single_lead/:lead_id", lead.getLeadById);
+router.put("/update_lead", lead.editLead);
+router.delete("/delete_lead", lead.deleteLead);
 
 /* Lead Type Route */
-router.post("/add_leadtype",  leadtype.addLeadType);
-router.get("/get_all_leadtypes",  leadtype.getLeadTypes);
-router.put("/update_leadtype",  leadtype.editLeadType);
-router.delete("/delete_leadtype",  leadtype.deleteLeadType);
+router.post("/add_leadtype", leadtype.addLeadType);
+router.get("/get_all_leadtypes", leadtype.getLeadTypes);
+router.put("/update_leadtype", leadtype.editLeadType);
+router.delete("/delete_leadtype", leadtype.deleteLeadType);
 
 /* Lead Mast Route */
-router.post("/add_leadmast",  leadmast.addLeadMast);
-router.get("/get_all_leadmasts",  leadmast.getLeadMasts);
+router.post("/add_leadmast", leadmast.addLeadMast);
+router.get("/get_all_leadmasts", leadmast.getLeadMasts);
 router.get(
   "/get_single_leadmast/:leadmast_id",
-  
+
   leadmast.getLeadMastById
 );
-router.put("/update_leadmast",  leadmast.editLeadMast);
-router.delete("/delete_leadmast",  leadmast.deleteLeadMast);
-
+router.put("/update_leadmast", leadmast.editLeadMast);
+router.delete("/delete_leadmast", leadmast.deleteLeadMast);
 
 /* Asset Category Routes */
-router.post("/add_asset_category",  assetCategory.addAssetCategory);
+router.post("/add_asset_category", assetCategory.addAssetCategory);
 router.get("/get_all_asset_category", assetCategory.getAssetCategorys);
-router.get("/get_single_asset_category/:category_id",  assetCategory.getSingleAssetCategory);
-router.put("/update_asset_category",  assetCategory.editAssetCategory);
-router.delete("/delete_asset_category/:category_id",  assetCategory.deleteAssetCategory);
+router.get(
+  "/get_single_asset_category/:category_id",
+  assetCategory.getSingleAssetCategory
+);
+router.put("/update_asset_category", assetCategory.editAssetCategory);
+router.delete(
+  "/delete_asset_category/:category_id",
+  assetCategory.deleteAssetCategory
+);
 
 /* Asset Sub Category Routes */
-router.post("/add_asset_sub_category",  assetSubCategory.addAssetSubCategory);
-router.get("/get_all_asset_sub_category", assetSubCategory.getAssetSubCategorys);
-router.get("/get_single_asset_sub_category/:sub_category_id",  assetSubCategory.getSingleAssetSubCategory);
-router.put("/update_asset_sub_category",  assetSubCategory.editAssetSubCategory);
-router.delete("/delete_asset_sub_category/:sub_category_id",  assetSubCategory.deleteAssetSubCategory);
-router.get("/get_sub_category_from_categroyid/:category_id",assetSubCategory.getAssetSubCategoryFromCategoryId);
+router.post("/add_asset_sub_category", assetSubCategory.addAssetSubCategory);
+router.get(
+  "/get_all_asset_sub_category",
+  assetSubCategory.getAssetSubCategorys
+);
+router.get(
+  "/get_single_asset_sub_category/:sub_category_id",
+  assetSubCategory.getSingleAssetSubCategory
+);
+router.put("/update_asset_sub_category", assetSubCategory.editAssetSubCategory);
+router.delete(
+  "/delete_asset_sub_category/:sub_category_id",
+  assetSubCategory.deleteAssetSubCategory
+);
+router.get(
+  "/get_sub_category_from_categroyid/:category_id",
+  assetSubCategory.getAssetSubCategoryFromCategoryId
+);
 
 /* Vendor Routes */
-router.post("/add_vendor",  vendor.addVendor);
+router.post("/add_vendor", vendor.addVendor);
 router.get("/get_all_vendor", vendor.getVendors);
-router.get("/get_single_vendor/:vendor_id",  vendor.getSingleVendor);
-router.put("/update_vendor",  vendor.editVendor);
-router.delete("/delete_vendor/:vendor_id",  vendor.deleteVendor);
+router.get("/get_single_vendor/:vendor_id", vendor.getSingleVendor);
+router.put("/update_vendor", vendor.editVendor);
+router.delete("/delete_vendor/:vendor_id", vendor.deleteVendor);
 /* Page Uniqueness routes for insta */
-router.post("/page_uniqueness",  pageUniqueness.addPageUniqueness);
-router.get("/page_uniqueness",  pageUniqueness.getAllPageUniqueness);
-router.get("/page_uniqueness/:id",  pageUniqueness.getPageUniquenessById);
-router.put("/page_uniqueness",  pageUniqueness.editPageUniqueness);
-router.delete("/page_uniqueness/:id",  pageUniqueness.deletePageUniqueness);
+router.post("/page_uniqueness", pageUniqueness.addPageUniqueness);
+router.get("/page_uniqueness", pageUniqueness.getAllPageUniqueness);
+router.get("/page_uniqueness/:id", pageUniqueness.getPageUniquenessById);
+router.put("/page_uniqueness", pageUniqueness.editPageUniqueness);
+router.delete("/page_uniqueness/:id", pageUniqueness.deletePageUniqueness);
 
 /* coc routes */
 router.post("/add_coc", coc.addCoc);
@@ -906,20 +929,27 @@ router.put("/update_coc", coc.editCoc);
 router.get("/get_coc_history/:_id", coc.getCocHistory);
 
 /* Document master */
-router.post("/add_doc",  documentController.addDocument);
-router.get("/get_all_docs",  documentController.getDocs);
-router.get("/get_doc/:id",  documentController.getDoc);
+router.post("/add_doc", documentController.addDocument);
+router.get("/get_all_docs", documentController.getDocs);
+router.get("/get_doc/:id", documentController.getDoc);
 router.put("/update_doc", documentController.editDoc);
-router.delete("/delete_doc/:id",  documentController.deleteDoc);
-router.post("/add_doc_history",upload.fields([ { name: 'doc_file', maxCount: 10}]),documentController.addHistoryDoc);
-router.put("/update_doc_history",  documentController.editHistoryDoc);
+router.delete("/delete_doc/:id", documentController.deleteDoc);
+router.post(
+  "/add_doc_history",
+  upload.fields([{ name: "doc_file", maxCount: 10 }]),
+  documentController.addHistoryDoc
+);
+router.put("/update_doc_history", documentController.editHistoryDoc);
 
 /* Assets Images master */
-router.post("/add_assets_images",  assetsImage.addAssetImage);
-router.get("/get_all_assets_images",  assetsImage.getAllAssetsImages);
-router.get("/get_single_assets_image/:asset_image_id",  assetsImage.getSingleAssetsImage);
-router.put("/update_assets_images",  assetsImage.updateAssetImage);
-router.delete("/delete_assets_images/:asset_image_id",  assetsImage.deleteAssetImage);
+router.post("/add_assets_images", assetsImage.addAssetImage);
+router.get("/get_all_assets_images", assetsImage.getAllAssetsImages);
+router.post("/get_single_assets_image", assetsImage.getSingleAssetsImage);
+router.put("/update_assets_images", assetsImage.updateAssetImage);
+router.delete(
+  "/delete_assets_images/:asset_image_id",
+  assetsImage.deleteAssetImage
+);
 
 /* crawler count api */
 router.post("/add_crawler_count", insta.addCrawlerCount);
@@ -929,17 +959,28 @@ router.get("/get_single_crawler/:_id", insta.getSingleCrawler);
 
 /* notifications api */
 router.post("/add_notification", notification.addNotification);
-router.get("/get_all_unreden_notifications", notification.getAllUnredenNotifications);
+router.get(
+  "/get_all_unreden_notifications",
+  notification.getAllUnredenNotifications
+);
 router.get("/get_all_notifications", notification.getAllNotifications);
 router.put("/update_notification", notification.editNotification);
-router.delete("/delete_notification/:_id", notification.deleteNotification)
+router.delete("/delete_notification/:_id", notification.deleteNotification);
 /* user doc  */
-router.post("/add_user_doc",upload1.single("doc_image"), userDocManagement.addUserDoc);
-router.put("/update_user_doc",upload1.single("doc_image"), userDocManagement.editDoc);
+router.post(
+  "/add_user_doc",
+  upload1.single("doc_image"),
+  userDocManagement.addUserDoc
+);
+router.put(
+  "/update_user_doc",
+  upload1.single("doc_image"),
+  userDocManagement.editDoc
+);
 // router.post("/get_user_doc/:id", userDocManagement.getUserDoc);
 router.post("/get_user_doc", userDocManagement.getUserDoc);
 router.delete("/delete_user_doc/:id", userDocManagement.deleteDoc);
 
 //Swagger Route
-router.post("/add_dev_data", swaggerAccessManagement.addDevData); 
+router.post("/add_dev_data", swaggerAccessManagement.addDevData);
 module.exports = router;

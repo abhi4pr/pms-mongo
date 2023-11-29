@@ -6,6 +6,10 @@ const exeCountHisModel = new mongoose.Schema({
     type: Number,
     required: true
   },
+  user_id: {
+    type: Number,
+    required: true
+  },
   reach: {
     type: Number,
     required: false,
