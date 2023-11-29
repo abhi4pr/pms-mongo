@@ -1,5 +1,6 @@
 const exeSum = require('../models/exeSumModel.js');
 const exeInven = require('../models/exeInvenModel.js');
+const exePurchaseModel = require("../models/exePurchaseModel.js");
 const jwt = require('jsonwebtoken');
 const variable = require('../variables.js');
 const axios = require('axios');
@@ -309,7 +310,8 @@ exports.getLatestPIDCount = async (req, res) => {
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "media", maxCount: 1 },
-    { name: "reach_impression_upload_image", maxCount: 1 },
+    { name: "reach_upload_image", maxCount: 1 },
+    { name: "impression_upload_image", maxCount: 1},
     { name: "engagement_upload_image", maxCount: 1 },
     { name: "story_view_upload_image", maxCount: 1 },
     { name: "story_view_upload_video", maxCount: 1 },
@@ -331,7 +333,8 @@ exports.addIPCountHistory = [upload, async (req, res) => {
             start_date: req.body.start_date,
             end_date: req.body.end_date,
             media:req.files.media ? req.files.media[0].filename : '',
-            reach_impression_upload_image:req.files.reach_impression_upload_image ? req.files.reach_impression_upload_image[0].filename : '',
+            reach_upload_image:req.files.reach_upload_image ? req.files.reach_upload_image[0].filename : '',
+            impression_upload_image:req.files.impression_upload_image ? req.files.impression_upload_image[0].filename : '',
             engagement_upload_image:req.files.engagement_upload_image ? req.files.engagement_upload_image[0].filename : '',
             story_view_upload_image:req.files.story_view_upload_image ? req.files.story_view_upload_image[0].filename : '',
             story_view_upload_video:req.files.story_view_upload_video ? req.files.story_view_upload_video[0].filename : '',
@@ -369,7 +372,8 @@ exports.addIPCountHistory = [upload, async (req, res) => {
             percentage_country4_name: req.body.percentage_country4_name,
             percentage_country5_name: req.body.percentage_country5_name,
             country_image_upload:req.files.country_image_upload ? req.files.country_image_upload[0].filename : '',
-            stats_update_flag: true
+            stats_update_flag: true,
+            story_view_date: req.body.story_view_date
         })
         const simv = await simc.save();
     
@@ -382,7 +386,8 @@ exports.addIPCountHistory = [upload, async (req, res) => {
 
 const upload1 = multer({ dest: "uploads/" }).fields([
     { name: "media", maxCount: 1 },
-    { name: "reach_impression_upload_image", maxCount: 1 },
+    { name: "reach_upload_image", maxCount: 1 },
+    { name: "impression_upload_image", maxCount: 1},
     { name: "engagement_upload_image", maxCount: 1 },
     { name: "story_view_upload_image", maxCount: 1 },
     { name: "story_view_upload_video", maxCount: 1 },
@@ -403,7 +408,8 @@ exports.updateIPCountHistory = [upload1, async (req, res) => {
             start_date: req.body.start_date,
             end_date: req.body.end_date,
             media:req.files && req.files['media'] && req.files['media'][0] ? req.files['media'][0].filename : '',
-            reach_impression_upload_image: req.files && req.files['reach_impression_upload_image'] && req.files['reach_impression_upload_image'][0] ? req.files['reach_impression_upload_image'][0].filename : '',
+            reach_upload_image: req.files && req.files['reach_upload_image'] && req.files['reach_upload_image'][0] ? req.files['reach_upload_image'][0].filename : '',
+            impression_upload_image: req.files && req.files['impression_upload_image'] && req.files['impression_upload_image'][0] ? req.files['impression_upload_image'][0].filename : '',
             engagement_upload_image: req.files && req.files[' engagement_upload_image'] && req.files[' engagement_upload_image'][0] ? req.files[' engagement_upload_image'][0].filename :'',
             story_view_upload_image: req.files && req.files['story_view_upload_image'] && req.files['story_view_upload_image'][0] ? req.files['story_view_upload_image'][0].filename : '',
             story_view_upload_video: req.files && req.files['story_view_upload_video'] && req.files['story_view_upload_video'][0] ? req.files['story_view_upload_video'][0].filename : '',
@@ -441,7 +447,8 @@ exports.updateIPCountHistory = [upload1, async (req, res) => {
             percentage_country4_name: req.body.percentage_country4_name,
             percentage_country5_name: req.body.percentage_country5_name,
             country_image_upload: req.files && req.files['country_image_upload'] && req.files['country_image_upload'][0] ? req.files['country_image_upload'][0].filename : '',
-            stats_update_flag: true
+            stats_update_flag: true,
+            story_view_date: req.body.story_view_date
         }, { new: true });
         if (!editIPCountHistory) {
             return res.status(500).send({ success: false })
@@ -471,7 +478,7 @@ exports.exeForPurchase = async (req, res) => {
             
             if (!existingData) {
 
-                const creators = new exeSum({
+                const creators = new exePurchaseModel({
                     p_id: data.p_id,
                     page_name: data.page_name,
                     cat_name: data.cat_name,
@@ -501,6 +508,81 @@ exports.getAllExeHistory = async (req, res) => {
     }
 }
 
+// exports.getAllExeHistory = async (req, res) => {
+//     try {
+//         const simc = await exeSum
+//         .aggregate([
+//           {
+//             $lookup: {
+//               from: "usermodels",
+//               localField: "user_id",
+//               foreignField: "user_id",
+//               as: "user",
+//             },
+//           },
+//           {
+//             $unwind: {
+//               path: "$user",
+//               preserveNullAndEmptyArrays: true,
+//             },
+//           },
+
+//           {
+//             $project: {
+//              _id:"$_id",   
+//              id:"$id",
+//              sale_booking_execution_id:"$sale_booking_execution_id",
+//              sale_booking_id:"$sale_booking_id",
+//              start_date_:"$start_date_",
+//              end_date:"$end_date",
+//              summary: "$summary",
+//              remarks: "$remarks",
+//              created_by: "$created_by",
+//              last_updated_by: "$last_updated_by",
+//              creation_date: "$creation_date",
+//              last_updated_date: "$last_updated_date",
+//              sale_booking_date: "$sale_booking_date",
+//              campaign_amount: "$campaign_amount",
+//              execution_date: "$execution_date",
+//              execution_remark: "$executon_remark",
+//              execution_done_by: "$execution_done_by",
+//              cust_name: "$cust_name",
+//              loggedin_user_id: "$loggedin_user_id",
+//              execution_status: "$execution_status",
+//              payment_update_id: "$payment_update_id",
+//              payment_type: "$payment_type",
+//              status_desc: "$status_desc",
+//              invoice_creation_status: "$invoice_creation_status",
+//              manager_approval:"$manager_approval" ,
+//              invoice_particular: "$invoice_particular" ,
+//              payment_status_show: "$payment_status_show",
+//              sales_executive_name: "$sales_executive_name",
+//              page_ids: "$page_ids",
+//              service_id: "service_id",
+//              service_name: "$service_name",
+//              execution_excel: "$execution_excel",
+//              total_paid_amount: "$total_paid_amount",
+//              credit_approval_amount: "$credit_approval_amount",
+//              credit_approval_date: "$credit_approval_date",
+//              credit_approval_by: "$credit_approval_by",
+//              campaign_amount_without_gst: "$campaign_amount_without_gst",
+//              start_date: "$start_date",
+//              user_name:"$user.user_name"
+//             },
+//           },
+//         ])
+//         .exec();
+//       if (!simc) {
+//         res.status(500).send({ success: false });
+//       }
+//       res.status(200).send({ data: simc });
+//         // const cocData = await exeSum.find({});
+//         // res.status(200).send({data:cocData})
+//     } catch (error) {
+//         res.status(500).send({error:error.message, sms:'error getting all data of exe summary'})
+//     }
+// }
+
 exports.getExeIpCountHistory = async (req, res) => {
     try {
         const cocData = await exeCountHisModel.find({p_id: req.params.p_id , stats_update_flag : true}).lean();
@@ -508,7 +590,8 @@ exports.getExeIpCountHistory = async (req, res) => {
         const dataWithImageUrl = cocData.map((exe) => ({
             ...exe,
             media_url: exe.media ? exeImagesBaseUrl + exe.media : null,
-            reach_impression_upload_image_url: exe.reach_impression_upload_image ? exeImagesBaseUrl + exe.reach_impression_upload_image : null,
+            reach_upload_image_url: exe.reach_upload_image ? exeImagesBaseUrl + exe.reach_upload_image : null,
+            impression_upload_image_url: exe.impression_upload_image ? exeImagesBaseUrl + exe.impression_upload_image : null,
             engagement_upload_image_url: exe.engagement_upload_image ? exeImagesBaseUrl + exe.engagement_upload_image : null,
             story_view_upload_image_url: exe.story_view_upload_image ? exeImagesBaseUrl + exe.story_view_upload_image : null,
             story_view_upload_video_url: exe.story_view_upload_video ? exeImagesBaseUrl + exe.story_view_upload_video : null,
@@ -567,7 +650,8 @@ exports.getPercentage = async (req, res) => {
             'stats_for',
             'start_date',
             'end_date',
-            'reach_impression_upload_image',
+            'reach_upload_image',
+            'impression_upload_image',
             'engagement_upload_image',
             'story_view_upload_image',
             'story_view_upload_video',
@@ -617,7 +701,7 @@ exports.getPercentage = async (req, res) => {
           }
         }
 
-        const totalPercentage = (count/45)*100; 
+        const totalPercentage = (count/46)*100; 
         res.status(200).send({ latestEntry, totalPercentage: totalPercentage });
       } else {
         res.status(404).json({ message: 'Latest Entry not found' });
@@ -641,3 +725,22 @@ exports.getStatUpdateFlag = async (req, res) => {
       res.status(500).json({ error:error.message, message: 'Internal Server Error' });
     }
 };
+
+
+exports.getDistinctExeCountHistory = async (req, res) => {
+    try {
+        let query = {};
+        if (req.params.p_id) {
+            query.p_id = parseInt(req.params.p_id);
+        }
+
+        const allEntries = await exeCountHisModel
+            .find(query)
+            .sort({ creation_date: -1 })
+            .exec();
+
+        res.status(200).send({ data: allEntries });
+    } catch (error) {
+        res.status(500).send({ error: error.message, sms: 'Error getting all data of exe summary' });
+    }
+}

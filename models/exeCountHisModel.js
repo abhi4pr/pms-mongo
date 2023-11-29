@@ -30,6 +30,10 @@ const exeCountHisModel = new mongoose.Schema({
     required: false,
     default:0
   },
+  story_view_date:{
+    type: Date,
+    default:""
+  },
   stats_for:{
     type: String,
     required: false,
@@ -56,7 +60,12 @@ const exeCountHisModel = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  reach_impression_upload_image:{
+  reach_upload_image:{
+    type: String,
+    required: false,
+    default: ""
+  },
+  impression_upload_image:{
     type: String,
     required: false,
     default: ""
