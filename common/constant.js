@@ -13,6 +13,7 @@ module.exports = Object.freeze({
   SECRET_KEY_LOGIN:"thisissecret12",
   SECRET_KEY_DOC_LOGIN:"docloginsect1234d",
   CONST_VALIDATE_SESSION_EXPIRE_DOC:"1h",
+  CONST_SESSION_TIME_FOR_SWAGGER : 1500000,  //   1/2 hours
   CONST_VALIDATE_SESSION_EXPIRE: '24h',
 
   /* Response messages */ 

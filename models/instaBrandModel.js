@@ -63,7 +63,7 @@ const instaBrandSchema = new mongoose.Schema({
     required: false,
     default :0
   },
-  temp1: {
+  simillar_brand_id: {
     type: Number,
     required: false,
     default :0
