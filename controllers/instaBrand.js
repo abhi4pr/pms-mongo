@@ -16,7 +16,7 @@ exports.addInstaBrand = async (req, res) => {
             rating,
             campaign_count,
             post_count,
-            temp1,
+            simillar_brand_id,
             temp2,
             temp3,
             youtube
@@ -36,7 +36,7 @@ exports.addInstaBrand = async (req, res) => {
             rating,
             campaign_count,
             post_count,
-            temp1,
+            simillar_brand_id,
             temp2,
             temp3,
             youtube
@@ -105,7 +105,7 @@ exports.editInstaBrand = async (req, res) => {
             rating,
             campaign_count,
             post_count,
-            temp1,
+            simillar_brand_id,
             temp2,
             temp3,
             youtube
@@ -128,7 +128,7 @@ exports.editInstaBrand = async (req, res) => {
                     rating,
                     campaign_count,
                     post_count,
-                    temp1,
+                    simillar_brand_id,
                     temp2,
                     temp3,
                     youtube,
