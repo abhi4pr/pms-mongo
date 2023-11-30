@@ -154,6 +154,8 @@ router.get("/get_allocation_data_by_id/:id", sim.getSimAllocationDataById);
 router.put("/update_allocationsim", sim.editAllocation);
 router.delete("/delete_allocation/:id", sim.deleteAllocation);
 router.get("/alldataofsimallocment", sim.alldataofsimallocment);
+router.get("/get_asset_department_count", sim.getAssetDepartmentCount);
+router.get("/get_asset_users_of_dept/:dept_id", sim.getAssetUsersDepartment)
 
 /* logo brand */
 router.post("/add_logo_brand", logoBrand.addLogoBrand);

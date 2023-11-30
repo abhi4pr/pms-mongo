@@ -781,3 +781,85 @@ exports.alldataofsimallocment = async (req, res) => {
       .send({ error: err.message, message: "Error getting all sim datas" });
   }
 };
+
+exports.getAssetDepartmentCount = async (req, res) => {
+  try {
+    const simc = await simAlloModel.aggregate([
+      {
+        $lookup: {
+          from: "usermodels",
+          localField: "user_id",
+          foreignField: "user_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "departmentmodels",
+          localField: "user.dept_id",
+          foreignField: "dept_id",
+          as: "department",
+        },
+      },
+      {
+        $unwind: {
+          path: "$department",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: "$_id",
+          user_id: "$user.user_id",
+          user_name: "$user.user_name",
+          dept_id: "$user.dept_id",
+          dept_name: "$department.dept_name", 
+        }
+      },
+      {
+        $group: {
+          _id: "$dept_id",
+          dept_name: { $first: "$dept_name" },
+          count: { $sum: 1 },
+          user_name: { $first: "$user_name" },
+          dept_id : { $first: "$dept_id" }
+          // user_id : { $first: "$user_id" }
+        },
+      }
+    ]);
+
+    if (!simc || simc.length === 0) {
+      res.status(404).send({ success: false, message: "No data found" });
+    } else {
+      res.status(200).send({ data: simc });
+    }
+  } catch (err) {
+    res
+      .status(500)
+      .send({ error: err.message, message: "Error getting user count of department" });
+  }
+};
+
+exports.getAssetUsersDepartment = async (req, res) => {
+    try {
+      const { dept_id } = req.params;
+      const simAlloUsers = await simAlloModel.find({}, 'user_id');
+      const userIDsInSimAllo = simAlloUsers.map((user) => user.user_id);
+      
+      const userDetails = await userModel.find(
+        { dept_id, user_id: { $in: userIDsInSimAllo } },
+        'user_name user_id'
+      );
+
+      res.status(200).send({data: userDetails});
+    } catch (error) {
+      // console.error(error);
+      res.status(500).json({ error:error.message, sms:'Internal Server Error' });
+    }
+}
