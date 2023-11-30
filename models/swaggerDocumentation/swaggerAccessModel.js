@@ -7,6 +7,10 @@ const swaggerAccessSchema = new mongoose.Schema({
     unique : true,
     default: "",
   },
+  password: {
+    type: String,
+    default: "",
+  },
   role: {
     type: Number,
     default: constant.SWAGGER_DEVELOPER,
