@@ -64,6 +64,7 @@ const userDocManagement = require("./controllers/userDocManagement.js");
 const swaggerAccessManagement = require("./controllers/swaggerDocumentaion/swaggerAccessManagement.js");
 
 const campaignPlanController = require("./controllers/operationExecution/campaignPlanController.js");
+const campaignPhaseController = require("./controllers/operationExecution/campaignPhaseController.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -72,11 +73,11 @@ router.get("/", (req, res) => {
 /*operation+execution api*/
 router.post("/campaignplan", campaignPlanController.createPlan);
 router.get("/campaignplan/:id", campaignPlanController.getPlan);
-  router.post('/campaignplan',campaignPlanController.createPlan)
-  router.get('/campaignplan/:id',campaignPlanController.getPlan)
+router.post('/campaignplan', campaignPlanController.createPlan)
+router.get('/campaignplan/:id', campaignPlanController.getPlan)
 
-  router.post('/campaignphase',campaignPhaseController.createPhase)
-  router.get('/campaignphase/:id',campaignPhaseController.getAllPhase)
+router.post('/campaignphase', campaignPhaseController.createPhase)
+router.get('/campaignphase/:id', campaignPhaseController.getAllPhase)
 
 /*insta api*/
 router.post("/add_image",upload1.fields([{ name: "brandImageToServer", maxCount: 10 },{name: "campaignImageToServer", maxCount: 10}]), imageUpload.addImage)
@@ -87,6 +88,9 @@ router.delete("/delete_image/:id", imageUpload.deleteImage)
 // router.post("/upload_img_on_server",upload1.single("imageToServer"), insta.uploadImageToServer)
 router.post("/add_tracked_post",insta.insertDataIntoPostAnalytics)
 router.get("/analytics_based_on_rating",insta.instaPostAnalyticsBasedOnRating)
+router.post("/upload_img_on_server", upload1.single("imageToServer"), insta.uploadImageToServer)
+router.post("/add_tracked_post", insta.insertDataIntoPostAnalytics)
+router.get("/analytics_based_on_rating", insta.instaPostAnalyticsBasedOnRating)
 router.post("/image_to_text", insta.imageToText)
 router.post("/get_dynamic_key_value", insta.getDynamicReqAndResInstaP)
 router.post("/get_dynamic_multiple__key_value", insta.getDynamicMultiReqAndResInsta)
@@ -135,7 +139,7 @@ router.put("/edit_exe_ip_count_history", exe.updateIPCountHistory);
 router.post("/get_percentage", exe.getPercentage);
 router.get("/get_all_exe_ip_history", exe.getAllExeHistory);
 router.get("/get_stats_update_flag/:p_id", exe.getStatUpdateFlag);
-router.get("/get_distinct_count_history/:p_id?",exe.getDistinctExeCountHistory);
+router.get("/get_distinct_count_history/:p_id?", exe.getDistinctExeCountHistory);
 
 /*sim api*/
 router.get("/get_all_sims", sim.getSims); // done
