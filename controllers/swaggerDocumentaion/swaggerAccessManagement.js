@@ -7,18 +7,21 @@ const response = require("../../common/response");
 const ejs = require("ejs");
 const path = require("path");
 const fs = require("fs");
+const bcrypt = require("bcrypt");
 const { default: mongoose } = require("mongoose");
 
 /* Admin Api's */
 exports.addDevData = async (req, res) => {
   try {
-    const { email, phone, name, status, department } = req.body;
+    const { email, phone, name, status, department,password } = req.body;
+    let encryptedPass = await bcrypt.hash(password, 10);
     const devData = new swaggerAccessModel({
       email,
       phone,
       name,
       status,
       department,
+      password : encryptedPass
     });
 
     const savedDevData = await devData.save();
@@ -163,6 +166,16 @@ exports.devLogin = async (req, res) => {
     if (!userData) {
       return res.render("swaggerErrorTemplate", {
         error_title: "Access Denied, Please provide valid email.....",
+        error_description: "",
+        error_image:
+          "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
+        button_path: "/doc-login",
+        button_text: "Return to Login",
+      });
+    }
+    if(!bcrypt.compareSync(req.body.password, userData.password)){
+      return res.render("swaggerErrorTemplate", {
+        error_title: "Password Invalid...",
         error_description: "",
         error_image:
           "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",

@@ -493,6 +493,7 @@
           .getElementById("userTable")
           .addEventListener("click", function (event) {
             if (event.target && event.target.classList.contains("delete-btn")) {
+              console.log("here")
               const userId = event.target.getAttribute("data-userid");
               fetch(`/delete-dev/${userId}/${token}`, {
                 method: "DELETE",

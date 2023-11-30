@@ -1389,6 +1389,14 @@ exports.uploadImageToServer = async (req, res) =>{
 };
 exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
     try {
+        const trackCreatorParams = {
+            cron_expression: req.body.cron_expression,
+            // cron_expression: "*/15 * * * *",
+            tracking_expiry_at: req.body.tracking_expiry_at,
+            // tracking_expiry_at: "2023-12-01 12:12:12.12",
+            tracking: true
+        };
+
         /* Get Brands which rating is 4 to 5 */
         let brnadsData = await instaBrandModel.find({ 
             rating: { $gte: 4, $lte: 5 } 
@@ -1411,63 +1419,32 @@ exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
             crone_trak : 0,
             $or: conditionForBrandId
           },'shortCode')
-         
-          
-
-          postDataRespecticBrand?.map(async(item)=>{
-            const trackCreatorParams = {
-                connector: "instagram",
-                shortcode: item.shortCode,
-                cron_expression: "*/3 * * * *",
-            };
-            const response = await axios.post(
-                "https://app.ylytic.com/ylytic/admin/api/v1/track_post",
-                trackCreatorParams,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
+       let resArr = []
+        postDataRespecticBrand?.map(async(item, index)=>{
+            // if(index < 2 ){
+    
+                try {
+                  let result =  await axios.put(
+                        `https://app.ylytic.com/ylytic/api/v1/rt_tracking/posts/${item.shortCode}`,
+                        trackCreatorParams,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    );
+                    resArr.push(result?.data)
+                } catch (error) {
+                    console.log(error.message)
                 }
-            );
-            // if(response.data){
-
-            //     const savingRes = new instaPostAnalyticsModel({
-            //         handle: response.data.data?.handle ?? "",
-            //         postType: response.data.data.post_type,
-            //         creatorName: response.data.data.creator.username,
-            //         allComments: response.data.data.comments_count.overall,
-            //         brand_id: response.data.data.comments_count.today,
-            //         pastComment: response.data.data.comments_count.vs_previous,
-            //         allLike: response.data.data.likes_count.overall,
-            //         campaign_id: response.data.data.likes_count.today,
-            //         pastLike: response.data.data.likes_count.vs_previous,
-            //         allView:response.data.data.views_count.overall,
-            //         agency_id: response.data.data.views_count.today,
-            //         pastView: response.data.data.views_count.vs_previous,
-            //         title: response.data.data.title,
-            //         postedOn: response.data.data.posted_at,
-            //         postUrl: response.data.data.post_url,
-            //         postImage: response.data.data.display_url[0],
-            //         shortCode: response.data.shortcode,
-            //         posttype_decision:response.data.posttype_decision,
-            //         selector_name: response.data.selector_name,
-            //         interpretor_name: response.data.interpretor_name,
-            //         auditor_name: response.data.auditor_name,
-            //         auditor_decision: response.data.auditor_decision,
-            //         interpretor_decision: response.data.interpretor_decision,
-            //         selector_decision: response.data.selector_decision,
-            //         music_info :response.data.data?.music_info,
-            //         location :response.data.data?.location,
-            //         sponsored :response.data.data?.sponsored,
-            //     });
-            //      await savingRes.save()
-            //      /* update insta p model post mean that are tracked */
-            //     //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+                  
             // }
+                     /* update insta p model post mean that are tracked */
+                    //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+            
         })
-        // return res.send(postDataRespecticBrand)
-        res.status(response.status).json(response.data);
+        res.status(200).json(resArr);
     } catch (error) {
         res.status(500).send({error:error.message,message:'Internal server error'})
     }
@@ -1514,3 +1491,32 @@ exports.insertDataIntoPostAnalytics = async (req,res)=>{
         res.status(500).send({ error: error.message, sms: "error while adding data" });
     }
 }
+
+exports.getResBasedOnMatchForAnalyticsPost = async (req, res) => {
+    try {
+        const {  matchCondition, flag } = req.body;
+        const page = req.query?.page;
+        const perPage = req.query?.perPage;
+        const skip = (page - 1) * perPage;
+
+        if (flag === 1) {
+            const count = await instaPostAnalyticsModel.countDocuments(matchCondition);
+            return res.status(200).json({ count });
+        } else if (flag === 2) {
+            let getPosts;
+
+            if (page && perPage) {
+                getPosts = await instaPostAnalyticsModel.find(matchCondition).skip(skip).limit(perPage);
+            } else {
+                getPosts = await instaPostAnalyticsModel.find(matchCondition);
+            }
+
+            return res.status(200).json(getPosts);
+        }else {
+            return res.status(200).json({status:false, message:"Provide valid flag 1 for count and 2 for all data."})
+        }
+
+    } catch (error) {
+        res.status(500).json({ status: 500, error: error.message, sms: `Internal server error : ${error.message}` });
+    }
+};
