@@ -4,6 +4,14 @@ const userModel = require("../models/userModel.js");
 
 exports.addSim = async (req, res) => {
   try {
+    const nextHrDate = new Date();
+    nextHrDate.setDate(nextHrDate.getDate() + 30);
+    const updatedDateString = nextHrDate.toISOString();
+
+    const nextSelfDate = new Date(req.body.last_self_audit_date);
+    nextSelfDate.setDate(nextSelfDate.getDate() + 30);
+    const updatedDateString2 = nextSelfDate.toISOString();
+
     const simc = new simModel({
       sim_no: req.body.sim_no,
       Remarks: req.body.remark,
@@ -19,10 +27,16 @@ exports.addSim = async (req, res) => {
       warrantyDate: req.body.warrantyDate || "",
       dateOfPurchase: req.body.dateOfPurchase || "",
       selfAuditPeriod: req.body.selfAuditPeriod || 0,
+      hrAuditPeriod : req.body.hrAuditPeriod || 0,
       selfAuditUnit: req.body.selfAuditUnit || 0,
+      hrAuditUnit: req.body.hrAuditUnit || 0,
       invoiceCopy: req.file?.filename,
       assetsValue: req.body.assetsValue,
       assetsCurrentValue: req.body.assetsCurrentValue,
+      last_hr_audit_date : req.body.last_hr_audit_date,
+      last_self_audit_date: req.body.last_self_audit_date,
+      next_hr_audit_date: updatedDateString,
+      next_self_audit_date: updatedDateString2
     });
     const simv = await simc.save();
     res.send({ simv, status: 200 });
@@ -324,11 +338,13 @@ exports.editSim = async (req, res) => {
         category_id: req.body.category_id,
         sub_category_id: req.body.sub_category_id,
         vendor_id: req.body.vendor_id,
-        inWarranty: req.body.inWarranty,
-        warrantyDate: req.body.warrantyDate,
-        dateOfPurchase: req.body.dateOfPurchase,
-        selfAuditPeriod: req.body.selfAuditPeriod,
-        selfAuditUnit: req.body.selfAuditUnit,
+        inWarranty: req.body.inWarranty || "",
+        warrantyDate: req.body.warrantyDate || "",
+        dateOfPurchase: req.body.dateOfPurchase || "",
+        selfAuditPeriod: req.body.selfAuditPeriod || 0,
+        hrAuditPeriod: req.body.hrAuditPeriod || 0,
+        selfAuditUnit: req.body.selfAuditUnit || 0,
+        hrAuditUnit: req.body.hrAuditUnit || 0,
         invoiceCopy: req.file?.filename,
         assetsValue: req.body.assetsValue,
         assetsCurrentValue: req.body.assetsCurrentValue,

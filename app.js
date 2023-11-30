@@ -13,6 +13,7 @@ const swaggerAccessManagement=require('./controllers/swaggerDocumentaion/swagger
 const { checkDevAuthentication } = require("./middleware/swaggerMiddleware.js");
 const path = require("path");
 require("./controllers/autoMail.js");
+require("./controllers/assetAutoMail.js");
 
 
 const app = express();
