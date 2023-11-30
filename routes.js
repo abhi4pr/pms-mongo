@@ -71,6 +71,12 @@ router.get("/", (req, res) => {
 /*operation+execution api*/
 router.post("/campaignplan", campaignPlanController.createPlan);
 router.get("/campaignplan/:id", campaignPlanController.getPlan);
+  router.post('/campaignplan',campaignPlanController.createPlan)
+  router.get('/campaignplan/:id',campaignPlanController.getPlan)
+
+  router.post('/campaignphase',campaignPhaseController.createPhase)
+  router.get('/campaignphase/:id',campaignPhaseController.getAllPhase)
+
 /*insta api*/
 router.post("/upload_img_on_server",upload1.single("imageToServer"), insta.uploadImageToServer)
 router.post("/add_tracked_post",insta.insertDataIntoPostAnalytics)
