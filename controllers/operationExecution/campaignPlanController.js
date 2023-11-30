@@ -4,7 +4,7 @@ const catchAsync=require('../../helper/catchAsync');
 
 exports.createPlan=catchAsync(async (req,res,next) => {
     //will receive array of objects(pages),campaignId,vendor,campaignName,pageName
-
+    console.log("hit")
     const {pages,campaignId,campaignName,planName}=req.body
     for(let i=0;i<pages.length;i++){
         let data={
