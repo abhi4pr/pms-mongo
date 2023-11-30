@@ -15,6 +15,11 @@ const campaignSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  campaign_image: {
+    type: String,
+    required:false,
+    default: "",
+  },
 
   user_id: {
     type: Number,

@@ -72,7 +72,6 @@ const instaPostAnalyticsModel = new mongoose.Schema({
         type: String,
         required: false,
         default: "",
-        unique: true
     },
     postImage:{
         type: String,

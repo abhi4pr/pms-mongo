@@ -25,5 +25,10 @@ module.exports = Object.freeze({
   FETCH_SUCCESSFULLY :"Data Updated Successfully...",
   NO_RECORD_FOUND:"No Record found..."
 
+  /* html template usages */
+  // <img
+  //       src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
+  //       alt="CreativeFuel Logo"
+  //     />
  
 });

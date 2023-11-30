@@ -43,6 +43,7 @@ const user = require("./controllers/user.js");
 const attendance = require("./controllers/attendance.js");
 const instapage = require("./controllers/instaPage.js");
 const pageUniqueness = require("./controllers/pageUniqueness.js");
+const imageUpload = require("./controllers/Instagram/imageUpload.js");
 
 const role = require("./controllers/role.js");
 const kra = require("./controllers/kra.js");
@@ -72,7 +73,12 @@ router.get("/", (req, res) => {
 router.post("/campaignplan", campaignPlanController.createPlan);
 router.get("/campaignplan/:id", campaignPlanController.getPlan);
 /*insta api*/
-router.post("/upload_img_on_server",upload1.single("imageToServer"), insta.uploadImageToServer)
+router.post("/add_image",upload1.fields([{ name: "brandImageToServer", maxCount: 10 },{name: "campaignImageToServer", maxCount: 10}]), imageUpload.addImage)
+router.post("/get_all_images",imageUpload.getImages)
+router.get("/get_single_image/:id",imageUpload.getImage)
+router.put("/update_image",upload1.fields([{ name: "brandImageToServer", maxCount: 10 },{name: "campaignImageToServer", maxCount: 10}]), imageUpload.editImages)
+router.delete("/delete_image/:id", imageUpload.deleteImage)
+// router.post("/upload_img_on_server",upload1.single("imageToServer"), insta.uploadImageToServer)
 router.post("/add_tracked_post",insta.insertDataIntoPostAnalytics)
 router.get("/analytics_based_on_rating",insta.instaPostAnalyticsBasedOnRating)
 router.post("/image_to_text", insta.imageToText)

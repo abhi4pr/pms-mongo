@@ -20,14 +20,15 @@ exports.getCampaigns = async (req, res) => {
 
 exports.addCampaign = async (req, res) => {
   try {
-    const { campaign_name, hash_tag, user_id, agency_id,brand_id } = req.body;
+    const { campaign_name, hash_tag, user_id, agency_id,brand_id, campaign_image } = req.body;
 
     const campaignObj = new campaginSchema({
       campaign_name,
       hash_tag,
       user_id,
       agency_id,
-      brand_id
+      brand_id,
+      campaign_image
     });
     const savedcampaign = await campaignObj.save();
     res.send({ data: savedcampaign, status: 200 });
@@ -66,7 +67,8 @@ exports.editCampaign = async (req, res) => {
       user_id,
       agency_id,
       updated_by,
-      brand_id
+      brand_id,
+      campaign_image
     } = req.body;
 
     const editCampaignObj = await campaginSchema.findOneAndUpdate(
@@ -78,7 +80,8 @@ exports.editCampaign = async (req, res) => {
         agency_id,
         updated_by,
         updated_date: Date.now(),
-        brand_id
+        brand_id,
+        campaign_image
       },
       { new: true }
     );
@@ -101,7 +104,7 @@ exports.deleteCampaign = async (req, res) => {
   const id = parseInt(req.params.id);
   const condition = { campaign_id: id };
   try {
-    const result = await campaginSchema.deleteOne(condition);
+    const result = await campagingitSchema.deleteOne(condition);
     if (result.deletedCount === 1) {
       return res.status(200).json({
         success: true,

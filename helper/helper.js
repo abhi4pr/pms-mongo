@@ -42,13 +42,14 @@ module.exports = {
       if (empData?.digital_signature_image) {
         pdfFileName += " Signed";
         digitalSignature = `${constant.base_url}/uploads/${empData?.digital_signature_image}`;
-        
+        var currentDate = new Date();
+        var formattedDateTime = currentDate.toLocaleString();
         const sms = new notificationModel({
-            user_id: empData?.user_id,
-            notification_title: "Candidate has accepted offer letter",
-            notification_message: `${empData?.user_name} has been loggedin on ${formattedDateTime}`,
-            created_by: empData?.created_by
-        })
+          user_id: empData?.user_id,
+          notification_title: "Candidate has accepted offer letter",
+          notification_message: `${empData?.user_name} has been loggedin on ${formattedDateTime}`,
+          created_by: empData?.created_by,
+        });
         await sms.save();
       }
 

@@ -191,6 +191,7 @@ exports.devLogin = async (req, res) => {
       const loginHistory = new devLoginHistoryModel({
         dev_id: userData._id,
         isLoggedIn: true,
+        login_date : Math.floor(Date.now() / 1000) 
       });
       savedLoginHistory = await loginHistory.save();
       token = jwt.sign(

@@ -9,7 +9,10 @@ exports.upload = multer({
 //Generate actual fileName with view functionality
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    if (file.fieldname === "imageToServer") {
+
+    if (file.fieldname === "campaignImageToServer") {
+      cb(null, "./uploads/Campaign_s Avatar");
+    } else if (file.fieldname === "brandImageToServer") {
       cb(null, "./uploads/Brand_s Avatar");
     } else if (file.fieldname === "doc_image") {
       cb(null, "./uploads/userDocuments");
