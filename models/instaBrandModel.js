@@ -20,6 +20,11 @@ const instaBrandSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  brand_image: {
+    type: String,
+    required: false,
+    default : ""
+  },
   brandSubCategoryId: {
     type: Number,
     required: false,

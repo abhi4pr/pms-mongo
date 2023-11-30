@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Dashboard</title>
+    <link rel="icon" type="image/png" href="https://creativefuel.io/assets/img/image20.png">
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
@@ -298,16 +299,22 @@
         <a href="/doc-user" class="checkDevelopers"> Developers List </a>
       </div>
       <img
-        src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
+        src="https://png.pngtree.com/png-vector/20190328/ourmid/pngtree-programmers-code-the-website-from-the-command-line-flat-vector-illustration-png-image_878368.jpg"
         alt="CreativeFuel Logo"
+        style="height: 200px;"
       />
       <hr />
     </div>
     <div class="main">
-      <div class="header">
+      <div class="header" style = "display: flex; justify-content: space-between;">
         <h1>Developer Management</h1>
+        <img
+        src="https://creativefuel.io/assets/img/image20.png"
+        alt="CreativeFuel Logo"
+        style="height: 60px;"
+      />
       </div>
-      <div class="card">
+      <div class="card"> 
         <div>
           <input type="text" id="searchInput" placeholder="Search Name..." />
           <select id="statusFilter" required>
@@ -353,7 +360,6 @@
         </div>
       </div>
     </div>
-
     <script>
       // Get the token from the URL
       const urlParts = window.location.pathname.split("/");

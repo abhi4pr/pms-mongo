@@ -19,7 +19,8 @@ exports.addInstaBrand = async (req, res) => {
             simillar_brand_id,
             temp2,
             temp3,
-            youtube
+            youtube,
+            brand_image
         } = req.body;
 
         const instabrandObj = new instaBrandSchema({
@@ -39,7 +40,8 @@ exports.addInstaBrand = async (req, res) => {
             simillar_brand_id,
             temp2,
             temp3,
-            youtube
+            youtube,
+            brand_image
         });
 
         const savedInstaBrand = await instabrandObj.save();
@@ -108,7 +110,8 @@ exports.editInstaBrand = async (req, res) => {
             simillar_brand_id,
             temp2,
             temp3,
-            youtube
+            youtube,
+            brand_image
         } = req.body;
 
         const editInstaBrandObj = await instaBrandSchema.findOneAndUpdate(
@@ -132,6 +135,7 @@ exports.editInstaBrand = async (req, res) => {
                     temp2,
                     temp3,
                     youtube,
+                    brand_image,
                     updated_at: Date.now(),
                 },
             },
