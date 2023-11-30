@@ -23,7 +23,7 @@ const simModel = new mongoose.Schema({
   },
   status: {
     type: String,
-    default: "",
+    default: "Available",
   },
   s_type: {
     type: String,
@@ -90,6 +90,14 @@ const simModel = new mongoose.Schema({
     required: false,
     default: "",
   },
+  hr_audit_status: {
+    type: String,
+    default: "Done",
+  },
+  self_audit_status: {
+    type: String,
+    default: "Done",
+  },
   assetsValue: {
     type: Number,
     required: false,
@@ -110,12 +118,28 @@ const simModel = new mongoose.Schema({
   },
   hrAuditFlag: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   selfAuditFlag: {
     type: Boolean,
-    default: false,
+    default: true,
   },
+  last_hr_audit_date: {
+    type:Date,
+    default:Date.now
+  },
+  last_self_audit_date:{
+    type: Date,
+    default: Date.now
+  },
+  next_hr_audit_date:{
+    type: Date,
+    default: ""
+  },
+  next_self_audit_date:{
+    type: Date,
+    default: ""
+  }
 });
 
 AutoIncrement.initialize(mongoose.connection);

@@ -736,11 +736,53 @@ exports.getDistinctExeCountHistory = async (req, res) => {
 
         const allEntries = await exeCountHisModel
             .find(query)
-            .sort({ creation_date: -1 })
-            .exec();
+            .sort({ creation_date: -1 }).lean();
 
-        res.status(200).send({ data: allEntries });
+            const exeImagesBaseUrl = "http://34.93.135.33:8080/uploads/";
+            const dataWithImageUrl = allEntries.map((execount) => ({
+                ...execount,
+                media_url: execount.media ? exeImagesBaseUrl + execount.media : null,
+                reach_upload_image_url: execount.reach_upload_image ? exeImagesBaseUrl + execount.reach_upload_image : null,
+                impression_upload_image_url: execount.impression_upload_image ? exeImagesBaseUrl + execount.impression_upload_image : null,
+                engagement_upload_image_url: execount.engagement_upload_image ? exeImagesBaseUrl + execount.engagement_upload_image : null,
+                story_view_upload_image_url: execount.story_view_upload_image ? exeImagesBaseUrl + execount.story_view_upload_image : null,
+                story_view_upload_video_url: execount.story_view_upload_video ? exeImagesBaseUrl + execount.story_view_upload_video : null,
+                city_image_upload_url: execount.city_image_upload ? exeImagesBaseUrl + execount.city_image_upload : null,
+                Age_upload_url: execount.Age_upload ? exeImagesBaseUrl + execount.Age_upload : null,
+                country_image_upload_url: execount.country_image_upload ? exeImagesBaseUrl + execount.country_image_upload : null
+            }));    
+
+        res.status(200).send({ data: dataWithImageUrl });
     } catch (error) {
         res.status(500).send({ error: error.message, sms: 'Error getting all data of exe summary' });
     }
 }
+
+
+// exports.getDistinctExeCountHistory = async (req, res) => {
+//     try {
+//         let query = {};
+//         if (req.params.p_id) {
+//             query.p_id = parseInt(req.params.p_id);
+//         }
+
+//         const allEntries = await exeCountHisModel
+//             .aggregate([
+//                 { $match: query },
+//                 { $sort: { creation_date: -1 } },
+//                 {
+//                     $lookup: {
+//                         from: 'exePurchaseModel',
+//                         localField: 'p_id', 
+//                         foreignField: 'p_id', 
+//                         as: 'exePurchaseData'
+//                     }
+//                 },
+//             ])
+//             .exec();
+
+//         res.status(200).send({ data: allEntries });
+//     } catch (error) {
+//         res.status(500).send({ error: error.message, sms: 'Error getting all data of exe summary' });
+//     }
+// }

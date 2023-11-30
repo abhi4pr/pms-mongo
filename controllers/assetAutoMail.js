@@ -2,6 +2,8 @@ const schedule = require("node-schedule");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const simModel = require("../models/simModel");
+const simAlloModel = require("../models/simAlloModel");
+const userModel = require("../models/userModel");
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -12,25 +14,51 @@ var transporter = nodemailer.createTransport({
 });
 
 const jobDays = schedule.scheduleJob("0 0 * * *", async () => {
-  const currentDate = new Date();
 
-  const simModels = await simModel.find({
-    selfAuditFlag: false,
-    hrAuditFlag: false,
-    Creation_date: {
-      $lte: new Date(currentDate.getTime() - 5 * 24 * 60 * 60 * 1000),
+  const simModels = await simModel.aggregate([
+    {
+      $match: {
+        hrAuditFlag: true,
+        audit_status: "Done"
+      }
     },
-  });
+    {
+      $lookup: {
+        from: "simallomodels", 
+        localField: "sim_id",
+        foreignField: "sim_id",
+        as: "simallo"
+      }
+    },
+    {
+      $lookup: {
+        from: "usermodels", 
+        localField: "simallo.user_id",
+        foreignField: "user_id",
+        as: "user"
+      }
+    },
+    {
+      $project:{
+        _id: "$id",
+        user_name: "$user.user_name",
+        user_email_id: "$user.user_email_id",
+        asset_name: "$assetName",
+        next_hr_audit_date: "$next_hr_audit_date",
+        audit_status: "$audit_status",
+        user_contact_no: "$user_contact_no"
+      }
+    }
+  ]);
 
   for (const simModel of simModels) {
-    if (!simModel.selfAuditFlag) {
-      const daysSinceCreation = Math.floor(
-        (currentDate - simModel.Creation_date) / (24 * 60 * 60 * 1000)
+    if (simModel.next_hr_audit_date == new Date() && simModel.audit_status == "Done") {
+      simModel.findOneAndUpdate(
+        { sim_id: simModel.sim_id },
+        { audit_status: "Pending" }
       );
-      if ([5, 10, 15].includes(daysSinceCreation)) {
-        await sendReminderAssetEmail(simModel);
-        await sendWhatsappSms(simModel);
-      }
+      await sendReminderAssetEmail(simModel)
+      await sendWhatsappSms(simModel)
     }
   }
 });
@@ -43,6 +71,7 @@ async function sendReminderAssetEmail(simModel) {
 
   let mailOptions = {
     from: "vijayanttrivedi1500@gmail.com",
+    // to: simModel.user_email_id,
     to: "ascs739@gmail.com",
     subject: "It's time to verify our asset",
     html: html,
@@ -58,24 +87,17 @@ async function sendReminderAssetEmail(simModel) {
 }
 
 async function sendWhatsappSms(simModel) {
-  const simModels = await simModel.find({
-    selfAuditFlag: false,
-    hrAuditFlag: false,
-    Creation_date: {
-      $lte: new Date(currentDate.getTime() - 5 * 24 * 60 * 60 * 1000),
-    },
-  });
-
-  simModels.forEach(async (sim) => {
+  simModel.forEach(async (sim) => {
     const response = await axios.post(
       "https://backend.api-wa.co/campaign/heyx/api",
       {
         apiKey:
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ODA0YmMyYTVjOTlmMGYwNmY3Y2QyNSIsIm5hbWUiOiJDcmVhdGl2ZWZ1ZWwiLCJhcHBOYW1lIjoiQWlTZW5zeSIsImNsaWVudElkIjoiNjQ4MDRiYzJkYzhjZWYwNDViOTY3NTk2IiwiYWN0aXZlUGxhbiI6IkJBU0lDX01PTlRITFkiLCJpYXQiOjE2OTc0NDQ3OTB9.xg686Rd8V4J1PzDA27P1KBho1MTnYwo3X_WB0o0-6qs",
         campaignName: "CF_Pre_Onday_new",
+        // destination: "simModel.user_contact_no",
         destination: "7000436496",
-        userName: "aditi",
-        templateParams: ["aditi"],
+        userName: simModel.user_name,
+        templateParams: [simModel.user_name],
       }
     );
     if (response.status === 200) {
