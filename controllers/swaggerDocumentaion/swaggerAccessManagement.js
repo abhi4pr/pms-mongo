@@ -93,11 +93,25 @@ exports.deleteDev = async (req, res) => {
   try {
     const user = await swaggerAccessModel.findByIdAndDelete(req.params.id);
     if (!user) {
-      return response.returnFalse(200, req, res, "No record found.");
+      return res.render("swaggerErrorTemplate", {
+        error_title: "No record found..",
+        error_description: "",
+        error_image:
+          "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
+        button_path: `/doc-user/${req.params.token}`,
+        button_text: "Back",
+      });
     }
-    return response.returnTrue(200, req, res, "Data Deleted Success.");
+    return res.redirect(`/doc-user/${req.params.token}`);
   } catch (err) {
-    return response.returnFalse(200, req, res, "Internal Server Error.");
+    return res.render("swaggerErrorTemplate", {
+      error_title: "Internal Server Error.",
+      error_description: err.message,
+      error_image:
+        "https://img.freepik.com/premium-photo/http-error-500-internal-server-error-3d-render-illustration_567294-2973.jpg?w=360",
+        button_path: `/doc-user/${req.params.token}`,
+      button_text: "Back",
+    });
   }
 };
 exports.getDevSingleData = async (req, res) => {

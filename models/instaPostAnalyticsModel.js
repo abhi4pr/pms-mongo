@@ -23,6 +23,11 @@ const instaPostAnalyticsModel = new mongoose.Schema({
         required: false,
         default: 0
     },
+    todayComment: {
+        type: Number,
+        required: false,
+        default: 0
+    },
     pastComment: {
         type: Number,
         required: false,
@@ -38,6 +43,11 @@ const instaPostAnalyticsModel = new mongoose.Schema({
         required: false,
         default: 0
     },
+    todayLikes:{
+        type: Number,
+        required: false,
+        default: 0
+    },
     pastLike:{
         type: Number,
         required: false,
@@ -48,11 +58,16 @@ const instaPostAnalyticsModel = new mongoose.Schema({
         required: false,
         default: 0
     },
-    agency_id:{
+    todayViews:{
         type: Number,
         required: false,
         default: 0
     },
+    // agency_id:{
+    //     type: Number,
+    //     required: false,
+    //     default: 0
+    // },
     pastView:{
         type: Number,
         required: false,
