@@ -142,7 +142,7 @@
     background: #fff;
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
+    width: 400px;
     padding: 20px;
   }
   .modal-header img {
@@ -164,7 +164,10 @@
   }
   .modal-actions {
     display: flex;
-    justify-content: space-around;
+    /* justify-content: space-evenly; */
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
   }
   .modal-actions button {
     padding: 10px 20px;
@@ -186,15 +189,19 @@
 <body>
 <div class="modal">
   <div class="modal-header">
-    <img src="path-to-your-image.png" alt="Confirmation">
+    <img src="https://png.pngtree.com/png-vector/20221130/ourmid/pngtree-businessman-thinking-confused-cartoon-vector-manager-faq-vector-format-vector-png-image_41211742.jpg" alt="Confirmation">
   </div>
   <div class="modal-content">
-    <h2>Are you sure you want to apply?</h2>
-    <p>If you choose to apply, your application will be submitted to the employer.</p>
+    <h2><%= error_title %></h2>
+    <p><%= error_description %></p>
   </div>
   <div class="modal-actions">
-    <button class="cancel">No, I don't want this job</button>
-    <button class="apply">Yes, I want to apply</button>
+    <button class="cancel" onclick="location.href='<%= button_path_cancel %>';" class="return-button">
+      <%= button_text_cancel %>
+    </button>
+    <button class="apply" onclick="location.href='<%= button_path_ok %>';" class="return-button">
+      <%= button_text_ok %>
+    </button>
   </div>
 </div>
 </body>

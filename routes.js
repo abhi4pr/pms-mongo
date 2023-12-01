@@ -88,6 +88,7 @@ router.post('/campaignphase', campaignPhaseController.createPhase)
 router.get('/campaignphase/:id', campaignPhaseController.getAllPhase)
 
 /*insta api*/
+router.get("/shorcode_info",insta.getCountBasedOnTrackedPost)
 router.post("/add_image",upload1.fields([{ name: "brandImageToServer", maxCount: 10 },{name: "campaignImageToServer", maxCount: 10}]), imageUpload.addImage)
 router.post("/get_all_images",imageUpload.getImages)
 router.get("/get_single_image/:id",imageUpload.getImage)

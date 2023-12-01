@@ -39,8 +39,8 @@ app.get('/dev-delete/:id/:token',checkDevAuthentication, (req, res) => {
   let userId  = req.params.id
   let token  = req.params.token
   return res.render("confirmationTemplate", {
-    error_title: "Are you sure you want to delete this developer...",
-    error_description: "After delete this data you can't retrive from anyway.",
+    error_title: "Are you sure you want to delete ?",
+    error_description: "After delete this data you can't retrive from anyway....",
     error_image:
       "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
       button_path_cancel: `/doc-user/${token}`,
