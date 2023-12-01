@@ -1053,8 +1053,8 @@ exports.loginUser = async (req, res) => {
                     role_id: simc[0]?.role_id,
                     dept_id: simc[0]?.dept_id,
                     room_id: simc[0]?.room_id,
-                    Sitting_id: simc[0]?.Sitting_id,
-                    Sitting_ref_no: simc[0]?.Sitting_ref_no,
+                    // Sitting_id: simc[0]?.Sitting_id,
+                    sitting_ref_no: simc[0]?.sitting_ref_no,
                     onboard_status: simc[0]?.onboard_status,
                     user_status: simc[0]?.user_status,
                 },
@@ -2199,3 +2199,19 @@ exports.logOut = async (req, res) => {
         return response.returnTrue ( 500 , req, res, "Internal Server Error",{})
     }
 }
+
+
+// exports.getUsersByDepartment = async (req, res) => {
+//     try {
+//         const { dept_id } = req.body;
+
+//         const userDetails = await userModel.find(
+//             { dept_id },
+//             'user_name user_id'
+//         );
+
+//         res.status(200).send({ data: userDetails });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message, sms: 'Internal Server Error' });
+//     }
+// }

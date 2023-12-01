@@ -605,6 +605,10 @@ const userModel = new mongoose.Schema({
         type: Date,
         required: false,
         default: ""
+    },
+    showOnboardingModal:{
+        type: Boolean,
+        default:true
     }
 });
 
