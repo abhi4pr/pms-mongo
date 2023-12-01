@@ -52,6 +52,7 @@ const lead = require("./controllers/lead.js");
 const leadtype = require("./controllers/lead.js");
 const leadmast = require("./controllers/lead.js");
 const { verifyToken } = require("./middleware/auth.js");
+const demoApi = require("./controllers/demoApi.js");
 
 const assetCategory = require("./controllers/assestsCategory.js");
 const assetSubCategory = require("./controllers/assetsSubCategory.js");
@@ -69,6 +70,13 @@ const campaignPhaseController = require("./controllers/operationExecution/campai
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
 });
+
+/* demo api */
+router.post("/add_demo", demoApi.addDemo);
+router.get("/get_all_demo", demoApi.getAllDemo);
+router.get("/get_single_demo/:_id", demoApi.getSingleDemo);
+router.put("/update_demo", demoApi.editDemo);
+router.delete("/delete_demo/:_id", demoApi.deleteDemo);
 
 /*operation+execution api*/
 router.post("/campaignplan", campaignPlanController.createPlan);

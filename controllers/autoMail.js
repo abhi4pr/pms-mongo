@@ -23,7 +23,7 @@ const job0Days = schedule.scheduleJob('0 0 * * *', async () => {
 const job1Days = schedule.scheduleJob('0 0 * * *', async () => {
   sendReminderEmail(1);
   sendWhatsappSms(1);
-  sendEmail();
+  sendEmail(1);
 });
 
 const job2Days = schedule.scheduleJob('0 0 * * *', async () => {
@@ -135,7 +135,7 @@ async function sendReminderEmail(daysBefore) {
 }
 
 
-async function sendEmail() {
+async function sendEmail(daysBefore) {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + daysBefore);
 
