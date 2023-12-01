@@ -38,7 +38,7 @@ const upload = multer({ dest: "uploads/" }).fields([
     { name: "bankPassBook_Cheque", maxCount: 1 },
     { name: "joining_extend_document", maxCount: 1 },
     { name: "digital_signature_image", maxCount: 1 },
-    { name:  "annexure_pdf", maxCount:1 }
+    { name: "annexure_pdf", maxCount: 1 }
 ]);
 
 exports.addUser = [upload, async (req, res) => {
@@ -157,8 +157,8 @@ exports.addUser = [upload, async (req, res) => {
             ctc: req.body.ctc,
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : '',
-            profileflag : req.body.profileflag,
-            nick_name : req.body.nick_name,
+            profileflag: req.body.profileflag,
+            nick_name: req.body.nick_name,
             offer_later_date: req.body.offer_later_date,
             annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : ''
         })
@@ -166,19 +166,19 @@ exports.addUser = [upload, async (req, res) => {
 
         // Genreate a pdf file for offer later
         if (simv?.offer_letter_send) {
-          helper.generateOfferLaterPdf(simv);
-    
-        } 
-         //Generate documents for respective user id
-         const docs = await documentModel.find();
-         if(docs.length !== 0){
-             const newDocuments = docs.map(item => ({
-                 doc_id: item._id,
-                 user_id: simv?.user_id,
-             }));
-             await userDocManagmentModel.insertMany(newDocuments);
-         }
-         //End Generate documents for respective user id
+            helper.generateOfferLaterPdf(simv);
+
+        }
+        //Generate documents for respective user id
+        const docs = await documentModel.find();
+        if (docs.length !== 0) {
+            const newDocuments = docs.map(item => ({
+                doc_id: item._id,
+                user_id: simv?.user_id,
+            }));
+            await userDocManagmentModel.insertMany(newDocuments);
+        }
+        //End Generate documents for respective user id
 
         const joining = simv.joining_date;
         const convertDate = new Date(joining);
@@ -268,7 +268,7 @@ const upload1 = multer({ dest: "uploads/" }).fields([
     { name: "bankPassBook_Cheque", maxCount: 1 },
     { name: "joining_extend_document", maxCount: 1 },
     { name: "digital_signature_image", maxCount: 1 },
-    { name:  "annexure_pdf", maxCount:1 }
+    { name: "annexure_pdf", maxCount: 1 }
 ]);
 exports.updateUser = [upload1, async (req, res) => {
     try {
@@ -395,19 +395,20 @@ exports.updateUser = [upload1, async (req, res) => {
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files && req.files['annexure_pdf'] && req.files['annexure_pdf'][0] ? req.files['annexure_pdf'][0].filename : (existingUser && existingUser.annexure_pdf) || '',
             profileflag: req.body.profileflag,
-            nick_name: req.body.nick_name ,
+            nick_name: req.body.nick_name,
             offer_later_acceptance_date: req.body.offer_later_acceptance_date,
-            offer_later_status: req.body.offer_later_status, 
-            offer_later_reject_reason: req.body.offer_later_reject_reason 
+            offer_later_status: req.body.offer_later_status,
+            offer_later_reject_reason: req.body.offer_later_reject_reason,
+            showOnboardingModal: req.body.showOnboardingModal
 
         }, { new: true });
         if (!editsim) {
             return res.status(500).send({ success: false })
         }
         // Genreate a pdf file for offer later
-        if (editsim?.offer_later_status == true || (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== "") )) {
+        if (editsim?.offer_later_status == true || (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== ""))) {
             helper.generateOfferLaterPdf(editsim)
-            } 
+        }
         return res.status(200).send({ success: true, data: editsim })
     } catch (err) {
         return res.status(500).send({ error: err.message, sms: 'Error updating user details' })
@@ -655,19 +656,20 @@ exports.getAllUsers = async (req, res) => {
                     designation_name: "$designation.desi_name",
                     userSalaryStatus: '$userSalaryStatus',
                     digital_signature_image: "$digital_signature_image",
-                    bank_name:"$bank_name",
-                    ifsc_code:"$ifsc_code",
-                    account_no:"$account_no",
-                    guardian_name:"$guardian_name",
-                    guardian_address:"$guardian_address",
-                    relation_with_guardian:"$relation_with_guardian",
-                    gaurdian_number:"$gaurdian_number",
-                    emergency_contact:"$emergency_contact",
-                    ctc:"$ctc",
-                    offer_letter_send:"$offer_letter_send",
-                    annexure_pdf:"$annexure_pdf",
-                    profileflag:"$profileflag",
-                    nick_name: "$nick_name"
+                    bank_name: "$bank_name",
+                    ifsc_code: "$ifsc_code",
+                    account_no: "$account_no",
+                    guardian_name: "$guardian_name",
+                    guardian_address: "$guardian_address",
+                    relation_with_guardian: "$relation_with_guardian",
+                    gaurdian_number: "$gaurdian_number",
+                    emergency_contact: "$emergency_contact",
+                    ctc: "$ctc",
+                    offer_letter_send: "$offer_letter_send",
+                    annexure_pdf: "$annexure_pdf",
+                    profileflag: "$profileflag",
+                    nick_name: "$nick_name",
+                    showOnboardingModal:"$showOnboardingModal"
                 }
             }
         ]).exec();
@@ -926,18 +928,19 @@ exports.getSingleUser = async (req, res) => {
                     Report_L2N: "$reportL2.user_name",
                     Report_L3N: "$reportL3.user_name",
                     designation_name: "$designation.desi_name",
-                    bank_name:"$bank_name",
-                    ifsc_code:"$ifsc_code",
-                    account_no:"$account_no",
-                    guardian_name:"$guardian_name",
-                    guardian_address:"$guardian_address",
-                    relation_with_guardian:"$relation_with_guardian",
-                    gaurdian_number:"$gaurdian_number",
-                    emergency_contact:"$emergency_contact",
-                    ctc:"$ctc",
-                    offer_letter_send:"$offer_letter_send",
-                    profileflag:"$profileflag",
-                    nick_name: "$nick_name"
+                    bank_name: "$bank_name",
+                    ifsc_code: "$ifsc_code",
+                    account_no: "$account_no",
+                    guardian_name: "$guardian_name",
+                    guardian_address: "$guardian_address",
+                    relation_with_guardian: "$relation_with_guardian",
+                    gaurdian_number: "$gaurdian_number",
+                    emergency_contact: "$emergency_contact",
+                    ctc: "$ctc",
+                    offer_letter_send: "$offer_letter_send",
+                    profileflag: "$profileflag",
+                    nick_name: "$nick_name",
+                    showOnboardingModal:"$showOnboardingModal"
                 }
             }
         ]).exec();
@@ -1037,7 +1040,7 @@ exports.loginUser = async (req, res) => {
                 }
             }
         ]).exec();
-        
+
         if (simc.length === 0) {
             return res.status(500).send({ success: false })
         }
@@ -1065,13 +1068,13 @@ exports.loginUser = async (req, res) => {
             var currentDate = new Date();
             var formattedDateTime = currentDate.toLocaleString();
 
-            if(simc[0].onboard_status == 2){                
+            if (simc[0].onboard_status == 2) {
                 const saveDataObj = {
                     user_id: simc[0].id,
                     user_email_id: simc[0].email || simc[0].user_login_id
                 };
                 await userLoginHisModel.create(saveDataObj);
-                if(simc[0].first_login_flag == false){
+                if (simc[0].first_login_flag == false) {
                     await userModel.findOneAndUpdate({ user_login_id: req.body.user_login_id.toLowerCase().trim() }, {
                         first_login_flag: true,
                         first_login_time: formattedDateTime
@@ -1121,6 +1124,7 @@ exports.deliveryBoyByRoom = async (req, res) => {
 }
 
 exports.deliveryUser = async (req, res) => {
+    const ImageUrl = "http://34.93.135.33:8080/uploads/";
     try {
         const delv = await userModel.aggregate([
             {
@@ -1135,7 +1139,10 @@ exports.deliveryUser = async (req, res) => {
                 }
             },
             {
-                $unwind: '$department'
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true,
+                },
             },
             {
                 $lookup: {
@@ -1146,7 +1153,10 @@ exports.deliveryUser = async (req, res) => {
                 }
             },
             {
-                $unwind: '$role'
+                $unwind: {
+                    path: "$role",
+                    preserveNullAndEmptyArrays: true,
+                },
             },
             {
                 $lookup: {
@@ -1157,7 +1167,10 @@ exports.deliveryUser = async (req, res) => {
                 }
             },
             {
-                $unwind: '$user1'
+                $unwind: {
+                    path: "$user1",
+                    preserveNullAndEmptyArrays: true,
+                },
             },
             {
                 $project: {
@@ -1249,25 +1262,25 @@ exports.deliveryUser = async (req, res) => {
                     joining_date_extend_reason: '$joining_date_extend_reason',
                     joining_date_reject_reason: '$joining_date_reject_reason',
                     invoice_template_no: '$invoice_template_no',
-                    image: ImageUrl + '$image',
-                    UID: ImageUrl + '$UID',
-                    pan: ImageUrl + '$pan',
-                    highest_upload: ImageUrl + '$highest_upload',
-                    other_upload: ImageUrl + '$other_upload',
-                    tenth_marksheet: ImageUrl + '$tenth_marksheet',
-                    twelveth_marksheet: ImageUrl + '$twelveth_marksheet',
-                    UG_Marksheet: ImageUrl + '$UG_Marksheet',
-                    passport: ImageUrl + '$passport',
-                    pre_off_letter: ImageUrl + '$pre_off_letter',
-                    pre_expe_letter: ImageUrl + '$pre_expe_letter',
-                    pre_relieving_letter: ImageUrl + '$pre_relieving_letter',
-                    bankPassBook_Cheque: ImageUrl + '$bankPassBook_Cheque',
-                    joining_extend_document: ImageUrl + '$joining_extend_document',
-                    guardian_name:"$guardian_name",
-                    guardian_address:"$guardian_address",
-                    relation_with_guardian:"$relation_with_guardian",
-                    gaurdian_number:"$gaurdian_number",
-                    emergency_contact:"$emergency_contact"
+                    image: { $concat: [ImageUrl, '$image'] },
+                    UID: { $concat: [ImageUrl, '$UID'] },
+                    pan: { $concat: [ImageUrl, '$pan'] },
+                    highest_upload: { $concat: [ImageUrl, '$highest_upload'] },
+                    other_upload: { $concat: [ImageUrl, '$other_upload'] },
+                    tenth_marksheet: { $concat: [ImageUrl, '$tenth_marksheet'] },
+                    twelveth_marksheet:  { $concat: [ImageUrl, '$twelveth_marksheet'] },
+                    UG_Marksheet: { $concat: [ImageUrl, '$UG_Marksheet'] },
+                    passport: { $concat: [ImageUrl, '$passport'] },
+                    pre_off_letter: { $concat: [ImageUrl, '$pre_off_letter'] },
+                    pre_expe_letter: { $concat: [ImageUrl, '$pre_expe_letter'] },
+                    pre_relieving_letter: { $concat: [ImageUrl, '$pre_relieving_letter'] },
+                    bankPassBook_Cheque: { $concat: [ImageUrl, '$bankPassBook_Cheque'] },
+                    joining_extend_document: { $concat: [ImageUrl, '$joining_extend_document'] },
+                    guardian_name: "$guardian_name",
+                    guardian_address: "$guardian_address",
+                    relation_with_guardian: "$relation_with_guardian",
+                    gaurdian_number: "$gaurdian_number",
+                    emergency_contact: "$emergency_contact"
                 }
             }
         ]).exec();
@@ -1513,13 +1526,13 @@ exports.sendUserMail = async (req, res) => {
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                    user: "connect@creativefuel.io",
-                    pass: "clqjuhplszzqesiv",
+                    user: "onboarding@creativefuel.io",
+                    pass: "fjjmxuavwpescyat",
                 },
             });
 
             let mailOptions = {
-                from: "connect@creativefuel.io",
+                from: "onboarding@creativefuel.io",
                 to: email,
                 subject: subject,
                 html: html,
@@ -1535,7 +1548,7 @@ exports.sendUserMail = async (req, res) => {
 
             await mailTransporter.sendMail(mailOptions);
             res.sendStatus(200);
-        }else if (status == "reportTo") {
+        } else if (status == "reportTo") {
             const templatePath = path.join(__dirname, "reportTo.ejs");
             const template = await fs.promises.readFile(templatePath, "utf-8");
 
@@ -1547,13 +1560,13 @@ exports.sendUserMail = async (req, res) => {
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                    user: "connect@creativefuel.io",
-                    pass: "clqjuhplszzqesiv",
+                    user: "onboarding@creativefuel.io",
+                    pass: "fjjmxuavwpescyat",
                 },
             });
 
             let mailOptions = {
-                from: "connect@creativefuel.io",
+                from: "onboarding@creativefuel.io",
                 to: email,
                 subject: subject,
                 html: html,
@@ -1583,13 +1596,13 @@ exports.sendUserMail = async (req, res) => {
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                    user: "connect@creativefuel.io",
-                    pass: "clqjuhplszzqesiv",
+                    user: "onboarding@creativefuel.io",
+                    pass: "fjjmxuavwpescyat",
                 },
             });
 
             let mailOptions = {
-                from: "connect@creativefuel.io",
+                from: "onboarding@creativefuel.io",
                 to: email,
                 subject: subject,
                 html: html,
@@ -2025,13 +2038,13 @@ exports.sendMailAllWfoUser = async (req, res) => {
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                    user: "vijayanttrivedi1500@gmail.com",
-                    pass: "odovpikkjvkprrjv",
+                    user: "onboarding@creativefuel.io",
+                    pass: "fjjmxuavwpescyat",
                 },
             });
 
             let mailOptions = {
-                from: "vijayanttrivedi1500@gmail.com",
+                from: "onboarding@creativefuel.io",
                 to: emailId,
                 subject: subject,
                 html: html,
@@ -2131,32 +2144,32 @@ exports.forgotPass = async (req, res) => {
         const template = await fs.promises.readFile(templatePath, "utf-8");
         const html = ejs.render(template, {
             email,
-            password : getRandomPassword
-        
+            password: getRandomPassword
+
         });
 
-        if(updatePass){
-            sendMail("Forgot password", html,email);
-        }else{
-            return res.status(500).send({sms:'email couldn not send'});
+        if (updatePass) {
+            sendMail("Forgot password", html, email);
+        } else {
+            return res.status(500).send({ sms: 'email couldn not send' });
         }
-        return res.status(200).send({  message: 'Successfully Sent email.' })
+        return res.status(200).send({ message: 'Successfully Sent email.' })
 
     } catch (err) {
-       return  res.status(500).send({ error: err.message, message: 'Error Sending Mail' })
+        return res.status(500).send({ error: err.message, message: 'Error Sending Mail' })
     }
 };
 
 exports.getLoginHistory = async (req, res) => {
     try {
         const dataa = await userLoginHisModel.find({});
-        res.status(200).send({data:dataa})
+        res.status(200).send({ data: dataa })
     } catch (error) {
-        res.status(500).send({error: error.message, sms:"error getting user login history"})
+        res.status(500).send({ error: error.message, sms: "error getting user login history" })
     }
 }
 
-exports.getAllFirstLoginUsers = async(req, res) => {
+exports.getAllFirstLoginUsers = async (req, res) => {
     try {
         const delv = await userModel.find({ notify_hr: true })
         if (!delv) {
@@ -2170,33 +2183,33 @@ exports.getAllFirstLoginUsers = async(req, res) => {
 
 exports.logOut = async (req, res) => {
     try {
-        const  { user_id } = req.body
-        const userLoginHistory = await userLoginHisModel.findOne({user_id : user_id},'login_date');
-        if(!userLoginHistory ) {
-           return response.returnFalse(200,req,res,"No record found for this user in login history", {})
+        const { user_id } = req.body
+        const userLoginHistory = await userLoginHisModel.findOne({ user_id: user_id }, 'login_date');
+        if (!userLoginHistory) {
+            return response.returnFalse(200, req, res, "No record found for this user in login history", {})
         }
         const timestamp = Date.parse(userLoginHistory?.login_date);
         let formatedLoginTime = Math.floor(timestamp / 1000)
-        let formatedCurrentTime= Math.floor(Date.now() / 1000)
-       
+        let formatedCurrentTime = Math.floor(Date.now() / 1000)
+
         let diffInSecound = formatedCurrentTime - formatedLoginTime
 
-        let updateLoginHistoryData = await userLoginHisModel.findOneAndUpdate({user_id : user_id},
+        let updateLoginHistoryData = await userLoginHisModel.findOneAndUpdate({ user_id: user_id },
             {
-                $set:{
-                    duration : diffInSecound,
-                    log_out_date : Date.now()
+                $set: {
+                    duration: diffInSecound,
+                    log_out_date: Date.now()
                 }
             },
             {
-                new : true
+                new: true
             })
-        if(!updateLoginHistoryData){
-            return response.returnTrue ( 200 , req, res, "Something went wrong no login history found.",{})
+        if (!updateLoginHistoryData) {
+            return response.returnTrue(200, req, res, "Something went wrong no login history found.", {})
         }
-        return response.returnTrue ( 200 , req, res, "Successfully capture login duration time",updateLoginHistoryData)
+        return response.returnTrue(200, req, res, "Successfully capture login duration time", updateLoginHistoryData)
     } catch (error) {
-        return response.returnTrue ( 500 , req, res, "Internal Server Error",{})
+        return response.returnTrue(500, req, res, "Internal Server Error", {})
     }
 }
 

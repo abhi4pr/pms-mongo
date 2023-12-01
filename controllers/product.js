@@ -476,6 +476,7 @@ exports.addOrderReq = async (req, res) => {
       props1,
       Status : "pending"
     });
+    
     const savedOrderReqObj = await orderReqObj.save();
 
     //Fetching User Details
@@ -484,6 +485,7 @@ exports.addOrderReq = async (req, res) => {
     const sittingDetails = await sittingModel.findOne({
       sitting_id: parseInt(sitting_id),
     });
+   
     //Creating Template for sending in mail
     const templatePath = path.join(__dirname, "template1.ejs");
     const template = await fs.promises.readFile(templatePath, "utf-8");
