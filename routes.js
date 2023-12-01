@@ -397,7 +397,7 @@ router.delete("/delete_finance", finance.deleteFinance);
 /* Sitting Routes */
 router.post("/add_sitting", sitting.addSitting);
 router.get("/get_all_sittings", sitting.getSittings);
-router.get("/get_single_sitting/:id", sitting.getSingleSitting);
+router.get("/get_single_sitting/:sitting_id", sitting.getSingleSitting);
 router.put("/update_sitting", sitting.editSitting);
 router.delete("/delete_sitting/:id", sitting.deleteSitting);
 router.get("/not_alloc_sitting", sitting.getNotAllocSitting);

@@ -8,8 +8,8 @@ const userModel = require("../models/userModel");
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "vijayanttrivedi1500@gmail.com",
-    pass: "odovpikkjvkprrjv",
+    user: "onboarding@creativefuel.io",
+    pass: "fjjmxuavwpescyat",
   },
 });
 
@@ -82,7 +82,7 @@ async function sendReminderAssetEmail(simModel) {
   const html = ejs.render(template, { name });
 
   let mailOptions = {
-    from: "vijayanttrivedi1500@gmail.com",
+    from: "onboarding@creativefuel.io",
     to: "aditi@creativefuel.io",
     subject: "It's time to verify our asset",
     html: html,
