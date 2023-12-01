@@ -8,7 +8,7 @@ exports.addSim = async (req, res) => {
     nextHrDate.setDate(nextHrDate.getDate() + 30);
     const updatedDateString = nextHrDate.toISOString();
 
-    const nextSelfDate = new Date(req.body.last_self_audit_date);
+    const nextSelfDate = new Date();
     nextSelfDate.setDate(nextSelfDate.getDate() + 30);
     const updatedDateString2 = nextSelfDate.toISOString();
 
@@ -245,12 +245,15 @@ exports.getSims = async (req, res) => {
             inWarranty: "$inWarranty",
             warrantyDate: "$warrantyDate",
             dateOfPurchase: "$dateOfPurchase",
+            hrAuditPeriod: "$hrAuditPeriod",
+            hrAuditUnit: "$hrAuditUnit",
             selfAuditPeriod: "$selfAuditPeriod",
             selfAuditUnit: "$selfAuditUnit",
             invoiceCopy: "$invoiceCopy",
             assetsValue: "$assetsValue",
             created_by: "$created_by",
             assetsCurrentValue: "$assetsCurrentValue",
+            Remarks:"$Remarks",
             user_name: "$userdata.user_name",
             category_name: "$category.category_name",
             sub_category_name: "$subcategory.sub_category_name",

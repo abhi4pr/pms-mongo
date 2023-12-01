@@ -161,35 +161,34 @@ const upload1 = multer({ dest: "uploads/assets" }).fields([
   { name: "img3", maxCount: 1 },
   { name: "img4", maxCount: 1 },
 ]);
+
 exports.updateAssetImage = [
   upload1,
   async (req, res) => {
     try {
+      console.log("file", req.files);
+      const existingAssetImage = await assetsImagesModel.findOne({
+        sim_id: parseInt(req.body.sim_id),
+      });
+
+      const updateFields = {
+        uploaded_by: req.body.uploaded_by,
+        type: req.body.type,
+      };
+
+      if (req.files) {
+        updateFields.img1 = req.files["img1"] ? req.files["img1"][0].filename : existingAssetImage.img1;
+        updateFields.img2 = req.files["img2"] ? req.files["img2"][0].filename : existingAssetImage.img2;
+        updateFields.img3 = req.files["img3"] ? req.files["img3"][0].filename : existingAssetImage.img3;
+        updateFields.img4 = req.files["img4"] ? req.files["img4"][0].filename : existingAssetImage.img4;
+      }
+
       const editassetimage = await assetsImagesModel.findOneAndUpdate(
-        { asset_image_id: parseInt(req.body.asset_image_id) },
-        {
-          sim_id: req.body.sim_id,
-          img1:
-            req.files && req.files["img1"] && req.files["img1"][0]
-              ? req.files["img1"][0].filename
-              : "",
-          img2:
-            req.files && req.files["img2"] && req.files["img2"][0]
-              ? req.files["img2"][0].filename
-              : "",
-          img3:
-            req.files && req.files["img3"] && req.files["img3"][0]
-              ? req.files["img3"][0].filename
-              : "",
-          img4:
-            req.files && req.files["img4"] && req.files["img4"][0]
-              ? req.files["img4"][0].filename
-              : "",
-          uploaded_by: req.body.uploaded_by,
-          type: req.body.type,
-        },
+        { sim_id: parseInt(req.body.sim_id) },
+        updateFields,
         { new: true }
       );
+
       if (!editassetimage) {
         return res.status(500).send({ success: false });
       }
@@ -198,10 +197,11 @@ exports.updateAssetImage = [
     } catch (err) {
       return res
         .status(500)
-        .send({ error: err.message, sms: "Error updating user details" });
+        .send({ error: err.message, sms: "Error updating assets image details" });
     }
   },
 ];
+
 
 exports.deleteAssetImage = async (req, res) => {
   assetsImagesModel
