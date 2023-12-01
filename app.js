@@ -35,6 +35,20 @@ app.get('/doc-login', (req, res) => {
 app.get('/doc-access/:token',checkDevAuthentication, (req, res) => {
   return res.render('swaggerAccessForm');
 });
+app.get('/dev-delete/:id/:token',checkDevAuthentication, (req, res) => {
+  let userId  = req.params.id
+  let token  = req.params.token
+  return res.render("confirmationTemplate", {
+    error_title: "Are you sure you want to delete this developer...",
+    error_description: "After delete this data you can't retrive from anyway.",
+    error_image:
+      "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
+      button_path_cancel: `/doc-user/${token}`,
+      button_text_cancel: "Cancel",
+      button_text_ok: "Ok",
+      button_path_ok: `/delete-dev/${userId}/${token}`,
+  });
+});
 app.get('/doc-user/:token',checkDevAuthentication, (req, res) => {
   return res.render('userList');
 });
@@ -52,7 +66,7 @@ app.get('/doc-users/:token',checkDevAuthentication,swaggerAccessManagement.getDe
 app.get('/dev-login-history/:token',checkDevAuthentication,swaggerAccessManagement.getDevLoginHis );
 app.get('/dev-data/:id/:token',checkDevAuthentication,swaggerAccessManagement.getDevSingleData );
 app.put('/dev-data-update/:id/:token',checkDevAuthentication,swaggerAccessManagement.updateDevData );
-app.delete('/delete-dev/:id/:token',checkDevAuthentication,swaggerAccessManagement.deleteDev );
+app.get('/delete-dev/:id/:token',checkDevAuthentication,swaggerAccessManagement.deleteDev );
 
 // end
 app.use(

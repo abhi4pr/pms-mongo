@@ -434,11 +434,10 @@
                                 <a href='/dev-update/${
                                   user._id
                                 }/${token}' ><i class="fas fa-pencil-alt"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
-                                <button class="delete-btn" data-userid="${
+                                <a href='/dev-delete/${
                                   user._id
-                                }"  onmouseover="this.style.backgroundColor='#e96364'; this.style.color='white';"
-        onmouseout="this.style.backgroundColor='initial'; this.style.color='initial';"
-        style="background-color: initial; color: initial; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"><i class="fas fa-trash-alt"></i></button>
+                                }/${token}' ><i class="fas fa-trash-alt"></i></a> 
+                 
                             </td>
                         `;
             });
@@ -489,13 +488,32 @@
         }
 
         /* Event Delegation for Delete Buttons */
-        document
-          .getElementById("userTable")
-          .addEventListener("click", function (event) {
-            if (event.target && event.target.classList.contains("delete-btn")) {
-              console.log("here")
-              const userId = event.target.getAttribute("data-userid");
-              fetch(`/delete-dev/${userId}/${token}`, {
+        // document
+        //   .getElementById("userTable")
+        //   .addEventListener("click", function (event) {
+        //     if (event.target && event.target.classList.contains("delete-btn")) {
+              
+        //       const userId = event.target.getAttribute("data-userid");
+        //       fetch(`/delete-dev/${userId}/${token}`, {
+        //         method: "DELETE",
+        //       })
+        //         .then((response) => response.json())
+        //         .then((data) => {
+        //           console.log("User deleted:", data);
+        //           // Optionally remove the user's row from the table
+        //           if (data.success === false) {
+        //             alert("Error deleting user: " + data.message);
+        //           } else {
+        //             event.target.closest("tr").remove();
+        //             window.location.href = `/doc-user/${token}`;
+        //           }
+        //         })
+        //         .catch((error) => alert(error));
+        //     }
+        //   });
+
+        function deleteData (userId){
+          fetch(`/delete-dev/${userId}/${token}`, {
                 method: "DELETE",
               })
                 .then((response) => response.json())
@@ -511,7 +529,10 @@
                 })
                 .catch((error) => alert(error));
             }
-          });
+            // }
+          // });
+        // }
+          // });
 
         /*   Events  */
         document
