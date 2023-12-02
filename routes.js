@@ -89,10 +89,10 @@ router.get('/campaignphase/:id', campaignPhaseController.getAllPhase)
 
 /*insta api*/
 router.get("/shorcode_info",insta.getCountBasedOnTrackedPost)
-router.post("/add_image",upload1.fields([{ name: "brandImageToServer", maxCount: 10 },{name: "campaignImageToServer", maxCount: 10}]), imageUpload.addImage)
+router.post("/add_image",upload1.fields([{ name: "brandImageToServer", maxCount: 10 },{name: "campaignImageToServer", maxCount: 10},{name:"creatorImageToServer", maxCount: 10}]), imageUpload.addImage)
 router.post("/get_all_images",imageUpload.getImages)
 router.get("/get_single_image/:id",imageUpload.getImage)
-router.put("/update_image",upload1.fields([{ name: "brandImageToServer", maxCount: 10 },{name: "campaignImageToServer", maxCount: 10}]), imageUpload.editImages)
+router.put("/update_image",upload1.fields([{ name: "brandImageToServer", maxCount: 10 },{name: "campaignImageToServer", maxCount: 10},{name: "campaignImageToServer", maxCount: 10},{name:"creatorImageToServer", maxCount: 10}]), imageUpload.editImages)
 router.delete("/delete_image/:id", imageUpload.deleteImage)
 // router.post("/upload_img_on_server",upload1.single("imageToServer"), insta.uploadImageToServer)
 router.post("/add_tracked_post",insta.insertDataIntoPostAnalytics)

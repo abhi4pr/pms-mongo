@@ -10,7 +10,9 @@ exports.upload = multer({
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
 
-    if (file.fieldname === "campaignImageToServer") {
+    if (file.fieldname === "creatorImageToServer") {
+      cb(null, "./uploads/Creator_s Avatar");
+    }else if (file.fieldname === "campaignImageToServer") {
       cb(null, "./uploads/Campaign_s Avatar");
     } else if (file.fieldname === "brandImageToServer") {
       cb(null, "./uploads/Brand_s Avatar");
