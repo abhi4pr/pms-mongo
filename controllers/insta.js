@@ -1452,6 +1452,41 @@ exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
         res.status(500).send({error:error.message,message:'Internal server error'})
     }
 };
+exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
+    try {
+        const trackCreatorParams = {
+            cron_expression: req.body.cron_expression,
+            // cron_expression: "*/15 * * * *",
+            tracking_expiry_at: req.body.tracking_expiry_at,
+            // tracking_expiry_at: "2023-12-01 12:12:12.12",
+            tracking: true
+        };
+    let data = req.body.data
+
+     data.map(async(item, index)=>{
+            // if(index < 2 ){
+    
+                try {
+                  let result =  await axios.put(
+                        `https://app.ylytic.com/ylytic/api/v1/rt_tracking/posts/${item.shortCode}`,
+                        trackCreatorParams,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    );
+                    resArr.push(result?.data)
+                } catch (error) {
+                    console.log(error.message)
+                }
+        })
+        res.status(200).json({message : "Request Send from our side to third party."});
+    } catch (error) {
+        res.status(500).send({error:error.message,message:'Internal server error'})
+    }
+};
 
 // exports.insertDataIntoPostAnalytics = async (req,res)=>{
 //     try {
