@@ -216,7 +216,7 @@ exports.deleteImage = async (req, res) => {
       let folderName =
       result?.img_type === 1
         ? "../uploads/Brand_s Avatar"
-        : editImage?.img_type === 2
+        : result?.img_type === 2
         ? "/uploads/Campaign_s Avatar"
         : "/uploads/Creator_s Avatar/";
 
@@ -228,7 +228,7 @@ exports.deleteImage = async (req, res) => {
         200,
         req,
         res,
-        `Image with ID ${req.params._id} deleted successfully`,
+        `Image with ID ${req.params.id} deleted successfully`,
         {}
       );
     } else {
@@ -236,7 +236,7 @@ exports.deleteImage = async (req, res) => {
         200,
         req,
         res,
-        `Image with ID ${req.params._id} not found`,
+        `Image with ID ${req.params.id} not found`,
         {}
       );
     }
