@@ -7,9 +7,10 @@ const imageModel = require("../../models/Instagram/imageUpload");
 exports.addImage = async (req, res) => {
   try {
     const { img_type, created_by } = req.body;
-    let img = req.files?.brandImageToServer
-      ? req.files?.brandImageToServer
-      : req.files?.campaignImageToServer;
+    let img =
+      req.files?.brandImageToServer ||
+      req.files?.campaignImageToServer ||
+      req.files?.creatorImageToServer;
     let savedDocuments = [];
     if (img) {
       for (const file of img) {
@@ -69,6 +70,10 @@ exports.getImages = async (req, res) => {
                           case: { $eq: ["$img_type", 2] },
                           then: `${constant.base_url}/uploads/Campaign_s Avatar/`,
                         },
+                        {
+                          case: { $eq: ["$img_type", 3] },
+                          then: `${constant.base_url}/uploads/Creator_s Avatar/`,
+                        },
                       ],
                       default: "",
                     },
@@ -126,6 +131,10 @@ exports.getImage = async (req, res) => {
                           case: { $eq: ["$img_type", 2] },
                           then: `${constant.base_url}/uploads/Campaign_s Avatar/`,
                         },
+                        {
+                          case: { $eq: ["$img_type", 3] },
+                          then: `${constant.base_url}/uploads/Creator_s Avatar/`,
+                        },
                       ],
                       default: "",
                     },
@@ -162,9 +171,10 @@ exports.getImage = async (req, res) => {
 };
 exports.editImages = async (req, res) => {
   try {
-    let image = req.files.brandImageToServer
-      ? req.files.brandImageToServer
-      : req.files.campaignImageToServer;
+    let image =
+      req.files.brandImageToServer ||
+      req.files.campaignImageToServer ||
+      req.files.creatorImageToServer;
     const editImage = await imageModel.findByIdAndUpdate(req.body._id, {
       $set: {
         img: image[0].originalname,
@@ -179,8 +189,9 @@ exports.editImages = async (req, res) => {
     let folderName =
       editImage?.img_type === 1
         ? "../uploads/Brand_s Avatar"
-        : "/uploads/Campaign_s Avatar";
-    console.log(folderName);
+        : editImage?.img_type === 2
+        ? "/uploads/Campaign_s Avatar"
+        : "/uploads/Creator_s Avatar/";
 
     const result = helper.fileRemove(editImage?.img, folderName);
     if (result?.status == false) {
@@ -203,9 +214,11 @@ exports.deleteImage = async (req, res) => {
     const result = await imageModel.findByIdAndDelete(req.params.id);
     if (result) {
       let folderName =
-        result?.img_type === 1
-          ? "../uploads/Brand_s Avatar"
-          : "/uploads/Campaign_s Avatar";
+      result?.img_type === 1
+        ? "../uploads/Brand_s Avatar"
+        : result?.img_type === 2
+        ? "/uploads/Campaign_s Avatar"
+        : "/uploads/Creator_s Avatar/";
 
       const result2 = helper.fileRemove(result?.img, folderName);
       if (result2?.status == false) {
@@ -215,7 +228,7 @@ exports.deleteImage = async (req, res) => {
         200,
         req,
         res,
-        `Image with ID ${req.params._id} deleted successfully`,
+        `Image with ID ${req.params.id} deleted successfully`,
         {}
       );
     } else {
@@ -223,7 +236,7 @@ exports.deleteImage = async (req, res) => {
         200,
         req,
         res,
-        `Image with ID ${req.params._id} not found`,
+        `Image with ID ${req.params.id} not found`,
         {}
       );
     }

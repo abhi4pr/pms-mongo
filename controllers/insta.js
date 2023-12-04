@@ -1452,51 +1452,278 @@ exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
         res.status(500).send({error:error.message,message:'Internal server error'})
     }
 };
+exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
+    try {
+        const trackCreatorParams = {
+            cron_expression: req.body.cron_expression,
+            // cron_expression: "*/15 * * * *",
+            tracking_expiry_at: req.body.tracking_expiry_at,
+            // tracking_expiry_at: "2023-12-01 12:12:12.12",
+            tracking: true
+        };
+    let data = req.body.data
 
+     data.map(async(item, index)=>{
+            // if(index < 2 ){
+    
+                try {
+                  let result =  await axios.put(
+                        `https://app.ylytic.com/ylytic/api/v1/rt_tracking/posts/${item.shortCode}`,
+                        trackCreatorParams,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    );
+                    resArr.push(result?.data)
+                } catch (error) {
+                    console.log(error.message)
+                }
+        })
+        res.status(200).json({message : "Request Send from our side to third party."});
+    } catch (error) {
+        res.status(500).send({error:error.message,message:'Internal server error'})
+    }
+};
+
+// exports.insertDataIntoPostAnalytics = async (req,res)=>{
+//     try {
+       
+//             const savingRes = new instaPostAnalyticsModel({
+//                 handle: req.body.data?.handle ?? "",
+//                 postType: req.body.data.post_type,
+//                 creatorName: req.body.data.creator.username,
+//                 allComments: req.body.data.comments_count.overall,
+//                 brand_id: 0,
+//                 todayComment: req.body.data.comments_count.today,
+//                 pastComment: req.body.data.comments_count.vs_previous,
+//                 allLike: req.body.data.likes_count.overall,
+//                 campaign_id: 0,
+//                 todayLikes: req.body.data.likes_count.today,
+//                 pastLike: req.body.data.likes_count.vs_previous,
+//                 allView: req.body.data.views_count.overall,
+//                 todayViews: req.body.data.views_count.today,
+//                 // agency_id: req.body.data.views_count.today,
+//                 pastView: req.body.data.views_count.vs_previous,
+//                 title: req.body.data.title,
+//                 postedOn: req.body.data.posted_at,
+//                 postUrl: req.body.data.post_url,
+//                 postImage: req.body.data.display_url[0],
+//                 shortCode: req.body.shortcode,
+//                 posttype_decision: req.body.posttype_decision,
+//                 selector_name: req.body.selector_name,
+//                 interpretor_name: req.body.interpretor_name,
+//                 auditor_name: req.body.auditor_name,
+//                 auditor_decision: req.body.auditor_decision,
+//                 interpretor_decision: req.body.interpretor_decision,
+//                 selector_decision: req.body.selector_decision,
+//                 music_info : req.body.data?.music_info,
+//                 location : req.body.data?.location,
+//                 sponsored : req.body.data?.sponsored,
+//             });
+//             const result =  await savingRes.save()
+//              /* update insta p model post mean that are tracked */
+//             //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+//             res.send({ result, status: 200 });
+       
+//     } catch (error) {
+//         res.status(500).send({ error: error.message, sms: "error while adding data" });
+//     }
+// }
 exports.insertDataIntoPostAnalytics = async (req,res)=>{
     try {
-       
-            const savingRes = new instaPostAnalyticsModel({
-                handle: req.body.data?.handle ?? "",
-                postType: req.body.data.post_type,
-                creatorName: req.body.data.creator.username,
-                allComments: req.body.data.comments_count.overall,
-                brand_id: 0,
-                todayComment: req.body.data.comments_count.today,
-                pastComment: req.body.data.comments_count.vs_previous,
-                allLike: req.body.data.likes_count.overall,
-                campaign_id: 0,
-                todayLikes: req.body.data.likes_count.today,
-                pastLike: req.body.data.likes_count.vs_previous,
-                allView: req.body.data.views_count.overall,
-                todayViews: req.body.data.views_count.today,
-                // agency_id: req.body.data.views_count.today,
-                pastView: req.body.data.views_count.vs_previous,
-                title: req.body.data.title,
-                postedOn: req.body.data.posted_at,
-                postUrl: req.body.data.post_url,
-                postImage: req.body.data.display_url[0],
-                shortCode: req.body.shortcode,
-                posttype_decision: req.body.posttype_decision,
-                selector_name: req.body.selector_name,
-                interpretor_name: req.body.interpretor_name,
-                auditor_name: req.body.auditor_name,
-                auditor_decision: req.body.auditor_decision,
-                interpretor_decision: req.body.interpretor_decision,
-                selector_decision: req.body.selector_decision,
-                music_info : req.body.data?.music_info,
-                location : req.body.data?.location,
-                sponsored : req.body.data?.sponsored,
-            });
-            const result =  await savingRes.save()
+       let shortCodeFind = req.body.shortcode;
+        
+       let findDataFromPost = await instaP.find({ shortCode : shortCodeFind }).lean()
+       const { _id, __v, todayComment,
+        todayLikes,
+        todayViews,
+        selector_date,
+        auditor_date,
+        createdAt,
+        postType,
+        creatorName,
+        allComments,
+        pastComment,
+        allLike,
+        pastLike,
+        allView,
+        pastView,
+        title,
+        postedOn,
+        postUrl,
+        postImage,
+        shortCode,
+        posttype_decision,
+        selector_name,
+        interpretor_name,
+        auditor_name,
+        auditor_decision,
+        interpretor_decision,
+        selector_decision,
+        dateCol,
+        hashTag,
+        mentions,
+        interpretor_date,
+        handle,
+        updatedAt,
+        campaign_id,
+        location,
+        music_info,
+        sponsored,
+        brand_id,
+        crone_trak } = findDataFromPost[0];
+ 
+       const savingRes = new instaPostAnalyticsModel({
+        todayComment, 
+        todayLikes,
+        todayViews,
+        selector_date, //
+        auditor_date, //
+        createdAt,
+        postType, 
+        creatorName, //
+        allComments,
+        pastComment,
+        allLike,
+        pastLike,
+        allView,
+        pastView,
+        title, 
+        postedOn,
+        postUrl, //
+        postImage, //
+        shortCode, //
+        posttype_decision, //
+        selector_name, //
+        interpretor_name, //
+        auditor_name, //
+        auditor_decision,  //
+        interpretor_decision, //
+        selector_decision, //
+        dateCol, //
+        hashTag, //
+        mentions, //
+        interpretor_date, //
+        handle, //
+        updatedAt, //  
+        campaign_id, // ***
+        location, 
+        music_info, 
+        sponsored, 
+        brand_id, //  ***
+        crone_trak  //
+         });
+        const result =  await savingRes.save()
+
+        if(result){
+          let updatedPost =  await instaP.findByIdAndUpdate(_id,{ $set : {
+             createdAt : Date.now(),
+             todayComment: req.body.data.comments_count.today,
+             todayLikes: req.body.data.likes_count.today,
+             todayViews: req.body.data.views_count.today,
+             postType: req.body.data.post_type,
+             allComments: req.body.data.comments_count.overall,
+             pastComment: req.body.data.comments_count.vs_previous,
+             allLike: req.body.data.likes_count.overall,
+             pastLike: req.body.data.likes_count.vs_previous,
+             allView: req.body.data.views_count.overall,
+             todayViews: req.body.data.views_count.today,
+             pastView: req.body.data.views_count.vs_previous,
+             title: req.body.data.title,
+             postedOn: req.body.data.posted_at,
+             location : req.body.data?.location,
+             music_info : req.body.data?.music_info,
+             sponsored : req.body.data?.sponsored,
+
+          }})
+            if(!updatedPost){
+              return  res.send({ message: "Analytics data inserted sucessfully but insta post model not update properly.", status: 200 });
+            }
+        }
              /* update insta p model post mean that are tracked */
             //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
-            res.send({ result, status: 200 });
+       return res.send({ message:"Succefully perform operation.", status: 200 });
        
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "error while adding data" });
     }
 }
+
+
+exports.getCountBasedOnTrackedPost = async (req,res) => {
+        try {
+            let obj = {}
+         /* Get Brands which rating is 4 to 5 */
+        const filterForBrand = {
+            rating: { $gte: 4, $lte: 5 } 
+          };
+          
+          const projectionForBrand = {
+            instaBrandId: 1,
+          };
+
+          const brnadsData = await instaBrandModel.find(filterForBrand, projectionForBrand);
+          const brnadsDataCount = await instaBrandModel.countDocuments(filterForBrand);
+           
+
+        if(brnadsData?.length === 0){
+            return res.status(200).json({status:false, message:"There are no brands with 4 to 5 rating."})
+        }
+
+        /* Create condition with brand id */
+        let conditionForBrandId = brnadsData?.map((item)=>{
+            let obj = {
+                brand_id : item.instaBrandId
+            }
+            return obj
+        })
+      
+        const filterForPost = {
+            interpretor_decision: 1,
+            crone_trak: 0,
+            $or: conditionForBrandId,
+          };
+          
+          const projectionForPost = {
+            shortCode: 1,
+          };
+          const postDataRespecticBrand = await instaP.find(filterForPost, projectionForPost);
+          const documentCount = await instaP.countDocuments(filterForPost);
+
+
+          const uniqueShortcodes = await instaPostAnalyticsModel.find({},'shortCode');
+
+
+
+          // Finding not tracked shortcode 
+          // Extract an array of unique shortcodes from uniqueShortcodes array
+            const uniqueShortcodeValues = [...new Set(uniqueShortcodes.map(obj => obj.shortCode))];
+            const resultArray1 = postDataRespecticBrand.filter(postData => {
+                  return !uniqueShortcodeValues.includes(postData.shortCode);
+             });
+            const resultArray2 = postDataRespecticBrand.filter(postData => {
+                  return uniqueShortcodeValues.includes(postData.shortCode);
+             });
+             obj.brnads_data_count_rating = brnadsDataCount
+             obj.insta_post_counts_based_on_brands = documentCount
+             obj.insta_post_shortcode = postDataRespecticBrand
+             obj.short_code_match_in_analytics_counts = resultArray2 && resultArray2.length
+             obj.short_code_match_in_analytics = resultArray2
+             obj.short_code_not_match_in_analytics_model_count = resultArray1  && resultArray1.length
+             obj.short_code_not_match_in_analytics = resultArray1
+             obj.unique_shortcode_values_from_analytics_model_counts = uniqueShortcodeValues && uniqueShortcodeValues.length
+             obj.unique_shortcode_values_from_analytics = uniqueShortcodeValues
+            //  obj.unique_shortcodes_from_analytics = uniqueShortcodes
+           
+             return res.status(200).json({obj})
+        } catch (error) {
+            res.status(500).send({error:error.message,message:'Internal server error'}) 
+        }
+}
+
 
 exports.getResBasedOnMatchForAnalyticsPost = async (req, res) => {
     try {
