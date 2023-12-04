@@ -69,6 +69,7 @@ const campaignPlanController = require("./controllers/operationExecution/campaig
 const campaignPhaseController = require("./controllers/operationExecution/campaignPhaseController.js");
 const city = require("./controllers/cityController.js");
 const phpFinance = require("./controllers/phpFinance.js")
+const phpPayment = require("./controllers/phpPaymentAccList.js")
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -966,6 +967,7 @@ router.get("/get_all_cocs", coc.getAllCocs);
 router.get("/get_single_coc/:_id", coc.getSingleCoc);
 router.put("/update_coc", coc.editCoc);
 router.get("/get_coc_history/:_id", coc.getCocHistory);
+router.delete("/delete_coc/:_id", coc.deleteCoc);
 
 /* Document master */
 router.post("/add_doc", documentController.addDocument);
@@ -1033,5 +1035,7 @@ router.delete("/delete_city/:_id", city.deleteCity);
 /* php finance api */
 router.post("/add_php_finance_data_in_node", phpFinance.savePhpFinanceDataInNode);
 router.get("/get_all_php_finance_data", phpFinance.getAllphpFinanceData);
+router.post("/add_php_payment_acc_data_in_node", phpPayment.savePhpPaymentAccDataInNode);
+router.get("/get_all_php_payment_acc_data", phpPayment.getAllphpPaymentAccData);
 
 module.exports = router;

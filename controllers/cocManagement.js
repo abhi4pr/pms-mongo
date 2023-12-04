@@ -76,7 +76,7 @@ exports.editCoc = async (req, res) => {
 };
 
 exports.deleteCoc = async (req, res) =>{
-    cocModel.deleteOne({sim_id:req.params.id}).then(item =>{
+    cocModel.findByIdAndDelete(req.params._id).then(item =>{
         if(item){
             return res.status(200).json({success:true, message:'sim deleted'})
         }else{
