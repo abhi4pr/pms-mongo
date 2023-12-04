@@ -1428,7 +1428,7 @@ exports.getOrderReqsBasedOnFilter = async (req, res) => {
       {
         $match: {
           $and: [
-            { Status: { $nin: ["complete", "declined"] } },
+            { Status: { $nin: ["Delivered", "declined"] } },
             {
               $or: [
                 { room_id: parseInt(room_id) },
@@ -1463,15 +1463,23 @@ exports.getOrderReqsBasedOnFilter = async (req, res) => {
           as: "sittingModel",
         },
       },
-
       {
-        $unwind: "$userModel",
+        $unwind: {
+          path: "$userModel",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
-        $unwind: "$productModel",
+        $unwind: {
+          path: "$productModel",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
-        $unwind: "$sittingModel",
+        $unwind: {
+          path: "$sittingModel",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $project: {
