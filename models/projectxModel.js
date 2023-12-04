@@ -49,6 +49,30 @@ const projectxSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  page_logo_url: {
+    type: String,
+    default: "",
+  },
+  tracking_cron: {
+    type: String,
+    default: "",
+  },
+  tracking: {
+    type: Boolean,
+    default: false,
+  },
+  crawler_count: {
+    type: Number,
+    default: 0,
+  },
+  max_post_count_a_day: {
+    type: Number,
+    default: 0,
+  },
+  avg_post_count_a_day: {
+    type: Number,
+    default: 0,
+  },
 
   updated_at: {
     type: Date,

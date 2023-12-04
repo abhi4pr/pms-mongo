@@ -1801,3 +1801,24 @@ exports.getResBasedOnMatchForAnalyticsPost = async (req, res) => {
         res.status(500).json({ status: 500, error: error.message, sms: `Internal server error : ${error.message}` });
     }
 };
+
+
+exports.trackCreatorGet = async (req, res) => {
+    try {
+
+        const response = await axios.get(
+            `https://app.ylytic.com/ylytic/api/v1/rt_tracking/creators/${req.params.pagename}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        res.status(response.status).json(response.data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: err, sms: "These creators cron expression cant be edited" });
+    }
+};
