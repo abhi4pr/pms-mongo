@@ -442,6 +442,7 @@ exports.getAllOrderDeliveries = async (req, res) => {
 //Orders Req Api's
 exports.addOrderReq = async (req, res) => {
   try {
+    var d1 = new Date();
     const {
       product_id,
       order_quantity,
@@ -459,6 +460,14 @@ exports.addOrderReq = async (req, res) => {
       email
     } = req.body;
 
+    const Delivered_datetime = delivered_datetime
+      ? new Date(delivered_datetime)
+      : null;
+
+    const Request_datetime = new Date();
+    Request_datetime.setHours(Request_datetime.getHours() + 5);
+    Request_datetime.setMinutes(Request_datetime.getMinutes() + 30);
+    
     //Saved Data into Order Req Table
     const orderReqObj = new orderReqModel({
       product_id: product_id,
@@ -468,15 +477,16 @@ exports.addOrderReq = async (req, res) => {
       Sitting_id: sitting_id,
       Status: status,
       Request_delivered_by: request_delivered_by,
-      Delivered_datetime: delivered_datetime,
+      Delivered_datetime: Delivered_datetime,
       Message: message,
       Remarks: remarks,
       Created_by: created_by,
       room_id,
       props1,
-      Status : "pending"
+      Status: "pending",
+      Request_datetime : Request_datetime
     });
-    
+
     const savedOrderReqObj = await orderReqObj.save();
 
     //Fetching User Details
@@ -485,7 +495,7 @@ exports.addOrderReq = async (req, res) => {
     const sittingDetails = await sittingModel.findOne({
       sitting_id: parseInt(sitting_id),
     });
-   
+
     //Creating Template for sending in mail
     const templatePath = path.join(__dirname, "template1.ejs");
     const template = await fs.promises.readFile(templatePath, "utf-8");
@@ -503,7 +513,7 @@ exports.addOrderReq = async (req, res) => {
     });
 
     //Send Mail with Template
-    sendMail("Pantry New Order", html,email);
+    sendMail("Pantry New Order", html, email);
     return response.returnTrue(
       200,
       req,
@@ -872,7 +882,7 @@ exports.pendingOrdersById = async (req, res) => {
 
     //Create Logic for create timer as well as image url
     const currentTime = new Date();
-   
+
 
     const responseData = orders.map((item) => {
       const orderRequestId = item.Order_req_id;
@@ -1170,16 +1180,28 @@ exports.allOrderReqData = async (req, res) => {
         },
       },
       {
-        $unwind: "$userModelRequestDelivered",
+        $unwind: {
+          path: "$userModelRequestDelivered",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
-        $unwind: "$userModel",
+        $unwind: {
+          path: "$userModel",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
-        $unwind: "$productModel",
+        $unwind: {
+          path: "$productModel",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
-        $unwind: "$sittingModel",
+        $unwind: {
+          path: "$sittingModel",
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $project: {
@@ -1220,7 +1242,7 @@ exports.allOrderReqData = async (req, res) => {
 
     // Calculate the countdown timers based on the "Duration" from the database
     const currentTime = new Date();
-    
+
     const responseData = orderReq.map((item) => {
       const orderRequestId = item.Order_req_id;
 
@@ -1341,7 +1363,7 @@ exports.orderReqHistory = async (req, res) => {
         $limit: 3,
       },
     ]);
-    
+
     const responseData = orderReqHis.map((item) => {
       const imageUrl = item.Product_image
         ? `${constant.base_url}/uploads/${item.Product_image}`

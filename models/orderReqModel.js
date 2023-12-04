@@ -31,7 +31,6 @@ const orderReqSchema = new mongoose.Schema({
   },
   Request_datetime: {
     type: Date,
-    default: Date.now,
   },
   Status: {
     type: String
