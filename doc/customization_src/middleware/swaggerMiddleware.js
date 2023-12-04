@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const constant = require("../common/constant");
-const devLoginHistoryModel = require("../models/swaggerDocumentation/devLoginHistoryModel");
+const constant = require("../../../common/constant");
+const devLoginHistoryModel = require("../models/devLoginHistoryModel");
 exports.checkDevAuthentication = async(req, res, next) => {
   const authorizationHeader = req.params.token;
   if (!authorizationHeader) {

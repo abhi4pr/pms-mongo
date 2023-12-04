@@ -13,6 +13,11 @@ const constant = require("../common/constant.js");
 const notificationModel = require("../models/notificationModel.js");
 
 module.exports = {
+  /**
+   * Generates a PDF for the offer letter based on the provided employee data.
+   * @param {object} empData - The employee data object.
+   * @returns {Promise<void>} - A promise that resolves when the PDF is generated.
+   */
   generateOfferLaterPdf: async (empData) => {
     try {
       const designationData = await designationModel.findOne(
@@ -118,6 +123,12 @@ module.exports = {
     }
   },
 
+  /**
+   * Formats the given number of seconds into a human-readable string representation
+   * that includes the number of days, hours, minutes, and seconds.
+   * @param {number} seconds - The number of seconds to format.
+   * @returns {string} A formatted string representation of the given number of seconds.
+   */
   formateSecoundTime: (seconds) => {
     const days = Math.floor(seconds / (3600 * 24));
     seconds -= days * 3600 * 24;
@@ -127,6 +138,12 @@ module.exports = {
     seconds -= mnts * 60;
     return `${days} days, ${hrs} hours, ${mnts} minutes, and ${seconds} seconds`;
   },
+  /**
+   * Removes a file from the specified folder.
+   * @param {string} filename - The name of the file to be removed.
+   * @param {string} foldername - The name of the folder containing the file.
+   * @returns {Object} - An object with the status and message of the operation.
+   */
   fileRemove: (filename, foldername) => {
     const folder = path.join(__dirname, foldername);
     const fileName = filename;
@@ -143,6 +160,11 @@ module.exports = {
       });
     }
   },
+  /**
+   * Generates the next invoice number for a given user.
+   * @param {string} userId - The ID of the user for whom the invoice number is being generated.
+   * @returns {Promise<string>} - A promise that resolves to the next invoice number.
+   */
   createNextInvoiceNumber: async (userId) => {
     const latestEntry = await attendanceModel
       .findOne()
@@ -169,8 +191,32 @@ module.exports = {
     return `${monthYear}/${userId}/${nextIncrement}`;
   },
 
+  /**
+   * Generates a random password consisting of 6 alphanumeric characters.
+   * @returns {string} - The randomly generated password.
+   */
   generateRandomPassword: () => {
     const randomString = Math.random().toString(36).slice(-6);
     return randomString;
+  },
+  /**
+   * Generates a random One-Time Password (OTP) consisting of 6 digits.
+   * @returns {string} - The randomly generated OTP.
+   */
+  generateRandomOTP: () => {
+    // Generate a random number between 100000 and 999999
+    const randomOTP = Math.floor(100000 + Math.random() * 900000);
+    return randomOTP.toString();
+  },
+  /**
+   * Generates the expiry time for a one-time password (OTP) in milliseconds.
+   * @returns {number} The expiry time for the OTP in milliseconds.
+   */
+  generateOtpExpiryTime: () => {
+    // Get the current time in milliseconds
+    var currentTime = new Date().getTime();
+    // Calculate the expiry time (10 minutes = 600,000 milliseconds)
+    var expiryTime = currentTime + 600000;
+    return expiryTime;
   },
 };

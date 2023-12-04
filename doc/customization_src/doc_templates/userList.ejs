@@ -9,6 +9,7 @@
     />
 
     <style>
+       @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
       body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -44,6 +45,7 @@
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Poppins', sans-serif;
         /* margin-bottom: 20px; */
       }
 
@@ -167,7 +169,7 @@
         margin: 5px;
         text-decoration: none;
         color: #fff;
-        background-color: #04d3c0;
+        background-color: #013660;
         border: 2px solid transparent;
         border-radius: 5px;
         transition: all 0.3s ease;
@@ -177,16 +179,16 @@
 
       .checkDevelopers:hover {
         /* Hover styling */
-        background-color: #0056b3;
+        background-color: rgb(81, 97, 181);
         color: #fff;
-        border-color: #013660;
+        border-color: rgb(81, 97, 181);
         transform: scale(1.05);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
 
       .checkDevelopers:active {
         /* Active/Clicked styling */
-        background-color: #013660;
+        background-color: #001e36;
         color: #fff;
         border-color: #013660;
         transform: scale(0.95);
@@ -297,22 +299,21 @@
           Login History &nbsp; &nbsp;
         </a>
         <a href="/doc-user" class="checkDevelopers"> Developers List </a>
+        <a href="/all-request" class="checkDevelopers"> Reequest  </a>
       </div>
       <img
-        src="https://png.pngtree.com/png-vector/20190328/ourmid/pngtree-programmers-code-the-website-from-the-command-line-flat-vector-illustration-png-image_878368.jpg"
+        src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
         alt="CreativeFuel Logo"
         style="height: 200px;"
       />
       <hr />
     </div>
     <div class="main">
-      <div class="header" style = "display: flex; justify-content: space-between;">
-        <h1>Developer Management</h1>
-        <img
-        src="https://creativefuel.io/assets/img/image20.png"
-        alt="CreativeFuel Logo"
-        style="height: 60px;"
-      />
+      <div class="header" style = "display: flex; justify-content: center;  align-items: center;">
+        <h1 style="margin-right: auto;">Developer Management</h1>
+        <a href="#" id="resetFilterBtn" style="margin-left: auto; font-size: 25px;"><i class="fas fa-sign-out-alt"></i></a>
+        <a href="/admin-profile" id="resetFilterBtn" style=" font-size: 25px;"><i class="fas fa-user"></i></a>
+        <!-- <a href="#" id="resetFilterBtn" ><i class="fas fa-sync-alt"></i> Update</a> -->
       </div>
       <div class="card"> 
         <div>
@@ -344,6 +345,7 @@
                 <th>Phone</th>
                 <th>Name</th>
                 <th>Department</th>
+                <th>Email Verified</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -411,7 +413,7 @@
       document.addEventListener("DOMContentLoaded", function () {
 
         /* Create Api Call */
-        fetch(`/doc-users/${token}`) 
+        fetch(`/doc-users/${token}/1`) 
           .then((response) => response.json())
           .then((data) => {
             const tableBody = document
@@ -425,6 +427,7 @@
                             <td>${user.phone}</td>
                             <td>${user.name}</td>
                             <td>${user.department}</td>
+                            <td>${user.isAdminVerified ===1 ? "Yes" : "No"}</td>
                             <td style="${
                               user.status === "Inactive"
                                 ? "color: red;"
@@ -436,7 +439,7 @@
                                 }/${token}' ><i class="fas fa-pencil-alt"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
                                 <a href='/dev-delete/${
                                   user._id
-                                }/${token}' ><i class="fas fa-trash-alt"></i></a> 
+                                }/${token}/1' ><i class="fas fa-trash-alt"></i></a> 
                  
                             </td>
                         `;

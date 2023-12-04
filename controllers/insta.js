@@ -1637,6 +1637,7 @@ exports.insertDataIntoPostAnalytics = async (req,res)=>{
              location : req.body.data?.location,
              music_info : req.body.data?.music_info,
              sponsored : req.body.data?.sponsored,
+             crone_trak : parseInt(crone_trak) + 1
 
           }})
             if(!updatedPost){
@@ -1653,11 +1654,22 @@ exports.insertDataIntoPostAnalytics = async (req,res)=>{
 }
 
 
+/**
+ * Retrieves counts based on tracked posts and brands from the database.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns None
+ * @throws {Error} If there is an error retrieving the data from the database.
+ */
 exports.getCountBasedOnTrackedPost = async (req,res) => {
         try {
             let obj = {}
-         /* Get Brands which rating is 4 to 5 */
-        const filterForBrand = {
+        /**
+         * Retrieves brand data from the instaBrandModel collection based on the given filter and projection.
+         * @param {Object} filterForBrand - The filter object to apply to the query.
+         * @param {Object} projectionForBrand - The projection object to apply to the query.
+         */
+         const filterForBrand = {
             rating: { $gte: 4, $lte: 5 } 
           };
           
@@ -1669,11 +1681,17 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
           const brnadsDataCount = await instaBrandModel.countDocuments(filterForBrand);
            
 
+        /**
+         * Checks if the `brnadsData` array is empty. If it is empty, it returns a JSON response
+         * with a status of `false` and a message indicating that there are no brands with a rating
+         * of 4 to 5. If the array is not empty, it creates a new array `conditionForBrandId` by
+         * mapping over the `brnadsData` array and extracting the `instaBrandId` property from each
+         * item to create a new object with a `brand_id` property.
+         * @param {Array} brnadsData - The array of brand data.
+         */
         if(brnadsData?.length === 0){
             return res.status(200).json({status:false, message:"There are no brands with 4 to 5 rating."})
         }
-
-        /* Create condition with brand id */
         let conditionForBrandId = brnadsData?.map((item)=>{
             let obj = {
                 brand_id : item.instaBrandId
@@ -1681,6 +1699,11 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
             return obj
         })
       
+        /**
+         * Retrieves data from the "instaP" collection based on the given filter and projection.
+         * @param {object} filterForPost - The filter object to apply to the query.
+         * @param {object} projectionForPost - The projection object to apply to the query.
+         */
         const filterForPost = {
             interpretor_decision: 1,
             crone_trak: 0,
@@ -1694,10 +1717,15 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
           const documentCount = await instaP.countDocuments(filterForPost);
 
 
+
+          /**
+           * Finds unique shortcodes from the instaPostAnalyticsModel and filters the postDataRespecticBrand array
+           * into two separate arrays based on whether the shortcode is included in the uniqueShortcodeValues array or not.
+           * @returns {Promise<{resultArray1: Array<any>, resultArray2: Array<any>}>} - An object containing two arrays:
+           * resultArray1 - the filtered array of postDataRespecticBrand where the shortcode is not included in uniqueShortcodeValues,
+           * resultArray2 - the filtered array of postDataRespecticBrand where the shortcode is included in uniqueShortcodeValues.
+           */
           const uniqueShortcodes = await instaPostAnalyticsModel.find({},'shortCode');
-
-
-
           // Finding not tracked shortcode 
           // Extract an array of unique shortcodes from uniqueShortcodes array
             const uniqueShortcodeValues = [...new Set(uniqueShortcodes.map(obj => obj.shortCode))];
@@ -1707,6 +1735,20 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
             const resultArray2 = postDataRespecticBrand.filter(postData => {
                   return uniqueShortcodeValues.includes(postData.shortCode);
              });
+             /**
+              * Assigns various properties to the given object based on the provided data.
+              * @param {object} obj - The object to assign properties to.
+              * @param {number} brnadsDataCount - The count of brand data.
+              * @param {number} documentCount - The count of Instagram posts based on brands.
+              * @param {string} postDataRespecticBrand - The Instagram post shortcode.
+              * @param {number} resultArray2 - The count of short code matches in analytics.
+              * @param {array} resultArray2 - The short code matches in analytics.
+              * @param {number} resultArray1 - The count of short code not matches in analytics.
+              * @param {array} resultArray1 - The  short code not matches in analytics.
+              * @param {number} resultArray1 - The unique shortcode values count from analytics.
+              * @param {number} uniqueShortcodeValues - The unique shortcode values count from analytics.
+              * @param {array} uniqueShortcodeValues - The unique shortcode values  from analytics.
+              */
              obj.brnads_data_count_rating = brnadsDataCount
              obj.insta_post_counts_based_on_brands = documentCount
              obj.insta_post_shortcode = postDataRespecticBrand
@@ -1725,6 +1767,12 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
 }
 
 
+/**
+ * Retrieves analytics data for a post based on the provided match condition and flag.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns None
+ */
 exports.getResBasedOnMatchForAnalyticsPost = async (req, res) => {
     try {
         const {  matchCondition, flag } = req.body;

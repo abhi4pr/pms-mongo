@@ -178,7 +178,7 @@
       margin: 5px;
       text-decoration: none;
       color: #fff;
-      background-color: #04d3c0;
+      background-color: #013660;
       border: 2px solid transparent;
       border-radius: 5px;
       transition: all 0.3s ease;
@@ -188,9 +188,9 @@
 
     .checkDevelopers:hover {
       /* Hover styling */
-      background-color: #0056b3;
+      background-color: rgb(81, 97, 181);
       color: #fff;
-      border-color: #013660;
+      border-color: rgb(81, 97, 181);
       transform: scale(1.05);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
@@ -258,11 +258,30 @@
     }
     #togglePassword {
     position: relative;
-    left: 400px;
-    bottom: 25px;
+    left:91%;
+    bottom: 27px;
     cursor: pointer;
     user-select: none;
     }
+    .fa-eye:before {
+    content: "\f06e";
+    background: #023660;
+    padding: 10px;
+    color: #fff;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    /* margin-bottom: 13px; */
+}
+    .fa-eye-slash:before {
+    content: "\f06e";
+    background: #023660;
+    color: #fff;
+    padding: 10px;
+    padding-right: 8px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    /* margin-bottom: 13px; */
+}
   </style>
 </head>
 
@@ -276,10 +295,13 @@
         Login History &nbsp; &nbsp;
       </a>
       <a href="/doc-user" class="checkDevelopers"> Developers List </a>
+      <a href="/all-request" class="checkDevelopers"> Reequest  </a>
     </div>
     <img
-      src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
-      alt="CreativeFuel Logo" />
+    src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
+    alt="CreativeFuel Logo"
+    style="height: 200px;"
+  />
     <hr />
   </div>
   <div class="main">
@@ -300,9 +322,9 @@
           </div>
           <div class="form-field">
             <label for="password">Password:</label>
-            <div class="password-container">
+            <div class="password-container" >
               <input type="password" required id="password" name="password" placeholder="Enter password" />
-              <i id="togglePassword" class="fas fa-eye" onclick="togglePasswordVisibility()"></i>
+              <i  id="togglePassword" class="fas fa-eye" onclick="togglePasswordVisibility()"></i>
             </div>
             <div id="passwordError" style="color: red; display: none; font-size: 12px">
               Please enter a valid password.
