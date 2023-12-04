@@ -2,10 +2,7 @@ const { default: mongoose } = require("mongoose");
 // const AutoIncrement = require("mongoose-auto-increment");
 
 const phaseCommitmentSchema = new mongoose.Schema({
-    phaseId:{
-      type:mongoose.SchemaTypes.ObjectId,
-      ref:"CampaignPhaseModel"
-    },
+   
     campaignId:{
       type:String,
       required:[true,"campaignId is required"]
@@ -25,6 +22,9 @@ const phaseCommitmentSchema = new mongoose.Schema({
     planName:{
       type:String,
       required:[true,'plan name is required']
+    },
+    phase_id:{
+      type:String,
     },
     phaseName:{
       type:String,
