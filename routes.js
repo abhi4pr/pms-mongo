@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const insta = require("./controllers/insta.js");
 const exe = require("./controllers/execution.js");
 const sim = require("./controllers/sim.js");
@@ -66,6 +67,7 @@ const swaggerAccessManagement = require("./controllers/swaggerDocumentaion/swagg
 
 const campaignPlanController = require("./controllers/operationExecution/campaignPlanController.js");
 const campaignPhaseController = require("./controllers/operationExecution/campaignPhaseController.js");
+const city = require("./controllers/cityController.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -608,7 +610,7 @@ router.delete("/delete_user_auth", user.deleteUserAuth);
 router.get("/get_all_user_auth", user.allUserAuthDetail);
 router.post("/login_user", user.loginUser);
 router.post("/log_out", user.logOut);
-router.post("/get_delivery_boy", user.deliveryBoy); //done
+router.get("/get_delivery_boy", user.deliveryBoy); //done
 router.get("/get_delivery_user", user.deliveryUser);
 router.get(
   "/get_single_delivery_boy_by_room/:room_id",
@@ -662,6 +664,7 @@ router.post(
 );
 router.get("/get_all_wfh_users", user.getAllWfhUsers);
 router.get("/get_all_login_history", user.getLoginHistory);
+router.post("/get_user_pre_sitting",user.getUserPresitting);
 // router.post("/get_users_by_departments",user.getUsersByDepartment);
 // router.get("/get_first_time_login_users", user.getAllFirstLoginUsers)
 
@@ -1014,4 +1017,12 @@ router.delete("/delete_user_doc/:id", userDocManagement.deleteDoc);
 
 //Swagger Route
 router.post("/add_dev_data", swaggerAccessManagement.addDevData);
+
+// City Routes 
+router.post("/add_city", city.addCity);
+router.put("/update_city", city.editCity);
+router.get("/get_all_cities", city.getAllCities);
+router.get("/get_single_city/:_id", city.getSingleCity);
+router.delete("/delete_city/:_id", city.deleteCity);
+
 module.exports = router;
