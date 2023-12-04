@@ -12,6 +12,12 @@ exports.addProjectx = async (req, res) => {
     manage_by,
     followers_count,
     track,
+    page_logo_url,
+    tracking_cron,
+    tracking,
+    crawler_count,
+    max_post_count_a_day,
+    avg_post_count_a_day
   } = req.body;
   try {
     const projectxObj = new projectxSchema({
@@ -26,6 +32,12 @@ exports.addProjectx = async (req, res) => {
       followers_count,
       track,
       created_at: Date.now(),
+      page_logo_url,
+      tracking_cron,
+      tracking,
+      crawler_count,
+      max_post_count_a_day,
+      avg_post_count_a_day
     });
     const savedprojectx = await projectxObj.save();
     if (!projectxObj) {
