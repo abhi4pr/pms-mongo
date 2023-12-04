@@ -21,6 +21,8 @@ const nodemailer = require("nodemailer");
 const userDocManagmentModel = require("../models/userDocManagementModel.js");
 const sendMail = require("../common/sendMail.js");
 const helper = require('../helper/helper.js');
+const OrderRequest = require("../models/orderReqModel.js");
+const Sitting = require("../models/sittingModel.js");
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "image", maxCount: 1 },
@@ -1101,7 +1103,7 @@ exports.loginUser = async (req, res) => {
 
 exports.deliveryBoy = async (req, res) => {
     try {
-        const delv = await userModel.find({ role_id: 3 }).select('user_id')
+        const delv = await userModel.find({ role_id: 3 }).select({ user_id: 1, user_name: 1, room_id: 1 })
         if (!delv) {
             res.status(500).send({ success: false })
         }
@@ -2213,6 +2215,30 @@ exports.logOut = async (req, res) => {
     }
 }
 
+exports.getUserPresitting = async (req, res) => {
+    try {
+      const userId = req.body.user_id;
+      
+      const sittingIds = await OrderRequest
+      .find({ User_id: userId })
+      .sort({ Sitting_id: -1 })
+      .limit(5)
+      .distinct('Sitting_id')
+      .exec();
+    
+    if (!sittingIds || sittingIds.length === 0) {
+      return res.status(404).json({ message: "No order requests found" });
+    }
+    
+    const sittingMastData = await Sitting
+      .find({ sitting_id: { $in: sittingIds } })
+      .exec();
+    
+    res.status(200).json(sittingMastData);
+    } catch (error) {
+      res.status(500).json({ message: "Error retrieving order requests from the database" });
+    }
+  };
 
 // exports.getUsersByDepartment = async (req, res) => {
 //     try {
