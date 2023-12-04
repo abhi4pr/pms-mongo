@@ -20,8 +20,17 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'templates'));
 // app.use(express.json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
+app.use(bodyParser.json({limit: '50mb'}));
+
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: '50mb',
+    parameterLimit: 50000,
+  }),
+);
 app.use(cors());
 app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use("/api", routes);

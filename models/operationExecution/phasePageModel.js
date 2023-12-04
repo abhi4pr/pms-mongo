@@ -2,13 +2,17 @@ const { default: mongoose } = require("mongoose");
 // const AutoIncrement = require("mongoose-auto-increment");
 
 const phasePageSchema = new mongoose.Schema({
-  phaseId: {
+  phase_id: {
     type: String,
-    required: [true, "phaseId is required"]
+   
   },
   phaseName:{
     type: String,
     required: [true, "phase name is required"]
+  },
+  plan_id:{
+    type: String,
+    required: [true, "plan id is required"]
   },
   planName: {
     type: String,

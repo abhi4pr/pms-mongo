@@ -82,12 +82,15 @@ router.delete("/delete_demo/:_id", demoApi.deleteDemo);
 
 /*operation+execution api*/
 router.post("/campaignplan", campaignPlanController.createPlan);
+router.put("/campaignplan", campaignPlanController.updateBulk);
 router.get("/campaignplan/:id", campaignPlanController.getPlan);
-router.post('/campaignplan', campaignPlanController.createPlan)
-router.get('/campaignplan/:id', campaignPlanController.getPlan)
+router.get('/campaignplan/singleplan/:id', campaignPlanController.getSinglePlan)
+router.put('/campaignplan/singleplan/:id', campaignPlanController.singlePlanUpdate)
+// router.get('/campaignplan/:id', campaignPlanController.getPlan)
 
 router.post('/campaignphase', campaignPhaseController.createPhase)
 router.get('/campaignphase/:id', campaignPhaseController.getAllPhase)
+router.get('/campaignphase/singlephase/:id', campaignPhaseController.getSinglePhase)
 
 /*insta api*/
 router.get("/shorcode_info",insta.getCountBasedOnTrackedPost)

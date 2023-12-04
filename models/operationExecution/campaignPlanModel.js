@@ -1,10 +1,13 @@
 const { default: mongoose } = require("mongoose");
-// const AutoIncrement = require("mongoose-auto-increment");
+const AutoIncrement = require("mongoose-auto-increment");
 
 const campaignPlanSchema = new mongoose.Schema({
     planName:{
         type:String,
         required:[true,"plan name is required."]
+    },
+    plan_id:{
+        type:String,
     },
     vendor_id:{
         type:String,
@@ -57,10 +60,35 @@ const campaignPlanSchema = new mongoose.Schema({
     },
     modifiedAt:{
         type:Date
+    },
+    modifiedBy:{
+        type:String,
+        default:"user"
+    },
+    replacement_status:{
+        type:String,
+        default:'inactive',
+        enum:['active', 'inactive','replaced']
+    },
+    delete_status:{
+        type:String,
+        default:'inactive',
+        enum:['active', 'inactive']
+    },
+    replaced_with:{
+        type:String,
+        default:'N/A',
     }
+
 });
 
-
+AutoIncrement.initialize(mongoose.connection);
+campaignPlanSchema.plugin(AutoIncrement.plugin, {
+  model: "CampaignPlanModel",
+  field: "plan_id",
+  startAt: 1,
+  incrementBy: 1,
+});
 module.exports = mongoose.model(
   "CampaignPlanModel",
   campaignPlanSchema
