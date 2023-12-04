@@ -1,3 +1,9 @@
+/**
+ * An array of objects representing different tags and their descriptions.
+ * Each object has a 'name' property representing the tag name, and a 'description'
+ * property representing a description of the tag.
+ * @type {Array<Object>}
+ */
 module.exports = tags = [
   {
     name: "Insta Api's",
