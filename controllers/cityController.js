@@ -31,31 +31,29 @@ exports.getSingleCity = async (req, res) =>{
         const city = await cityModel.findById(req.params._id);
         res.status(200).send({data:city})
     } catch (error) {
-        res.status(500).send({error:error.message,sms:'Error getting single coc data'})
+        res.status(500).send({error:error.message,sms:'Error getting single city data'})
     }
 };
 
 exports.editCity = async (req, res) => {
     try{
-        const editsim = await cocModel.findByIdAndUpdate(req.body._id,{
+        const editsim = await cityModel.findByIdAndUpdate(req.body._id,{
             city_name: req.body.city_name,
             updated_by: req.body.updated_by
         }, { new: true })
         
-        await simc.save();
-
-        res.status(200).send({success:true,data:editsim})
+        res.status(200).send({ success:true, data: editsim })
     } catch(err){
-        res.status(500).send({error:err,sms:'Error updating coc details'})
+        res.status(500).send({error:err,sms:'Error updating city details'})
     }
 };
 
 exports.deleteCity = async (req, res) =>{
     cocModel.deleteOne({_id:req.params.id}).then(item =>{
         if(item){
-            return res.status(200).json({success:true, message:'sim deleted'})
+            return res.status(200).json({success:true, message:'city deleted'})
         }else{
-            return res.status(404).json({success:false, message:'sim not found'})
+            return res.status(404).json({success:false, message:'city not found'})
         }
     }).catch(err=>{
         return res.status(400).json({success:false, message:err})
