@@ -18,6 +18,11 @@ const instaPModel = new mongoose.Schema({
         required: false,
         default: ""
     },
+    profile_pic_url: {
+        type: String,
+        required: false,
+        default: ""
+    },
     allComments: {
         type: Number,
         required: false,

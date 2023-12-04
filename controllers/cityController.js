@@ -49,7 +49,7 @@ exports.editCity = async (req, res) => {
 };
 
 exports.deleteCity = async (req, res) =>{
-    cityModel.findByIdAndDelete(req.params._id).then(item =>{
+    cityModel.findByIdAndDelete(req.params._id, {timeout : 15000}).then(item =>{
         if(item){
             return res.status(200).json({success:true, message:'city deleted'})
         }else{

@@ -162,6 +162,7 @@ exports.trackPost = async (req, res) => {
                 handle: req.body.data?.handle ?? "",
                 postType: req.body.data.post_type,
                 creatorName: req.body.data.creator.username,
+                profile_pic_url: req.body.data.creator.profile_pic_url,
                 allComments: req.body.data.comments_count.overall,
                 brand_id: 0,
                 todayComment: req.body.data.comments_count.today,
