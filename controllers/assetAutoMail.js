@@ -20,8 +20,8 @@ const hrAssetNotification = schedule.scheduleJob("0 0 * * *", async () => {
   const simModels = await simModel.aggregate([
     {
       $match: {
-        hrAuditFlag: true,
-        audit_status: "Done"
+        // hrAuditFlag: true,
+        hr_audit_status: "Done"  
       }
     },
     {
@@ -43,21 +43,23 @@ const hrAssetNotification = schedule.scheduleJob("0 0 * * *", async () => {
     {
       $project:{
         _id: "$id",
+        sim_id: "$sim_id",
+        assetsName: "$assetsName",
         user_name: "$user.user_name",
         user_email_id: "$user.user_email_id",
         asset_name: "$assetName",
         next_hr_audit_date: "$next_hr_audit_date",
-        audit_status: "$audit_status",
+        hr_audit_status: "$hr_audit_status", 
         user_contact_no: "$user_contact_no"
       }
     }
   ]);
 
   for (const simModel of simModels) {
-    if (simModel.next_hr_audit_date == new Date() && simModel.audit_status == "Done") {
+    if (simModel.next_hr_audit_date == new Date() && simModel.hr_audit_status == "Done") {   
       simModel.findOneAndUpdate(
-        { sim_id: simModel.sim_id },
-        { audit_status: "Pending" }
+        { sim_id: simModel.sim_id },  
+        { hr_audit_status: "Pending" }   
       );
       await sendReminderAssetEmail(simModel)
       await sendWhatsappSms(simModel)
@@ -78,7 +80,7 @@ const hrAssetNotification = schedule.scheduleJob("0 0 * * *", async () => {
 async function sendReminderAssetEmail(simModel) {
   const templatePath = path.join(__dirname, `assetemailtemp.ejs`);
   const template = await fs.promises.readFile(templatePath, "utf-8");
-  const name = simModel.assetsName;
+  const name = simModel.assetsName;    //
   const html = ejs.render(template, { name });
 
   let mailOptions = {

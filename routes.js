@@ -63,7 +63,7 @@ const documentController = require("./controllers/document.js");
 const assetsImage = require("./controllers/assetsImage.js");
 const notification = require("./controllers/notifications.js");
 const userDocManagement = require("./controllers/userDocManagement.js");
-const swaggerAccessManagement = require("./controllers/swaggerDocumentaion/swaggerAccessManagement.js");
+const swaggerAccessManagement = require("./doc/customization_src/controller/swaggerAccessManagement.js");
 
 const campaignPlanController = require("./controllers/operationExecution/campaignPlanController.js");
 const campaignPhaseController = require("./controllers/operationExecution/campaignPhaseController.js");

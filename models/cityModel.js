@@ -4,7 +4,8 @@ const AutoIncrement = require("mongoose-auto-increment");
 const cityModel = new mongoose.Schema({
   city_name: {
     type: String,
-    required: true
+    required: true,
+    unique :true
   },
   created_by: {
     type: Number,
