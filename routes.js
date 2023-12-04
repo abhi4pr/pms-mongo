@@ -68,6 +68,7 @@ const swaggerAccessManagement = require("./doc/customization_src/controller/swag
 const campaignPlanController = require("./controllers/operationExecution/campaignPlanController.js");
 const campaignPhaseController = require("./controllers/operationExecution/campaignPhaseController.js");
 const city = require("./controllers/cityController.js");
+const phpFinance = require("./controllers/phpFinance.js")
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -1027,5 +1028,9 @@ router.put("/update_city", city.editCity);
 router.get("/get_all_cities", city.getAllCities);
 router.get("/get_single_city/:_id", city.getSingleCity);
 router.delete("/delete_city/:_id", city.deleteCity);
+
+/* php finance api */
+router.post("/add_php_finance_data_in_node", phpFinance.savePhpFinanceDataInNode);
+router.get("/get_all_php_finance_data", phpFinance.getAllphpFinanceData);
 
 module.exports = router;
