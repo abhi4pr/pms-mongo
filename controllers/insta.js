@@ -1171,9 +1171,9 @@ exports.getDynamicMultiReqAndResInsta = async (req, res) => {
             let getPosts;
 
             if (page && perPage) {
-                getPosts = await modelCollection.find(dataQuery).skip(skip).limit(perPage);
+                getPosts = await modelCollection.find(dataQuery).sort({ postedOn: -1 }).skip(skip).limit(perPage);
             } else {
-                getPosts = await modelCollection.find(dataQuery);
+                getPosts = await modelCollection.find(dataQuery).sort({ postedOn: -1 });
             }
 
             return res.status(200).json(getPosts);
