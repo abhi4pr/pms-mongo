@@ -737,6 +737,7 @@ router.post("/get_distinct_depts", attendance.getDistinctDepts);
 router.post("/check_salary_status", attendance.checkSalaryStatus);
 router.get("/all_departments_of_wfh", attendance.allDeptsOfWfh);
 router.get("/dept_with_wfh", attendance.deptWithWFH);
+router.post("/save_all_depts_attendance", attendance.addAttendanceAllDepartments)
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
