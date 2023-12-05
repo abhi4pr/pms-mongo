@@ -3,7 +3,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 
 async function checkIfDataExists(sale_booking_refund_id) {
-    const query = { sale_booking_refund_id: sale_booking_id };
+    const query = { sale_booking_refund_id: sale_booking_refund_id };
     const result = await phpPaymentRefundModel.findOne(query);
     return result !== null;
 }

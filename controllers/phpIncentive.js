@@ -4,7 +4,7 @@ const FormData = require('form-data');
 
 async function checkIfDataExists(incentive_request_id) {
     const query = { incentive_request_id: incentive_request_id };
-    const result = await phpPaymentRefundModel.findOne(query);
+    const result = await phpIncentiveModel.findOne(query);
     return result !== null;
 }
 

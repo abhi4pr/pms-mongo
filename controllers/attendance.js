@@ -785,6 +785,76 @@ exports.updateAttendenceStatus = async (req, res) => {
   }
 };
 
+// exports.getMonthYearData = async (req, res) => {
+//   try {
+//     const currentDate = new Date();
+//     const currentYear = currentDate.getFullYear();
+//     const currentMonthIndex = currentDate.getMonth() + 1;
+//     const numberOfMonths = 6;
+//     const months = [
+//       "April",
+//       "May",
+//       "June",
+//       "July",
+//       "August",
+//       "September",
+//       "October",
+//       "November",
+//       "December",
+//       "January",
+//       "February",
+//       "March",
+//     ];
+
+//     const monthYearArray = months.map((month) => ({
+//       month,
+//       year:
+//         month === "January" || month === "February" || month === "March"
+//           ? currentYear + 1
+//           : currentYear,
+//     }));
+
+//     const aggregationPipeline = [
+//       {
+//         $group: {
+//           _id: {
+//             month: "$month",
+//             year: "$year",
+//             dept: "$dept"
+//           },
+//         },
+//       },
+//     ];
+
+//     const dbResult = await attendanceModel.aggregate(aggregationPipeline);
+//     console.log("vijay", dbResult);
+//     const uniqueDeptIds = [...new Set(dbResult.map(item => item._id.dept))];
+//     const deptCount = uniqueDeptIds.length;
+
+//     // const dbResult = await attendanceModel.aggregate(aggregationPipeline).toArray();
+
+//     const dbSet = new Set(
+//       dbResult.map((item) => `${item._id.month}-${item._id.year}`)
+//     );
+
+//     const actualExistingResult = monthYearArray.map((item) => {
+//       const dateStr = `${item.month}-${item.year}-${item.dept}`;
+//       item.atdGenerated = dbSet.has(dateStr) ? 1 : 0;
+
+//       return item;
+//     });
+
+//     const response = { data: [...actualExistingResult] };
+//     res.status(200).json(response);
+//   } catch (error) {
+//     return res.send({
+//       error: error.message,
+//       status: 500,
+//       sms: "error getting data",
+//     });
+//   }
+// };
+
 exports.getMonthYearData = async (req, res) => {
   try {
     const currentDate = new Date();
@@ -824,27 +894,36 @@ exports.getMonthYearData = async (req, res) => {
           },
         },
       },
+      {
+        $group: {
+          _id: {
+            month: "$_id.month",
+            year: "$_id.year"
+          },
+          deptCount: { $sum: 1 }
+        }
+      }
     ];
 
     const dbResult = await attendanceModel.aggregate(aggregationPipeline);
-    console.log("vijay", dbResult);
-    const uniqueDeptIds = [...new Set(dbResult.map(item => item._id.dept))];
-    const deptCount = uniqueDeptIds.length;
-
-    // const dbResult = await attendanceModel.aggregate(aggregationPipeline).toArray();
-
+    
     const dbSet = new Set(
       dbResult.map((item) => `${item._id.month}-${item._id.year}`)
     );
 
     const actualExistingResult = monthYearArray.map((item) => {
       const dateStr = `${item.month}-${item.year}`;
-      item.atdGenerated = dbSet.has(dateStr) ? 1 : 0;
+      const existingData = dbSet.has(dateStr) ? 1 : 0;
+
+      const deptCount = dbResult.find(entry => entry._id.month === item.month && entry._id.year === item.year)?.deptCount || 0;
+
+      item.deptCount = deptCount;
+      item.atdGenerated = existingData;
 
       return item;
     });
 
-    const response = { data: [...actualExistingResult] ,deptCount: deptCount};
+    const response = { data: [...actualExistingResult] };
     res.status(200).json(response);
   } catch (error) {
     return res.send({
@@ -854,6 +933,8 @@ exports.getMonthYearData = async (req, res) => {
     });
   }
 };
+
+
 
 exports.getDistinctDepts = async (req, res) => {
   try {
@@ -1322,5 +1403,66 @@ exports.deptIdWithWfh = async (req, res) => {
   } catch (error) {
     console.error("Error querying MongoDB:", error.message);
     res.status(500).send("Internal Server Error");
+  }
+};
+
+async function checkIfAttendanceExist(user_id,month,year){
+  const query = {user_id:user_id,month:month,year:year};
+  const result = await attendanceModel.findOne(query)
+  return result !== null;
+}
+
+exports.addAttendanceAllDepartments = async (req, res) => {
+  try {
+    const month = req.body.month;
+    const year = req.body.year;
+
+    const getAllWfhUser = await userModel.find({
+      job_type: 'WFH'
+    }).select({dept_id:1,user_id:1,salary:1})
+    // console.log(getAllWfhUser)
+    
+    getAllWfhUser.map(async (item)=>{
+      const work_days = 30;
+      const presentDays = work_days - 0;
+      const perdaysal = item.salary / 30;
+      const totalSalary = perdaysal * presentDays;
+      const netSalary = totalSalary;
+      // const tdsDeduction = (netSalary * item.tds_per) / 100;
+      const tdsDeduction = netSalary > 0 ? (netSalary * item.tds_per) / 100 : 0;
+      const ToPay = netSalary - tdsDeduction;
+
+      const existingData = await checkIfAttendanceExist(item.dept_id,item.user_id,item.salary)
+
+      if(!existingData){
+        const saveData = new attendanceModel({
+          dept: item.dept_id,
+          user_id: item.user_id,
+          invoiceNo: item.invoiceNo,
+          user_name: item.user_name,
+          noOfabsent: 0,
+          month: req.body.month,
+          year: req.body.year,
+          bonus: 0,
+          total_salary: item.salary && item.salary.toFixed(2),
+          tds_deduction: tdsDeduction && tdsDeduction.toFixed(2) || 0,
+          net_salary: netSalary && netSalary.toFixed(2),
+          toPay: ToPay && ToPay.toFixed(2),
+          remark: "",
+          Created_by: item.user_id,
+          salary: item.salary,
+          attendence_generated: 1,
+          salary_status: 1
+        })
+        await saveData.save()
+      }
+    })
+    res.send({status:200,sms:"attendance added for all depts"})
+    // res.send({ status: 200 });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .send({ error: error.message, sms: "error while adding data" });
   }
 };
