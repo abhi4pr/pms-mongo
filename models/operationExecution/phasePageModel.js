@@ -55,7 +55,7 @@ const phasePageSchema = new mongoose.Schema({
     // required:[true,"campaign id is required"]
   },
   follower_count: {
-    type: Number,
+    type: String,
     // required:[true,"campaign id is required"]
   },
   page_link: {
