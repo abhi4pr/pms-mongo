@@ -70,6 +70,7 @@ const campaignPhaseController = require("./controllers/operationExecution/campai
 const city = require("./controllers/cityController.js");
 const phpFinance = require("./controllers/phpFinance.js")
 const phpPayment = require("./controllers/phpPaymentAccList.js")
+const phpRefund = require("./controllers/phpPaymentRefund.js")
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -1037,5 +1038,7 @@ router.post("/add_php_finance_data_in_node", phpFinance.savePhpFinanceDataInNode
 router.get("/get_all_php_finance_data", phpFinance.getAllphpFinanceData);
 router.post("/add_php_payment_acc_data_in_node", phpPayment.savePhpPaymentAccDataInNode);
 router.get("/get_all_php_payment_acc_data", phpPayment.getAllphpPaymentAccData);
+router.post("/add_php_payment_refund_data_in_node", phpRefund.savePhpPaymentRefundInNode);
+router.get("/get_all_php_payment_refund_data", phpRefund.getAllphpPaymentRefundData);
 
 module.exports = router;
