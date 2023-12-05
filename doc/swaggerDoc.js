@@ -3,6 +3,20 @@ const mainSchema = require("./components/mainSchema");
 const apis = require("./components/allApiCollection");
 const mainServers = require("./components/mainServers");
 
+/**
+ * Represents the Swagger documentation object.
+ * @type {Object}
+ * @property {string} openapi - The version of the OpenAPI specification used.
+ * @property {Object} info - Information about the API.
+ * @property {string} info.version - The version of the API.
+ * @property {Object} info.contact - Contact information for the API.
+ * @property {string} info.contact.email - The email address of the API contact.
+ * @property {Array} servers - An array of server objects.
+ * @property {Array} tags - An array of tag objects.
+ * @property {Object} paths - The paths of the API.
+ * @property {Object} components - The components of the API.
+ *
+ */
 const swaggerDocumantion = {
   openapi: "3.0.0",
   info: {

@@ -16,6 +16,10 @@ const { instaApis } = require("../apis/instaDoc");
 const { documenentMastApis } = require("../apis/documentDoc");
 const { userApis } = require("../apis/userDoc");
 
+/**
+ * Combines multiple API schemas into a single main schema object.
+ * @returns {Object} - The main schema object containing all the API schemas.
+ */
 const mainSchema = {
   ...instaApis,
   ...brandApis,

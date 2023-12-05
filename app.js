@@ -35,85 +35,29 @@ app.use(cors());
 app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use("/api", routes);
 
-// Code for  swagger in working stag
 
-// Route for displaying the login form
-app.get('/doc-login', (req, res) => {
-  res.sendFile(__dirname + '/doc/customization_src/doc_templates/index.html');
-});
-app.get('/doc-access/:token',checkDevAuthentication, (req, res) => {
-  return res.render('swaggerAccessForm');
-});
-app.get('/admin-profile', (req, res) => {
-  return res.render('adminProfileOverview');
-});
-app.get('/admin-request', (req, res) => {
-  return res.render('devRequestForm');
-});
-app.get('/all-request/:token',checkDevAuthentication, (req, res) => {
-  return res.render('allDevRequest');
-});
-app.get('/dev-forgot', (req, res) => {
-  return res.render('forgotPassword');
-});
-app.get('/otp-verify', (req, res) => {
-  return res.render('otpVerify');
-});
-app.get('/reset-password', (req, res) => {
-  return res.render('resetPassword');
-});
-app.get('/dev-delete/:id/:token/:page',checkDevAuthentication, (req, res) => {
-  let userId  = req.params.id
-  let token  = req.params.token
-  let page  = req.params.page
-  let url = page == 1 ? "/doc-user" : "/all-request"
-  return res.render("confirmationTemplate", {
-    error_title: "Are you sure you want to delete ?",
-    error_description: "After delete this data you can't retrive from anyway....",
-    error_image:
-      "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
-      button_path_cancel: `${url}/${token}`,
-      button_text_cancel: "Cancel",
-      button_text_ok: "Ok",
-      button_path_ok: `/delete-dev/${userId}/${token}/${page}`,
-  });
-});
-app.get('/doc-user/:token',checkDevAuthentication, (req, res) => {
-  return res.render('userList');
-});
-app.get('/login-history/:token',checkDevAuthentication, (req, res) => {
-  return res.render('swaggerDevLoginHistory');
-});
-app.get('/dev-update/:id/:token',checkDevAuthentication, (req, res) => {
-  return res.render('swaggerEditForm');
-});
-// Handle login
-app.post('/doc-login',swaggerAccessManagement.devLogin );
-app.post('/send-req',swaggerAccessManagement.addDevRequest );
-app.post('/doc-logout/:token',checkDevAuthentication,swaggerAccessManagement.devLogout );
-app.post('/add-developer/:token',checkDevAuthentication,swaggerAccessManagement.addDevData );
-app.post('/verify-otp',swaggerAccessManagement.verifyOtp );
-app.post('/otp-send',swaggerAccessManagement.otpSend );
-app.post('/update-password',swaggerAccessManagement.updatePassword );
-app.get('/doc-users/:token/:isAdminVerified',checkDevAuthentication,swaggerAccessManagement.getDevData );
-app.get('/dev-login-history/:token',checkDevAuthentication,swaggerAccessManagement.getDevLoginHis );
-app.get('/dev-data/:id/:token',checkDevAuthentication,swaggerAccessManagement.getDevSingleData );
-app.put('/dev-data-update/:id/:token',checkDevAuthentication,swaggerAccessManagement.updateDevData );
-app.get('/delete-dev/:id/:token/:page',checkDevAuthentication,swaggerAccessManagement.deleteDev );
-
-// end
+/**
+ * Sets up the backend and frontend routes for the documentation.
+ * Also sets up the API documentation route with authentication.
+ * @param {Object} app - The Express app object.
+ * @param {Object} docBackendRouter - The router for backend routes.
+ * @param {Object} docFrontendRouter - The router for frontend routes.
+ * @param {string} token - The authentication token for the API documentation route.
+ * @param {Function} checkDevAuthentication - The middleware function for checking developer authentication.
+ * @param {Object} swaggerUi - The Swagger UI object.
+ * @param {Object} swaggerDocumantion - The Swagger documentation object.
+ * @param {Object} swaggerConfig - The configuration object for Swagger
+ */
+const docBackendRouter = require("./doc/customization_src/routes/backend_routes.js");
+const docFrontendRouter = require("./doc/customization_src/routes/frontend_routes.js");
+app.use("/", docBackendRouter);
+app.use("/", docFrontendRouter);
 app.use(
   "/api-docs/:token",
   checkDevAuthentication,
   swaggerUi.serve,
   swaggerUi.setup(swaggerDocumantion, swaggerConfig)
 );
-// app.use(
-//   "/api-docs/:token",
-//   checkDevAuthentication,
-//   swaggerUi.serve,
-//   swaggerUi.setup(swaggerDocumantion, swaggerConfig)
-// );
 
 const openai = new OpenAI({
   apiKey: "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",

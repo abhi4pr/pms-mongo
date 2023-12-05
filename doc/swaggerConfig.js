@@ -138,26 +138,6 @@ module.exports.swaggerConfig = {
       if (filterInput) {
         filterInput.placeholder = "Search the Module..."; // Set your custom placeholder text here
       }
-
-      //code for popup message
-      // const popup = document.createElement("div");
-      // popup.className = "custom-popup";
-      // popup.innerText =
-      //   '"Here you will find all the API details you need. Review them carefully to help with your work also you can work here."';
-      // document.body.appendChild(popup);
-      // // Display the popup with fadeIn animation
-      // popup.classList.add("show");
-      // // Set timeout for the popup to fade out
-      // setTimeout(() => {
-      //   popup.classList.replace("show", "hide");
-      // }, 5000);
-      // // Remove the popup after the fadeOut animation completes
-      // popup.addEventListener("animationend", (e) => {
-      //   if (e.animationName === "fadeOut") {
-      //     popup.remove();
-      //   }
-      // });
-
       // Create custom homepage content
       const infoContainer = document.querySelector(".swagger-ui .info");
       const customHomepage = document.createElement("div");
