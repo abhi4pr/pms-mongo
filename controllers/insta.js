@@ -1780,11 +1780,11 @@ exports.getResBasedOnMatchForProvidedModel = async (req, res) => {
         const page = req.query?.page;
         const perPage = req.query?.perPage;
         const skip = (page - 1) * perPage;
-        if (![1, 2].includes(model)) {
-            return res.status(200).json({ message: "Invalid model value, you should provide 1 or 2, 1 for insta p (post model) and 2 for post analytics (insta post analytics) ." });
+        if (![1, 2, 3].includes(model)) {
+            return res.status(200).json({ message: "Invalid model value, you should provide 1, 2 or 3, 1 for insta p (post model) and 2 for post analytics (insta post analytics) and 3 for insta story ." });
         }
         
-        const modelCollection = model === 1 ? instaP : instaPostAnalyticsModel;
+        const modelCollection = model === 1 ? instaP : model === 2 ? instaPostAnalyticsModel : instaS;
 
         if (flag === 1) {
             const count = await modelCollection.countDocuments(matchCondition);
