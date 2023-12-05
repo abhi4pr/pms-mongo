@@ -2,8 +2,8 @@ const phpPaymentRefundModel = require("../models/phpPaymentRefundModel.js");
 const axios = require('axios');
 const FormData = require('form-data');
 
-async function checkIfDataExists(id) {
-    const query = { id: id };
+async function checkIfDataExists(sale_booking_refund_id) {
+    const query = { sale_booking_refund_id: sale_booking_id };
     const result = await phpPaymentRefundModel.findOne(query);
     return result !== null;
 }
@@ -25,7 +25,7 @@ exports.savePhpPaymentRefundInNode = async (req, res) => {
         
         for (const data of responseData) {
           
-            const existingData = await checkIfDataExists(data.id)
+            const existingData = await checkIfDataExists(data.sale_booking_refund_id)
             
             if (!existingData) {
 

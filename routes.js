@@ -72,6 +72,7 @@ const phpFinance = require("./controllers/phpFinance.js")
 const phpPayment = require("./controllers/phpPaymentAccList.js")
 const phpRefund = require("./controllers/phpPaymentRefund.js")
 const phpIncentive = require("./controllers/phpIncentive.js")
+const phpPaymentBal = require("./controllers/phpPaymentBalList.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -1050,5 +1051,7 @@ router.post("/add_php_payment_refund_data_in_node", phpRefund.savePhpPaymentRefu
 router.get("/get_all_php_payment_refund_data", phpRefund.getAllphpPaymentRefundData);
 router.post("/add_php_payment_incentive_data_in_node", phpIncentive.savePhpIncentiveInNode);
 router.get("/get_all_php_payment_incentive_data", phpIncentive.getAllphpIncentiveData);
+router.post("/add_php_payment_bal_data_in_node", phpPaymentBal.savePhpPaymentBalDataInNode);
+router.get("/get_all_php_payment_bal_data", phpPaymentBal.getAllphpPaymentBalData);
 
 module.exports = router;
