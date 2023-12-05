@@ -109,7 +109,14 @@ router.post("/upload_img_on_server", upload1.single("imageToServer"), insta.uplo
 router.post("/add_tracked_post", insta.insertDataIntoPostAnalytics)
 router.put("/analytics_based_on_rating", insta.instaPostAnalyticsBasedOnRating)
 router.post("/manually_tracked_shortcode", insta.manuallyApplyTrackingOnShortcode)
-router.post("/get_post_analytics_data", insta.getResBasedOnMatchForAnalyticsPost)
+/**
+ * Route handler for the POST request to retrieve data form different models bssed on provided matchCondition.
+ * @param {string} "/get_post_analytics_data" - The endpoint for the request.
+ * @param {Function} insta.getResBasedOnMatchForProvidedModel - The function to handle the request.
+ * @returns None
+ */
+// router.post("/get_post_analytics_data", insta.getResBasedOnMatchForProvidedModel) //modified with cordination
+router.post("/get_data_on_match_condition", insta.getResBasedOnMatchForProvidedModel)
 router.post("/image_to_text", insta.imageToText)
 router.post("/get_dynamic_key_value", insta.getDynamicReqAndResInstaP)
 router.post("/get_dynamic_multiple__key_value", insta.getDynamicMultiReqAndResInsta)

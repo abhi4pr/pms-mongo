@@ -1769,28 +1769,33 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
 
 
 /**
- * Retrieves analytics data for a post based on the provided match condition and flag.
+ * Retrieves analytics data for a post based on the provided match condition and model.
  * @param {Object} req - The request object.
  * @param {Object} res - The response object.
  * @returns None
  */
-exports.getResBasedOnMatchForAnalyticsPost = async (req, res) => {
+exports.getResBasedOnMatchForProvidedModel = async (req, res) => {
     try {
-        const {  matchCondition, flag } = req.body;
+        const {  matchCondition, flag,model } = req.body;
         const page = req.query?.page;
         const perPage = req.query?.perPage;
         const skip = (page - 1) * perPage;
+        if (![1, 2].includes(model)) {
+            return res.status(200).json({ message: "Invalid model value, you should provide 1 or 2, 1 for insta p (post model) and 2 for post analytics (insta post analytics) ." });
+        }
+        
+        const modelCollection = model === 1 ? instaP : instaPostAnalyticsModel;
 
         if (flag === 1) {
-            const count = await instaPostAnalyticsModel.countDocuments(matchCondition);
+            const count = await modelCollection.countDocuments(matchCondition);
             return res.status(200).json({ count });
         } else if (flag === 2) {
             let getPosts;
 
             if (page && perPage) {
-                getPosts = await instaPostAnalyticsModel.find(matchCondition).skip(skip).limit(perPage);
+                getPosts = await modelCollection.find(matchCondition).skip(skip).limit(perPage);
             } else {
-                getPosts = await instaPostAnalyticsModel.find(matchCondition);
+                getPosts = await modelCollection.find(matchCondition);
             }
 
             return res.status(200).json(getPosts);
