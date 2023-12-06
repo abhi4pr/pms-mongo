@@ -123,13 +123,13 @@ exports.savePhpSaleBookingTdsVerificationDataInNode = async (req, res) => {
             }
         )
         const responseData = response.data.body;
-
-        await Promise.all(responseData.map(async (data) => {
+        const promise = responseData.map(async (data) => {
+   
             const existingData = await checkIfDataExists(data.sale_booking_id)
 
             if (!existingData) {
-
                 const creators = new phpPaymentBalListModel({
+                    sale_booking_id: data.sale_booking_id,
                     sales_exe_name: data.sales_exe_name,
                     total_refund_amount: data.total_refund_amount,
                     balance_refund_amount: data.balance_refund_amount,
@@ -185,11 +185,13 @@ exports.savePhpSaleBookingTdsVerificationDataInNode = async (req, res) => {
                     },
                     { new: true }
                 );
-                return res.status(200).json({ msg: "Data already insterted there is no new data available to insert." });
+              
             }
-        }));
+        })
 
-        res.send({ sms: "data copied in local db", status: 200 })
+       let resResult = await Promise.all(promise);
+
+      return  res.send({ sms: "data copied in local db", status: 200 })
     } catch (error) {
         return res.status(500).send({ error: error.message, sms: 'error while adding data' })
     }

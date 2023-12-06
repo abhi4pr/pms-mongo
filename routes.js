@@ -1051,8 +1051,10 @@ router.post("/add_php_finance_data_in_node", phpFinance.savePhpFinanceDataInNode
 router.get("/get_all_php_finance_data", phpFinance.getAllphpFinanceData);
 router.post("/add_php_payment_acc_data_in_node", phpPayment.savePhpPaymentAccDataInNode);
 router.get("/get_all_php_payment_acc_data", phpPayment.getAllphpPaymentAccData);
+router.get("/get_all_php_payment_acc_data_pending",phpPayment.getAllphpPaymentAccDataForStatus);
 router.post("/add_php_payment_refund_data_in_node", phpRefund.savePhpPaymentRefundInNode);
 router.get("/get_all_php_payment_refund_data", phpRefund.getAllphpPaymentRefundData);
+router.get("/get_all_php_payment_refund_data_pending",phpRefund.getAllphpPaymentRefundDataStatus);
 router.post("/add_php_payment_incentive_data_in_node", phpIncentive.savePhpIncentiveInNode);
 router.get("/get_all_php_payment_incentive_data", phpIncentive.getAllphpIncentiveData);
 router.post("/add_php_payment_bal_data_in_node", phpPaymentBal.savePhpPaymentBalDataInNode);
