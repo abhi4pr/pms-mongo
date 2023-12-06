@@ -10,9 +10,9 @@ const axios = require('axios');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'vijayanttrivedi1500@gmail.com',
-    pass: 'odovpikkjvkprrjv',
-  },
+    user: "onboarding@creativefuel.io",
+    pass: "fjjmxuavwpescyat",
+},
 });
 
 const job0Days = schedule.scheduleJob('0 0 * * *', async () => {
@@ -109,7 +109,7 @@ async function sendReminderEmail(daysBefore) {
     const html = ejs.render(template, {name} );
 
     let mailOptions = {
-        from: "vijayanttrivedi1500@gmail.com",
+        from: "onboarding@creativefuel.io",
         to: user.user_email_id,
         subject: 
           daysBefore === 0
@@ -154,7 +154,7 @@ async function sendEmail(daysBefore) {
     const html = ejs.render(template, {name,joining_date} );
 
     let mailOptions = {
-        from: "vijayanttrivedi1500@gmail.com",
+        from: "onboarding@creativefuel.io",
         to: user.user_email_id,
         subject: "Welcome Onboard- Your First Day at Creativefuel!",
         html: html

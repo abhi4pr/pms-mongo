@@ -180,7 +180,7 @@ const phpPaymentBalListModel = new mongoose.Schema({
         required: false
     },
     sale_booking_type : {
-        type: Number,
+        type: String,
         required: false
     },
     rs_sale_booking_id : {
@@ -200,8 +200,7 @@ const phpPaymentBalListModel = new mongoose.Schema({
         default : Date.now
     },
     last_updated_date : {
-        type: Date,
-        default : Date.now
+        type: String,
     },
     invoice_particular_id : {
         type: Number,
@@ -209,6 +208,94 @@ const phpPaymentBalListModel = new mongoose.Schema({
     },
     invoice_particular_name : {
         type: String,
+        required: false
+    },
+    sales_exe_name : {
+        type: String,
+        required: false
+    },
+    total_refund_amount : {
+        type: Number,
+        required: false
+    },
+    balance_refund_amount : {
+        type: Number,
+        required: false
+    },
+    net_balance_amount_to_pay_percentage : {
+        type: Number,
+        required: false
+    },
+    booking_created_date : {
+        type: String,
+        required: false
+    },
+    show_fstatus : {
+        type: String,
+        required: false
+    },
+    execution_status : {
+        type: Number,
+        required: false
+    },
+    full_or_partial : {
+        type: String,
+        required: false
+    },
+    payment_approval_status : {
+        type: Number,
+        required: false
+    },
+    total_record_services : {
+        type: Number,
+        required: false
+    },
+    total_record_services_amount : {
+        type: Number,
+        required: false
+    },
+    total_execution_approval : {
+        type: Number,
+        required: false
+    },
+    total_execution_approval_pending : {
+        type: Number,
+        required: false
+    },
+    total_execution_approval_sent : {
+        type: Number,
+        required: false
+    },
+    total_execution_approval_done : {
+        type: Number,
+        required: false
+    },
+    total_execution_approval_pending_amount : {
+        type: Number,
+        required: false
+    },
+    total_execution_approval_sent_amount : {
+        type: Number,
+        required: false
+    },
+    total_execution_approval_done_amount : {
+        type: Number,
+        required: false
+    },
+    total_refund_amount :{
+        type: Number,
+        required: false
+    },
+    manager_refund_reason :{
+        type: Number,
+        required: false
+    },
+    credit_limit : {
+        type: Number,
+        required: false
+    },
+    access : {
+        type: Number,
         required: false
     }
 });
