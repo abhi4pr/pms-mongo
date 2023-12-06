@@ -67,3 +67,14 @@ exports.getAllphpPaymentRefundData = async (req, res) => {
         res.status(500).send({error: error.message, sms:"error getting php payment refund data"})
     }
 }
+
+
+exports.getAllphpPaymentRefundDataStatus = async (req, res) => {
+    try {
+        const getData = await phpPaymentRefundModel.find({finance_refund_status : 0});
+        res.status(200).send({data:getData})
+    } catch (error) {
+        res.status(500).send({error: error.message, sms:"error getting php payment refund data"})
+    }
+}
+
