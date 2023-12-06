@@ -44,15 +44,12 @@ exports.savePhpPaymentBalDataInNode = async (req, res) => {
                     total_paid_amount: data.total_paid_amount,
                     sno: data.sno
                 })
-                console.log("creeeeeeee",creators);
                 const instav = await creators.save();
-
-
             } else {
                 return res.status(200).json({ msg: "Data already insterted there is no new data available to insert." })
             }
         }));
-        
+
         res.send({ sms: "data copied in local db", status: 200 })
     } catch (error) {
         return res.status(500).send({ error: error.message, sms: 'error while adding data' })
@@ -61,7 +58,21 @@ exports.savePhpPaymentBalDataInNode = async (req, res) => {
 
 exports.getAllphpPaymentBalData = async (req, res) => {
     try {
-        const getData = await phpPaymentBalListModel.find({})
+        const getData = await phpPaymentBalListModel.find({}).select( { _id: 1,
+            sale_booking_id: 1,
+            campaign_amount: 1,
+            sale_booking_date: 1,
+            user_id: 1,
+            created_by: 1,
+            manager_approval: 1,
+            invoice_creation_status: 1,
+            salesexe_credit_approval: 1,
+            payment_update_id: 1,
+            payment_amount: 1,
+            payment_type: 1,
+            cust_name: 1,
+            total_paid_amount: 1,
+            sno: 1})
         res.status(200).send({ data: getData })
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "error getting php payment account data" })

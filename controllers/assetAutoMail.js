@@ -189,7 +189,7 @@ async function sendReminderAssetEmail1(simModel) {
   const html = ejs.render(template, { name });
 
   let mailOptions = {
-    from: "vijayanttrivedi1500@gmail.com",
+    from: "onboarding@creativefuel.io",
     to: simModel.user_email_id,
     subject: "It's time to verify our asset",
     html: html,

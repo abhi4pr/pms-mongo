@@ -73,6 +73,9 @@ const phpPayment = require("./controllers/phpPaymentAccList.js")
 const phpRefund = require("./controllers/phpPaymentRefund.js")
 const phpIncentive = require("./controllers/phpIncentive.js")
 const phpPaymentBal = require("./controllers/phpPaymentBalList.js");
+const phpPendingInvoice = require("./controllers/phpPendingInvoice.js");
+const phpSaleBookingTds = require("./controllers/saleBookingTds.js");
+
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -1054,5 +1057,12 @@ router.post("/add_php_payment_incentive_data_in_node", phpIncentive.savePhpIncen
 router.get("/get_all_php_payment_incentive_data", phpIncentive.getAllphpIncentiveData);
 router.post("/add_php_payment_bal_data_in_node", phpPaymentBal.savePhpPaymentBalDataInNode);
 router.get("/get_all_php_payment_bal_data", phpPaymentBal.getAllphpPaymentBalData);
+router.post("/add_php_pending_invoice_data_in_node", phpPendingInvoice.savePhpPaymentPendingInvoiceDataInNode);
+router.get("/get_all_php_pending_invoice_data", phpPendingInvoice.getAllphpPaymentPendingInvoiceData);
+router.post("/add_php_sale_booking_tds_data_in_node", phpSaleBookingTds.savePhpSaleBookingTdsDataInNode);
+router.get("/get_all_php_sale_booking_tds_data", phpSaleBookingTds.getAllphpSaleBookingTdsData);
+router.post("/add_php_sale_booking_tds_verification_data_in_node", phpSaleBookingTds.savePhpSaleBookingTdsVerificationDataInNode);
+router.get("/get_all_php_sale_booking_tds_verification_data", phpSaleBookingTds.getAllphpSaleBookingTdsVerificationData);
+
 
 module.exports = router;
