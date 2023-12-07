@@ -346,6 +346,7 @@
                 <th>Name</th>
                 <th>Department</th>
                 <th>Email Verified</th>
+                <th>Account Verified</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -427,7 +428,8 @@
                             <td>${user.phone}</td>
                             <td>${user.name}</td>
                             <td>${user.department}</td>
-                            <td>${user.isAdminVerified ===1 ? "Yes" : "No"}</td>
+                            <td>${user.isEmailVerified ===1 ? "Yes" : "No"}</td>
+                            <td>${user.isAdminVerified === 1 ? "Yes" : user.isAdminVerified === 2 ? "Rejected" : "No"}</td>
                             <td style="${
                               user.status === "Inactive"
                                 ? "color: red;"
