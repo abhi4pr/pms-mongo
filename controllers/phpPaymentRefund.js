@@ -78,3 +78,29 @@ exports.getAllphpPaymentRefundDataStatus = async (req, res) => {
     }
 }
 
+exports.pendingApprovalRefundUpdate = async (req,res) => {
+    try {
+        let payment_screenshot = req?.file?.filename;
+        const editPendingApprovalRefundData = await phpPaymentAccListModel.findOneAndUpdate(
+            { sale_booking_refund_id: parseInt(req.body.sale_booking_refund_id) },
+            {
+               status : req.body.status,
+               payment_screenshot
+            },
+            { new: true }
+        );
+        if (!editPendingApprovalRefundData) {
+            return response.returnFalse(
+                200,
+                req,
+                res,
+                "No Reord Found ",
+                {}
+            );
+        }
+        return response.returnTrue(200, req, res, "Updation Successfully", editPendingApprovalRefundData);
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+}
+

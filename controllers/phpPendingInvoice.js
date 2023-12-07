@@ -133,3 +133,27 @@ exports.getAllphpPaymentPendingInvoiceData = async (req, res) => {
         res.status(500).send({ error: error.message, sms: "error getting php payment account data" })
     }
 }
+
+exports.pendingInvoiceUpdate = async (req,res) => {
+    try {
+        const editPendingApprovalData = await phpPaymentBalListModel.findOneAndUpdate(
+            { sale_booking_id: parseInt(req.body.sale_booking_id) },
+            {
+               status : req.body.status
+            },
+            { new: true }
+        );
+        if (!editPendingApprovalData) {
+            return response.returnFalse(
+                200,
+                req,
+                res,
+                "No Reord Found ",
+                {}
+            );
+        }
+        return response.returnTrue(200, req, res, "Updation Successfully", editPendingApprovalData);
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+}
