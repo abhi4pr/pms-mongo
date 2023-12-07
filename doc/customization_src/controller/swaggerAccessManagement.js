@@ -29,7 +29,7 @@ exports.addDevData = async (req, res) => {
     const savedDevData = await devData.save();
     
     if (savedDevData) {
-      const templatePath = path.join(__dirname, `../../templates/devInvationSend.ejs`);
+      const templatePath = path.join(__dirname, `../doc_templates/devInvationSend.ejs`);
     const template = await fs.promises.readFile(templatePath, "utf-8");
       
     const html = ejs.render(template, {
