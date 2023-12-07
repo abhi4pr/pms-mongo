@@ -932,30 +932,90 @@ exports.getDistinctExeCountHistory = async (req, res) => {
 }
 
 
-// exports.getDistinctExeCountHistory = async (req, res) => {
-//     try {
-//         let query = {};
-//         if (req.params.p_id) {
-//             query.p_id = parseInt(req.params.p_id);
-//         }
+exports.getAllExePurchase = async (req, res) => {
+    try {
+        const allEntries = await exePurchaseModel.find({});
+        const result = [];
 
-//         const allEntries = await exeCountHisModel
-//             .aggregate([
-//                 { $match: query },
-//                 { $sort: { creation_date: -1 } },
-//                 {
-//                     $lookup: {
-//                         from: 'exePurchaseModel',
-//                         localField: 'p_id', 
-//                         foreignField: 'p_id', 
-//                         as: 'exePurchaseData'
-//                     }
-//                 },
-//             ])
-//             .exec();
+        for (const entry of allEntries) {
+            const latestEntry = await exeCountHisModel.findOne()
+                .sort({ creation_date: -1 })
+                .exec();
 
-//         res.status(200).send({ data: allEntries });
-//     } catch (error) {
-//         res.status(500).send({ error: error.message, sms: 'Error getting all data of exe summary' });
-//     }
-// }
+            if (latestEntry) {
+                const relevantFields = [
+                    'reach',
+                    'impression',
+                    'engagement',
+                    'story_view',
+                    'stats_for',
+                    'start_date',
+                    'end_date',
+                    'reach_upload_image',
+                    'impression_upload_image',
+                    'engagement_upload_image',
+                    'story_view_upload_image',
+                    'story_view_upload_video',
+                    'city1_name',
+                    'city2_name',
+                    'city3_name',
+                    'city4_name',
+                    'city5_name',
+                    'percentage_city1_name',
+                    'percentage_city2_name',
+                    'percentage_city3_name',
+                    'percentage_city4_name',
+                    'percentage_city5_name',
+                    'city_image_upload',
+                    'male_percent',
+                    'female_percent',
+                    'Age_13_17_percent',
+                    'Age_upload',
+                    'Age_18_24_percent',
+                    'Age_25_34_percent',
+                    'Age_35_44_percent',
+                    'Age_45_54_percent',
+                    'Age_55_64_percent',
+                    'Age_65_plus_percent',
+                    'quater',
+                    'profile_visit',
+                    'country1_name',
+                    'country2_name',
+                    'country3_name',
+                    'country4_name',
+                    'country5_name',
+                    'percentage_country1_name',
+                    'percentage_country2_name',
+                    'percentage_country3_name',
+                    'percentage_country4_name',
+                    'percentage_country5_name',
+                    'country_image_upload'
+                ];
+
+                const count = relevantFields.filter(field =>
+                    latestEntry[field] !== null &&
+                    latestEntry[field] !== '' &&
+                    latestEntry[field] !== 0
+                ).length;
+
+                const totalPercentage = (count / relevantFields.length) * 100;
+
+                result.push({
+                    page_name: entry.page_name,
+                    cat_name: entry.cat_name,
+                    follower_count: entry.follower_count,
+                    page_link: entry.page_link,
+                    platform: entry.platform,
+                    latestEntry,
+                    totalPercentage
+                });
+            }
+        }
+        res.status(200).send({ result });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message, message: 'Internal Server Error' });
+    }
+};
+
+

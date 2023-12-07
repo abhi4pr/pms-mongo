@@ -58,23 +58,51 @@ exports.savePhpPaymentBalDataInNode = async (req, res) => {
 
 exports.getAllphpPaymentBalData = async (req, res) => {
     try {
-        const getData = await phpPaymentBalListModel.find({}).select( { _id: 1,
-            sale_booking_id: 1,
-            campaign_amount: 1,
-            sale_booking_date: 1,
-            user_id: 1,
-            created_by: 1,
-            manager_approval: 1,
-            invoice_creation_status: 1,
-            salesexe_credit_approval: 1,
-            payment_update_id: 1,
-            payment_amount: 1,
-            payment_type: 1,
-            cust_name: 1,
-            total_paid_amount: 1,
-            sno: 1})
+        const getData = await phpPaymentBalListModel.find({})
+        // .select( { _id: 1,
+        //     sale_booking_id: 1,
+        //     campaign_amount: 1,
+        //     sale_booking_date: 1,
+        //     user_id: 1,
+        //     created_by: 1,
+        //     manager_approval: 1,
+        //     invoice_creation_status: 1,
+        //     salesexe_credit_approval: 1,
+        //     payment_update_id: 1,
+        //     payment_amount: 1,
+        //     payment_type: 1,
+        //     cust_name: 1,
+        //     total_paid_amount: 1,
+        //     sno: 1})
         res.status(200).send({ data: getData })
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "error getting php payment account data" })
+    }
+}
+
+exports.balancePaymentListUpdate = async (req,res) => {
+    try {
+        let payment_screenshot = req?.file?.filename;
+        const editPendingApprovalRefundData = await phpPaymentBalListModel.findOneAndUpdate(
+            { sale_booking_id: parseInt(req.body.sale_booking_id) },
+            {
+
+               status : req.body.status,
+               payment_screenshot
+            },
+            { new: true }
+        );
+        if (!editPendingApprovalRefundData) {
+            return response.returnFalse(
+                200,
+                req,
+                res,
+                "No Reord Found ",
+                {}
+            );
+        }
+        return response.returnTrue(200, req, res, "Updation Successfully", editPendingApprovalRefundData);
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
     }
 }
