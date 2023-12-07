@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const variable = require('../variables.js');
 const axios = require('axios');
 const exeCountHisModel = require('../models/exeCountHisModel.js');
+const response = require("../common/response.js");
 const multer = require("multer");
 
 exports.exeInvenPost = async (req, res) => {
@@ -146,6 +147,11 @@ exports.exeSumPost = async (req, res) => {
 async function checkIfDataExists(sale_booking_execution_id) {
     const query = { sale_booking_execution_id: sale_booking_execution_id };
     const result = await exeSum.findOne(query);
+    return result !== null;
+}
+async function checkIfDataExistsInExecutionPurchase(p_id) {
+    const query = { p_id };
+    const result = await exePurchaseModel.findOne(query);
     return result !== null;
 }
 
@@ -307,6 +313,144 @@ exports.getLatestPIDCount = async (req, res) => {
         res.status(500).send({ error: err.message, sms: 'Error getting all Ip Count' });
     }
 };
+exports.pageHealthDashboard = async (req, res) => {
+    try {   
+        const getcreators = await exeCountHisModel.aggregate([
+            {
+              $sort: {
+                p_id: 1,
+                creation_date: -1
+              }
+            },
+            {
+              $group: {
+                _id: "$p_id",
+                latestDocument: { $first: "$$ROOT" },
+                p_id_count : { $sum :1},  // For finding how many document exists in a group set
+
+                //Highest values
+                maxReach: { $max: "$reach" },
+                maxImpression: { $max: "$impression" },
+                maxEngagement: { $max: "$engagement" },
+                maxStoryView: { $max: "$story_view" },
+                maxStoryViewDate: { $max: "$story_view_date" },
+
+                //Lowest values
+                minReach: { $min: "$reach" },
+                minImpression: { $min: "$impression" },
+                minEngagement: { $min: "$engagement" },
+                minStoryView: { $min: "$story_view" },
+                minStoryViewDate: { $min: "$story_view_date" },
+
+                //Average Values
+                avgReach: { $avg: "$reach" },
+                avgImpression: { $avg: "$impression" },
+                avgEngagement: { $avg: "$engagement" },
+                avgStoryView: { $avg: "$story_view" },
+                avgStoryViewDate: { $avg: "$story_view_date" },
+
+                // Gender specification
+                avgMalePercent : { $avg : "$male_percent"},
+                avgFemalePercent : { $avg : "$female_percent"},
+
+                // Age Group specification 
+                avgAge_13_17_percent : { $avg : "$Age_13_17_percent"},
+                avgAge_18_24_percent : { $avg : "$Age_18_24_percent"},
+                avgAge_25_34_percent : { $avg : "$Age_25_34_percent"},
+                avgAge_35_44_percent : { $avg : "$Age_35_44_percent"},
+                avgAge_45_54_percent : { $avg : "$Age_45_54_percent"},
+                avgAge_55_64_percent : { $avg : "$Age_55_64_percent"},
+                avgAge_65_plus_percent : { $avg : "$Age_65_plus_percent"},
+              }
+            },
+            {
+              $lookup: {
+                from: "exepurchasemodels", 
+                localField: "_id",
+                foreignField: "p_id",
+                as: "exePurchaseModelData"
+              }
+            },
+            {
+              $unwind: "$exePurchaseModelData"
+            },
+            {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: [
+                      "$latestDocument",
+                      "$exePurchaseModelData",
+                      {p_id_count : "$p_id_count"},
+                      //Highest values which can return in response
+                      { maxReach: "$maxReach" },
+                      { maxImpression: "$maxImpression" },
+                      { maxEngagement: "$maxEngagement" },
+                      { maxStoryView: "$maxStoryView" },
+                      { maxStoryViewDate: "$maxStoryViewDate" },
+  
+                      //Average values which can return in response
+                      { avgReach: "$avgReach" },
+                      { avgImpression: "$avgImpression" },
+                      { avgEngagement: "$avgEngagement" },
+                      { avgStoryView: "$avgStoryView" },
+                      { avgStoryViewDate: "$avgStoryViewDate" },
+
+                      //Lowest values which can return in response
+                      { minReach: "$minReach" },
+                      { minImpression: "$minImpression" },
+                      { minEngagement: "$minEngagement" },
+                      { minStoryView: "$minStoryView" },
+                      { minStoryViewDate: "$minStoryViewDate" },
+
+                      // Gender specification
+                      { avgMalePercent : "$avgMalePercent"},
+                      { avgFemalePercent : "$avgFemalePercent"},
+
+                      //Age Classification 
+                      { avgAge_13_17_percent : "$avgAge_13_17_percent"},
+                      { avgAge_18_24_percent : "$avgAge_18_24_percent"},
+                      { avgAge_35_44_percent : "$avgAge_35_44_percent"},
+                      { avgAge_45_54_percent : "$avgAge_45_54_percent"},
+                      { avgAge_55_64_percent : "$avgAge_55_64_percent"},
+                      { avgAge_65_plus_percent : "$avgAge_55_64_percent"},
+                    ]
+                  }
+                }
+              },
+          ]);
+
+          if (getcreators && getcreators.length === 0){
+            return response.returnFalse(200,req,res,'No Record Found', {})
+          }
+          for ( const data of getcreators){
+            let ageGroup =  [
+                { ageGroup: "13-17", percentage: data?.avgAge_13_17_percent / data?.p_id_count },
+                { ageGroup: "18-24", percentage: data?.avgAge_18_24_percent / data?.p_id_count},
+                { ageGroup: "35-44", percentage:  data?.avgAge_35_44_percent / data?.p_id_count },
+                { ageGroup: "45-54", percentage:  data?.avgAge_45_54_percent / data?.p_id_count },
+                { ageGroup: "55-64", percentage:  data?.avgAge_55_64_percent / data?.p_id_count},
+                { ageGroup: "65+", percentage: data?.avgAge_65_plus_percent / data?.p_id_count },
+              ];
+
+              ageGroup.sort((a, b) => b.percentage - a.percentage);
+                // Get the top 5 values
+                const top5Values = ageGroup.slice(0, 5);
+                data.top5AgeGroupPercentage = [...top5Values]
+                // Delete specific properties
+                delete data.avgAge_13_17_percent;
+                delete data.avgAge_18_24_percent;
+                delete data.avgAge_35_44_percent;
+                delete data.avgAge_45_54_percent;
+                delete data.avgAge_55_64_percent;
+                delete data.avgAge_65_plus_percent;
+                delete data.p_id_count;
+          }
+
+        return response.returnTrue(200,req,res,"Finding Operation Success", getcreators)
+    } catch (err) {
+        return response.returnFalse(500,req,res,err.message, {})
+    }
+};
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "media", maxCount: 1 },
@@ -464,36 +608,54 @@ exports.updateIPCountHistory = [upload1, async (req, res) => {
 exports.exeForPurchase = async (req, res) => {
     try {
         const loggedin_user_id = req.body.loggedin_user_id;
-        const response = await axios.post(
-            'https://purchase.creativefuel.io/webservices/RestController.php?view=executionSummaryList', {
-            loggedin_user_id: loggedin_user_id
-        }
-
+        const response = await axios.get(
+            'https://purchase.creativefuel.io/webservices/RestController.php?view=inventoryDataList'
         )
         const responseData = response.data.body;
-        
-        for (const data of responseData) {
-          
-            const existingData = await checkIfDataExists(data.p_id)
-            
-            if (!existingData) {
 
+        const promises = responseData.map(async (data) => {
+            const existingData = await checkIfDataExistsInExecutionPurchase(data.p_id);
+        
+            if (!existingData) {
                 const creators = new exePurchaseModel({
-                    p_id: data.p_id,
+                    p_id: parseInt(data.p_id),
                     page_name: data.page_name,
                     cat_name: data.cat_name,
                     platform: data.platform,
-                    follower_count: data.follower_count,
+                    follower_count: parseInt(data.follower_count),
                     page_link: data.page_link,
-                    vendor_id: data.vendor_id
-                })
-                const instav = await creators.save();
-             
-                return res.send({ instav, status: 200 })
-            }else{
-              return  res.status(200).json({msg:"Data already insterted there is no new data available to insert."})
+                    vendor_id: parseInt(data.vendor_id)
+                });
+                return creators.save();
+            } else {
+                return { message : `Data already insterted this `}; // or handle the case where data already exists
             }
-        }
+        });
+        
+        const results = await Promise.all(promises);
+         return res.send({ instav :results, status: 200 })
+        // for (const data of responseData) {
+          
+        //     const existingData = await checkIfDataExists(data.p_id)
+            
+        //     if (!existingData) {
+
+        //         const creators = new exePurchaseModel({
+        //             p_id: parseInt(data.p_id),
+        //             page_name: data.page_name,
+        //             cat_name: data.cat_name,
+        //             platform: data.platform,
+        //             follower_count: parseInt(data.follower_count),
+        //             page_link: data.page_link,
+        //             vendor_id: parseInt(data.vendor_id)
+        //         })
+        //         const instav = await creators.save();
+             
+        //         return res.send({ instav, status: 200 })
+        //     }else{
+        //       return  res.status(200).json({msg:"Data already insterted there is no new data available to insert."})
+        //     }
+        // }
     } catch (error) {
         return res.status(500).send({ error: error.message, sms: 'error while adding data' })
     }

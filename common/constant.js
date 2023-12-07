@@ -16,6 +16,7 @@ module.exports = Object.freeze({
   CONST_VALIDATE_SESSION_EXPIRE_DOC:"1h",
   CONST_SESSION_TIME_FOR_SWAGGER : 1500000,  //   1/2 hours
   CONST_VALIDATE_SESSION_EXPIRE: '24h',
+  CONST_EMAIL_VERIFICATION_EXPIRED: '10m',
 
   /* Response messages */ 
 

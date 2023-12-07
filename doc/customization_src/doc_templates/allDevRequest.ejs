@@ -345,6 +345,7 @@
                 <th>Phone</th>
                 <th>Name</th>
                 <th>Department</th>
+                <th>Email Verified</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -425,8 +426,9 @@
                             <td>${user.phone}</td>
                             <td>${user.name}</td>
                             <td>${user.department}</td>
+                            <td>${user.isEmailVerified ===1 ? "Yes" : "No"}</td>
                             <td class="action-buttons">
-                                <a href='/dev-update/${
+                                <a href='/update-request-status/${
                                   user._id
                                 }/${token}' ><i class="fas fa-pencil-alt"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
                                 <a href='/dev-update/${
