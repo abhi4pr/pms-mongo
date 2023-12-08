@@ -1070,6 +1070,6 @@ router.post("/add_php_sale_booking_tds_data_in_node", phpSaleBookingTds.savePhpS
 router.get("/get_all_php_sale_booking_tds_data", phpSaleBookingTds.getAllphpSaleBookingTdsData);
 router.post("/add_php_sale_booking_tds_verification_data_in_node", phpSaleBookingTds.savePhpSaleBookingTdsVerificationDataInNode);
 router.get("/get_all_php_sale_booking_tds_verification_data", phpSaleBookingTds.getAllphpSaleBookingTdsVerificationData);
-
+router.get("/get_all_php_payment_acc_data_customers/:cust_id",phpPayment.getAccListDataFromCustId)
 
 module.exports = router;

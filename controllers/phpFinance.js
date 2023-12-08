@@ -51,7 +51,7 @@ exports.savePhpFinanceDataInNode = async (req, res) => {
                     last_updated_by: data.last_updated_by,
                     creation_date: data.creation_date,
                     last_updated_date: data.last_updated_date,
-                    cust_id: data.cust_id,
+                    cust_id: parseInt(data.cust_id),
                     sale_booking_date: data.sale_booking_date,
                     campaign_amount: data.campaign_amount,
                     base_amount: data.base_amount,

@@ -1,4 +1,5 @@
 const phpPaymentAccListModel = require("../models/phpPaymentAccListModel.js");
+const phpFinanceModel = require("../models/phpFinanceModel.js");
 const axios = require('axios');
 const FormData = require('form-data');
 
@@ -91,5 +92,19 @@ exports.pendingApprovalUpdate = async (req,res) => {
         return response.returnTrue(200, req, res, "Updation Successfully", editPendingApprovalData);
     } catch (err) {
         return response.returnFalse(500, req, res, err.message, {});
+    }
+}
+
+exports.getAccListDataFromCustId = async (req, res) => {
+    try {
+        const getData = await phpFinanceModel.find({
+            $or: [
+              { cust_id: String(req.params.cust_id) },
+              { cust_id: Number(req.params.cust_id) }
+            ]
+          })
+        res.status(200).send({data:getData})
+    } catch (error) {
+        res.status(500).send({error: error.message, sms:"error getting php payment account data of customer details"})
     }
 }
