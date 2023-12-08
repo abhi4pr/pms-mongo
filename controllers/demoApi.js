@@ -15,7 +15,8 @@ exports.addDemo = async (req, res) =>{
             t9: req.body.t9,
             t10: req.body.t10,
             t11: req.body.t11,
-            t12: req.body.t12
+            t12: req.body.t12,
+            t13 : req?.file?.filename
         })
         const simv = await simc.save();
         res.send({simv,status:200});
@@ -60,7 +61,8 @@ exports.editDemo = async (req, res) => {
             t9: req.body.t9,
             t10: req.body.t10,
             t11: req.body.t11,
-            t12: req.body.t12
+            t12: req.body.t12,
+            t13 : req?.file?.filename
         }, { new: true })
 
         res.status(200).send({success:true,data:editsim})

@@ -82,10 +82,10 @@ router.get("/", (req, res) => {
 });
 
 /* demo api */
-router.post("/add_demo", demoApi.addDemo);
+router.post("/add_demo",upload1.single("t13"), demoApi.addDemo);
 router.get("/get_all_demo", demoApi.getAllDemo);
 router.get("/get_single_demo/:_id", demoApi.getSingleDemo);
-router.put("/update_demo", demoApi.editDemo);
+router.put("/update_demo",upload1.single("t13"), demoApi.editDemo);
 router.delete("/delete_demo/:_id", demoApi.deleteDemo);
 
 /*operation+execution api*/
