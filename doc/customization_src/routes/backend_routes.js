@@ -15,10 +15,9 @@ router.get('/dev-login-history/:token',checkDevAuthentication,swaggerAccessManag
 router.get('/dev-data/:id/:token',checkDevAuthentication,swaggerAccessManagement.getDevSingleData );
 router.put('/dev-data-update/:id/:token',checkDevAuthentication,swaggerAccessManagement.updateDevData );
 router.get('/delete-dev/:id/:token/:page',checkDevAuthentication,swaggerAccessManagement.deleteDev );
-router.get('/delete_history/:token',checkDevAuthentication,swaggerAccessManagement.clearLoginHis );
 router.get('/email-verification/:token',swaggerAccessManagement.emailVerification );
 router.get('/update-request-status/:id/:token/:status',swaggerAccessManagement.requestStatusUpdate );
 router.get('/admin-profile-data/:token',swaggerAccessManagement.adminProfile );
 router.post('/update-admin-password/:token/:id',swaggerAccessManagement.updatePasswordAdmin );
-
+router.get('/delete-history',swaggerAccessManagement.clearLoginHis)
 module.exports = router;
