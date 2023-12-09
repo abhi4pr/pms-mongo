@@ -609,7 +609,17 @@ const userModel = new mongoose.Schema({
     showOnboardingModal:{
         type: Boolean,
         default:true
-    }
+    },
+    latitude: {
+        type: Number,
+        required: false,
+        default: 0
+    },
+    longitude: {
+        type: Number,
+        required: false,
+        default: 0
+    },
 });
 
 AutoIncrement.initialize(mongoose.connection);

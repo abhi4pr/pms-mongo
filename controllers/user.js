@@ -162,7 +162,9 @@ exports.addUser = [upload, async (req, res) => {
             profileflag: req.body.profileflag,
             nick_name: req.body.nick_name,
             offer_later_date: req.body.offer_later_date,
-            annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : ''
+            annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : '',
+            latitude : req.body.latitude,
+            longitude : req.body.longitude
         })
         const simv = await simc.save();
 
@@ -401,7 +403,9 @@ exports.updateUser = [upload1, async (req, res) => {
             offer_later_acceptance_date: req.body.offer_later_acceptance_date,
             offer_later_status: req.body.offer_later_status,
             offer_later_reject_reason: req.body.offer_later_reject_reason,
-            showOnboardingModal: req.body.showOnboardingModal
+            showOnboardingModal: req.body.showOnboardingModal,
+            latitude : req.body.latitude,
+            longitude : req.body.longitude
 
         }, { new: true });
         if (!editsim) {

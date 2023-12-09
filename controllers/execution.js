@@ -86,11 +86,11 @@ exports.exeSumPost = async (req, res) => {
 
         )
         const responseData = response.data.body;
-        
+
         for (const data of responseData) {
-          
+
             const existingData = await checkIfDataExists(data.sale_booking_execution_id)
-            
+
             if (!existingData) {
 
                 const creators = new exeSum({
@@ -133,10 +133,10 @@ exports.exeSumPost = async (req, res) => {
                     start_date: data.start_date
                 })
                 const instav = await creators.save();
-             
+
                 return res.send({ instav, status: 200 })
-            }else{
-              return  res.status(200).json({msg:"Data already insterted there is no new data available to insert."})
+            } else {
+                return res.status(200).json({ msg: "Data already insterted there is no new data available to insert." })
             }
         }
     } catch (error) {
@@ -156,7 +156,7 @@ async function checkIfDataExistsInExecutionPurchase(p_id) {
 }
 
 exports.getExeSum = async (req, res) => {
-    try {   
+    try {
         const getcreators = await exeSum.find();
         if (!getcreators) {
             res.status(500).send({ success: false });
@@ -169,7 +169,7 @@ exports.getExeSum = async (req, res) => {
 
 exports.editExeSum = async (req, res) => {
     try {
-        const editinsta = await exeSum.findOneAndUpdate({sale_booking_execution_id:req.body.sale_booking_execution_id}, {
+        const editinsta = await exeSum.findOneAndUpdate({ sale_booking_execution_id: req.body.sale_booking_execution_id }, {
             sale_booking_execution_id: req.body.sale_booking_execution_id,
             loggedin_user_id: req.body.loggedin_user_id,
             sale_booking_id: req.body.sale_booking_id,
@@ -199,13 +199,13 @@ exports.executionGraph = async (req, res) => {
         exeSum.aggregate(pipeline, (err, data) => {
             if (err) {
                 console.error(err);
-                return res.status(500).json({err:err.message});
+                return res.status(500).json({ err: err.message });
             } else {
 
                 // Helper function to group data by interval start, interval type, and execution status
                 const groupData = () => {
                     const groupedData = {};
-                    const currentDate = new Date(); 
+                    const currentDate = new Date();
 
                     data.forEach(item => {
                         const saleBookingDate = new Date(item.sale_booking_date);
@@ -303,8 +303,8 @@ exports.executionGraph = async (req, res) => {
 }
 
 exports.getLatestPIDCount = async (req, res) => {
-    try {   
-        const getcreators = await exeCountHisModel.findOne({p_id:req.params.p_id}).sort({ creation_date: -1 });
+    try {
+        const getcreators = await exeCountHisModel.findOne({ p_id: req.params.p_id }).sort({ creation_date: -1 });
         if (!getcreators) {
             res.status(500).send({ success: false });
         }
@@ -314,154 +314,154 @@ exports.getLatestPIDCount = async (req, res) => {
     }
 };
 exports.pageHealthDashboard = async (req, res) => {
-    try {   
+    try {
         const getcreators = await exeCountHisModel.aggregate([
             {
-              $sort: {
-                p_id: 1,
-                creation_date: -1
-              }
+                $sort: {
+                    p_id: 1,
+                    creation_date: -1
+                }
             },
             {
-              $group: {
-                _id: "$p_id",
-                latestDocument: { $first: "$$ROOT" },
-                p_id_count : { $sum :1},  // For finding how many document exists in a group set
+                $group: {
+                    _id: "$p_id",
+                    latestDocument: { $first: "$$ROOT" },
+                    p_id_count: { $sum: 1 },  // For finding how many document exists in a group set
 
-                //Highest values
-                maxReach: { $max: "$reach" },
-                maxImpression: { $max: "$impression" },
-                maxEngagement: { $max: "$engagement" },
-                maxStoryView: { $max: "$story_view" },
-                maxStoryViewDate: { $max: "$story_view_date" },
+                    //Highest values
+                    maxReach: { $max: "$reach" },
+                    maxImpression: { $max: "$impression" },
+                    maxEngagement: { $max: "$engagement" },
+                    maxStoryView: { $max: "$story_view" },
+                    maxStoryViewDate: { $max: "$story_view_date" },
 
-                //Lowest values
-                minReach: { $min: "$reach" },
-                minImpression: { $min: "$impression" },
-                minEngagement: { $min: "$engagement" },
-                minStoryView: { $min: "$story_view" },
-                minStoryViewDate: { $min: "$story_view_date" },
+                    //Lowest values
+                    minReach: { $min: "$reach" },
+                    minImpression: { $min: "$impression" },
+                    minEngagement: { $min: "$engagement" },
+                    minStoryView: { $min: "$story_view" },
+                    minStoryViewDate: { $min: "$story_view_date" },
 
-                //Average Values
-                avgReach: { $avg: "$reach" },
-                avgImpression: { $avg: "$impression" },
-                avgEngagement: { $avg: "$engagement" },
-                avgStoryView: { $avg: "$story_view" },
-                avgStoryViewDate: { $avg: "$story_view_date" },
+                    //Average Values
+                    avgReach: { $avg: "$reach" },
+                    avgImpression: { $avg: "$impression" },
+                    avgEngagement: { $avg: "$engagement" },
+                    avgStoryView: { $avg: "$story_view" },
+                    avgStoryViewDate: { $avg: "$story_view_date" },
 
-                // Gender specification
-                avgMalePercent : { $avg : "$male_percent"},
-                avgFemalePercent : { $avg : "$female_percent"},
+                    // Gender specification
+                    avgMalePercent: { $avg: "$male_percent" },
+                    avgFemalePercent: { $avg: "$female_percent" },
 
-                // Age Group specification 
-                avgAge_13_17_percent : { $avg : "$Age_13_17_percent"},
-                avgAge_18_24_percent : { $avg : "$Age_18_24_percent"},
-                avgAge_25_34_percent : { $avg : "$Age_25_34_percent"},
-                avgAge_35_44_percent : { $avg : "$Age_35_44_percent"},
-                avgAge_45_54_percent : { $avg : "$Age_45_54_percent"},
-                avgAge_55_64_percent : { $avg : "$Age_55_64_percent"},
-                avgAge_65_plus_percent : { $avg : "$Age_65_plus_percent"},
-              }
+                    // Age Group specification 
+                    avgAge_13_17_percent: { $avg: "$Age_13_17_percent" },
+                    avgAge_18_24_percent: { $avg: "$Age_18_24_percent" },
+                    avgAge_25_34_percent: { $avg: "$Age_25_34_percent" },
+                    avgAge_35_44_percent: { $avg: "$Age_35_44_percent" },
+                    avgAge_45_54_percent: { $avg: "$Age_45_54_percent" },
+                    avgAge_55_64_percent: { $avg: "$Age_55_64_percent" },
+                    avgAge_65_plus_percent: { $avg: "$Age_65_plus_percent" },
+                }
             },
             {
-              $lookup: {
-                from: "exepurchasemodels", 
-                localField: "_id",
-                foreignField: "p_id",
-                as: "exePurchaseModelData"
-              }
+                $lookup: {
+                    from: "exepurchasemodels",
+                    localField: "_id",
+                    foreignField: "p_id",
+                    as: "exePurchaseModelData"
+                }
             },
             {
-              $unwind: "$exePurchaseModelData"
+                $unwind: "$exePurchaseModelData"
             },
             {
                 $replaceRoot: {
-                  newRoot: {
-                    $mergeObjects: [
-                      "$latestDocument",
-                      "$exePurchaseModelData",
-                      {p_id_count : "$p_id_count"},
-                      //Highest values which can return in response
-                      { maxReach: "$maxReach" },
-                      { maxImpression: "$maxImpression" },
-                      { maxEngagement: "$maxEngagement" },
-                      { maxStoryView: "$maxStoryView" },
-                      { maxStoryViewDate: "$maxStoryViewDate" },
-  
-                      //Average values which can return in response
-                      { avgReach: "$avgReach" },
-                      { avgImpression: "$avgImpression" },
-                      { avgEngagement: "$avgEngagement" },
-                      { avgStoryView: "$avgStoryView" },
-                      { avgStoryViewDate: "$avgStoryViewDate" },
+                    newRoot: {
+                        $mergeObjects: [
+                            "$latestDocument",
+                            "$exePurchaseModelData",
+                            { p_id_count: "$p_id_count" },
+                            //Highest values which can return in response
+                            { maxReach: "$maxReach" },
+                            { maxImpression: "$maxImpression" },
+                            { maxEngagement: "$maxEngagement" },
+                            { maxStoryView: "$maxStoryView" },
+                            { maxStoryViewDate: "$maxStoryViewDate" },
 
-                      //Lowest values which can return in response
-                      { minReach: "$minReach" },
-                      { minImpression: "$minImpression" },
-                      { minEngagement: "$minEngagement" },
-                      { minStoryView: "$minStoryView" },
-                      { minStoryViewDate: "$minStoryViewDate" },
+                            //Average values which can return in response
+                            { avgReach: "$avgReach" },
+                            { avgImpression: "$avgImpression" },
+                            { avgEngagement: "$avgEngagement" },
+                            { avgStoryView: "$avgStoryView" },
+                            { avgStoryViewDate: "$avgStoryViewDate" },
 
-                      // Gender specification
-                      { avgMalePercent : "$avgMalePercent"},
-                      { avgFemalePercent : "$avgFemalePercent"},
+                            //Lowest values which can return in response
+                            { minReach: "$minReach" },
+                            { minImpression: "$minImpression" },
+                            { minEngagement: "$minEngagement" },
+                            { minStoryView: "$minStoryView" },
+                            { minStoryViewDate: "$minStoryViewDate" },
 
-                      //Age Classification 
-                      { avgAge_13_17_percent : "$avgAge_13_17_percent"},
-                      { avgAge_18_24_percent : "$avgAge_18_24_percent"},
-                      { avgAge_35_44_percent : "$avgAge_35_44_percent"},
-                      { avgAge_45_54_percent : "$avgAge_45_54_percent"},
-                      { avgAge_55_64_percent : "$avgAge_55_64_percent"},
-                      { avgAge_65_plus_percent : "$avgAge_55_64_percent"},
-                    ]
-                  }
+                            // Gender specification
+                            { avgMalePercent: "$avgMalePercent" },
+                            { avgFemalePercent: "$avgFemalePercent" },
+
+                            //Age Classification 
+                            { avgAge_13_17_percent: "$avgAge_13_17_percent" },
+                            { avgAge_18_24_percent: "$avgAge_18_24_percent" },
+                            { avgAge_35_44_percent: "$avgAge_35_44_percent" },
+                            { avgAge_45_54_percent: "$avgAge_45_54_percent" },
+                            { avgAge_55_64_percent: "$avgAge_55_64_percent" },
+                            { avgAge_65_plus_percent: "$avgAge_55_64_percent" },
+                        ]
+                    }
                 }
-              },
-          ]);
+            },
+        ]);
 
-          if (getcreators && getcreators.length === 0){
-            return response.returnFalse(200,req,res,'No Record Found', {})
-          }
-          for ( const data of getcreators){
-            let ageGroup =  [
+        if (getcreators && getcreators.length === 0) {
+            return response.returnFalse(200, req, res, 'No Record Found', {})
+        }
+        for (const data of getcreators) {
+            let ageGroup = [
                 { ageGroup: "13-17", percentage: data?.avgAge_13_17_percent / data?.p_id_count },
-                { ageGroup: "18-24", percentage: data?.avgAge_18_24_percent / data?.p_id_count},
-                { ageGroup: "35-44", percentage:  data?.avgAge_35_44_percent / data?.p_id_count },
-                { ageGroup: "45-54", percentage:  data?.avgAge_45_54_percent / data?.p_id_count },
-                { ageGroup: "55-64", percentage:  data?.avgAge_55_64_percent / data?.p_id_count},
+                { ageGroup: "18-24", percentage: data?.avgAge_18_24_percent / data?.p_id_count },
+                { ageGroup: "35-44", percentage: data?.avgAge_35_44_percent / data?.p_id_count },
+                { ageGroup: "45-54", percentage: data?.avgAge_45_54_percent / data?.p_id_count },
+                { ageGroup: "55-64", percentage: data?.avgAge_55_64_percent / data?.p_id_count },
                 { ageGroup: "65+", percentage: data?.avgAge_65_plus_percent / data?.p_id_count },
-              ];
+            ];
 
-              ageGroup.sort((a, b) => b.percentage - a.percentage);
-                // Get the top 5 values
-                const top5Values = ageGroup.slice(0, 5);
-                data.top5AgeGroupPercentage = [...top5Values]
-                // Delete specific properties
-                delete data.avgAge_13_17_percent;
-                delete data.avgAge_18_24_percent;
-                delete data.avgAge_35_44_percent;
-                delete data.avgAge_45_54_percent;
-                delete data.avgAge_55_64_percent;
-                delete data.avgAge_65_plus_percent;
-                delete data.p_id_count;
-          }
+            ageGroup.sort((a, b) => b.percentage - a.percentage);
+            // Get the top 5 values
+            const top5Values = ageGroup.slice(0, 5);
+            data.top5AgeGroupPercentage = [...top5Values]
+            // Delete specific properties
+            delete data.avgAge_13_17_percent;
+            delete data.avgAge_18_24_percent;
+            delete data.avgAge_35_44_percent;
+            delete data.avgAge_45_54_percent;
+            delete data.avgAge_55_64_percent;
+            delete data.avgAge_65_plus_percent;
+            delete data.p_id_count;
+        }
 
-        return response.returnTrue(200,req,res,"Finding Operation Success", getcreators)
+        return response.returnTrue(200, req, res, "Finding Operation Success", getcreators)
     } catch (err) {
-        return response.returnFalse(500,req,res,err.message, {})
+        return response.returnFalse(500, req, res, err.message, {})
     }
 };
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "media", maxCount: 1 },
     { name: "reach_upload_image", maxCount: 1 },
-    { name: "impression_upload_image", maxCount: 1},
+    { name: "impression_upload_image", maxCount: 1 },
     { name: "engagement_upload_image", maxCount: 1 },
     { name: "story_view_upload_image", maxCount: 1 },
     { name: "story_view_upload_video", maxCount: 1 },
     { name: "city_image_upload", maxCount: 1 },
     { name: "Age_upload", maxCount: 1 },
-    { name:"country_image_upload", maxCount: 1 }
+    { name: "country_image_upload", maxCount: 1 }
 ]);
 
 exports.addIPCountHistory = [upload, async (req, res) => {
@@ -476,14 +476,14 @@ exports.addIPCountHistory = [upload, async (req, res) => {
             stats_for: req.body.stats_for,
             start_date: req.body.start_date,
             end_date: req.body.end_date,
-            media:req.files.media ? req.files.media[0].filename : '',
-            reach_upload_image:req.files.reach_upload_image ? req.files.reach_upload_image[0].filename : '',
-            impression_upload_image:req.files.impression_upload_image ? req.files.impression_upload_image[0].filename : '',
-            engagement_upload_image:req.files.engagement_upload_image ? req.files.engagement_upload_image[0].filename : '',
-            story_view_upload_image:req.files.story_view_upload_image ? req.files.story_view_upload_image[0].filename : '',
-            story_view_upload_video:req.files.story_view_upload_video ? req.files.story_view_upload_video[0].filename : '',
-            city_image_upload:req.files.city_image_upload ? req.files.city_image_upload[0].filename : '',
-            Age_upload:req.files.Age_upload ? req.files.Age_upload[0].filename : '',
+            media: req.files.media ? req.files.media[0].filename : '',
+            reach_upload_image: req.files.reach_upload_image ? req.files.reach_upload_image[0].filename : '',
+            impression_upload_image: req.files.impression_upload_image ? req.files.impression_upload_image[0].filename : '',
+            engagement_upload_image: req.files.engagement_upload_image ? req.files.engagement_upload_image[0].filename : '',
+            story_view_upload_image: req.files.story_view_upload_image ? req.files.story_view_upload_image[0].filename : '',
+            story_view_upload_video: req.files.story_view_upload_video ? req.files.story_view_upload_video[0].filename : '',
+            city_image_upload: req.files.city_image_upload ? req.files.city_image_upload[0].filename : '',
+            Age_upload: req.files.Age_upload ? req.files.Age_upload[0].filename : '',
             city1_name: req.body.city1_name,
             city2_name: req.body.city2_name,
             city3_name: req.body.city3_name,
@@ -515,12 +515,12 @@ exports.addIPCountHistory = [upload, async (req, res) => {
             percentage_country3_name: req.body.percentage_country3_name,
             percentage_country4_name: req.body.percentage_country4_name,
             percentage_country5_name: req.body.percentage_country5_name,
-            country_image_upload:req.files.country_image_upload ? req.files.country_image_upload[0].filename : '',
+            country_image_upload: req.files.country_image_upload ? req.files.country_image_upload[0].filename : '',
             stats_update_flag: true,
             story_view_date: req.body.story_view_date
         })
         const simv = await simc.save();
-    
+
         res.send({ simv, status: 200 });
 
     } catch (err) {
@@ -531,18 +531,18 @@ exports.addIPCountHistory = [upload, async (req, res) => {
 const upload1 = multer({ dest: "uploads/" }).fields([
     { name: "media", maxCount: 1 },
     { name: "reach_upload_image", maxCount: 1 },
-    { name: "impression_upload_image", maxCount: 1},
+    { name: "impression_upload_image", maxCount: 1 },
     { name: "engagement_upload_image", maxCount: 1 },
     { name: "story_view_upload_image", maxCount: 1 },
     { name: "story_view_upload_video", maxCount: 1 },
     { name: "city_image_upload", maxCount: 1 },
     { name: "Age_upload", maxCount: 1 },
-    { name:"country_image_upload", maxCount: 1 }
+    { name: "country_image_upload", maxCount: 1 }
 ]);
 
 exports.updateIPCountHistory = [upload1, async (req, res) => {
     try {
-       
+
         const editIPCountHistory = await exeCountHisModel.findOneAndUpdate({ _id: req.body._id }, {
             reach: req.body.reach,
             impression: req.body.impression,
@@ -551,10 +551,10 @@ exports.updateIPCountHistory = [upload1, async (req, res) => {
             stats_for: req.body.stats_for,
             start_date: req.body.start_date,
             end_date: req.body.end_date,
-            media:req.files && req.files['media'] && req.files['media'][0] ? req.files['media'][0].filename : '',
+            media: req.files && req.files['media'] && req.files['media'][0] ? req.files['media'][0].filename : '',
             reach_upload_image: req.files && req.files['reach_upload_image'] && req.files['reach_upload_image'][0] ? req.files['reach_upload_image'][0].filename : '',
             impression_upload_image: req.files && req.files['impression_upload_image'] && req.files['impression_upload_image'][0] ? req.files['impression_upload_image'][0].filename : '',
-            engagement_upload_image: req.files && req.files[' engagement_upload_image'] && req.files[' engagement_upload_image'][0] ? req.files[' engagement_upload_image'][0].filename :'',
+            engagement_upload_image: req.files && req.files[' engagement_upload_image'] && req.files[' engagement_upload_image'][0] ? req.files[' engagement_upload_image'][0].filename : '',
             story_view_upload_image: req.files && req.files['story_view_upload_image'] && req.files['story_view_upload_image'][0] ? req.files['story_view_upload_image'][0].filename : '',
             story_view_upload_video: req.files && req.files['story_view_upload_video'] && req.files['story_view_upload_video'][0] ? req.files['story_view_upload_video'][0].filename : '',
             city_image_upload: req.files && req.files['city_image_upload'] && req.files['city_image_upload'][0] ? req.files['city_image_upload'][0].filename : '',
@@ -615,7 +615,7 @@ exports.exeForPurchase = async (req, res) => {
 
         const promises = responseData.map(async (data) => {
             const existingData = await checkIfDataExistsInExecutionPurchase(data.p_id);
-        
+
             if (!existingData) {
                 const creators = new exePurchaseModel({
                     p_id: parseInt(data.p_id),
@@ -628,16 +628,16 @@ exports.exeForPurchase = async (req, res) => {
                 });
                 return creators.save();
             } else {
-                return { message : `Data already insterted this `}; // or handle the case where data already exists
+                return { message: `Data already insterted this ` }; // or handle the case where data already exists
             }
         });
-        
+
         const results = await Promise.all(promises);
-         return res.send({ instav :results, status: 200 })
+        return res.send({ instav: results, status: 200 })
         // for (const data of responseData) {
-          
+
         //     const existingData = await checkIfDataExists(data.p_id)
-            
+
         //     if (!existingData) {
 
         //         const creators = new exePurchaseModel({
@@ -650,7 +650,7 @@ exports.exeForPurchase = async (req, res) => {
         //             vendor_id: parseInt(data.vendor_id)
         //         })
         //         const instav = await creators.save();
-             
+
         //         return res.send({ instav, status: 200 })
         //     }else{
         //       return  res.status(200).json({msg:"Data already insterted there is no new data available to insert."})
@@ -664,9 +664,9 @@ exports.exeForPurchase = async (req, res) => {
 exports.getAllExeHistory = async (req, res) => {
     try {
         const cocData = await exeSum.find({});
-        res.status(200).send({data:cocData})
+        res.status(200).send({ data: cocData })
     } catch (error) {
-        res.status(500).send({error:error.message, sms:'error getting all data of exe summary'})
+        res.status(500).send({ error: error.message, sms: 'error getting all data of exe summary' })
     }
 }
 
@@ -747,7 +747,7 @@ exports.getAllExeHistory = async (req, res) => {
 
 exports.getExeIpCountHistory = async (req, res) => {
     try {
-        const cocData = await exeCountHisModel.find({p_id: req.params.p_id , stats_update_flag : true}).lean();
+        const cocData = await exeCountHisModel.find({ p_id: req.params.p_id, stats_update_flag: true }).lean();
         const exeImagesBaseUrl = "http://34.93.135.33:8080/uploads/";
         const dataWithImageUrl = cocData.map((exe) => ({
             ...exe,
@@ -767,124 +767,124 @@ exports.getExeIpCountHistory = async (req, res) => {
                 .send({ success: true, data: [], message: "No Record found" });
         } else {
             const result = dataWithImageUrl;
-            res.status(200).send({data : result});
+            res.status(200).send({ data: result });
         }
     } catch (error) {
-        res.status(500).send({error:error.message, sms:'error getting stats history for this page'})
+        res.status(500).send({ error: error.message, sms: 'error getting stats history for this page' })
     }
 }
 
 exports.deleteExeIpCountHistory = async (req, res) => {
     try {
         const deletedHistory = await exeCountHisModel.findByIdAndUpdate(
-          req.params._id,
-          { isDeleted: true },
-          { new: true }
+            req.params._id,
+            { isDeleted: true },
+            { new: true }
         );
-    
+
         if (!deletedHistory) {
-          return res.status(404).json({ message: 'History not found' });
+            return res.status(404).json({ message: 'History not found' });
         }
-    
+
         res.json(deletedHistory);
-      } catch (error) {
+    } catch (error) {
         res.status(500).json({ message: 'Internal Server Error' });
-      }
+    }
 }
 
 
 exports.getPercentage = async (req, res) => {
     try {
-      const latestEntry = await exeCountHisModel
-        .findOne({
-          p_id: parseInt(req.body.p_id),
-        })
-        .sort({ creation_date: -1 })
-        .exec();
-  
-      if (latestEntry) {
-        let count = 0;
-        const relevantFields = [
-            'reach',
-            'impression',
-            'engagement',
-            'story_view',
-            'stats_for',
-            'start_date',
-            'end_date',
-            'reach_upload_image',
-            'impression_upload_image',
-            'engagement_upload_image',
-            'story_view_upload_image',
-            'story_view_upload_video',
-            'city1_name',
-            'city2_name',
-            'city3_name',
-            'city4_name',
-            'city5_name',
-            'percentage_city1_name',
-            'percentage_city2_name',
-            'percentage_city3_name',
-            'percentage_city4_name',
-            'percentage_city5_name',
-            'city_image_upload',
-            'male_percent',
-            'female_percent',
-            'Age_13_17_percent',
-            'Age_upload',
-            'Age_18_24_percent',
-            'Age_25_34_percent',
-            'Age_35_44_percent',
-            'Age_45_54_percent',
-            'Age_55_64_percent',
-            'Age_65_plus_percent',
-            'quater',
-            'profile_visit',
-            'country1_name',
-            'country2_name',
-            'country3_name',
-            'country4_name',
-            'country5_name',
-            'percentage_country1_name',
-            'percentage_country2_name',
-            'percentage_country3_name',
-            'percentage_country4_name',
-            'percentage_country5_name',
-            'country_image_upload'
-        ];
-  
-        for (const field of relevantFields) {
-          if (
-            latestEntry[field] !== null &&
-            latestEntry[field] !== '' &&
-            latestEntry[field] !== 0
-          ) {
-            count++;
-          }
-        }
+        const latestEntry = await exeCountHisModel
+            .findOne({
+                p_id: parseInt(req.body.p_id),
+            })
+            .sort({ creation_date: -1 })
+            .exec();
 
-        const totalPercentage = (count/46)*100; 
-        res.status(200).send({ latestEntry, totalPercentage: totalPercentage });
-      } else {
-        res.status(404).json({ message: 'Latest Entry not found' });
-      }
+        if (latestEntry) {
+            let count = 0;
+            const relevantFields = [
+                'reach',
+                'impression',
+                'engagement',
+                'story_view',
+                'stats_for',
+                'start_date',
+                'end_date',
+                'reach_upload_image',
+                'impression_upload_image',
+                'engagement_upload_image',
+                'story_view_upload_image',
+                'story_view_upload_video',
+                'city1_name',
+                'city2_name',
+                'city3_name',
+                'city4_name',
+                'city5_name',
+                'percentage_city1_name',
+                'percentage_city2_name',
+                'percentage_city3_name',
+                'percentage_city4_name',
+                'percentage_city5_name',
+                'city_image_upload',
+                'male_percent',
+                'female_percent',
+                'Age_13_17_percent',
+                'Age_upload',
+                'Age_18_24_percent',
+                'Age_25_34_percent',
+                'Age_35_44_percent',
+                'Age_45_54_percent',
+                'Age_55_64_percent',
+                'Age_65_plus_percent',
+                'quater',
+                'profile_visit',
+                'country1_name',
+                'country2_name',
+                'country3_name',
+                'country4_name',
+                'country5_name',
+                'percentage_country1_name',
+                'percentage_country2_name',
+                'percentage_country3_name',
+                'percentage_country4_name',
+                'percentage_country5_name',
+                'country_image_upload'
+            ];
+
+            for (const field of relevantFields) {
+                if (
+                    latestEntry[field] !== null &&
+                    latestEntry[field] !== '' &&
+                    latestEntry[field] !== 0
+                ) {
+                    count++;
+                }
+            }
+
+            const totalPercentage = (count / 46) * 100;
+            res.status(200).send({ latestEntry, totalPercentage: totalPercentage });
+        } else {
+            res.status(404).json({ message: 'Latest Entry not found' });
+        }
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal Server Error' });
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
-  };
-  
+};
+
 exports.getStatUpdateFlag = async (req, res) => {
     try {
-      const latestEntry = await exeCountHisModel.findOne({ p_id: req.params.p_id, isDeleted:false }).sort({ creation_date: -1 }).exec();
-  
-      if (latestEntry) {
-        res.status(200).send({ latestEntry });
-      } else {
-        res.status(404).json({ message: 'Latest Entry not found' });
-      }
+        const latestEntry = await exeCountHisModel.findOne({ p_id: req.params.p_id, isDeleted: false }).sort({ creation_date: -1 }).exec();
+
+        if (latestEntry) {
+            res.status(200).send({ latestEntry });
+        } else {
+            res.status(404).json({ message: 'Latest Entry not found' });
+        }
     } catch (error) {
-      res.status(500).json({ error:error.message, message: 'Internal Server Error' });
+        res.status(500).json({ error: error.message, message: 'Internal Server Error' });
     }
 };
 
@@ -931,89 +931,116 @@ exports.getDistinctExeCountHistory = async (req, res) => {
     }
 }
 
+// exports.getAllExePurchase = async (req, res) => {
+//     try {
+//         const allEntries = await exePurchaseModel.find({});
+//         const result = [];
+
+//         const relevantFields = [
+//             'reach', 'impression', 'engagement', 'story_view', 'stats_for',
+//             'start_date', 'end_date', 'reach_upload_image', 'impression_upload_image',
+//             'engagement_upload_image', 'story_view_upload_image', 'story_view_upload_video',
+//             'city1_name', 'city2_name', 'city3_name', 'city4_name', 'city5_name',
+//             'percentage_city1_name', 'percentage_city2_name', 'percentage_city3_name',
+//             'percentage_city4_name', 'percentage_city5_name', 'city_image_upload',
+//             'male_percent', 'female_percent', 'Age_13_17_percent', 'Age_upload',
+//             'Age_18_24_percent', 'Age_25_34_percent', 'Age_35_44_percent',
+//             'Age_45_54_percent', 'Age_55_64_percent', 'Age_65_plus_percent',
+//             'quater', 'profile_visit', 'country1_name', 'country2_name',
+//             'country3_name', 'country4_name', 'country5_name',
+//             'percentage_country1_name', 'percentage_country2_name',
+//             'percentage_country3_name', 'percentage_country4_name',
+//             'percentage_country5_name', 'country_image_upload'
+//         ];
+
+//         const latestEntries = await exeCountHisModel.find()
+//             .sort({ creation_date: -1 })
+//             .exec();
+
+//         for (let i = 0; i < allEntries.length; i++) {
+//             const entry = allEntries[i];
+//             const latestEntry = latestEntries[i];
+
+//             if (latestEntry) {
+//                 const count = relevantFields.filter(field =>
+//                     latestEntry[field] !== null &&
+//                     latestEntry[field] !== '' &&
+//                     latestEntry[field] !== 0
+//                 ).length;
+
+//                 const totalPercentage = (count / relevantFields.length) * 100;
+
+//                 result.push({
+//                     page_name: entry.page_name,
+//                     cat_name: entry.cat_name,
+//                     follower_count: entry.follower_count,
+//                     page_link: entry.page_link,
+//                     platform: entry.platform,
+//                     latestEntry,
+//                     totalPercentage
+//                 });
+//             }
+//         }
+
+//         res.status(200).send({ result });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: error.message, message: 'Internal Server Error' });
+//     }
+// };
 
 exports.getAllExePurchase = async (req, res) => {
     try {
         const allEntries = await exePurchaseModel.find({});
         const result = [];
 
-        for (const entry of allEntries) {
-            const latestEntry = await exeCountHisModel.findOne()
-                .sort({ creation_date: -1 })
+        const relevantFields = [
+            'reach', 'impression', 'engagement', 'story_view', 'stats_for',
+            'start_date', 'end_date', 'reach_upload_image', 'impression_upload_image',
+            'engagement_upload_image', 'story_view_upload_image', 'story_view_upload_video',
+            'city1_name', 'city2_name', 'city3_name', 'city4_name', 'city5_name',
+            'percentage_city1_name', 'percentage_city2_name', 'percentage_city3_name',
+            'percentage_city4_name', 'percentage_city5_name', 'city_image_upload',
+            'male_percent', 'female_percent', 'Age_13_17_percent', 'Age_upload',
+            'Age_18_24_percent', 'Age_25_34_percent', 'Age_35_44_percent',
+            'Age_45_54_percent', 'Age_55_64_percent', 'Age_65_plus_percent',
+            'quater', 'profile_visit', 'country1_name', 'country2_name',
+            'country3_name', 'country4_name', 'country5_name',
+            'percentage_country1_name', 'percentage_country2_name',
+            'percentage_country3_name', 'percentage_country4_name',
+            'percentage_country5_name', 'country_image_upload'
+        ];
+
+        for (let i = 0; i < allEntries.length; i++) {
+            const entry = allEntries[i];
+
+            const latestEntry = await exeCountHisModel.findOne({ p_id: entry.p_id })
                 .exec();
 
-            if (latestEntry) {
-                const relevantFields = [
-                    'reach',
-                    'impression',
-                    'engagement',
-                    'story_view',
-                    'stats_for',
-                    'start_date',
-                    'end_date',
-                    'reach_upload_image',
-                    'impression_upload_image',
-                    'engagement_upload_image',
-                    'story_view_upload_image',
-                    'story_view_upload_video',
-                    'city1_name',
-                    'city2_name',
-                    'city3_name',
-                    'city4_name',
-                    'city5_name',
-                    'percentage_city1_name',
-                    'percentage_city2_name',
-                    'percentage_city3_name',
-                    'percentage_city4_name',
-                    'percentage_city5_name',
-                    'city_image_upload',
-                    'male_percent',
-                    'female_percent',
-                    'Age_13_17_percent',
-                    'Age_upload',
-                    'Age_18_24_percent',
-                    'Age_25_34_percent',
-                    'Age_35_44_percent',
-                    'Age_45_54_percent',
-                    'Age_55_64_percent',
-                    'Age_65_plus_percent',
-                    'quater',
-                    'profile_visit',
-                    'country1_name',
-                    'country2_name',
-                    'country3_name',
-                    'country4_name',
-                    'country5_name',
-                    'percentage_country1_name',
-                    'percentage_country2_name',
-                    'percentage_country3_name',
-                    'percentage_country4_name',
-                    'percentage_country5_name',
-                    'country_image_upload'
-                ];
-
-                const count = relevantFields.filter(field =>
+            const totalPercentage = latestEntry ? relevantFields.reduce((total, field) => {
+                if (
                     latestEntry[field] !== null &&
                     latestEntry[field] !== '' &&
                     latestEntry[field] !== 0
-                ).length;
+                ) {
+                    return total + 1;
+                }
+                return total;
+            }, 0) / relevantFields.length * 100 : 0;
 
-                const totalPercentage = (count / relevantFields.length) * 100;
-
-                result.push({
-                    page_name: entry.page_name,
-                    cat_name: entry.cat_name,
-                    follower_count: entry.follower_count,
-                    page_link: entry.page_link,
-                    platform: entry.platform,
-                    latestEntry,
-                    totalPercentage
-                });
-            }
+            result.push({
+                p_id : entry.p_id,
+                page_name: entry.page_name,
+                cat_name: entry.cat_name,
+                follower_count: entry.follower_count,
+                page_link: entry.page_link,
+                platform: entry.platform,
+                latestEntry,
+                totalPercentage
+            });
         }
         res.status(200).send({ result });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: error.message, message: 'Internal Server Error' });
     }
 };
