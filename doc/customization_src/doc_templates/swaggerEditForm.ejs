@@ -23,7 +23,7 @@
       /* Center the background image */
       color: white;
       padding: 20px;
-      height: 700px;
+      height: 740px;
     }
 
     .main {
@@ -172,44 +172,48 @@
     }
 
     .checkDevelopers {
-      /* Base styling */
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 5px;
-      text-decoration: none;
-      color: #fff;
-      background-color: #013660;
-      border: 2px solid transparent;
-      border-radius: 5px;
-      transition: all 0.3s ease;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
+    /* Base styling */
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    margin: 5px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #013660;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
-    .checkDevelopers:hover {
-      /* Hover styling */
-      background-color: rgb(81, 97, 181);
-      color: #fff;
-      border-color: rgb(81, 97, 181);
-      transform: scale(1.05);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
+.checkDevelopers i {
+    margin-right: 10px; /* Adjust the spacing between icon and text */
+}
 
-    .checkDevelopers:active {
-      /* Active/Clicked styling */
-      background-color: #013660;
-      color: #fff;
-      border-color: #013660;
-      transform: scale(0.95);
-    }
+.checkDevelopers:hover {
+    /* Hover styling */
+    background-color: rgb(81, 97, 181);
+    color: #fff;
+    border-color: rgb(81, 97, 181);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
 
+.checkDevelopers:active {
+    /* Active/Clicked styling */
+    background-color: #001e36;
+    color: #fff;
+    border-color: #013660;
+    transform: scale(0.95);
+}
     .sidebar-links {
       margin-top: 200px;
       margin-left: 15px;
     }
 
     /* Style the dropdown container */
-    #status,
+    #status,#accountVerification,
     #dept {
       background-color: #fff;
       /* White background */
@@ -236,7 +240,7 @@
     }
 
     /* Style for the arrow indicator using Unicode character */
-    #status,
+    #status,#accountVerification,
     #dept {
       background: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right #fff;
       background-position-x: calc(100% - 10px);
@@ -256,6 +260,26 @@
       background-color: #e9ecef;
       /* Slightly darker background on hover */
     }
+    #resetFilterBtn, #logoutbtn, #adminprofilebtn {
+        padding: 8px 17px;
+        margin-top: 20px;
+        background-color: #013660;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #resetFilterBtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #logoutbtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #adminprofilebtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
   </style>
 </head>
 
@@ -266,22 +290,22 @@
     <div class="sidebar-links">
       <a href="/api-docs" class="checkDevelopers"> Documentation &nbsp;</a>
       <a href="/login-history" class="checkDevelopers">
-        Login History &nbsp; &nbsp;
+        Login &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; <i class="fas fa-history"></i>
       </a>
-      <a href="/doc-user" class="checkDevelopers"> Developers List </a>
-      <a href="/all-request" class="checkDevelopers"> Reequest  </a>
+      <a href="/doc-user" class="checkDevelopers"> Developer &nbsp; <i class="fas fa-check-circle"></i></a>
+      <a href="/all-request" class="checkDevelopers"> Reequest &nbsp; &nbsp;<i class=" fas fa-bell"></i> </a>
+      <a href="/rejected-dev" class="checkDevelopers"> Developer  &nbsp;<i class="fas fa-times-circle"></i> </a>
     </div>
     <img
-    src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
-    alt="CreativeFuel Logo"
-    style="height: 200px;"
-  />
+      src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
+      alt="CreativeFuel Logo"
+      style="height: 200px;"
+    />
     <hr />
   </div>
   <div class="main">
     <div class="header" style="display: flex; justify-content: space-between;">
-      <h1>Developer Management</h1>
-      <img src="https://creativefuel.io/assets/img/image20.png" alt="CreativeFuel Logo" style="height: 60px;" />
+      <h1>Update Developer Data</h1>
     </div>
 
     <div class="card">
@@ -323,14 +347,14 @@
               <option value="Inactive" class="dropdownCheck">Inactive</option>
             </select>
           </div>
-          <div class="form-field">
-            <label for="status">Account Verification:</label>
-            <select id="status2" name="status">
-              <option value="1" class="dropdownCheck">Verified</option>
-              <option value="2" class="dropdownCheck">Rejected</option>
-              <option value= "0" class="dropdownCheck">Not verified</option>
+          <!-- <div class="form-field">
+            <label for="accountVerification">Account Verification:</label>
+            <select id="accountVerification" name="accountVerification">
+              <option value=1 class="dropdownCheck">Verified</option>
+              <option value=2 class="dropdownCheck">Rejected</option>
+              <option value=0 class="dropdownCheck">Not verified</option>
             </select>
-          </div>
+          </div> -->
 
           <input type="submit" value="Update" class="form-submit" />
         </form>
@@ -419,7 +443,7 @@
           document.getElementById("name").value = data.data.name;
           document.getElementById("dept").value = data.data.department;
           document.getElementById("status").value = data.data.status;
-          document.getElementById("status2").value = data.data.isAdminVerified === 1 ? "Verified" : data.data.isAdminVerified === 2 ? "Rejected" : "Not Verified";
+          // document.getElementById("accountVerification").value = String(data.data.isAdminVerified);
         } else {
           alert("Error fetching data: " + data?.message);
         }
@@ -439,6 +463,7 @@
           name: document.getElementById("name").value,
           status: document.getElementById("status").value,
           department: document.getElementById("dept").value,
+          // isAdminVerified: document.getElementById("accountVerification").value,
         };
 
         fetch(`/dev-data-update/${developerId}/${token}`, {

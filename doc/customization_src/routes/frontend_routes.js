@@ -10,8 +10,11 @@ router.get("/doc-login", (req, res) => {
 router.get("/doc-access/:token", checkDevAuthentication, (req, res) => {
   return res.render("swaggerAccessForm");
 });
-router.get("/admin-profile", (req, res) => {
+router.get("/admin-profile/:token", (req, res) => {
   return res.render("adminProfileOverview");
+});
+router.get("/rejected-dev/:token", (req, res) => {
+  return res.render("rejectedDev");
 });
 router.get("/admin-request", (req, res) => {
   return res.render("devRequestForm");
@@ -46,6 +49,26 @@ router.get(
       button_text_cancel: "Cancel",
       button_text_ok: "Ok",
       button_path_ok: `/delete-dev/${userId}/${token}/${page}`,
+    });
+  }
+);
+router.get(
+  "/clear-all-history/:token/:id",
+  checkDevAuthentication,
+  (req, res) => {
+    let token = req.params.token;
+    let id = req.params.id;
+    return res.render("confirmationTemplate", {
+      error_title: "Are you sure you want to delete ?",
+      error_description:
+        "After delete this data you can't retrive from anyway....",
+      error_image:
+        "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
+      button_path_cancel: `/login-history/${token}`,
+      button_text_cancel: "Cancel",
+      button_text_ok: "Ok",
+      button_path_ok: `/delete_history/${token}/1`,
+
     });
   }
 );
