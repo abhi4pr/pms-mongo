@@ -53,21 +53,21 @@ router.get(
   }
 );
 router.get(
-  "/clear-all-history/:token/:id",
-  checkDevAuthentication,
+  "/clear-all-history",
+  // checkDevAuthentication,
   (req, res) => {
-    let token = req.params.token;
-    let id = req.params.id;
+    // let token = req.params.token;
+    // let id = req.params.id;
     return res.render("confirmationTemplate", {
       error_title: "Are you sure you want to delete ?",
       error_description:
         "After delete this data you can't retrive from anyway....",
       error_image:
         "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
-      button_path_cancel: `/login-history/${token}`,
+      button_path_cancel: `/login-history`,
       button_text_cancel: "Cancel",
-      button_text_ok: "Ok",
-      button_path_ok: `/delete_history/${token}/1`,
+      button_text_ok: `OK`,
+      button_path_ok: `/delete-history`
 
     });
   }
