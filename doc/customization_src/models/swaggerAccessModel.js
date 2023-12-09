@@ -1,6 +1,5 @@
 const { default: mongoose } = require("mongoose");
 const constant = require("../../../common/constant");
-
 const swaggerAccessSchema = new mongoose.Schema({
   email: {
     type: String,

@@ -26,7 +26,7 @@
       /* Center the background image */
       color: white;
       padding: 20px;
-      height: 700px;
+      height: 740px;
     }
 
     .main {
@@ -170,36 +170,41 @@
     }
 
     .checkDevelopers {
-      /* Base styling */
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 5px;
-      text-decoration: none;
-      color: #fff;
-      background-color: #013660;
-      border: 2px solid transparent;
-      border-radius: 5px;
-      transition: all 0.3s ease;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
+    /* Base styling */
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    margin: 5px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #013660;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
-    .checkDevelopers:hover {
-      /* Hover styling */
-      background-color: rgb(81, 97, 181);
-      color: #fff;
-      border-color: rgb(81, 97, 181);
-      transform: scale(1.05);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
+.checkDevelopers i {
+    margin-right: 10px; /* Adjust the spacing between icon and text */
+}
 
-    .checkDevelopers:active {
-      /* Active/Clicked styling */
-      background-color: #013660;
-      color: #fff;
-      border-color: #013660;
-      transform: scale(0.95);
-    }
+.checkDevelopers:hover {
+    /* Hover styling */
+    background-color: rgb(81, 97, 181);
+    color: #fff;
+    border-color: rgb(81, 97, 181);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.checkDevelopers:active {
+    /* Active/Clicked styling */
+    background-color: #001e36;
+    color: #fff;
+    border-color: #013660;
+    transform: scale(0.95);
+}
 
     #searchInput {
       padding: 8px;
@@ -225,20 +230,29 @@
       background-color: rgb(81, 97, 181);
     }
 
-    #resetFilterBtn {
-      padding: 8px 17px;
-      margin-top: 20px;
-      background-color: #013660;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
+    #resetFilterBtn, #logoutbtn, #adminprofilebtn,#clearHis {
+        padding: 8px 17px;
+        margin-top: 20px;
+        background-color: #013660;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
 
-    #resetFilterBtn:hover {
-      background-color: rgb(81, 97, 181);
-    }
+      #resetFilterBtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #clearHis:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #logoutbtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #adminprofilebtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
 
     .action-buttons a,
     .action-buttons button {
@@ -290,7 +304,7 @@
     }
 
     #addDevbtn {
-      padding: 5px 15px 8px 15px;
+      padding: 2px 15px 7px 15px;
       margin-right: 5px;
       border-radius: 4px;
       background-color: #013660;
@@ -315,22 +329,24 @@
     <div class="sidebar-links">
       <a href="/api-docs" class="checkDevelopers"> Documentation &nbsp;</a>
       <a href="/login-history" class="checkDevelopers">
-        Login History &nbsp; &nbsp;
+        Login &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; <i class="fas fa-history"></i>
       </a>
-      <a href="/doc-user" class="checkDevelopers"> Developers List </a>
-      <a href="/all-request" class="checkDevelopers"> Reequest  </a>
+      <a href="/doc-user" class="checkDevelopers"> Developer &nbsp; <i class="fas fa-check-circle"></i></a>
+      <a href="/all-request" class="checkDevelopers"> Reequest &nbsp; &nbsp;<i class=" fas fa-bell"></i> </a>
+      <a href="/rejected-dev" class="checkDevelopers"> Developer  &nbsp;<i class="fas fa-times-circle"></i> </a>
     </div>
     <img
-    src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
-    alt="CreativeFuel Logo"
-    style="height: 200px;"
-  />
+      src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
+      alt="CreativeFuel Logo"
+      style="height: 200px;"
+    />
     <hr />
   </div>
   <div class="main">
     <div class="header" style="display: flex; justify-content: space-between;">
-      <h1>Developer Management</h1>
-      <img src="https://creativefuel.io/assets/img/image20.png" alt="CreativeFuel Logo" style="height: 60px;" />
+      <h1>Developer Login History</h1>
+      <a href="/doc-logout" id="logoutbtn" style="margin-left: auto; font-size: 25px;"><i class="fas fa-sign-out-alt"></i></a>
+      <a href="/admin-profile" id="adminprofilebtn" style=" font-size: 25px;"><i class="fas fa-user"></i></a>
     </div>
     <div class="card">
       <div>
@@ -341,6 +357,8 @@
           <option value="Developer">Developer</option>
         </select>
         <button id="resetFilterBtn">Reset Filters</button>
+        <!-- <button id="clearHis" onclick="clearHistory()">Clear All History</button> -->
+
       </div>
 
       <div class="table-container">
@@ -422,11 +440,27 @@
 
     // Select the links by class
     const links = document.querySelectorAll(".checkDevelopers");
+    const link4 = document.getElementById("adminprofilebtn");
+    const link3 = document.getElementById("logoutbtn");
+    // const link5 = document.getElementById("clearHis");
+      link4.href += "/" + token;
+      link3.href += "/" + token;
+      // link5.href += "/" + token;
 
     // Append the token to each link
     links.forEach((link) => {
       link.href += "/" + token;
     });
+
+    // function clearHistory() {
+
+
+    //     // Construct the URL with the token
+    //     const urlWithToken = '/clear-all-history/' + token + "/1";
+
+    //     // Redirect to the URL with the token
+    //     window.location.href = urlWithToken;
+    // }
 
     window.addEventListener("beforeunload", function (event) {
       // Call your logout API
@@ -480,10 +514,10 @@
                             <td>${user.logout_date ? formatDateFromSeconds(user.logout_date) : ""}</td>
                             <td>${formatTime(user.duration)}</td>
                             <td class="action-buttons">
-                           <button class="delete-btn" data-userid="${user._id
-              }"  onmouseover="this.style.backgroundColor='#e96364'; this.style.color='white';"
-        onmouseout="this.style.backgroundColor='initial'; this.style.color='initial';"
-        style="background-color: initial; color: initial; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"><i class="fas fa-trash-alt"></i></button>
+                              <a href='/dev-delete/${
+                                  user._id
+                                }/${token}/3' ><i class="fas fa-trash-alt"></i></a> 
+                 
                             </td>
                         `;
           });

@@ -23,6 +23,7 @@ exports.addDevData = async (req, res) => {
       status,
       department,
       isAdminVerified: 1,
+      isEmailVerified: 1,
       password: encryptedPass,
     });
 
@@ -57,7 +58,7 @@ exports.addDevData = async (req, res) => {
         500,
         req,
         res,
-        "'Department name must be unique. Another department with the same name already exists.'",
+        "Email must be unique'",
         {}
       );
     } else {
@@ -112,10 +113,11 @@ exports.getDevData = async (req, res) => {
   }
 };
 exports.deleteDev = async (req, res) => {
+  let page = req.params.page;
+  let modelCollection = page == 3 ? devLoginHistoryModel : swaggerAccessModel
+  const url = page == 1 ? "/doc-user" : page == 2 ? "/all-request" : "/login-history";
   try {
-    let page = req.params.page;
-    let url = page == 1 ? "/doc-user" : "/all-request";
-    const user = await swaggerAccessModel.findByIdAndDelete(req.params.id);
+    const user = await modelCollection.findByIdAndDelete(req.params.id);
     if (!user) {
       return res.render("swaggerErrorTemplate", {
         error_title: "No record found..",
@@ -128,6 +130,7 @@ exports.deleteDev = async (req, res) => {
     }
     return res.redirect(`${url}/${req.params.token}`);
   } catch (err) {
+    
     return res.render("swaggerErrorTemplate", {
       error_title: "Internal Server Error.",
       error_description: err.message,
@@ -155,10 +158,34 @@ exports.getDevSingleData = async (req, res) => {
     return response.returnFalse(500, req, res, err.message, {});
   }
 };
+exports.adminProfile = async (req, res) => {
+  try {
+    const authorization = req.params.token;
+    const token = authorization.replace("Bearer ", "");
+    const decoded = jwt.decode(token, { complete: true });
+    let email = decoded.payload.email;
+    let loginInfo = await swaggerAccessModel.findOne({email});
+    if (!loginInfo) {
+      return response.returnFalse(200, req, res, "No record found.");
+    }
+    return response.returnTrue(
+      200,
+      req,
+      res,
+      "Data Created Successfully",
+      loginInfo
+    );
+  } catch (err) {
+    return response.returnFalse(500, req, res, err.message, {});
+  }
+};
 exports.getDevLoginHis = async (req, res) => {
   try {
     const savedDevLoginData = await devLoginHistoryModel
       .aggregate([
+        {
+          $match :{logout_date : { $ne : ""}}
+        },
         {
           $lookup: {
             from: "swaggeraccessmodels",
@@ -278,7 +305,8 @@ exports.devLogin = async (req, res) => {
     if (userData.role === constant.SWAGGER_ADMIN) {
       return res.redirect(`/doc-user/${token}`);
     }
-    res.redirect(`/api-docs/${token}`);
+    // res.redirect(`/api-docs/${token}`);
+    return response.returnTrue(200,req,res,"Login success",token)
   } catch (err) {
     return res.render("swaggerErrorTemplate", {
       error_title: "Internal Server Error.",
@@ -312,7 +340,7 @@ exports.devLogout = async (req, res) => {
         duration: diffInSecound,
       },
     });
-    return response.returnTrue(200, req, res, "Log out Successfully");
+    return res.redirect(`/doc-login`);
   } catch (err) {
     return response.returnFalse(200, req, res, err.message);
   }
@@ -590,6 +618,49 @@ exports.updatePassword = async (req, res) => {
     r;
   }
 };
+exports.updatePasswordAdmin = async (req, res) => {
+  try {
+    let id = req.params.id;
+    let token = req.params.token;
+    let password = req.body.password;
+    let encryptedPass = await bcrypt.hash(password, 10);
+    let savedDevData = await swaggerAccessModel.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          password: encryptedPass,
+        },
+      }
+    );
+    if (!savedDevData) {
+      return res.render("swaggerErrorTemplate", {
+        error_title: "No Record Found",
+        error_description: "",
+        error_image:
+          "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
+          button_path: `/admin-profile/${token}`,
+          button_text: "Back",
+      });
+    }
+    return res.render("swaggerErrorTemplate", {
+      error_title: "Password Reset Successfully.",
+      error_description: "",
+      error_image:
+        "https://t3.ftcdn.net/jpg/04/75/01/24/360_F_475012493_x7oLL5mrWTm25OCRluB2fZkn0onfSEqu.jpg",
+      button_path: `/admin-profile/${token}`,
+      button_text: "Back",
+    });
+  } catch (error) {
+    return res.render("swaggerErrorTemplate", {
+      error_title: "Internal Server Error.",
+      error_description: error.message,
+      error_image:
+        "https://img.freepik.com/premium-photo/http-error-500-internal-server-error-3d-render-illustration_567294-2973.jpg?w=360",
+        button_path: `/admin-profile/${token}`,
+        button_text: "Back",
+    });
+  }
+};
 
 exports.emailVerification = async (req, res) => {
   try {
@@ -635,7 +706,7 @@ exports.requestStatusUpdate = async (req, res) => {
   try {
     let status = req.params.status
     let dev_id = req.params.id
-    let token = req.body.token
+    let token = req.params.token
 
     let savedDevData = await swaggerAccessModel.findByIdAndUpdate(dev_id, {
       $set: {
@@ -648,16 +719,28 @@ exports.requestStatusUpdate = async (req, res) => {
         error_description: "",
         error_image:
           "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
-        button_path: "/admin-request",
-        button_text: "Back",
+          button_path: `/all-request/${token}`,
+          button_text: "Back",
       });
     }
+    const templatePath2 = path.join(
+      __dirname,
+      `../doc_templates/statusUpdateDeveloperEmail.ejs`
+    );
+    const template2 = await fs.promises.readFile(templatePath2, "utf-8");
+
+    const html2 = ejs.render(template2, {
+      name: savedDevData.name,
+      status : savedDevData.isAdminVerified == 1 ? "Approved" : savedDevData.isAdminVerified == 2 ? "Rejected" : "Pending",
+    });
+    //Send Mail with Template
+    sendMail("Documentation Access Request", html2, savedDevData?.email);
     return res.render("swaggerErrorTemplate", {
       error_title: "Status Changed.",
       error_description: "",
       error_image:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRql70xOOTbXm-EbXqyornkJuoAV-mbMiXgi4qkvOXduE6joMY-qHZA2w6DHorDgbrpRyU&usqp=CAU",
-        button_path: "/admin-request",
+        button_path: `/all-request/${token}`,
         button_text: "Back",
     });
   } catch (error) {
@@ -666,8 +749,37 @@ exports.requestStatusUpdate = async (req, res) => {
       error_description: error.message,
       error_image:
         "https://img.freepik.com/premium-photo/http-error-500-internal-server-error-3d-render-illustration_567294-2973.jpg?w=360",
-        button_path: "/admin-request",
+        button_path: `/all-request/${token}`,
         button_text: "Back",
+    });
+  }
+};
+
+exports.clearLoginHis = async (req, res) => {
+
+  try {
+    const user = await devLoginHistoryModel.deleteMany({});
+    if (!user) {
+      return res.render("swaggerErrorTemplate", {
+        error_title: "No record found..",
+        error_description: "",
+        error_image:
+          "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
+        button_path: `${url}/${req.params.token}`,
+        button_text: "Back",
+      });
+    }
+    
+    return res.redirect(`login-history/${req.params.token}`);
+  } catch (err) {
+    
+    return res.render("swaggerErrorTemplate", {
+      error_title: "Internal Server Error.",
+      error_description: err.message,
+      error_image:
+        "https://img.freepik.com/premium-photo/http-error-500-internal-server-error-3d-render-illustration_567294-2973.jpg?w=360",
+      button_path: `${url}/${req.params.token}`,
+      button_text: "Back",
     });
   }
 };

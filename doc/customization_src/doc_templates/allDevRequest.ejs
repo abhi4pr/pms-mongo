@@ -24,7 +24,7 @@
         background-position: center; /* Center the background image */
         color: white;
         padding: 20px;
-        height: 700px;
+        height: 740px;
       }
 
       .main {
@@ -163,36 +163,41 @@
         background-color: #f9f9f9;
       }
       .checkDevelopers {
-        /* Base styling */
-        display: inline-block;
-        padding: 10px 20px;
-        margin: 5px;
-        text-decoration: none;
-        color: #fff;
-        background-color: #013660;
-        border: 2px solid transparent;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-        font-weight: bold;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
+    /* Base styling */
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    margin: 5px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #013660;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
-      .checkDevelopers:hover {
-        /* Hover styling */
-        background-color: rgb(81, 97, 181);
-        color: #fff;
-        border-color: rgb(81, 97, 181);
-        transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      }
+.checkDevelopers i {
+    margin-right: 10px; /* Adjust the spacing between icon and text */
+}
 
-      .checkDevelopers:active {
-        /* Active/Clicked styling */
-        background-color: #001e36;
-        color: #fff;
-        border-color: #013660;
-        transform: scale(0.95);
-      }
+.checkDevelopers:hover {
+    /* Hover styling */
+    background-color: rgb(81, 97, 181);
+    color: #fff;
+    border-color: rgb(81, 97, 181);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.checkDevelopers:active {
+    /* Active/Clicked styling */
+    background-color: #001e36;
+    color: #fff;
+    border-color: #013660;
+    transform: scale(0.95);
+}
       #searchInput {
         padding: 8px;
         margin-bottom: 20px;
@@ -273,7 +278,7 @@
         border-color: #888;
       }
       #addDevbtn {
-        padding: 5px 15px 8px 15px;
+        padding: 2px 15px 7px 15px;
         margin-right: 5px;
         border-radius: 4px;
         background-color: #013660;
@@ -287,6 +292,29 @@
       #addDevbtn:hover {
         background-color: rgb(81, 97, 181);
       }
+      #scrollTopBtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #resetFilterBtn, #logoutbtn, #adminprofilebtn {
+        padding: 8px 17px;
+        margin-top: 20px;
+        background-color: #013660;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #resetFilterBtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #logoutbtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #adminprofilebtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
     </style>
   </head>
   <body>
@@ -296,10 +324,11 @@
       <div class="sidebar-links">
         <a href="/api-docs" class="checkDevelopers"> Documentation &nbsp;</a>
         <a href="/login-history" class="checkDevelopers">
-          Login History &nbsp; &nbsp;
+          Login &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; <i class="fas fa-history"></i>
         </a>
-        <a href="/doc-user" class="checkDevelopers"> Developers List </a>
-        <a href="/all-request" class="checkDevelopers"> Reequest  </a>
+        <a href="/doc-user" class="checkDevelopers"> Developer &nbsp; <i class="fas fa-check-circle"></i></a>
+        <a href="/all-request" class="checkDevelopers"> Reequest &nbsp; &nbsp;<i class=" fas fa-bell"></i> </a>
+        <a href="/rejected-dev" class="checkDevelopers"> Developer  &nbsp;<i class="fas fa-times-circle"></i> </a>
       </div>
       <img
         src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
@@ -310,15 +339,15 @@
     </div>
     <div class="main">
       <div class="header" style = "display: flex; justify-content: center;  align-items: center;">
-        <h1 style="margin-right: auto;">Developer Management</h1>
-        <a href="#" id="resetFilterBtn" style="margin-left: auto; font-size: 25px;"><i class="fas fa-sign-out-alt"></i></a>
-        <a href="/admin-profile" id="resetFilterBtn" style=" font-size: 25px;"><i class="fas fa-user"></i></a>
+        <h1 style="margin-right: auto;">Developer Request's</h1>
+        <a href="/doc-logout" id="logoutbtn" style="margin-left: auto; font-size: 25px;"><i class="fas fa-sign-out-alt"></i></a>
+        <a href="/admin-profile" id="adminprofilebtn" style=" font-size: 25px;"><i class="fas fa-user"></i></a>
         <!-- <a href="#" id="resetFilterBtn" ><i class="fas fa-sync-alt"></i> Update</a> -->
       </div>
       <div class="card">
         <div>
           <input type="text" id="searchInput" placeholder="Search Name..." />
-          <select id="statusFilter" required>
+          <select id="statusFilter" required style="display: none;">
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -368,7 +397,12 @@
       // Select the links by class
       const links = document.querySelectorAll(".checkDevelopers");
       const link2 = document.getElementById("addDevbtn");
+      const link3 = document.getElementById("logoutbtn");
+      const link4 = document.getElementById("adminprofilebtn");
+      
       link2.href += "/" + token;
+      link3.href += "/" + token;
+      link4.href += "/" + token;
       // Append the token to each link
       links.forEach((link) => {
         link.href += "/" + token;
@@ -430,10 +464,10 @@
                             <td class="action-buttons">
                                 <a href='/update-request-status/${
                                   user._id
-                                }/${token}' ><i class="fas fa-pencil-alt"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
-                                <a href='/dev-update/${
+                                }/${token}/1' ><i class="fas fa-check-circle"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
+                                <a href='/update-request-status/${
                                   user._id
-                                }/${token}' ><i class="fas fa-pencil-alt"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
+                                }/${token}/2' ><i class="fas fa-times-circle"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
                                 <a href='/dev-delete/${
                                   user._id
                                 }/${token}/2' ><i class="fas fa-trash-alt"></i></a> 
