@@ -162,7 +162,8 @@
       .user-table tbody tr:nth-child(even) {
         background-color: #f9f9f9;
       }
-      
+     
+
 .checkDevelopers {
     /* Base styling */
     display: flex;
@@ -199,6 +200,9 @@
     border-color: #013660;
     transform: scale(0.95);
 }
+
+
+
       #searchInput {
         padding: 8px;
         margin-bottom: 20px;
@@ -220,7 +224,7 @@
       #scrollTopBtn:hover {
         background-color: rgb(81, 97, 181);
       }
-      #resetFilterBtn, #logoutbtn, #adminprofilebtn {
+      #resetFilterBtn {
         padding: 8px 17px;
         margin-top: 20px;
         background-color: #013660;
@@ -232,12 +236,6 @@
       }
 
       #resetFilterBtn:hover {
-        background-color: rgb(81, 97, 181);
-      }
-      #logoutbtn:hover {
-        background-color: rgb(81, 97, 181);
-      }
-      #adminprofilebtn:hover {
         background-color: rgb(81, 97, 181);
       }
 
@@ -299,20 +297,45 @@
       #addDevbtn:hover {
         background-color: rgb(81, 97, 181);
       }
+      #scrollTopBtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #resetFilterBtn, #logoutbtn, #adminprofilebtn {
+        padding: 8px 17px;
+        margin-top: 20px;
+        background-color: #013660;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #resetFilterBtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #logoutbtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+      #adminprofilebtn:hover {
+        background-color: rgb(81, 97, 181);
+      }
+
+      
     </style>
   </head>
   <body>
-    <div class="sidebar">
-      <!-- Sidebar content -->
+    <!-- <div class="sidebar">
+   
       <div class="sidebar-logo"></div>
       <div class="sidebar-links">
         <a href="/api-docs" class="checkDevelopers"> Documentation &nbsp;</a>
         <a href="/login-history" class="checkDevelopers">
-          Login &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; <i class="fas fa-history"></i>
+          Login History &nbsp; &nbsp;
         </a>
-        <a href="/doc-user" class="checkDevelopers"> Developer &nbsp; <i class="fas fa-check-circle"></i></a>
-        <a href="/all-request" class="checkDevelopers"> Reequest &nbsp; &nbsp;<i class=" fas fa-bell"></i> </a>
-        <a href="/rejected-dev" class="checkDevelopers"> Developer  &nbsp;<i class="fas fa-times-circle"></i> </a>
+        <a href="/doc-user" class="checkDevelopers"> Developers List </a>
+        <a href="/all-request" class="checkDevelopers"> Reequest  </a>
+        <a href="/rejected-dev" class="checkDevelopers"> Rejected dev  </a>
       </div>
       <img
         src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
@@ -320,19 +343,37 @@
         style="height: 200px;"
       />
       <hr />
-    </div>
+    </div> -->
+    <div class="sidebar">
+        <!-- Sidebar content -->
+        <div class="sidebar-logo"></div>
+        <div class="sidebar-links">
+          <a href="/api-docs" class="checkDevelopers"> Documentation &nbsp;</a>
+          <a href="/login-history" class="checkDevelopers">
+            Login &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; <i class="fas fa-history"></i>
+          </a>
+          <a href="/doc-user" class="checkDevelopers"> Developer &nbsp; <i class="fas fa-check-circle"></i></a>
+          <a href="/all-request" class="checkDevelopers"> Reequest &nbsp; &nbsp;<i class=" fas fa-bell"></i> </a>
+          <a href="/rejected-dev" class="checkDevelopers"> Developer  &nbsp;<i class="fas fa-times-circle"></i> </a>
+        </div>
+        <img
+          src="https://media.licdn.com/dms/image/C4D0BAQF6QHYd1myKyw/company-logo_200_200/0/1630521048751/creative_fuel_io_logo?e=2147483647&v=beta&t=E0hyxWgbSM42fPDcFCT-q7Y9LvSuysj-dLMWcVC1aSw"
+          alt="CreativeFuel Logo"
+          style="height: 200px;"
+        />
+        <hr />
+      </div>
     <div class="main">
       <div class="header" style = "display: flex; justify-content: center;  align-items: center;">
-        <h1 style="margin-right: auto;">Verified Developer's</h1>
-        <a href="/doc-logout" id="logoutbtn" style="margin-left: 10px; font-size: 25px;"><i class="fas fa-sign-out-alt"></i></a>
-        <a href="/admin-profile" id="adminprofilebtn" style="margin-left: 10px; font-size: 25px;"><i class="fas fa-user"></i></a>
+        <h1 style="margin-right: auto;">Rejected Developer's</h1>
+        <a href="/doc-logout" id="logoutbtn" style="margin-left: auto; font-size: 25px;"><i class="fas fa-sign-out-alt"></i></a>
+        <a href="/admin-profile" id="adminprofilebtn" style=" font-size: 25px;"><i class="fas fa-user"></i></a>
         <!-- <a href="#" id="resetFilterBtn" ><i class="fas fa-sync-alt"></i> Update</a> -->
-    </div>
-    
-      <div class="card"> 
+      </div>
+      <div class="card">
         <div>
           <input type="text" id="searchInput" placeholder="Search Name..." />
-          <select id="statusFilter" required>
+          <select id="statusFilter" required style="display: none;">
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -360,8 +401,6 @@
                 <th>Name</th>
                 <th>Department</th>
                 <th>Email Verified</th>
-                <!-- <th>Account Verified</th> -->
-                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -386,38 +425,34 @@
       const link2 = document.getElementById("addDevbtn");
       const link3 = document.getElementById("logoutbtn");
       const link4 = document.getElementById("adminprofilebtn");
-      link4.href += "/" + token;
-      link3.href += "/" + token;
+      
       link2.href += "/" + token;
+      link3.href += "/" + token;
+      link4.href += "/" + token;
       // Append the token to each link
       links.forEach((link) => {
         link.href += "/" + token;
       });
 
-      /* Handle feature when user close tab */
-      window.addEventListener("beforeunload", function (event) {
-        navigator.sendBeacon(`/doc-logout/${token}`); // Using sendBeacon for asynchronous request
-      });
-
+      function logout() {
+        // Call your logout API
+        fetch('/doc-logout/' + token) // Replace with your actual logout API call
+          .then(() => (window.location.href = `/doc-login`))
+          .catch((err) => console.error("Error:", err));
+      }
+    
       /* Handle if not activity perform on page like no key press or mouse */
       let inactivityTime = function () {
         let time;
         window.onload = resetTimer;
         // Events that reset the timer
         document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-
-        function logout() {
-          // Call your logout API
-          fetch(`/doc-logout/${token}`, { method: "POST" }) // Replace with your actual logout API call
-            .then(() => (window.location.href = `/doc-login`))
-            .catch((err) => console.error("Error:", err));
-        }
+        document.onkeypress = resetTimer
 
         function resetTimer() {
           clearTimeout(time);
-          // Set timeout for 1 hour (1500000 ms)
-          time = setTimeout(logout, 1500000);
+          // Set timeout for 1 hour (3600000 ms)
+          time = setTimeout(logout, 360000);
         }
       };
 
@@ -432,7 +467,7 @@
       document.addEventListener("DOMContentLoaded", function () {
 
         /* Create Api Call */
-        fetch(`/doc-users/${token}/1`) 
+        fetch(`/doc-users/${token}/2`) 
           .then((response) => response.json())
           .then((data) => {
             const tableBody = document
@@ -447,23 +482,17 @@
                             <td>${user.name}</td>
                             <td>${user.department}</td>
                             <td>${user.isEmailVerified ===1 ? "Yes" : "No"}</td>
-                            <td style="${
-                              user.status === "Inactive"
-                                ? "color: red;"
-                                : "color: green;"
-                            }">${user.status}</td>
                             <td class="action-buttons">
-                                <a href='/dev-update/${
+                                <a href='/update-request-status/${
                                   user._id
-                                }/${token}' ><i class="fas fa-pencil-alt"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
+                                }/${token}/1' ><i class="fas fa-check-circle"></i></a> <div style="height: 15px; width: 1px; background-color: grey; display: inline-block;"></div>
                                 <a href='/dev-delete/${
                                   user._id
-                                }/${token}/1' ><i class="fas fa-trash-alt"></i></a> 
+                                }/${token}/2' ><i class="fas fa-trash-alt"></i></a> 
                  
                             </td>
                         `;
             });
-            // <td>${user.isAdminVerified === 1 ? "Verified" : user.isAdminVerified === 2 ? "Rejected" : "No"}</td>
             if (data.data.length > 10) {
               document.getElementById("scrollTopBtn").style.display = "block";
             }
@@ -492,7 +521,7 @@
             let row = rows[i];
             let name = row.cells[3].textContent.toLowerCase(); // Assuming name is in the 4th cell
             let department = row.cells[4].textContent.toLowerCase(); // Assuming department is in the 5th cell
-            let status = row.cells[6].textContent.toLowerCase(); // Assuming status is in the 6th cell
+            let status = row.cells[5].textContent.toLowerCase(); // Assuming status is in the 6th cell
             if (
               (name.includes(searchTerm) || searchTerm === "") &&
               (department.includes(selectedDepartment) ||
@@ -510,6 +539,8 @@
             visibleRowCount > 10 ? "block" : "none";
         }
 
+       
+
         function deleteData (userId){
           fetch(`/delete-dev/${userId}/${token}`, {
                 method: "DELETE",
@@ -522,11 +553,12 @@
                     alert("Error deleting user: " + data.message);
                   } else {
                     event.target.closest("tr").remove();
-                    window.location.href = `/doc-user/${token}`;
+                    window.location.href = `/all-request/${token}`;
                   }
                 })
                 .catch((error) => alert(error));
             }
+           
 
         /*   Events  */
         document

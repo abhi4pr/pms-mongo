@@ -315,12 +315,72 @@ exports.getLatestPIDCount = async (req, res) => {
 };
 exports.pageHealthDashboard = async (req, res) => {
     try {
+        const { intervalFlag } = req.body;
+        const currentDate = new Date();
+        let dateFilter;
+
+        /**
+         * Sets the date filter based on the given interval flag.
+         * @param {number} intervalFlag - The interval flag to determine the date filter.
+         * @param {Date} currentDate - The current date.
+         * @returns {Object} The date filter object.
+         */
+        switch (intervalFlag) {
+            case 1:
+                // For flag 1, include last month data
+                dateFilter = {
+                    creation_date: {
+                        $gte: new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate()),
+                        $lte: currentDate
+                    }
+                };
+                break;
+            case 3:
+                // For flag 3, include last 3 months data
+                dateFilter = {
+                    creation_date: {
+                        $gte: new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, currentDate.getDate()),
+                        $lte: currentDate
+                    }
+                };
+                break;
+            case 6:
+                // For flag 3, include last 6 months data
+                dateFilter = {
+                    creation_date: {
+                        $gte: new Date(currentDate.getFullYear(), currentDate.getMonth() - 6, currentDate.getDate()),
+                        $lte: currentDate
+                    }
+                };
+                break;
+            case 10:
+                // For flag 4, include last 1 year data
+                dateFilter = {
+                    creation_date: {
+                        $gte: new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), currentDate.getDate()),
+                        $lte: currentDate
+                    }
+                };
+                break;
+            case 2:
+               // For flag 2, include all data
+                dateFilter = {};
+                break;
+            default:
+                dateFilter = {};
+                break;
+        }
+
+       
         const getcreators = await exeCountHisModel.aggregate([
             {
                 $sort: {
                     p_id: 1,
                     creation_date: -1
                 }
+            },
+            {
+              $match: dateFilter
             },
             {
                 $group: {
@@ -422,6 +482,15 @@ exports.pageHealthDashboard = async (req, res) => {
         if (getcreators && getcreators.length === 0) {
             return response.returnFalse(200, req, res, 'No Record Found', {})
         }
+        /**
+         * Calculates the percentage of each age group based on the average age percentages
+         * in the given data object. Sorts the age groups in descending order based on their
+         * percentage and keeps only the top 5 age groups. Updates the data object with the
+         * top 5 age group percentages and removes the individual average age percentages and
+         * the total count of individuals.
+         * @param {Array} getcreators - An array of data objects representing creators.
+         * @returns None
+         */
         for (const data of getcreators) {
             let ageGroup = [
                 { ageGroup: "13-17", percentage: data?.avgAge_13_17_percent / data?.p_id_count },

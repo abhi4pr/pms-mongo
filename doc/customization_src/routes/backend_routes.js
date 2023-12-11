@@ -1,6 +1,6 @@
 const express = require("express");
 const swaggerAccessManagement=require('../controller/swaggerAccessManagement');
-const { checkDevAuthentication } = require("../middleware/swaggerMiddleware");
+const { checkDevAuthentication, checkDevAuthenticationUsingQuery } = require("../middleware/swaggerMiddleware");
 const router = express.Router();
 
 router.post('/doc-login',swaggerAccessManagement.devLogin );
@@ -15,9 +15,9 @@ router.get('/dev-login-history/:token',checkDevAuthentication,swaggerAccessManag
 router.get('/dev-data/:id/:token',checkDevAuthentication,swaggerAccessManagement.getDevSingleData );
 router.put('/dev-data-update/:id/:token',checkDevAuthentication,swaggerAccessManagement.updateDevData );
 router.get('/delete-dev/:id/:token/:page',checkDevAuthentication,swaggerAccessManagement.deleteDev );
-router.get('/email-verification/:token',swaggerAccessManagement.emailVerification );
-router.get('/update-request-status/:id/:token/:status',swaggerAccessManagement.requestStatusUpdate );
-router.get('/admin-profile-data/:token',swaggerAccessManagement.adminProfile );
-router.post('/update-admin-password/:token/:id',swaggerAccessManagement.updatePasswordAdmin );
-router.get('/delete-history',swaggerAccessManagement.clearLoginHis)
+router.get('/email-verification/:token',checkDevAuthentication,swaggerAccessManagement.emailVerification );
+router.get('/update-request-status/:id/:token/:status',checkDevAuthentication,swaggerAccessManagement.requestStatusUpdate );
+router.get('/admin-profile-data/:token',checkDevAuthentication,swaggerAccessManagement.adminProfile );
+router.post('/update-admin-password/:token/:id',checkDevAuthentication,swaggerAccessManagement.updatePasswordAdmin );
+router.get('/delete-history',checkDevAuthenticationUsingQuery,swaggerAccessManagement.clearLoginHis)
 module.exports = router;

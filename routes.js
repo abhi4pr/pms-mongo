@@ -173,7 +173,7 @@ router.post("/get_percentage", exe.getPercentage);
 router.get("/get_all_exe_ip_history", exe.getAllExeHistory);
 router.get("/get_stats_update_flag/:p_id", exe.getStatUpdateFlag);
 router.get("/get_distinct_count_history/:p_id?", exe.getDistinctExeCountHistory);
-router.get("/page_health_dashboard", exe.pageHealthDashboard);
+router.post("/page_health_dashboard", exe.pageHealthDashboard);
 
 /*sim api*/
 router.get("/get_all_sims", sim.getSims); // done

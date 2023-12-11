@@ -270,10 +270,15 @@ module.exports.swaggerConfig = {
       // Get the token from the URL
       const urlParts = window.location.pathname.split("/");
       const token = urlParts[urlParts.length - 2];
-
+      function logout() {
+        // Call your logout API
+        fetch('/doc-logout/' + token) // Replace with your actual logout API call
+          .then(() => (window.location.href = `/doc-login`))
+          .catch((err) => console.error("Error:", err));
+      }
       /* Handle feature when user close tab */
       window.addEventListener("beforeunload", function (event) {
-        navigator.sendBeacon(`/doc-logout/${token}`); // Using sendBeacon for asynchronous request
+        logout ();
       });
 
       /* Handle if not activity perform on page like no key press or mouse */
@@ -282,19 +287,12 @@ module.exports.swaggerConfig = {
         window.onload = resetTimer;
         // Events that reset the timer
         document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-
-        function logout() {
-          // Call your logout API
-          fetch('/doc-logout/' + token, { method: "POST" }) // Replace with your actual logout API call
-            .then(() => (window.location.href = `/doc-login`))
-            .catch((err) => console.error("Error:", err));
-        }
+        document.onkeypress = resetTimer
 
         function resetTimer() {
           clearTimeout(time);
           // Set timeout for 1 hour (3600000 ms)
-          time = setTimeout(logout, 1500000);
+          time = setTimeout(logout, 360000);
         }
       };
 
