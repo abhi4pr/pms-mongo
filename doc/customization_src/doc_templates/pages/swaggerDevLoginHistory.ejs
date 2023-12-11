@@ -277,7 +277,8 @@
 
     /* Style the dropdown containers */
     #roleFilter,
-    #departmentFilter {
+    #departmentFilter,
+    #clearHisDropdown {
       padding: 7px 9px;
       border-radius: 4px;
       border: 1px solid #ccc;
@@ -290,7 +291,8 @@
 
     /* Styling for the dropdown options */
     #roleFilter option,
-    #departmentFilter option {
+    #departmentFilter option,
+    #clearHisDropdown option {
       padding: 18px 30px;
       /* Adjusted padding for options */
     }
@@ -298,8 +300,10 @@
     /* Additional styles for hover and focus states */
     #roleFilter:hover,
     #departmentFilter:hover,
+    #clearHisDropdown:hover,
     #roleFilter:focus,
-    #departmentFilter:focus {
+    #departmentFilter:focus,
+    #clearHisDropdown:focus {
       border-color: #888;
     }
 
@@ -349,15 +353,22 @@
       <a href="/admin-profile" id="adminprofilebtn" style=" font-size: 25px;"><i class="fas fa-user"></i></a>
     </div>
     <div class="card">
-      <div>
+      <div >
         <input type="text" id="searchInput" placeholder="Search Name..." />
         <select id="roleFilter" required>
           <option value="all">All Role</option>
           <option value="Admin">Admin</option>
           <option value="Developer">Developer</option>
         </select>
-        <button id="resetFilterBtn">Reset Filters</button>
-        <a id="clearHis" href="/clear-all-history">Clear All History</a>
+        <button id="resetFilterBtn">Reset Filters</button><hr style="margin-top: -10px;">
+       <div style="margin-bottom: 18px; margin-top: -16px;">
+        <select id="clearHisDropdown" required>
+          <option value="7">Last 7 Day's</optionß>
+            <option value="30">Last 30 Day's</option>
+          <option value="all"> All </option>
+        </select>
+        <button id="clearHis" onclick="clearHistory()">History Clear</button>
+       </div>
 
       </div>
 
@@ -442,53 +453,48 @@
     const links = document.querySelectorAll(".checkDevelopers");
     const link4 = document.getElementById("adminprofilebtn");
     const link3 = document.getElementById("logoutbtn");
-    // const link5 = document.getElementById("clearHis");
+    const link5 = document.getElementById("clearHis");
       link4.href += "/" + token;
       link3.href += "/" + token;
-      // link5.href += "/" + token;
+      link5.href += "/" + token;
 
     // Append the token to each link
     links.forEach((link) => {
       link.href += "/" + token;
     });
 
-    // function clearHistory() {
+    function clearHistory() {
+      const valueHistoryToBeDelete = document.getElementById("clearHisDropdown").value;
 
+        // Construct the URL with the token
+        const urlWithToken = '/clear-all-history/' + token + '/' + valueHistoryToBeDelete;
 
-    //     // Construct the URL with the token
-    //     const urlWithToken = '/clear-all-history/' + token + "/1";
-
-    //     // Redirect to the URL with the token
-    //     window.location.href = urlWithToken;
-    // }
-
-    window.addEventListener("beforeunload", function (event) {
-      // Call your logout API
-      navigator.sendBeacon(`/doc-logout/${token}`); // Using sendBeacon for asynchronous request
-    });
-
-    let inactivityTime = function () {
-      let time;
-      window.onload = resetTimer;
-      // Events that reset the timer
-      document.onmousemove = resetTimer;
-      document.onkeypress = resetTimer;
-
-      function logout() {
+        // Redirect to the URL with the token
+        window.location.href = urlWithToken;
+    }
+    function logout() {
         // Call your logout API
-        fetch(`/doc-logout/${token}`, { method: "POST" }) // Replace with your actual logout API call
+        fetch('/doc-logout/' + token) // Replace with your actual logout API call
           .then(() => (window.location.href = `/doc-login`))
           .catch((err) => console.error("Error:", err));
       }
+    
+      /* Handle if not activity perform on page like no key press or mouse */
+      let inactivityTime = function () {
+        let time;
+        window.onload = resetTimer;
+        // Events that reset the timer
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer
 
-      function resetTimer() {
-        clearTimeout(time);
-        // Set timeout for 1 hour (1500000 ms)
-        time = setTimeout(logout, 1500000);
-      }
-    };
+        function resetTimer() {
+          clearTimeout(time);
+          // Set timeout for 1 hour (3600000 ms)
+          time = setTimeout(logout, 360000);
+        }
+      };
 
-    inactivityTime(); // Initialize the inactivity timer function
+      inactivityTime(); // Initialize the inactivity timer function
 
     function scrollToTop() {
       document

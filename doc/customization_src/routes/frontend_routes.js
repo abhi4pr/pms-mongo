@@ -4,7 +4,7 @@ const path = require("path");
 const router = express.Router();
 
 router.get("/doc-login", (req, res) => {
-  const templatePath = path.join(__dirname, `../doc_templates/index.html`);
+  const templatePath = path.join(__dirname, `../doc_templates/pages/index.html`);
   res.sendFile(templatePath);
 });
 router.get("/doc-access/:token", checkDevAuthentication, (req, res) => {
@@ -53,10 +53,11 @@ router.get(
   }
 );
 router.get(
-  "/clear-all-history",
-  // checkDevAuthentication,
+  "/clear-all-history/:token/:valueToBeDelete",
+  checkDevAuthentication,
   (req, res) => {
-    // let token = req.params.token;
+    let token = req.params.token;
+    let valueToBeDelete = req.params.valueToBeDelete;
     // let id = req.params.id;
     return res.render("confirmationTemplate", {
       error_title: "Are you sure you want to delete ?",
@@ -64,10 +65,11 @@ router.get(
         "After delete this data you can't retrive from anyway....",
       error_image:
         "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
-      button_path_cancel: `/login-history`,
+      button_path_cancel: `/login-history/${token}`,
       button_text_cancel: "Cancel",
       button_text_ok: `OK`,
-      button_path_ok: `/delete-history`
+      // button_path_ok: `/delete-history/${token}`
+      button_path_ok: `/delete-history?token=${encodeURIComponent(token)}&days=${valueToBeDelete}`
 
     });
   }

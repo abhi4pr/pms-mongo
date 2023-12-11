@@ -54,13 +54,7 @@ exports.addDevData = async (req, res) => {
   } catch (err) {
     if (err.code === 11000) {
       // The error code 11000 indicates a duplicate key error (unique constraint violation)
-      return response.returnFalse(
-        500,
-        req,
-        res,
-        "Email must be unique'",
-        {}
-      );
+      return response.returnFalse(500, req, res, "Email must be unique'", {});
     } else {
       return response.returnFalse(500, req, res, err.message, {});
     }
@@ -114,8 +108,9 @@ exports.getDevData = async (req, res) => {
 };
 exports.deleteDev = async (req, res) => {
   let page = req.params.page;
-  let modelCollection = page == 3 ? devLoginHistoryModel : swaggerAccessModel
-  const url = page == 1 ? "/doc-user" : page == 2 ? "/all-request" : "/login-history";
+  let modelCollection = page == 3 ? devLoginHistoryModel : swaggerAccessModel;
+  const url =
+    page == 1 ? "/doc-user" : page == 2 ? "/all-request" : "/login-history";
   try {
     const user = await modelCollection.findByIdAndDelete(req.params.id);
     if (!user) {
@@ -130,7 +125,6 @@ exports.deleteDev = async (req, res) => {
     }
     return res.redirect(`${url}/${req.params.token}`);
   } catch (err) {
-    
     return res.render("swaggerErrorTemplate", {
       error_title: "Internal Server Error.",
       error_description: err.message,
@@ -164,7 +158,7 @@ exports.adminProfile = async (req, res) => {
     const token = authorization.replace("Bearer ", "");
     const decoded = jwt.decode(token, { complete: true });
     let email = decoded.payload.email;
-    let loginInfo = await swaggerAccessModel.findOne({email});
+    let loginInfo = await swaggerAccessModel.findOne({ email });
     if (!loginInfo) {
       return response.returnFalse(200, req, res, "No record found.");
     }
@@ -184,7 +178,7 @@ exports.getDevLoginHis = async (req, res) => {
     const savedDevLoginData = await devLoginHistoryModel
       .aggregate([
         {
-          $match :{logout_date : { $ne : ""}}
+          $match: { logout_date: { $ne: "" } },
         },
         {
           $lookup: {
@@ -239,7 +233,7 @@ exports.devLogin = async (req, res) => {
       });
     }
     if (
-      userData.isAdminVerified === 0 &&
+      (userData.isAdminVerified === 0 || userData.isAdminVerified === 2) &&
       userData.role !== constant.ADMIN_ROLE
     ) {
       return res.render("swaggerErrorTemplate", {
@@ -262,7 +256,7 @@ exports.devLogin = async (req, res) => {
         button_text: "Return to Login",
       });
     }
-   
+
     if (userData.status !== "Active" && userData.role !== constant.ADMIN_ROLE) {
       return res.render("swaggerErrorTemplate", {
         error_title: "Your account is currently inactive.",
@@ -305,8 +299,8 @@ exports.devLogin = async (req, res) => {
     if (userData.role === constant.SWAGGER_ADMIN) {
       return res.redirect(`/doc-user/${token}`);
     }
-    // res.redirect(`/api-docs/${token}`);
-    return response.returnTrue(200,req,res,"Login success",token)
+    res.redirect(`/api-docs/${token}`);
+    // return response.returnTrue(200, req, res, "Login success", token);
   } catch (err) {
     return res.render("swaggerErrorTemplate", {
       error_title: "Internal Server Error.",
@@ -624,22 +618,19 @@ exports.updatePasswordAdmin = async (req, res) => {
     let token = req.params.token;
     let password = req.body.password;
     let encryptedPass = await bcrypt.hash(password, 10);
-    let savedDevData = await swaggerAccessModel.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          password: encryptedPass,
-        },
-      }
-    );
+    let savedDevData = await swaggerAccessModel.findByIdAndUpdate(id, {
+      $set: {
+        password: encryptedPass,
+      },
+    });
     if (!savedDevData) {
       return res.render("swaggerErrorTemplate", {
         error_title: "No Record Found",
         error_description: "",
         error_image:
           "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
-          button_path: `/admin-profile/${token}`,
-          button_text: "Back",
+        button_path: `/admin-profile/${token}`,
+        button_text: "Back",
       });
     }
     return res.render("swaggerErrorTemplate", {
@@ -656,8 +647,8 @@ exports.updatePasswordAdmin = async (req, res) => {
       error_description: error.message,
       error_image:
         "https://img.freepik.com/premium-photo/http-error-500-internal-server-error-3d-render-illustration_567294-2973.jpg?w=360",
-        button_path: `/admin-profile/${token}`,
-        button_text: "Back",
+      button_path: `/admin-profile/${token}`,
+      button_text: "Back",
     });
   }
 };
@@ -704,23 +695,25 @@ exports.emailVerification = async (req, res) => {
 
 exports.requestStatusUpdate = async (req, res) => {
   try {
-    let status = req.params.status
-    let dev_id = req.params.id
-    let token = req.params.token
+    let status = req.params.status;
+    let dev_id = req.params.id;
+    let token = req.params.token;
 
-    let savedDevData = await swaggerAccessModel.findByIdAndUpdate(dev_id, {
-      $set: {
+    let savedDevData = await swaggerAccessModel.findByIdAndUpdate(
+      dev_id,
+      {
         isAdminVerified: status,
       },
-    });
+      { new: true }
+    );
     if (!savedDevData) {
       return res.render("swaggerErrorTemplate", {
         error_title: "No Record Found",
         error_description: "",
         error_image:
           "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
-          button_path: `/all-request/${token}`,
-          button_text: "Back",
+        button_path: `/all-request/${token}`,
+        button_text: "Back",
       });
     }
     const templatePath2 = path.join(
@@ -731,7 +724,12 @@ exports.requestStatusUpdate = async (req, res) => {
 
     const html2 = ejs.render(template2, {
       name: savedDevData.name,
-      status : savedDevData.isAdminVerified == 1 ? "Approved" : savedDevData.isAdminVerified == 2 ? "Rejected" : "Pending",
+      status:
+        savedDevData.isAdminVerified == 1
+          ? "Approved"
+          : savedDevData.isAdminVerified == 2
+          ? "Rejected"
+          : "Pending",
     });
     //Send Mail with Template
     sendMail("Documentation Access Request", html2, savedDevData?.email);
@@ -740,8 +738,8 @@ exports.requestStatusUpdate = async (req, res) => {
       error_description: "",
       error_image:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRql70xOOTbXm-EbXqyornkJuoAV-mbMiXgi4qkvOXduE6joMY-qHZA2w6DHorDgbrpRyU&usqp=CAU",
-        button_path: `/all-request/${token}`,
-        button_text: "Back",
+      button_path: `/all-request/${token}`,
+      button_text: "Back",
     });
   } catch (error) {
     return res.render("swaggerErrorTemplate", {
@@ -749,36 +747,45 @@ exports.requestStatusUpdate = async (req, res) => {
       error_description: error.message,
       error_image:
         "https://img.freepik.com/premium-photo/http-error-500-internal-server-error-3d-render-illustration_567294-2973.jpg?w=360",
-        button_path: `/all-request/${token}`,
-        button_text: "Back",
+      button_path: `/all-request/${token}`,
+      button_text: "Back",
     });
   }
 };
 
 exports.clearLoginHis = async (req, res) => {
-
   try {
-    const user = await devLoginHistoryModel.deleteMany({});
+    let days = req.query.days;
+    const currentDate = Math.round(new Date() / 1000);
+    const sevenDaysAgo =
+      Math.floor(Date.now() / 1000) - parseInt(days) * 24 * 60 * 60;
+    let matchCondition =
+      days == "all"
+        ? { $ne: "" }
+        : { $ne: "", $gte: sevenDaysAgo, $lt: currentDate };
+    const user = await devLoginHistoryModel.deleteMany({
+      logout_date: matchCondition,
+    });
+
     if (!user) {
       return res.render("swaggerErrorTemplate", {
         error_title: "No record found..",
         error_description: "",
         error_image:
           "https://cdni.iconscout.com/illustration/premium/thumb/employee-is-unable-to-find-sensitive-data-9952946-8062130.png?f=webp",
-        button_path: `${url}/${req.params.token}`,
+        button_path: `/login-history/${req.query.token}`,
         button_text: "Back",
       });
     }
-    
-    return res.redirect(`login-history/${req.params.token}`);
+
+    return res.redirect(`/login-history/${req.query.token}`);
   } catch (err) {
-    
     return res.render("swaggerErrorTemplate", {
       error_title: "Internal Server Error.",
       error_description: err.message,
       error_image:
         "https://img.freepik.com/premium-photo/http-error-500-internal-server-error-3d-render-illustration_567294-2973.jpg?w=360",
-      button_path: `${url}/${req.params.token}`,
+      button_path: `/login-history/${req.query.token}`,
       button_text: "Back",
     });
   }
