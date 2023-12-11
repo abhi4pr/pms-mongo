@@ -620,6 +620,11 @@ const userModel = new mongoose.Schema({
         required: false,
         default: 0
     },
+    coc_flag:{
+        type: Boolean,
+        default: false,
+        required: false
+    }
 });
 
 AutoIncrement.initialize(mongoose.connection);

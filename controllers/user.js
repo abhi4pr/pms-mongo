@@ -405,7 +405,8 @@ exports.updateUser = [upload1, async (req, res) => {
             offer_later_reject_reason: req.body.offer_later_reject_reason,
             showOnboardingModal: req.body.showOnboardingModal,
             latitude : req.body.latitude,
-            longitude : req.body.longitude
+            longitude : req.body.longitude,
+            coc_flag: req.body.coc_flag
 
         }, { new: true });
         if (!editsim) {
