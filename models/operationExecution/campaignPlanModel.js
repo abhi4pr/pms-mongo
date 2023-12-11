@@ -68,16 +68,23 @@ const campaignPlanSchema = new mongoose.Schema({
     replacement_status:{
         type:String,
         default:'inactive',
-        enum:['active', 'inactive','replaced']
+        enum:['active', 'inactive','replaced','replacement','pending']
     },
     delete_status:{
         type:String,
         default:'inactive',
         enum:['active', 'inactive']
     },
+    replaced_by:{
+        type:String,
+        default:'N/A'
+    },
     replaced_with:{
         type:String,
         default:'N/A',
+    },
+    replacement_id:{
+        type:String,
     }
 
 });
