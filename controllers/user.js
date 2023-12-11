@@ -676,7 +676,10 @@ exports.getAllUsers = async (req, res) => {
                     annexure_pdf: "$annexure_pdf",
                     profileflag: "$profileflag",
                     nick_name: "$nick_name",
-                    showOnboardingModal:"$showOnboardingModal"
+                    showOnboardingModal:"$showOnboardingModal",
+                    coc_flag: "$coc_flag",
+                    latitude:"$latitude",
+                    longitude:"$longitude"
                 }
             }
         ]).exec();
@@ -947,7 +950,10 @@ exports.getSingleUser = async (req, res) => {
                     offer_letter_send: "$offer_letter_send",
                     profileflag: "$profileflag",
                     nick_name: "$nick_name",
-                    showOnboardingModal:"$showOnboardingModal"
+                    showOnboardingModal:"$showOnboardingModal",
+                    coc_flag: "$coc_flag",
+                    latitude:"$latitude",
+                    longitude:"$longitude"
                 }
             }
         ]).exec();
