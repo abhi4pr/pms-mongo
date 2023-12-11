@@ -2,11 +2,8 @@ const { default: mongoose } = require("mongoose");
 // const AutoIncrement = require("mongoose-auto-increment");
 
 const pageReplacementRecordSchema = new mongoose.Schema({
-    plan_id:{
-      type:'String',
-      required: [true,'plan_id is required'],
-    },
-    plan_name:{
+  
+    planName:{
       type:'String',
       // required: [true,'plan_name is required'],
     },

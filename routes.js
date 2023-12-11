@@ -65,8 +65,14 @@ const notification = require("./controllers/notifications.js");
 const userDocManagement = require("./controllers/userDocManagement.js");
 const swaggerAccessManagement = require("./doc/customization_src/controller/swaggerAccessManagement.js");
 
+//opertaion + execution imports start here`
 const campaignPlanController = require("./controllers/operationExecution/campaignPlanController.js");
 const campaignPhaseController = require("./controllers/operationExecution/campaignPhaseController.js");
+const expertiseController = require('./controllers/operationExecution/expertiseController.js')
+const assignmentController = require('./controllers/operationExecution/assignmentController.js')
+const assignmentCommitController=require('./controllers/operationExecution/assignmentCommitController.js')
+//opertaion + execution imports ends here`
+
 const city = require("./controllers/cityController.js");
 const phpFinance = require("./controllers/phpFinance.js")
 const phpPayment = require("./controllers/phpPaymentAccList.js")
@@ -88,7 +94,7 @@ router.get("/get_single_demo/:_id", demoApi.getSingleDemo);
 router.put("/update_demo",upload1.single("t13"), demoApi.editDemo);
 router.delete("/delete_demo/:_id", demoApi.deleteDemo);
 
-/*operation+execution api*/
+/*operation+execution api starts*/
 router.post("/campaignplan", campaignPlanController.createPlan);
 router.put("/campaignplan", campaignPlanController.updateBulk);
 router.get("/campaignplan/:id", campaignPlanController.getPlan);
@@ -100,6 +106,22 @@ router.post('/campaignphase', campaignPhaseController.createPhase)
 router.get('/campaignphase/:id', campaignPhaseController.getAllPhase)
 router.get('/campaignphase/singlephase/:id', campaignPhaseController.getSinglePhase)
 
+router.post('/expertise',expertiseController.createExpert)
+router.get('/expertise',expertiseController.getAllExpert)
+router.get('/expertise/:id',expertiseController.getSingleExpert)
+
+router.post('/assignment',assignmentController.createAssignment)
+router.get('/assignment/:id',assignmentController.getSingleAssignment)
+
+router.get('/assignment/all/:id',assignmentController.getAllAssignmentToExpertee)
+
+
+router.post('/assignment/commit',assignmentCommitController.createAssComm)
+router.get('/assignment/commit/:id',assignmentCommitController.getAllAssComm)
+
+
+
+/*operation+execution api ends*/
 /*insta api*/
 router.get("/shorcode_info",insta.getCountBasedOnTrackedPost)
 router.post("/add_image",upload1.fields([{ name: "brandImageToServer", maxCount: 10 },{name: "campaignImageToServer", maxCount: 10},{name:"creatorImageToServer", maxCount: 10}]), imageUpload.addImage)

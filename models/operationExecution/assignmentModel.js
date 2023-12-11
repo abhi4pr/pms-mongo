@@ -1,7 +1,20 @@
 const { default: mongoose } = require("mongoose");
-// const AutoIncrement = require("mongoose-auto-increment");
+const AutoIncrement = require("mongoose-auto-increment");
 
-const phasePageSchema = new mongoose.Schema({
+const assignmentSchema = new mongoose.Schema({
+  ass_id: {
+    type: Number,
+  },
+  ass_to: {
+    // type:mongoose.SchemaTypes.ObjectId,
+    // ref:'ExpertiseModel',
+    type: String,
+  },
+  ass_by: {
+    // type:mongoose.SchemaTypes.ObjectId,
+    // ref:'userModels',
+    type: String,
+  },
   phase_id: {
     type: String,
 
@@ -62,13 +75,12 @@ const phasePageSchema = new mongoose.Schema({
     type: String,
     // required:[true,"campaign id is required"]
   },
-
-  createdAt: {
+  created_at: {
     type: Date,
-    default: Date.now()
+    defaule: Date.now(),
   },
-  modifiedAt: {
-    type: Date
+  updated_at: {
+    type: Date,
   },
   replacement_status: {
     type: String,
@@ -90,11 +102,39 @@ const phasePageSchema = new mongoose.Schema({
   },
   replacement_id: {
     type: String,
+  },
+  ass_status: {
+    type: String,
+    default: "assigned",
+    enum: ['assigned','pending','executed', 'verified', 'rejected']
+  },
+  executed_at: {
+    type: Date
+  },
+  
+  verified_by: {
+    // type:mongoose.SchemaTypes.ObjectId,
+    // ref:'userModels',
+    type: String,
+  },
+  verified_at: {
+    type: Date
+  },
+  verification_remark: {
+    type: String,
   }
+
 });
 
+AutoIncrement.initialize(mongoose.connection);
+assignmentSchema.plugin(AutoIncrement.plugin, {
+  model: "assignmentModel",
+  field: "ass_id",
+  startAt: 1,
+  incrementBy: 1,
+});
 
 module.exports = mongoose.model(
-  "PhasePageModel",
-  phasePageSchema
+  "assignmentModel",
+  assignmentSchema
 );
