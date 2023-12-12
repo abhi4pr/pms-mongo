@@ -43,6 +43,11 @@ const expertiseSchema = new mongoose.Schema({
     }
 });
 
+expertiseSchema.pre(/^find/, function(next){
+    this.updated_at =Date.now();
+    next();
+})
+
 AutoIncrement.initialize(mongoose.connection);
 expertiseSchema.plugin(AutoIncrement.plugin, {
   model: "ExpertiseModel",
