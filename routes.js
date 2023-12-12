@@ -1075,6 +1075,7 @@ router.delete("/delete_city/:_id", city.deleteCity);
 /* php finance api */
 router.post("/add_php_finance_data_in_node", phpFinance.savePhpFinanceDataInNode);
 router.get("/get_all_php_finance_data", phpFinance.getAllphpFinanceData);
+router.get("/get_all_php_finance_data_pending",phpFinance.getAllphpFinanceDataPending);
 router.post("/add_php_payment_acc_data_in_node", phpPayment.savePhpPaymentAccDataInNode);
 router.get("/get_all_php_payment_acc_data", phpPayment.getAllphpPaymentAccData);
 router.get("/get_all_php_payment_acc_data_pending",phpPayment.getAllphpPaymentAccDataForStatus);

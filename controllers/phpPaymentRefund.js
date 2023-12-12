@@ -50,7 +50,32 @@ exports.savePhpPaymentRefundInNode = async (req, res) => {
              
                 
             }else{
-              return  res.status(200).json({msg:"Data already insterted there is no new data available to insert."})
+                const updateExistingData = Object.keys(data).some(key => existingData[key] !== data[key])
+                if (updateExistingData) {
+                    await phpPaymentRefundModel.updateOne({ sale_booking_refund_id: data.sale_booking_refund_id },
+                        {
+                            $set: {
+                                sale_booking_id: data.sale_booking_id,
+                                refund_amount: data.refund_amount,
+                                refund_files: data.refund_files,
+                                manager_refund_status: data.manager_refund_status,
+                                manager_refund_reason: data.manager_refund_reason,
+                                finance_refund_status: data.finance_refund_status,
+                                finance_refund_reason: data.finance_refund_reason,
+                                creation_date: data.creation_date,
+                                last_updated_date: data.last_updated_date,
+                                cust_id: data.cust_id,
+                                campaign_amount: data.campaign_amount,
+                                sale_booking_date: data.sale_booking_date,
+                                cust_name: data.cust_name,
+                                sno: data.sno
+                            }
+                        }
+                    )
+                } else {
+                    return res.status(200).json({ msg: "Data already insterted there is no new data available to insert." })
+                }
+            //   return  res.status(200).json({msg:"Data already insterted there is no new data available to insert."})
             }
         }
         res.send({ sms:"data copied in local db", status: 200 })

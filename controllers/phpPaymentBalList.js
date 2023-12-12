@@ -46,7 +46,31 @@ exports.savePhpPaymentBalDataInNode = async (req, res) => {
                 })
                 const instav = await creators.save();
             } else {
-                return res.status(200).json({ msg: "Data already insterted there is no new data available to insert." })
+                const updateExistingData = Object.keys(data).some(key => existingData[key] !== data[key])
+                if (updateExistingData) {
+                    await phpPaymentBalListModel.updateOne({ sale_booking_id: data.sale_booking_id },
+                        {
+                            $set: {
+                                campaign_amount: data.campaign_amount,
+                                sale_booking_date: data.sale_booking_date,
+                                user_id: data.user_id,
+                                created_by: data.created_by,
+                                manager_approval: data.manager_approval,
+                                invoice_creation_status: data.invoice_creation_status,
+                                salesexe_credit_approval: data.salesexe_credit_approval,
+                                payment_update_id: data.payment_update_id,
+                                payment_amount: data.payment_amount,
+                                payment_type: data.payment_type,
+                                cust_name: data.cust_name,
+                                total_paid_amount: data.total_paid_amount,
+                                sno: data.sno
+                            }
+                        }
+                    )
+                } else {
+                    return res.status(200).json({ msg: "Data already insterted there is no new data available to insert." })
+                }
+                // return res.status(200).json({ msg: "Data already insterted there is no new data available to insert." })
             }
         }));
 
@@ -80,15 +104,15 @@ exports.getAllphpPaymentBalData = async (req, res) => {
     }
 }
 
-exports.balancePaymentListUpdate = async (req,res) => {
+exports.balancePaymentListUpdate = async (req, res) => {
     try {
         let payment_screenshot = req?.file?.filename;
         const editPendingApprovalRefundData = await phpPaymentBalListModel.findOneAndUpdate(
             { sale_booking_id: parseInt(req.body.sale_booking_id) },
             {
 
-               status : req.body.status,
-               payment_screenshot
+                status: req.body.status,
+                payment_screenshot
             },
             { new: true }
         );

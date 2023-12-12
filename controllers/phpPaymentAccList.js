@@ -13,9 +13,9 @@ exports.savePhpPaymentAccDataInNode = async (req, res) => {
     try {
         // const loggedin_user_id = req.body.loggedin_user_id;
         const sendData = new FormData();
-        sendData.append("loggedin_user_id",36);
+        sendData.append("loggedin_user_id", 36);
         const response = await axios.post(
-            'https://production.sales.creativefuel.io/webservices/RestController.php?view=sales-payment_account_list',  sendData,
+            'https://production.sales.creativefuel.io/webservices/RestController.php?view=sales-payment_account_list', sendData,
             {
                 headers: {
                     ...sendData.getHeaders(),
@@ -23,11 +23,11 @@ exports.savePhpPaymentAccDataInNode = async (req, res) => {
             }
         )
         const responseData = response.data.body;
-        
+
         for (const data of responseData) {
-          
+
             const existingData = await checkIfDataExists(data.id)
-            
+
             if (!existingData) {
 
                 const creators = new phpPaymentAccListModel({
@@ -41,13 +41,31 @@ exports.savePhpPaymentAccDataInNode = async (req, res) => {
                     sno: data.sno
                 })
                 const instav = await creators.save();
-             
-                
-            }else{
-              return  res.status(200).json({msg:"Data already insterted there is no new data available to insert."})
+
+
+            } else {
+                const updateExistingData = Object.keys(data).some(key => existingData[key] !== data[key])
+                if (updateExistingData) {
+                    await phpPaymentAccListModel.updateOne({ id: data.id },
+                        {
+                            $set: {
+                                title: data.title,
+                                detail: data.detail,
+                                gst_bank: data.gst_bank,
+                                payment_type: data.payment_type,
+                                status: data.status,
+                                created_at: data.created_at,
+                                sno: data.sno
+                            }
+                        }
+                    )
+                } else {
+                    return res.status(200).json({ msg: "Data already insterted there is no new data available to insert." })
+                }
+                //   return  res.status(200).json({msg:"Data already insterted there is no new data available to insert."})
             }
         }
-        res.send({ sms:"data copied in local db", status: 200 })
+        res.send({ sms: "data copied in local db", status: 200 })
     } catch (error) {
         return res.status(500).send({ error: error.message, sms: 'error while adding data' })
     }
@@ -56,27 +74,27 @@ exports.savePhpPaymentAccDataInNode = async (req, res) => {
 exports.getAllphpPaymentAccData = async (req, res) => {
     try {
         const getData = await phpPaymentAccListModel.find({})
-        res.status(200).send({data:getData})
+        res.status(200).send({ data: getData })
     } catch (error) {
-        res.status(500).send({error: error.message, sms:"error getting php payment account data"})
+        res.status(500).send({ error: error.message, sms: "error getting php payment account data" })
     }
 }
 
 exports.getAllphpPaymentAccDataForStatus = async (req, res) => {
     try {
-        const getData = await phpPaymentAccListModel.find({status : 0 })
-        res.status(200).send({data:getData})
+        const getData = await phpPaymentAccListModel.find({ status: 0 })
+        res.status(200).send({ data: getData })
     } catch (error) {
-        res.status(500).send({error: error.message, sms:"error getting php payment account data"})
+        res.status(500).send({ error: error.message, sms: "error getting php payment account data" })
     }
 }
 
-exports.pendingApprovalUpdate = async (req,res) => {
+exports.pendingApprovalUpdate = async (req, res) => {
     try {
         const editPendingApprovalData = await phpPaymentAccListModel.findOneAndUpdate(
             { payment_update_id: parseInt(req.body.payment_update_id) },
             {
-               status : req.body.status
+                status: req.body.status
             },
             { new: true }
         );
@@ -99,12 +117,12 @@ exports.getAccListDataFromCustId = async (req, res) => {
     try {
         const getData = await phpFinanceModel.find({
             $or: [
-              { cust_id: String(req.params.cust_id) },
-              { cust_id: Number(req.params.cust_id) }
+                { cust_id: String(req.params.cust_id) },
+                { cust_id: Number(req.params.cust_id) }
             ]
-          })
-        res.status(200).send({data:getData})
+        })
+        res.status(200).send({ data: getData })
     } catch (error) {
-        res.status(500).send({error: error.message, sms:"error getting php payment account data of customer details"})
+        res.status(500).send({ error: error.message, sms: "error getting php payment account data of customer details" })
     }
 }
