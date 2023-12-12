@@ -109,6 +109,8 @@ router.get('/campaignphase/singlephase/:id', campaignPhaseController.getSinglePh
 router.post('/expertise',expertiseController.createExpert)
 router.get('/expertise',expertiseController.getAllExpert)
 router.get('/expertise/:id',expertiseController.getSingleExpert)
+router.put('/expertise/:id',expertiseController.updateExpert)
+router.delete('/expertise/:id',expertiseController.deleteExpert)
 
 router.post('/assignment',assignmentController.createAssignment)
 router.get('/assignment/:id',assignmentController.getSingleAssignment)

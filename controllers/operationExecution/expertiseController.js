@@ -32,8 +32,14 @@ exports.getSingleExpert=catchAsync(async (req,res,next) => {
     })
 })
 exports.updateExpert=catchAsync(async (req,res,next) => {
-
+    const id=req.params.id
+    const {area_of_expertise,updated_by}=req.body
+    const data={area_of_expertise,updated_by,updated_at:Date.now()}
+    const result=await ExpertiseModel.findOneAndUpdate({user_id:id},data,{new:true})
+    res.status(200).json({data:result})
 })
 exports.deleteExpert=catchAsync(async (req,res,next) => {
-
+    const id = req.params.id
+    const result = await ExpertiseModel.findOneAndDelete({user_id:id})
+    res.status(200).json({data:result})
 })
