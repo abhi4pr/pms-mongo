@@ -71,6 +71,7 @@ const campaignPhaseController = require("./controllers/operationExecution/campai
 const expertiseController = require('./controllers/operationExecution/expertiseController.js')
 const assignmentController = require('./controllers/operationExecution/assignmentController.js')
 const assignmentCommitController=require('./controllers/operationExecution/assignmentCommitController.js')
+const operationDasboard =require('./controllers/operationExecution/dashboard.controller.js')
 //opertaion + execution imports ends here`
 
 const city = require("./controllers/cityController.js");
@@ -120,6 +121,7 @@ router.get('/assignment/all/:id',assignmentController.getAllAssignmentToExpertee
 
 router.post('/assignment/commit',assignmentCommitController.createAssComm)
 router.get('/assignment/commit/:id',assignmentCommitController.getAllAssComm)
+router.post('/operation_phase_dashboard',operationDasboard.phaseDashboard)
 
 
 
