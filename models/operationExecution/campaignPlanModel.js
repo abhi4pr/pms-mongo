@@ -7,7 +7,7 @@ const campaignPlanSchema = new mongoose.Schema({
         required:[true,"plan name is required."]
     },
     plan_id:{
-        type:String,
+        type: Number,
     },
     vendor_id:{
         type:String,
@@ -85,7 +85,11 @@ const campaignPlanSchema = new mongoose.Schema({
     },
     replacement_id:{
         type:String,
-    }
+    },
+    updatedFrom: {
+        type: String,
+        default : ""
+      }
 
 });
 

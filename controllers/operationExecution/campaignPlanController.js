@@ -2,6 +2,9 @@ const CampaignPlanModel = require('../../models/operationExecution/campaignPlanM
 const appError=require('../../helper/appError');
 const catchAsync=require('../../helper/catchAsync');
 const campaignPlanModel = require('../../models/operationExecution/campaignPlanModel');
+const PhasePageModel = require('../../models/operationExecution/phasePageModel')
+const AssignmentModel=require('../../models/operationExecution/assignmentModel');
+const response = require('../../common/response');
 
 exports.createPlan=catchAsync(async (req,res,next) => {
     //will receive array of objects(pages),campaignId,vendor,campaignName,pageName
@@ -88,5 +91,35 @@ exports.singlePlanUpdate=catchAsync(async (req,res,next) => {
     //validation is remaining
     const result = await campaignPlanModel.findOneAndUpdate({plan_id:id},req.body,{new:true})
     res.send({ data: result, status: 200})
+
+})
+exports.updatePlan = catchAsync(async (req,res,next) => {
+    const { campaignId, p_id} = req.body
+    const filter = { campaignId, p_id };
+
+    // const options1  = {
+    //   new: true, // Return the modified document rather than the original
+    //   upsert: true, // If the document does not exist, insert a new one
+    // };
+    const options2  = {
+      new: true, // Return the modified document rather than the original
+    };
+    
+    const result = await campaignPlanModel.findOneAndUpdate(filter, req.body, options2);
+    if(!result) {
+    const data = new campaignPlanModel({
+        ...req.body
+      });
+      const savedData = await data.save();
+      if(!savedData) {
+          return next(new appError(200,"No Record Found For Respective CampaignId and P_id (page id ) in Plan model."))
+      }
+    }
+
+    const result2 = await PhasePageModel.findOneAndUpdate(filter, {...req.body, updatedFrom : "Plan"}, options2);
+    const result3 = await AssignmentModel.findOneAndUpdate(filter, {...req.body, updatedFrom : "Plan"}, options2);
+
+   return response.returnTrue(200,req,res,"Updation Operation Successfully.")
+
 
 })
