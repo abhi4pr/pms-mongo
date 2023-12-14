@@ -6,6 +6,7 @@ exports.addDepartment = async (req, res) => {
   try {
     const simc = new departmentModel({
       dept_name: req.body.dept_name,
+      short_name: req.body.short_name,
       Remarks: req.body.remark,
       Created_by: req.body.Created_by,
     });
@@ -67,6 +68,7 @@ exports.editDepartment = async (req, res) => {
       { dept_id: parseInt(req.body.dept_id) },
       {
         dept_name: req.body.dept_name,
+        short_name: req.body.short_name,
         Remarks: req.body.remark,
         Created_by: req.body.Created_by,
         Last_updated_by: req.body.Last_updated_by,

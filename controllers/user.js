@@ -23,6 +23,7 @@ const sendMail = require("../common/sendMail.js");
 const helper = require('../helper/helper.js');
 const OrderRequest = require("../models/orderReqModel.js");
 const Sitting = require("../models/sittingModel.js");
+const { generateEmpId } = require("../helper/helper.js");
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "image", maxCount: 1 },
@@ -49,6 +50,9 @@ exports.addUser = [upload, async (req, res) => {
         if (req.body.user_login_password) {
             encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
         }
+
+        let empId =  await generateEmpId();
+
         const simc = new userModel({
             user_name: req.body.user_name,
             user_designation: req.body.user_designation,
@@ -163,8 +167,10 @@ exports.addUser = [upload, async (req, res) => {
             nick_name: req.body.nick_name,
             offer_later_date: req.body.offer_later_date,
             annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : '',
-            latitude : req.body.latitude,
-            longitude : req.body.longitude
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+            beneficiary: req.body.beneficiary,
+            emp_id : empId
         })
         const simv = await simc.save();
 
@@ -404,9 +410,10 @@ exports.updateUser = [upload1, async (req, res) => {
             offer_later_status: req.body.offer_later_status,
             offer_later_reject_reason: req.body.offer_later_reject_reason,
             showOnboardingModal: req.body.showOnboardingModal,
-            latitude : req.body.latitude,
-            longitude : req.body.longitude,
-            coc_flag: req.body.coc_flag
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+            coc_flag: req.body.coc_flag,
+            beneficiary: req.body.beneficiary
 
         }, { new: true });
         if (!editsim) {
@@ -676,10 +683,12 @@ exports.getAllUsers = async (req, res) => {
                     annexure_pdf: "$annexure_pdf",
                     profileflag: "$profileflag",
                     nick_name: "$nick_name",
-                    showOnboardingModal:"$showOnboardingModal",
+                    showOnboardingModal: "$showOnboardingModal",
                     coc_flag: "$coc_flag",
-                    latitude:"$latitude",
-                    longitude:"$longitude"
+                    latitude: "$latitude",
+                    longitude: "$longitude",
+                    beneficiary: "$beneficiary",
+                    emp_id : "$emp_id"
                 }
             }
         ]).exec();
@@ -950,10 +959,12 @@ exports.getSingleUser = async (req, res) => {
                     offer_letter_send: "$offer_letter_send",
                     profileflag: "$profileflag",
                     nick_name: "$nick_name",
-                    showOnboardingModal:"$showOnboardingModal",
+                    showOnboardingModal: "$showOnboardingModal",
                     coc_flag: "$coc_flag",
-                    latitude:"$latitude",
-                    longitude:"$longitude"
+                    latitude: "$latitude",
+                    longitude: "$longitude",
+                    beneficiary: "$beneficiary",
+                    emp_id : "$emp_id"
                 }
             }
         ]).exec();
@@ -1281,7 +1292,7 @@ exports.deliveryUser = async (req, res) => {
                     highest_upload: { $concat: [ImageUrl, '$highest_upload'] },
                     other_upload: { $concat: [ImageUrl, '$other_upload'] },
                     tenth_marksheet: { $concat: [ImageUrl, '$tenth_marksheet'] },
-                    twelveth_marksheet:  { $concat: [ImageUrl, '$twelveth_marksheet'] },
+                    twelveth_marksheet: { $concat: [ImageUrl, '$twelveth_marksheet'] },
                     UG_Marksheet: { $concat: [ImageUrl, '$UG_Marksheet'] },
                     passport: { $concat: [ImageUrl, '$passport'] },
                     pre_off_letter: { $concat: [ImageUrl, '$pre_off_letter'] },
@@ -2228,40 +2239,160 @@ exports.logOut = async (req, res) => {
 
 exports.getUserPresitting = async (req, res) => {
     try {
-      const userId = req.body.user_id;
-      
-      const sittingIds = await OrderRequest
-      .find({ User_id: userId })
-      .sort({ Sitting_id: -1 })
-      .limit(5)
-      .distinct('Sitting_id')
-      .exec();
-    
-    if (!sittingIds || sittingIds.length === 0) {
-      return res.status(404).json({ message: "No order requests found" });
-    }
-    
-    const sittingMastData = await Sitting
-      .find({ sitting_id: { $in: sittingIds } })
-      .exec();
-    
-    res.status(200).json(sittingMastData);
+        const userId = req.body.user_id;
+
+        const sittingIds = await OrderRequest
+            .find({ User_id: userId })
+            .sort({ Sitting_id: -1 })
+            .limit(5)
+            .distinct('Sitting_id')
+            .exec();
+
+        if (!sittingIds || sittingIds.length === 0) {
+            return res.status(404).json({ message: "No order requests found" });
+        }
+
+        const sittingMastData = await Sitting
+            .find({ sitting_id: { $in: sittingIds } })
+            .exec();
+
+        res.status(200).json(sittingMastData);
     } catch (error) {
-      res.status(500).json({ message: "Error retrieving order requests from the database" });
+        res.status(500).json({ message: "Error retrieving order requests from the database" });
     }
-  };
+};
 
-// exports.getUsersByDepartment = async (req, res) => {
-//     try {
-//         const { dept_id } = req.body;
 
-//         const userDetails = await userModel.find(
-//             { dept_id },
-//             'user_name user_id'
-//         );
+exports.getAllUsersWithDoBAndDoj = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const currentDayMonth = currentDate.toISOString().slice(5, 10);
 
-//         res.status(200).send({ data: userDetails });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message, sms: 'Internal Server Error' });
-//     }
-// }
+        const allUsers = await userModel.find().select({ joining_date: 1, DOB: 1, user_name: 1 });
+
+        const filteredUsers = allUsers.map(user => {
+            const userJoiningDate = user.joining_date?.toISOString().split('T')[0];
+            const userDOB = user.DOB?.toISOString().slice(5, 10);
+
+            if (userJoiningDate === currentDate.toISOString().split('T')[0]) {
+                return {
+                    user_name: user.user_name,
+                    joining_date: user.joining_date,
+                };
+            } else if (userDOB === currentDayMonth) {
+                return {
+                    user_name: user.user_name,
+                    DOB: user.DOB,
+                };
+            }
+
+            return null;
+        }).filter(Boolean);
+
+        res.json({ users: filteredUsers });
+    } catch (error) {
+        return res.status(500).send({ error: error.message });
+    }
+}
+
+exports.getLastMonthUsers = async (req, res) => {
+    try {
+        const currentDate = new Date();
+
+        const lastMonthStartDate = new Date(currentDate);
+        lastMonthStartDate.setMonth(currentDate.getMonth() - 1);
+       
+        const usersFromLastMonth = await userModel.find({
+            created_At: {
+                $gte: lastMonthStartDate,
+                $lt: currentDate,
+            }
+        }).select({ user_id: 1, user_name: 1, created_At: 1 });
+
+        res.json(usersFromLastMonth);
+    } catch (err) {
+        console.error(err); 
+        res.status(500).json({ error: err.message, sms: 'Error getting users from last month' });
+    }
+}
+
+exports.getAllFilledUsers = async (req, res) => {
+    try {
+        const userFields = Object.keys(userModel.schema.paths);
+        
+        const andConditions = userFields.map(field => ({ [field]: { $exists: true, $ne: null } }));
+
+        const usersWithAllFieldsFilled = await userModel.find({
+            $and: andConditions,
+        });
+
+        if (!usersWithAllFieldsFilled) {
+            res.status(500).send({ success: false });
+        }
+
+        res.status(200).send({ results: usersWithAllFieldsFilled });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: err.message, sms: 'Error getting users with all fields filled' });
+    }
+}
+
+exports.getFilledPercentage = async (req, res) => {
+    try {
+        const users = await userModel.find().select({
+            user_id:1,
+            user_name : 1,
+            PersonalEmail : 1,
+            PersonalNumber : 1,
+            fatherName : 1,
+            Gender : 1,
+            motherName : 1,
+            Hobbies: 1,
+            BloodGroup : 1,
+            SpokenLanguage : 1,
+            DO : 1,
+            Nationality : 1,
+            guardian_name : 1,
+            guardian_contact :1,
+            emergency_contact: 1,
+            guardian_address : 1,
+            relation_with_guardian : 1,
+            current_address : 1,
+            current_city : 1,
+            current_state : 1,
+            current_pin_code : 1,
+            permanent_address : 1,
+            permanent_city : 1,
+            permanent_state : 1,
+            permanent_pin_code : 1,
+            onboard_status : 1
+        });
+
+        if (!users) {
+            return res.status(500).send({ success: false });
+        }
+
+        const resultArray = [];
+        const percentageResults = users.map(user => {
+            const filledFields = Object.values(user._doc).filter(value => value !== null && value !== "" && value !== 0).length;
+
+            const filledPercentage = (filledFields / 24) * 100;
+            const result = { user_id: user.user_id, filledPercentage: filledPercentage.toFixed(2) };
+
+            resultArray.push(result);
+
+            return result;
+        });
+
+        const incompleteUsers = resultArray.filter(result => parseFloat(result.filledPercentage) < 100);
+        const incompleteUsersDetails = incompleteUsers.map(incompleteUser => {
+            const userDetail = users.find(user => user.user_id === incompleteUser.user_id);
+            return userDetail._doc;
+        });
+
+        res.status(200).send({ results: percentageResults, incompleteUsersDetails });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: err.message, sms: 'Error calculating filled percentage' });
+    }
+}

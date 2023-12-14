@@ -22,7 +22,7 @@ exports.savePhpIncentiveInNode = async (req, res) => {
             }
         )
         const responseData = response.data.body;
-
+      
         for (const data of responseData) {
 
             const existingData = await checkIfDataExists(data.incentive_request_id)
@@ -40,7 +40,7 @@ exports.savePhpIncentiveInNode = async (req, res) => {
                     creation_date: data.creation_date,
                     last_updated_date: data.last_updated_date,
                     name: data.name,
-                    sno: 1
+                    sno: data.sno
                 })
                 const instav = await creators.save();
 
@@ -59,7 +59,8 @@ exports.savePhpIncentiveInNode = async (req, res) => {
                                 remarks: data.remarks,
                                 creation_date: data.creation_date,
                                 last_updated_date: data.last_updated_date,
-                                name: data.name
+                                name: data.name,
+                                sno: 1
                             }
                         }
                     )

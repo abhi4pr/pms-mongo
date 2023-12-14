@@ -126,7 +126,7 @@ exports.savePhpFinanceDataInNode = async (req, res) => {
             } else {
                 const updateExistingData = Object.keys(data).some(key => existingData[key] !== data[key])
                 if (updateExistingData) {
-                    await phpPaymentAccListModel.updateOne({ payment_update_id: data.payment_update_id },
+                    await phpFinanceModel.updateOne({ payment_update_id: data.payment_update_id },
                         {
                             $set: {
                                 payment_date: data.payment_date,

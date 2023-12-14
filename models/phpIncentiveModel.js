@@ -32,11 +32,11 @@ const phpIncentiveModel = new mongoose.Schema({
         required: false
     },
     creation_date: {
-        type: Date,
+        type: String,
         required: false
     },
     last_updated_date: {
-        type: Date,
+        type: String,
         required: false
     },
     name: {
