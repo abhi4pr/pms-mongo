@@ -101,6 +101,9 @@ router.put("/campaignplan", campaignPlanController.updateBulk);
 router.get("/campaignplan/:id", campaignPlanController.getPlan);
 router.get('/campaignplan/singleplan/:id', campaignPlanController.getSinglePlan)
 router.put('/campaignplan/singleplan/:id', campaignPlanController.singlePlanUpdate)
+router.put('/updatePlan', campaignPlanController.updatePlan)
+router.put('/updatePhase', campaignPhaseController.updatePhase)
+router.put('/updateAssignment', assignmentController.updateAssignment)
 // router.get('/campaignplan/:id', campaignPlanController.getPlan)
 
 router.post('/campaignphase', campaignPhaseController.createPhase)

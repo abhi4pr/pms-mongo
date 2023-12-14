@@ -122,6 +122,10 @@ const assignmentSchema = new mongoose.Schema({
   },
   verification_remark: {
     type: String,
+  },
+  updatedFrom: {
+    type: String,
+    default : ""
   }
 
 });

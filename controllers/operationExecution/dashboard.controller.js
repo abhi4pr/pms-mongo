@@ -83,8 +83,8 @@ exports.phaseDashboard = catchAsync(async (req, res, next) => {
 
     {
       $project: {
-        _id:0,
-        phase_id: 1,
+        _id : 0,
+        phase_id : "$_id.phase_id",
         campaignId: 1,
         verified_execution_total: 1,
         executed_execution_total: 1,

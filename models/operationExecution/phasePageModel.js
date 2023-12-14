@@ -90,6 +90,10 @@ const phasePageSchema = new mongoose.Schema({
   },
   replacement_id: {
     type: String,
+  },
+  updatedFrom: {
+    type: String,
+    default : ""
   }
 });
 

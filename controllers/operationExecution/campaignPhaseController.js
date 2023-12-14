@@ -6,7 +6,8 @@ const appError = require('../../helper/appError');
 const catchAsync = require('../../helper/catchAsync');
 const campaignPlanModel = require('../../models/operationExecution/campaignPlanModel');
 const campaignPhaseModel = require('../../models/operationExecution/campaignPhaseModel');
-
+const AssignmentModel=require('../../models/operationExecution/assignmentModel');
+const response = require('../../common/response');
 // in phase we have done the parent refrencing. here parent is campaign phase , 
 // phasepages and phase commitments are refrencing towards the parent campaign phase  
 
@@ -97,4 +98,45 @@ exports.updateBulk=catchAsync(async (req,res,next) => {
     //2.check if there is page which is not in the phase 
             //on basis of phaseid i will fetch all the pages associated with the phase
 
+})
+
+exports.updatePhase = catchAsync(async (req,res,next)=>{
+    const { campaignId, p_id, phase_id} = req.body
+    const filter1 = { campaignId, p_id, phase_id };
+    const filter2 = { campaignId, p_id };
+
+    // const options1  = {
+    //   new: true, // Return the modified document rather than the original
+    //   upsert: true, // If the document does not exist, insert a new one
+    // };
+    const options2  = {
+      new: true, // Return the modified document rather than the original
+    };
+    
+    const result = await PhasePageModel.findOneAndUpdate(filter1, req.body, options2);
+    if(!result) {
+        const data = new PhasePageModel({
+            ...req.body
+          });
+          const savedData = await data.save();
+          if(!savedData) {
+            return next(new appError(200,"Something went wrong while creating phase page model ."))
+          }
+
+    }
+
+    const result2 = await campaignPlanModel.findOneAndUpdate(filter2, {...req.body, updatedFrom : "Phase"}, options2);
+    if(!result2) {
+        const data = new campaignPlanModel({
+            ...req.body
+          });
+          const savedData = await data.save();
+          if(!savedData) {
+              return next(new appError(200,"Something went wrong while creating plan."))
+          }
+    }
+    const result3 = await AssignmentModel.findOneAndUpdate(filter1, {...req.body, updatedFrom : "Phase"}, options2);
+    
+
+   return response.returnTrue(200,req,res,"Updation Operation Successfully.")
 })
