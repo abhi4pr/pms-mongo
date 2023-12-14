@@ -440,6 +440,122 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
   }
 };
 
+
+exports.getSalaryByMonthYear = async (req, res) => {
+  try {
+    const imageUrl = "http://34.93.135.33:8080/uploads/";
+
+    const getcreators = await attendanceModel
+      .aggregate([
+        {
+          $match: {
+            month: req.body.month,
+            year: parseInt(req.body.year),
+          },
+        },
+        {
+          $lookup: {
+            from: "usermodels",
+            localField: "user_id",
+            foreignField: "user_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: {
+            path: "$user",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "designationmodels",
+            localField: "user.user_designation",
+            foreignField: "desi_id",
+            as: "designation",
+          },
+        },
+        {
+          $unwind: {
+            path: "$designation",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "financemodels",
+            localField: "attendence_id",
+            foreignField: "attendence_id",
+            as: "finance",
+          },
+        },
+        {
+          $unwind: {
+            path: "$finance",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            attendence_id: 1,
+            dept: 1,
+            user_id: 1,
+            noOfabsent: 1,
+            year: 1,
+            remark: 1,
+            Creation_date: 1,
+            Created_by: 1,
+            Last_updated_by: 1,
+            Last_updated_date: 1,
+            month: 1,
+            bonus: 1,
+            total_salary: 1,
+            net_salary: 1,
+            tds_deduction: 1,
+            user_name: "$user.user_name",
+            user_email_id: "$user.user_email_id",
+            user_contact_no: "$user.user_contact_no",
+            permanent_address: "$user.permanent_address",
+            permanent_city: "$user.permanent_city",
+            permanent_state: "$user.permanent_state",
+            permanent_pin_code: "$user.permanent_pin_code",
+            bank_name: "$user.bank_name",
+            ifsc_code: "$user.ifsc_code",
+            account_no: "$user.account_no",
+            toPay: 1,
+            sendToFinance: 1,
+            attendence_generated: 1,
+            invoiceNo: 1,
+            attendence_status: 1,
+            salary_status: 1,
+            salary_deduction: 1,
+            salary: 1,
+            pan_no: "$user.pan_no",
+            current_address: "$user.current_address",
+            invoice_template_no: "$user.invoice_template_no",
+            joining_date: "$user.joining_date",
+            designation_name: "$designation.desi_name",
+            status_: "$finance.status_",
+            reference_no: "$finance.reference_no",
+            amount: "$finance.amount",
+            pay_date: "$finance.pay_date",
+            screenshot: {
+              $concat: [imageUrl, "$finance.screenshot"],
+            },
+            digital_signature_image: "$user.digital_signature_image",
+          },
+        },
+      ])
+      .exec();
+    if (getcreators?.length === 0) {
+      return res.status(500).send({ success: false });
+    }
+    return res.status(200).send({ data: getcreators });
+  } catch (err) {
+    return res.status(500).send({ error: err, sms: "Error getting salary" });
+  }
+};
+
 exports.getSalaryByFilter = async (req, res) => {
   try {
     if (req.body.dept == 0) {

@@ -715,6 +715,10 @@ router.post(
 router.get("/get_all_wfh_users", user.getAllWfhUsers);
 router.get("/get_all_login_history", user.getLoginHistory);
 router.post("/get_user_pre_sitting",user.getUserPresitting);
+router.get("/get_all_users_with_dob_doj",user.getAllUsersWithDoBAndDoj);
+router.get("/get_last_month_users",user.getLastMonthUsers);
+router.get("/get_all_filled_users",user.getAllFilledUsers);
+router.get("/get_all_percentage",user.getFilledPercentage);
 // router.post("/get_users_by_departments",user.getUsersByDepartment);
 // router.get("/get_first_time_login_users", user.getAllFirstLoginUsers)
 
@@ -725,6 +729,7 @@ router.post(
 
   attendance.getSalaryByDeptIdMonthYear
 );
+router.post("/get_salary_by_month_year",attendance.getSalaryByMonthYear);
 router.post("/get_salary_by_filter", attendance.getSalaryByFilter);
 router.post(
   "/get_attendance_by_userid",

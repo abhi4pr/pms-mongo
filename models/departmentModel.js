@@ -12,6 +12,12 @@ const departmentModel = new mongoose.Schema({
     unique:true,
     default: "",
   },
+  short_name: {
+    type: String,
+    required: false,
+    unique:true,
+    default: "",
+  },
   Remarks: {
     type: String,
     required: false,

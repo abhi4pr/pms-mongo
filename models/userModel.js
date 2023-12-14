@@ -624,6 +624,16 @@ const userModel = new mongoose.Schema({
         type: Boolean,
         default: false,
         required: false
+    },
+    beneficiary: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    emp_id: {
+        type: String,
+        required: false,
+        default: ""
     }
 });
 
