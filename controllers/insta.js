@@ -1543,118 +1543,152 @@ exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
 // }
 exports.insertDataIntoPostAnalytics = async (req,res)=>{
     try {
-       let shortCodeFind = req.body.shortcode;
-        
-       let findDataFromPost = await instaP.find({ shortCode : shortCodeFind }).lean()
-       const { _id, __v, todayComment,
-        todayLikes,
-        todayViews,
-        selector_date,
-        auditor_date,
-        createdAt,
-        postType,
-        creatorName,
-        allComments,
-        pastComment,
-        allLike,
-        pastLike,
-        allView,
-        pastView,
-        title,
-        postedOn,
-        postUrl,
-        postImage,
-        shortCode,
-        posttype_decision,
-        selector_name,
-        interpretor_name,
-        auditor_name,
-        auditor_decision,
-        interpretor_decision,
-        selector_decision,
-        dateCol,
-        hashTag,
-        mentions,
-        interpretor_date,
-        handle,
-        updatedAt,
-        campaign_id,
-        location,
-        music_info,
-        sponsored,
-        brand_id,
-        crone_trak } = findDataFromPost[0];
- 
-       const savingRes = new instaPostAnalyticsModel({
-        todayComment, 
-        todayLikes,
-        todayViews,
-        selector_date, //
-        auditor_date, //
-        createdAt,
-        postType, 
-        creatorName, //
-        allComments,
-        pastComment,
-        allLike,
-        pastLike,
-        allView,
-        pastView,
-        title, 
-        postedOn,
-        postUrl, //
-        postImage, //
-        shortCode, //
-        posttype_decision, //
-        selector_name, //
-        interpretor_name, //
-        auditor_name, //
-        auditor_decision,  //
-        interpretor_decision, //
-        selector_decision, //
-        dateCol, //
-        hashTag, //
-        mentions, //
-        interpretor_date, //
-        handle, //
-        updatedAt, //  
-        campaign_id, // ***
-        location, 
-        music_info, 
-        sponsored, 
-        brand_id, //  ***
-        crone_trak  //
-         });
-        const result =  await savingRes.save()
-
-        if(result){
-          let updatedPost =  await instaP.findByIdAndUpdate(_id,{ $set : {
-             createdAt : Date.now(),
-             todayComment: req.body.data.comments_count.today,
-             todayLikes: req.body.data.likes_count.today,
-             todayViews: req.body.data.views_count.today,
-             postType: req.body.data.post_type,
-             allComments: req.body.data.comments_count.overall,
-             pastComment: req.body.data.comments_count.vs_previous,
-             allLike: req.body.data.likes_count.overall,
-             pastLike: req.body.data.likes_count.vs_previous,
-             allView: req.body.data.views_count.overall,
-             todayViews: req.body.data.views_count.today,
-             pastView: req.body.data.views_count.vs_previous,
-             title: req.body.data.title,
-             postedOn: req.body.data.posted_at,
-             location : req.body.data?.location,
-             music_info : req.body.data?.music_info,
-             sponsored : req.body.data?.sponsored,
-             crone_trak : parseInt(crone_trak) + 1
-
-          }})
-            if(!updatedPost){
-              return  res.send({ message: "Analytics data inserted sucessfully but insta post model not update properly.", status: 200 });
+    let shortCodeFind = req.body.shortcode;
+    
+    /**
+     * 15 Dec 2023
+     * {
+            "event_type": "rt_tracking_ig_add_post",
+            "shortcode": "CyKFBVjPUIL",
+            "connector": "instagram",
+            "data": {
+            "error": {
+                "code": "404",
+                "message": "Invalid Url"
             }
+            },
+            "url": "https://app.ylytic.com/InstaPost?id=657850e79eb8c8053c09b606"
         }
-             /* update insta p model post mean that are tracked */
-            //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+     * Checks if the error message in the request body is "Invalid Url". If it is, updates the
+     * crone_trak field of the corresponding document in the instaP collection to -1.
+     */
+    if(req.body?.data?.error?.message == "Invalid Url"){
+            let updatedPost =  await instaP.findOneAndUpdate({
+                        shortCode : shortCodeFind
+                    },
+                    {
+                        crone_trak : -1
+                    }, 
+                    { new: true })
+            
+        if(!updatedPost){
+                return  res.send({ message: "There is something error in updating crone track to -1.", status: 200 });
+                }
+    } else {
+
+            let findDataFromPost = await instaP.find({ shortCode : shortCodeFind }).lean()
+            const { _id, __v, todayComment,
+            todayLikes,
+            todayViews,
+            selector_date,
+            auditor_date,
+            createdAt,
+            postType,
+            creatorName,
+            allComments,
+            pastComment,
+            allLike,
+            pastLike,
+            allView,
+            pastView,
+            title,
+            postedOn,
+            postUrl,
+            postImage,
+            shortCode,
+            posttype_decision,
+            selector_name,
+            interpretor_name,
+            auditor_name,
+            auditor_decision,
+            interpretor_decision,
+            selector_decision,
+            dateCol,
+            hashTag,
+            mentions,
+            interpretor_date,
+            handle,
+            updatedAt,
+            campaign_id,
+            location,
+            music_info,
+            sponsored,
+            brand_id,
+            crone_trak } = findDataFromPost[0];
+
+            const savingRes = new instaPostAnalyticsModel({
+            todayComment, 
+            todayLikes,
+            todayViews,
+            selector_date, //
+            auditor_date, //
+            createdAt,
+            postType, 
+            creatorName, //
+            allComments,
+            pastComment,
+            allLike,
+            pastLike,
+            allView,
+            pastView,
+            title, 
+            postedOn,
+            postUrl, //
+            postImage, //
+            shortCode, //
+            posttype_decision, //
+            selector_name, //
+            interpretor_name, //
+            auditor_name, //
+            auditor_decision,  //
+            interpretor_decision, //
+            selector_decision, //
+            dateCol, //
+            hashTag, //
+            mentions, //
+            interpretor_date, //
+            handle, //
+            updatedAt, //  
+            campaign_id, // ***
+            location, 
+            music_info, 
+            sponsored, 
+            brand_id, //  ***
+            crone_trak  //
+            });
+            const result =  await savingRes.save()
+
+            if(result){
+            let updatedPost =  await instaP.findByIdAndUpdate(_id,{ $set : {
+                createdAt : Date.now(),
+                todayComment: req.body.data.comments_count.today,
+                todayLikes: req.body.data.likes_count.today,
+                todayViews: req.body.data.views_count.today,
+                postType: req.body.data.post_type,
+                allComments: req.body.data.comments_count.overall,
+                pastComment: req.body.data.comments_count.vs_previous,
+                allLike: req.body.data.likes_count.overall,
+                pastLike: req.body.data.likes_count.vs_previous,
+                allView: req.body.data.views_count.overall,
+                todayViews: req.body.data.views_count.today,
+                pastView: req.body.data.views_count.vs_previous,
+                title: req.body.data.title,
+                postedOn: req.body.data.posted_at,
+                location : req.body.data?.location,
+                music_info : req.body.data?.music_info,
+                sponsored : req.body.data?.sponsored,
+                crone_trak : parseInt(crone_trak) + 1
+
+            }})
+                if(!updatedPost){
+                return  res.send({ message: "Analytics data inserted sucessfully but insta post model not update properly.", status: 200 });
+                }
+            }
+                /* update insta p model post mean that are tracked */
+                //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+    }
+        
+       
        return res.send({ message:"Succefully perform operation.", status: 200 });
        
     } catch (error) {
@@ -1723,6 +1757,11 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
             shortCode: 1,
           };
           const postDataRespecticBrand = await instaP.find(filterForPost, projectionForPost);
+        //   const postDataRespecticBrand = await instaP.find({
+        //     filterForPost,
+        //     projectionForPost,
+        //     crone_trak: { "$ne": -1 }
+        //   });
           const documentCount = await instaP.countDocuments(filterForPost);
 
 
@@ -1739,8 +1778,11 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
           // Extract an array of unique shortcodes from uniqueShortcodes array
             const uniqueShortcodeValues = [...new Set(uniqueShortcodes.map(obj => obj.shortCode))];
             const resultArray1 = postDataRespecticBrand.filter(postData => {
-                  return !uniqueShortcodeValues.includes(postData.shortCode);
-             });
+                return (
+                  !uniqueShortcodeValues.includes(postData.shortCode) &&
+                  postData.crone_trak !== -1
+                );
+              });
             const resultArray2 = postDataRespecticBrand.filter(postData => {
                   return uniqueShortcodeValues.includes(postData.shortCode);
              });
