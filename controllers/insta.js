@@ -158,10 +158,18 @@ exports.trackPost = async (req, res) => {
 
         let check = await instaP.findOne({ shortCode: req.body.shortcode })
         if (!check) {
+            let page_category_id = 0
+            const page_category_data = await projectxModel.findOne({
+                page_name: { $regex: new RegExp(req.body.data.creator.username?.toLowerCase(), 'i') }
+              });
+            
+              if (page_category_data) {
+                page_category_id = page_category_data?.page_category_id
+              } 
             const creators = new instaP({
                 handle: req.body.data?.handle ?? "",
                 postType: req.body.data.post_type,
-                creatorName: req.body.data.creator.username,
+                creatorName: req.body.data.creator.username, //
                 profile_pic_url: req.body.data.creator.profile_pic_url,
                 allComments: req.body.data.comments_count.overall,
                 brand_id: 0,
@@ -190,6 +198,7 @@ exports.trackPost = async (req, res) => {
                 music_info : req.body.data?.music_info,
                 location : req.body.data?.location,
                 sponsored : req.body.data?.sponsored,
+                page_category_id
             });
             const instav = await creators.save();
             res.send({ instav, status: 200 });
@@ -797,6 +806,14 @@ exports.trackStory = async (req, res) => {
             for (const data of req.body?.story_data?.stories) {
                 let check = await instaS.findOne({ shortcode: data?.shortcode })
                 if (!check) {
+                    let page_category_id = 0
+                    const page_category_data = await projectxModel.findOne({
+                     page_name: { $regex: new RegExp(req.body?.handle?.toLowerCase(), 'i') }
+                 });
+            
+                  if (page_category_data) {
+                   page_category_id = page_category_data?.page_category_id
+                  } 
                     const creators = new instaS({
                         creatorName: req.body?.handle,
                         mediaCont: req.body?.story_data?.media_count,
@@ -816,6 +833,7 @@ exports.trackStory = async (req, res) => {
                         interpretor_decision: req.body?.interpretor_decision,
                         selector_decision: req.body?.selector_decision,
                         image_url: data?.image_url,
+                        page_category_id
                     })
                     await creators.save();
                 }
@@ -1614,7 +1632,8 @@ exports.insertDataIntoPostAnalytics = async (req,res)=>{
             music_info,
             sponsored,
             brand_id,
-            crone_trak } = findDataFromPost[0];
+            crone_trak,
+            page_category_id } = findDataFromPost[0];
 
             const savingRes = new instaPostAnalyticsModel({
             todayComment, 
@@ -1654,7 +1673,8 @@ exports.insertDataIntoPostAnalytics = async (req,res)=>{
             music_info, 
             sponsored, 
             brand_id, //  ***
-            crone_trak  //
+            crone_trak,  //
+            page_category_id
             });
             const result =  await savingRes.save()
 

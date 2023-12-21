@@ -204,6 +204,11 @@ const instaPModel = new mongoose.Schema({
         required: false,
         default: 0 // 1 mean tracked and 0 mean not tracked
     },
+    page_category_id: {   
+        type: Number, 
+        required: false,
+        default: 0 
+    },
 });
 
 // AutoIncrement.initialize(mongoose.connection);
