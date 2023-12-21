@@ -161,10 +161,10 @@ router.get("/instagetcreators", insta.getCreators);
 router.post("/track_creator_posty", insta.trackCreatorY);
 router.put("/track_creator_puty/:pagename", insta.trackCreatorPutY);
 router.get("/track_creator_get/:pagename", insta.trackCreatorGet);
-router.post("/track_post_post", insta.trackPost);
+router.post("/track_post_post", insta.trackPost); // add data into instap model
 router.get("/instagetposts", insta.getPosts);
 router.post("/track_post_posty", insta.trackPostY);
-router.post("/track_story_post", insta.trackStory);
+router.post("/track_story_post", insta.trackStory);  // add data into instas model
 router.put("/instaupdate", insta.editInsta);
 router.get("/post_type_dec_count", insta.postTypeDecCount);
 router.post("/creator_name_count", insta.creatorNameCount);
