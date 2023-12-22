@@ -1158,7 +1158,7 @@ exports.getAnalytics = async (req, res) => {
 
 exports.getDynamicMultiReqAndResInsta = async (req, res) => {
     try {
-        const { model, request_key_1, request_key_2, request_value_1, request_value_2, flag, matchCondition, sortingFlag } = req.body;
+        const { model, request_key_1, request_key_2, request_value_1, request_value_2, flag, matchCondition, sortingFlag,sortingField } = req.body;
         const page = req.query?.page;
         const perPage = req.query?.perPage;
         const skip = (page - 1) * perPage;
@@ -1193,7 +1193,9 @@ exports.getDynamicMultiReqAndResInsta = async (req, res) => {
             let query = modelCollection.find(dataQuery);
 
             if (sortingFlag === 1) {
-                query = query.sort({ postedOn: -1 });
+                if(!sortingField) return res.status(200).json({ message: "Please Provide sortingField while performing sorting on data." });
+                query = query.sort({ [sortingField]: -1 });
+                // query = query.sort({ postedOn: -1 });
             }
             
             if (page && perPage) {
