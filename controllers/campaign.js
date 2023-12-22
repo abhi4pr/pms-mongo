@@ -104,7 +104,7 @@ exports.deleteCampaign = async (req, res) => {
   const id = parseInt(req.params.id);
   const condition = { campaign_id: id };
   try {
-    const result = await campagingitSchema.deleteOne(condition);
+    const result = await campaginSchema.deleteOne(condition);
     if (result.deletedCount === 1) {
       return res.status(200).json({
         success: true,
@@ -117,6 +117,6 @@ exports.deleteCampaign = async (req, res) => {
       });
     }
   } catch (err) {
-    return res.status(400).json({ success: false, message: err });
+    return res.status(400).json({ success: false, message: err.message });
   }
 };
