@@ -1481,6 +1481,42 @@ exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
         res.status(500).send({error:error.message,message:'Internal server error'})
     }
 };
+// exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
+//     try {
+//         const trackCreatorParams = {
+//             cron_expression: req.body.cron_expression,
+//             // cron_expression: "*/15 * * * *",
+//             tracking_expiry_at: req.body.tracking_expiry_at,
+//             // tracking_expiry_at: "2023-12-01 12:12:12.12",
+//             tracking: true
+//         };
+//     let data = req.body.data
+//     const axiosRequests = data.map(async (item) => {
+//         try {
+//             const result = await axios.get(
+//                 `http://34.93.221.166:3000/api/get_all_users`,
+               
+//             );
+//             return result?.data;
+//         } catch (error) {
+//             console.log(error.message);
+//             // You may want to handle the error and decide what to return in case of failure
+//             return null;
+//         }
+//     });
+
+//     const resArr = await Promise.all(axiosRequests);
+
+//     // Check if all requests were successful before returning the response
+//     if (resArr.every((response) => response !== null)) {
+//         res.status(200).json({ message: "Requests successfully sent to third party.", data: resArr });
+//     } else {
+//         res.status(500).json({ message: "Some requests failed. Check logs for details." });
+//     }
+//     } catch (error) {
+//         res.status(500).send({error:error.message,message:'Internal server error'})
+//     }
+// };
 exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
     try {
         const trackCreatorParams = {
@@ -1496,6 +1532,7 @@ exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
             // if(index < 2 ){
     
                 try {
+                  
                   let result =  await axios.put(
                         `https://app.ylytic.com/ylytic/api/v1/rt_tracking/posts/${item.shortCode}`,
                         trackCreatorParams,
@@ -1506,7 +1543,7 @@ exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
                             },
                         }
                     );
-                    resArr.push(result?.data)
+                    // resArr.push(result?.data)
                 } catch (error) {
                     console.log(error.message)
                 }
@@ -1824,13 +1861,13 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
               */
              obj.brnads_data_count_rating = brnadsDataCount
              obj.insta_post_counts_based_on_brands = documentCount
-             obj.insta_post_shortcode = postDataRespecticBrand
+            //  obj.insta_post_shortcode = postDataRespecticBrand
              obj.short_code_match_in_analytics_counts = resultArray2 && resultArray2.length
-             obj.short_code_match_in_analytics = resultArray2
+            //  obj.short_code_match_in_analytics = resultArray2
              obj.short_code_not_match_in_analytics_model_count = resultArray1  && resultArray1.length
              obj.short_code_not_match_in_analytics = resultArray1
              obj.unique_shortcode_values_from_analytics_model_counts = uniqueShortcodeValues && uniqueShortcodeValues.length
-             obj.unique_shortcode_values_from_analytics = uniqueShortcodeValues
+            //  obj.unique_shortcode_values_from_analytics = uniqueShortcodeValues
             //  obj.unique_shortcodes_from_analytics = uniqueShortcodes
            
              return res.status(200).json({obj})
