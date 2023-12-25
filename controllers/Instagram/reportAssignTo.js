@@ -43,11 +43,11 @@ exports.getDataFromReportAssign = async (req, res) => {
 };
 exports.getSingleDataFromReportAssign = async (req, res) => {
   try {
-    const doc = await reportAssignToModel.findById(req?.params?.id);
-    if (!doc) {
+    const doc = await reportAssignToModel.find({user_id : parseInt(req.params.id)});
+    if (doc && doc.length === 0 ) {
       return response.returnFalse(200, req, res, "No record found", {});
     } else {
-      return response.returnTrue(200, req, res, "Data Fetch Successfully", doc);
+      return response.returnTrue(200, req, res, "Data Fetch Successfully", doc[0]);
     }
   } catch (err) {
     return response.returnFalse(500, req, res, err.message, {});
@@ -56,11 +56,9 @@ exports.getSingleDataFromReportAssign = async (req, res) => {
 exports.editDataToReportAssign = async (req, res) => {
   try {
 
-    const editDocObj = await reportAssignToModel.findByIdAndUpdate(
-      req.body._id,
-      {
-        $set: req.body,
-      },
+    const editDocObj = await reportAssignToModel.findOneAndUpdate(
+      { user_id: parseInt(req.body.user_id) },
+       req.body,
       { new: true }
     );
 
@@ -81,7 +79,7 @@ exports.editDataToReportAssign = async (req, res) => {
 };
 exports.deleteDataFromReportAssign = async (req, res) => {
   try {
-    const result = await reportAssignToModel.findByIdAndDelete(req.params.id);
+    const result = await reportAssignToModel.findOneAndDelete({user_id : parseInt(req.params.id)});
     if (result) {
       return response.returnTrue(
         200,
