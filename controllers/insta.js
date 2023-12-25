@@ -1861,13 +1861,13 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
               */
              obj.brnads_data_count_rating = brnadsDataCount
              obj.insta_post_counts_based_on_brands = documentCount
-             obj.insta_post_shortcode = postDataRespecticBrand
+            //  obj.insta_post_shortcode = postDataRespecticBrand
              obj.short_code_match_in_analytics_counts = resultArray2 && resultArray2.length
-             obj.short_code_match_in_analytics = resultArray2
+            //  obj.short_code_match_in_analytics = resultArray2
              obj.short_code_not_match_in_analytics_model_count = resultArray1  && resultArray1.length
              obj.short_code_not_match_in_analytics = resultArray1
              obj.unique_shortcode_values_from_analytics_model_counts = uniqueShortcodeValues && uniqueShortcodeValues.length
-             obj.unique_shortcode_values_from_analytics = uniqueShortcodeValues
+            //  obj.unique_shortcode_values_from_analytics = uniqueShortcodeValues
             //  obj.unique_shortcodes_from_analytics = uniqueShortcodes
            
              return res.status(200).json({obj})
