@@ -3,102 +3,159 @@ const helper = require("../../helper/helper");
 const instaBrandModel = require("../../models/instaBrandModel");
 const instaP = require("../../models/instaPModel");
 const axios = require("axios");
+const schedule = require("node-schedule");
 const token =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY0NmNhOTExZWY5ZTcwNWM3ODc1Nzk0NyIsIm5hbWUiOiJjcmVhdGl2ZWZ1ZWwiLCJleHAiOjE3Mjc0ODg3MzAsInJvbGUiOiJDTElFTlQiLCJwZXJtaXNzaW9ucyI6W10sInNlc3Npb24iOiJhNjUwNDg1MS00ZTgwLTRiZjQtODBkZC02YzgxYWYxNjU2MzAifQ.EP0JfWCsLxaFdCLr6MizEeltnJ4h3s9PLi-GuoCUops";
+  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY0NmNhOTExZWY5ZTcwNWM3ODc1Nzk0NyIsIm5hbWUiOiJjcmVhdGl2ZWZ1ZWwiLCJleHAiOjE3Mjc0ODg3MzAsInJvbGUiOiJDTElFTlQiLCJwZXJtaXNzaW9ucyI6W10sInNlc3Npb24iOiJhNjUwNDg1MS00ZTgwLTRiZjQtODBkZC02YzgxYWYxNjU2MzAifQ.EP0JfWCsLxaFdCLr6MizEeltnJ4h3s9PLi-GuoCUops";
 
-exports.putPostOnTracking = async (req, res) => {
-    try {
-        /* Anurag Api Logic */
-        let apiLogic = async (shortCode) => {
-   
-            const currentDate = new Date();
-            currentDate.setDate(currentDate.getDate() + 1); // Adding one day
 
-            // Format the date as needed ("YYYY-MM-DD HH:mm:ss.SS")
-            const formattedDate = currentDate.toISOString().slice(0, 19).replace("T", " ") + ".00";
+/* Schedule job for every day at 11 pm */
+schedule.scheduleJob("0 17 * * *", async () => {
+  putPostOnTracking();
+});
+async function putPostOnTracking(req, res) {
+  try {
+    /* Anurag Api Logic */
+    let apiLogic = async (shortCode, sessionCalled) => {
+      //   console.log("api call for shortcode", shortCode,"With api section", sessionCalled);
+      // const currentDate = new Date();
+      // currentDate.setDate(currentDate.getDate() + 1); // Adding one day
 
-            let payloadObj = {
-                cron_expression: "30 17 * * *",  // UTC time is 05:30 PM AND OUR TIME IS 11:00 PM
-                tracking_expiry_at: formattedDate,
-                tracking: true,
-            };
-           
-            try {
-                let result = await axios.put(
-                    //   `https://app.ylytic.com/ylytic/api/v1/rt_tracking/posts/${shortCode}`,
-                    payloadObj,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-            } catch (error) {
-                console.log(error.message);
-            }
-        };
+      // // Format the date as needed ("YYYY-MM-DD HH:mm:ss.SS")
+      // const formattedDate = currentDate.toISOString().slice(0, 19).replace("T", " ") + ".00";
 
-        /* Get Brands which rating is 4 to 5 */
-        let brnadsData = await instaBrandModel.find(
-            {
-                rating: { $gte: 4, $lte: 5 },
-            },
-            "instaBrandId"
-        );
+      // let payloadObj = {
+      //     cron_expression: "30 17 * * *",  // UTC time is 05:30 PM AND OUR TIME IS 11:00 PM
+      //     tracking_expiry_at: formattedDate,
+      //     tracking: true,
+      // };
 
-        if (brnadsData?.length === 0) {
-            return response.returnFalse(
-                200,
-                req,
-                res,
-                `There are no brands with 4 to 5 rating.`,
-                {}
-            );
-        }
-        /* Create condition with brand id */
-        let conditionForBrandId = brnadsData?.map((item) => {
-            let obj = {
-                brand_id: item.instaBrandId,
-            };
-            return obj;
-        });
-        /* Find post (shortcode) based on provide condition */
-        let arr_of_shortcode = await instaP.find(
-            {
-                interpretor_decision: 1,
-                crone_trak: { $ne: -1, $lt: 3 }, // crone_trak not equal to -1 and less than 3
-                posttype_decision: 1,
-                $or: conditionForBrandId,
-            },
-            "shortCode"
-        );
-        arr_of_shortcode?.map(async (item) => {
-            if (item.crone_trak === 0) {
-                let diff = item.postedOn - Date.now();
-                if (diff >= 24) {  //hours
-                    await apiLogic(item.shortCode);
-                }
-            } else if (item.crone_trak === 1) {
-                let diff = item.createdAt - Date.now();
-                if (diff >= 7) {   //days
-                    await apiLogic(item.shortCode);
-                }
-            } else if (item.crone_trak === 2) {
-                let diff = item.postedOn - Date.now();
-                if (diff >= 30) {  //days
-                    await apiLogic(item.shortCode);
-                }
-            }
-            console.log("Logic performed for tracking post.")
-        });
-    } catch (err) {
-        return response.returnFalse(
-            500,
-            req,
-            res,
-            `INTERNAL SERVER ERROR : ${err.message}`,
-            {}
-        );
+      // try {
+      //     let result = await axios.put(
+      //         //   `https://app.ylytic.com/ylytic/api/v1/rt_tracking/posts/${shortCode}`,
+      //         payloadObj,
+      //         {
+      //             headers: {
+      //                 Authorization: `Bearer ${token}`,
+      //                 "Content-Type": "application/json",
+      //             },
+      //         }
+      //     );
+      // } catch (error) {
+      //     console.log(error.message);
+      // }
+    };
+
+    /* Get Brands which rating is 4 to 5 */
+    let brnadsData = await instaBrandModel.find(
+      {
+        rating: { $gte: 4, $lte: 5 },
+      },
+      "instaBrandId"
+    );
+
+    if (brnadsData?.length === 0) {
+      console.log(`There are no brands with 4 to 5 rating.`)
     }
-};
+    console.log("There is ", brnadsData.length, "brands with 4 to 5 rating");
+    /* Create condition with brand id */
+    let conditionForBrandId = brnadsData?.map((item) => {
+      let obj = {
+        brand_id: item.instaBrandId,
+      };
+      return obj;
+    });
+    // console.log("this brands data get in post model", JSON.stringify(conditionForBrandId, null, 2));
+
+    /* Find post (shortcode) based on provide condition */
+    let arr_of_shortcode = await instaP.find(
+      {
+        interpretor_decision: 1,
+        crone_trak: { $ne: -1, $lt: 3 }, // crone_trak not equal to -1 and less than 3
+        posttype_decision: { $gte: 2 },
+        $or: conditionForBrandId,
+      },
+      "shortCode postedOn crone_trak brand_id"
+    );
+    console.log("There are ", arr_of_shortcode.length, "post for respective brand id's ref:");
+    const currentDate = new Date();
+    arr_of_shortcode?.map(async (item) => {
+      const postedOnDate = new Date(item.postedOn);
+      const timeDifferenceInMilliseconds = currentDate - postedOnDate;
+      // Calculate the difference in hours
+      const hoursDifference = Math.abs(
+        timeDifferenceInMilliseconds / (1000 * 60 * 60)
+      );
+      // Calculate the difference in days
+      const daysDifference = Math.abs(
+        timeDifferenceInMilliseconds / (1000 * 60 * 60 * 24)
+      );
+      //   console.log("daysDifference =>",daysDifference)
+      //   console.log("hoursDifference =>",hoursDifference)
+      if (item.crone_trak === 0) {
+        if (hoursDifference >= 24) {
+          //hours
+          await apiLogic(item.shortCode, 1);
+        }
+      } else if (item.crone_trak === 1) {
+        if (daysDifference >= 7) {
+          //days
+          await apiLogic(item.shortCode, 2);
+        }
+      } else if (item.crone_trak === 2) {
+        if (daysDifference >= 30) {
+          //days
+          await apiLogic(item.shortCode, 3);
+        }
+      }
+    });
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
+exports.getPostsDataFromInsta = async (req, res) => {
+  try {
+
+    let proxies = [
+      { protocol: "https", ip: "109.230.220.112", host: "78.47.96.120:3128", port: "3128" },
+      { protocol: "https", ip: "190.128.152.37", host: "190.128.152.37:8080", port: "8080" },
+      { protocol: "https", ip: "188.190.40.44", host: "188.190.40.44:8080", port: "8080" },
+      { protocol: "https", ip: "14.63.229.140", host: "14.63.228.239:80", port: "80" },
+      { protocol: "https", ip: "195.138.94.169", host: "195.138.94.169:41890", port: "41890" },
+      { protocol: "https", ip: "36.91.148.38", host: "36.91.148.38:8080", port: "8080" },
+    ];
+
+    const instagramApiUrl = 'https://www.instagram.com/api/v1/users/web_profile_info/?username=rvcjinsta';
+
+    async function makeRequest(url, proxy) {
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            "X-Csrftoken": "r6YU4BxNGFPbDf1VLKYa0g7koFhIFsrX",
+            "X-Ig-App-Id": "936619743392459",
+          },
+          proxy: {
+            host: proxy.host,
+            port: parseInt(proxy.port),
+            protocol: proxy.protocol,
+          },
+        });
+
+        console.log(`Request successful with proxy: ${proxy.host}`);
+        console.log(response.data);
+      } catch (error) {
+        console.error(`Request failed with proxy: ${proxy.host}`);
+        console.error(error.message);
+      }
+    }
+
+    // Loop through proxies and make requests
+    for (let i = 0; i < 200; i++) {
+      const currentProxy = proxies[i % proxies.length]; // Cycle through proxies
+      console.log("proxydata",currentProxy)
+      await makeRequest(instagramApiUrl, currentProxy);
+    }
+  } catch (error) {
+    return response.returnFalse(500, req, res, error.message, {})
+  }
+}

@@ -269,6 +269,7 @@ exports.editInsta = async (req, res) => {
             req.body._id,
             {
                 posttype_decision: req.body.posttype_decision,
+                page_category_id: req.body.page_category_id,
                 postImage: req.body.postImage,
                 selector_name: req.body.selector_name,
                 interpretor_name: req.body.interpretor_name,

@@ -14,6 +14,7 @@ const { checkDevAuthentication } = require("./doc/customization_src/middleware/s
 const path = require("path");
 require("./controllers/autoMail.js");
 require("./controllers/assetAutoMail.js");
+require("./controllers/Instagram/forYleticController.js");
 
 
 const app = express();

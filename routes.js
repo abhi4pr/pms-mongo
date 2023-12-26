@@ -46,6 +46,7 @@ const instapage = require("./controllers/instaPage.js");
 const pageUniqueness = require("./controllers/pageUniqueness.js");
 const imageUpload = require("./controllers/Instagram/imageUpload.js");
 const reportAssignToController = require("./controllers/Instagram/reportAssignTo.js");
+const forYleticController = require("./controllers/Instagram/forYleticController.js");
 
 const role = require("./controllers/role.js");
 const kra = require("./controllers/kra.js");
@@ -184,6 +185,7 @@ router.post("/creator_name_count_for_stories", insta.creatorNameCountForStory);
 router.post("/selector_name_count_instas", insta.selectorNameCountInstaS);
 router.post("/selector_name_count_instap", insta.selectorNameCountInstaP);
 router.post("/count_posted_on", insta.countBasedOnPostedOn);
+router.get("/get_posts_from_insta", forYleticController.getPostsDataFromInsta);
 /* "Report Assign to" routes for insta */
 router.post("/report_assign", reportAssignToController.addDataIntoReportAssign);
 router.get("/report_assign", reportAssignToController.getDataFromReportAssign);
