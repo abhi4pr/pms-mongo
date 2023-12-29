@@ -47,7 +47,7 @@ const pageUniqueness = require("./controllers/pageUniqueness.js");
 const imageUpload = require("./controllers/Instagram/imageUpload.js");
 const reportAssignToController = require("./controllers/Instagram/reportAssignTo.js");
 const forYleticController = require("./controllers/Instagram/forYleticController.js");
-const BotXController = require("./controllers/Instagram/Bot Tools/BotX.js");
+const BotXController = require("./controllers/Instagram/Bot_Tools/BotX.js");
 const withProxy = require("./controllers/Instagram/withproxy.js");
 
 const role = require("./controllers/role.js");
@@ -1233,5 +1233,5 @@ router.get(
 /*   
 Bot Tools
 */
-router.get("/call_bot_tool", BotXController.callBotTools);
+// router.get("/call_bot_tool", BotXController.callBotTools);
 module.exports = router;
