@@ -8,9 +8,8 @@ const schedule = require("node-schedule");
 const token =
   "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY0NmNhOTExZWY5ZTcwNWM3ODc1Nzk0NyIsIm5hbWUiOiJjcmVhdGl2ZWZ1ZWwiLCJleHAiOjE3Mjc0ODg3MzAsInJvbGUiOiJDTElFTlQiLCJwZXJtaXNzaW9ucyI6W10sInNlc3Npb24iOiJhNjUwNDg1MS00ZTgwLTRiZjQtODBkZC02YzgxYWYxNjU2MzAifQ.EP0JfWCsLxaFdCLr6MizEeltnJ4h3s9PLi-GuoCUops";
 
-
 /* Schedule job for every day at 11 pm */
-schedule.scheduleJob("0 17 * * *", async () => {
+schedule.scheduleJob("* * * * *", async () => {
   putPostOnTracking();
 });
 async function putPostOnTracking(req, res) {
@@ -18,31 +17,25 @@ async function putPostOnTracking(req, res) {
     /* Anurag Api Logic */
     let apiLogic = async (shortCode, sessionCalled) => {
       //   console.log("api call for shortcode", shortCode,"With api section", sessionCalled);
-      // const currentDate = new Date();
-      // currentDate.setDate(currentDate.getDate() + 1); // Adding one day
-
-      // // Format the date as needed ("YYYY-MM-DD HH:mm:ss.SS")
-      // const formattedDate = currentDate.toISOString().slice(0, 19).replace("T", " ") + ".00";
-
-      // let payloadObj = {
-      //     cron_expression: "30 17 * * *",  // UTC time is 05:30 PM AND OUR TIME IS 11:00 PM
-      //     tracking_expiry_at: formattedDate,
-      //     tracking: true,
-      // };
 
       // try {
-      //     let result = await axios.put(
-      //         //   `https://app.ylytic.com/ylytic/api/v1/rt_tracking/posts/${shortCode}`,
-      //         payloadObj,
-      //         {
-      //             headers: {
-      //                 Authorization: `Bearer ${token}`,
-      //                 "Content-Type": "application/json",
-      //             },
-      //         }
-      //     );
+      //   let result = await axios.post(
+      //     //   `https://app.ylytic.com/ylytic/api/v1/rt_tracking/posts/${shortCode}`,
+      //     `https://app.ylytic.com/ylytic/api/v1/data_refresh/requests`,
+      //     {
+      //       request_type: "instagram_post",
+      //       shortcode: shortCode,
+      //     },
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${token}`,
+      //         "Content-Type": "application/json",
+      //       },
+      //     }
+      //   );
+      //   console.log(result)
       // } catch (error) {
-      //     console.log(error.message);
+      //   console.log(error.message);
       // }
     };
 
@@ -55,7 +48,7 @@ async function putPostOnTracking(req, res) {
     );
 
     if (brnadsData?.length === 0) {
-      console.log(`There are no brands with 4 to 5 rating.`)
+      console.log(`There are no brands with 4 to 5 rating.`);
     }
     console.log("There is ", brnadsData.length, "brands with 4 to 5 rating");
     /* Create condition with brand id */
@@ -77,9 +70,15 @@ async function putPostOnTracking(req, res) {
       },
       "shortCode postedOn crone_trak brand_id"
     );
-    console.log("There are ", arr_of_shortcode.length, "post for respective brand id's ref:");
+    console.log(
+      "There are ",
+      arr_of_shortcode.length,
+      "post for respective brand id's ref:"
+    );
     const currentDate = new Date();
-    arr_of_shortcode?.map(async (item) => {
+    let numberOfItemsToProcess = 10 
+    arr_of_shortcode?.slice(0, numberOfItemsToProcess)?.map(async (item) => {
+      console.log(item.shortCode)
       const postedOnDate = new Date(item.postedOn);
       const timeDifferenceInMilliseconds = currentDate - postedOnDate;
       // Calculate the difference in hours

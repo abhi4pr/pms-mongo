@@ -34,7 +34,11 @@ app.use(
 );
 app.use(cors());
 app.use("/uploads", express.static(__dirname + "/uploads"));
+
+/* Route Configuration */
+const instaBotXRoutes = require("./routes/instagram/bot_tools/botxRoutes.js");
 app.use("/api", routes);
+app.use("/api", instaBotXRoutes);
 
 
 /**
