@@ -9,9 +9,9 @@ const token =
   "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY0NmNhOTExZWY5ZTcwNWM3ODc1Nzk0NyIsIm5hbWUiOiJjcmVhdGl2ZWZ1ZWwiLCJleHAiOjE3Mjc0ODg3MzAsInJvbGUiOiJDTElFTlQiLCJwZXJtaXNzaW9ucyI6W10sInNlc3Npb24iOiJhNjUwNDg1MS00ZTgwLTRiZjQtODBkZC02YzgxYWYxNjU2MzAifQ.EP0JfWCsLxaFdCLr6MizEeltnJ4h3s9PLi-GuoCUops";
 
 /* Schedule job for every day at 11 pm */
-schedule.scheduleJob("* * * * *", async () => {
-  putPostOnTracking();
-});
+// schedule.scheduleJob("* * * * *", async () => {
+//   putPostOnTracking();
+// });
 async function putPostOnTracking(req, res) {
   try {
     /* Anurag Api Logic */
