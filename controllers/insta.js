@@ -663,45 +663,82 @@ exports.creatorStoriesCount = async (req, res) => {
 };
 exports.selectorNameCountInstaP = async (req, res) => {
     try {
-        const { selectData, startDate, endDate } = req.body
-        let startDateParse = new Date(startDate);
-        let endDateParse = new Date(endDate);
+        const { selectData, startDate, endDate, flagForField } = req.body;
+
+        if (![1, 2].includes(flagForField)) {
+            return res.status(200).json({
+                message: "Invalid flag value, you should provide 1 or 2, 1 for selector based data and 2 for interpretor based data."
+            });
+        }
         // const startDate = new Date("2023-01-01"); 
         // const endDate = new Date("2023-12-31");
-        //Flag 2 for all data fetch and flag 1 for perticular date range data fetch
+        const startDateParse = new Date(startDate);
+        const endDateParse = new Date(endDate);
+
+        let pipeline;
+
         if (selectData === 1) {
-            const query = await instaP.aggregate([
-                {
-                    $match: {
-                        selector_date: {
-                            $gte: startDateParse,
-                            $lte: endDateParse
+            if (flagForField === 1) {
+                pipeline = [
+                    {
+                        $match: {
+                            selector_date: {
+                                $gte: startDateParse,
+                                $lte: endDateParse
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$selector_name",
+                            count: { $sum: 1 }
                         }
                     }
-                },
-                {
-                    $group: {
-                        _id: "$selector_name",
-                        count: { $sum: 1 }
+                ];
+            } else if (flagForField === 2) {
+                pipeline = [
+                    {
+                        $match: {
+                            interpretor_date: {
+                                $gte: startDateParse,
+                                $lte: endDateParse
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$interpretor_name",
+                            count: { $sum: 1 }
+                        }
                     }
-                }
-            ]).exec();
-
-            res.status(200).send({ success: true, data: query });
+                ];
+            }
         } else if (selectData === 2) {
-            const query = await instaP.aggregate([
-                {
-                    $group: {
-                        _id: "$selector_name",
-                        count: { $sum: 1 }
+            if (flagForField === 1) {
+                pipeline = [
+                    {
+                        $group: {
+                            _id: "$selector_name",
+                            count: { $sum: 1 }
+                        }
                     }
-                }
-            ]).exec();
-
-            res.status(200).send({ success: true, data: query });
+                ];
+            } else if (flagForField === 2) {
+                pipeline = [
+                    {
+                        $group: {
+                            _id: "$interpretor_name",
+                            count: { $sum: 1 }
+                        }
+                    }
+                ];
+            }
         } else {
-            res.status(200).send({ success: false, message: "Please provide valid selectData" });
+            return res.status(200).json({ success: false, message: "Please provide valid selectData" });
         }
+        const query = await instaP.aggregate(pipeline).exec();
+        res.status(200).send({ success: true, data: query });
+
 
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "something went wrong" });
@@ -709,45 +746,82 @@ exports.selectorNameCountInstaP = async (req, res) => {
 };
 exports.selectorNameCountInstaS = async (req, res) => {
     try {
-        const { selectData, startDate, endDate } = req.body
+        const { selectData, startDate, endDate, flagForField } = req.body;
+
+        if (![1, 2].includes(flagForField)) {
+            return res.status(200).json({
+                message: "Invalid flag value, you should provide 1 or 2, 1 for selector based data and 2 for interpretor based data."
+            });
+        }
+
         let startDateParse = new Date(startDate);
         let endDateParse = new Date(endDate);
         // const startDate = new Date("2023-01-01"); 
         // const endDate = new Date("2023-12-31");
         //Flag 2 for all data fetch and flag 1 for perticular date range data fetch
+        let pipeline;
+
         if (selectData === 1) {
-            const query = await instaS.aggregate([
-                {
-                    $match: {
-                        selector_date: {
-                            $gte: startDateParse,
-                            $lte: endDateParse
+            if (flagForField === 1) {
+                pipeline = [
+                    {
+                        $match: {
+                            selector_date: {
+                                $gte: startDateParse,
+                                $lte: endDateParse
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$selector_name",
+                            count: { $sum: 1 }
                         }
                     }
-                },
-                {
-                    $group: {
-                        _id: "$selector_name",
-                        count: { $sum: 1 }
+                ];
+            } else if (flagForField === 2) {
+                pipeline = [
+                    {
+                        $match: {
+                            interpretor_date: {
+                                $gte: startDateParse,
+                                $lte: endDateParse
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$interpretor_name",
+                            count: { $sum: 1 }
+                        }
                     }
-                }
-            ]).exec();
-
-            res.status(200).send({ success: true, data: query });
+                ];
+            }
         } else if (selectData === 2) {
-            const query = await instaS.aggregate([
-                {
-                    $group: {
-                        _id: "$selector_name",
-                        count: { $sum: 1 }
+            if (flagForField === 1) {
+                pipeline = [
+                    {
+                        $group: {
+                            _id: "$selector_name",
+                            count: { $sum: 1 }
+                        }
                     }
-                }
-            ]).exec();
-
-            res.status(200).send({ success: true, data: query });
+                ];
+            } else if (flagForField === 2) {
+                pipeline = [
+                    {
+                        $group: {
+                            _id: "$interpretor_name",
+                            count: { $sum: 1 }
+                        }
+                    }
+                ];
+            }
         } else {
-            res.status(200).send({ success: false, message: "Please provide valid selectData" });
+            return res.status(200).json({ success: false, message: "Please provide valid selectData" });
         }
+        const query = await instaP.aggregate(pipeline).exec();
+        res.status(200).send({ success: true, data: query });
 
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "something went wrong" });
@@ -823,7 +897,8 @@ exports.trackStory = async (req, res) => {
                         shortcode: data?.shortcode,
                         links: data?.links,
                         hashtags: data?.hashtags,
-                        mentions: data?.mentions,
+                        mentions: data?.sticker_mentions,
+                        // mentions: data?.mentions,
                         locations: data?.locations,
                         music: data?.music,
                         posttype_decision: req.body?.posttype_decision,

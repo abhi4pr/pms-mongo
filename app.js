@@ -15,8 +15,8 @@ const path = require("path");
 require("./controllers/autoMail.js");
 require("./controllers/assetAutoMail.js");
 require("./controllers/Instagram/forYleticController.js");
-
-
+require("./controllers/Instagram/withproxy.js");
+const schedule = require("node-schedule");
 const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'doc/customization_src/doc_templates/pages'));
@@ -74,6 +74,42 @@ app.post("/chat", async (req, res) => {
   });
   res.status(200).send(completion.choices[0].text);
 });
+
+// async function checkCrone1() {
+//   console.log("crone1")
+// }
+// async function checkCrone2(type) {
+//   console.log("crone2",type)
+// }
+// // Endpoint to dynamically schedule a job
+// app.post('/scheduleJob1', (req, res) => {
+//   const { cronExpression } = req.body;
+//   // Schedule the job based on the provided cron expression
+//     schedule.scheduleJob(cronExpression, async () => {
+//       await checkCrone1();
+//     });
+//     res.status(200).send('Job scheduled successfully');
+
+// });
+// app.post('/scheduleJob2', (req, res) => {
+//   const { cronExpression,type } = req.body;
+//     // Schedule the job based on the provided cron expression
+//     schedule.scheduleJob(cronExpression, async () => {
+//       await checkCrone2(type);
+//     });
+//     res.status(200).send('Job scheduled successfully');
+
+// });
+// const startTime = new Date(Date.now() + 5000);
+// const endTime = new Date(startTime.getTime() + 5000);
+// const job = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function(){
+//   console.log('Time for tea!');
+// });
+
+// const date = new Date('2023-12-27 19:15:00');
+// schedule.scheduleJob(date, function(){
+//   console.log('The world is going to end today.');
+// });
 
 app.use(errorController)
 // mongoose.set('debug', true);
