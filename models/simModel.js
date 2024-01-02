@@ -71,7 +71,7 @@ const simModel = new mongoose.Schema({
     default: 90,
   },
   selfAuditUnit: {
-    type: Number,
+    type: String,
     required: false,
     default: 0,
   },
@@ -81,7 +81,7 @@ const simModel = new mongoose.Schema({
     default: 90,
   },
   hrAuditUnit: {
-    type: Number,
+    type: String,
     required: false,
     default: 0,
   },
@@ -125,20 +125,38 @@ const simModel = new mongoose.Schema({
     default: true,
   },
   last_hr_audit_date: {
-    type:Date,
-    default:Date.now
-  },
-  last_self_audit_date:{
     type: Date,
     default: Date.now
   },
-  next_hr_audit_date:{
+  last_self_audit_date: {
+    type: Date,
+    default: Date.now
+  },
+  next_hr_audit_date: {
     type: Date,
     default: ""
   },
-  next_self_audit_date:{
+  next_self_audit_date: {
     type: Date,
     default: ""
+  },
+  asset_financial_type: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  depreciation_percentage: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  asset_brand_id: {
+    type: Number,
+    required: false
+  },
+  asset_modal_id: {
+    type: Number,
+    required: false
   }
 });
 

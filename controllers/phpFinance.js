@@ -14,7 +14,7 @@ exports.savePhpFinanceDataInNode = async (req, res) => {
         const sendData = new FormData();
         sendData.append("loggedin_user_id", 36);
         const response = await axios.post(
-            'https://production.sales.creativefuel.io/webservices/RestController.php?view=pending_payment_list', sendData,
+            'https://salesdev.we-fit.in/webservices/RestController.php?view=pending_payment_list', sendData,
             {
                 headers: {
                     ...sendData.getHeaders(),
@@ -118,7 +118,8 @@ exports.savePhpFinanceDataInNode = async (req, res) => {
                     gst_bank: data.gst_bank,
                     status: data.status,
                     created_at: data.created_at,
-                    sno: data.sno
+                    sno: data.sno,
+                    user_name: data.user_name
                 })
                 const instav = await creators.save();
 
@@ -216,7 +217,8 @@ exports.savePhpFinanceDataInNode = async (req, res) => {
                                 gst_bank: data.gst_bank,
                                 status: data.status,
                                 created_at: data.created_at,
-                                sno: data.sno
+                                sno: data.sno,
+                                user_name: data.user_name
                             }
                         }
                     )

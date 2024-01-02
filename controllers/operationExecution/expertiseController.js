@@ -21,6 +21,18 @@ exports.getAllExpert=catchAsync(async (req,res,next) => {
         data: result
     })
 })
+
+exports.getExpertBasedOnUser=catchAsync(async (req,res,next) => {
+    const id=req.params.id
+    const result=await ExpertiseModel.findOne({user_id:id})
+    if(!result){
+        return next(new appError(404,"expertise not found") )
+    }
+    res.status(200).json({
+        data:result
+    })
+})
+
 exports.getSingleExpert=catchAsync(async (req,res,next) => {
     const id=req.params.id
     const result=await ExpertiseModel.findOne({exp_id:id})
@@ -33,6 +45,7 @@ exports.getSingleExpert=catchAsync(async (req,res,next) => {
 })
 exports.updateExpert=catchAsync(async (req,res,next) => {
     const id=req.params.id
+    console.log(req.body)
     const {area_of_expertise,updated_by}=req.body
     const data={area_of_expertise,updated_by,updated_at:Date.now()}
     const result=await ExpertiseModel.findOneAndUpdate({user_id:id},data,{new:true})

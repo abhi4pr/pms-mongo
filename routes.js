@@ -72,20 +72,30 @@ const swaggerAccessManagement = require("./doc/customization_src/controller/swag
 //opertaion + execution imports start here`
 const campaignPlanController = require("./controllers/operationExecution/campaignPlanController.js");
 const campaignPhaseController = require("./controllers/operationExecution/campaignPhaseController.js");
-const expertiseController = require("./controllers/operationExecution/expertiseController.js");
-const assignmentController = require("./controllers/operationExecution/assignmentController.js");
-const assignmentCommitController = require("./controllers/operationExecution/assignmentCommitController.js");
-const operationDasboard = require("./controllers/operationExecution/dashboard.controller.js");
+const expertiseController = require('./controllers/operationExecution/expertiseController.js')
+const assignmentController = require('./controllers/operationExecution/assignmentController.js')
+const assignmentCommitController = require('./controllers/operationExecution/assignmentCommitController.js')
+const operationDasboard = require('./controllers/operationExecution/dashboard.controller.js')
+const pageReplacementController = require('./controllers/operationExecution/pageReplacementController.js')
 //opertaion + execution imports ends here`
 
 const city = require("./controllers/cityController.js");
-const phpFinance = require("./controllers/phpFinance.js");
-const phpPayment = require("./controllers/phpPaymentAccList.js");
-const phpRefund = require("./controllers/phpPaymentRefund.js");
-const phpIncentive = require("./controllers/phpIncentive.js");
+const phpFinance = require("./controllers/phpFinance.js")
+const phpPayment = require("./controllers/phpPaymentAccList.js")
+const phpRefund = require("./controllers/phpPaymentRefund.js")
+const phpIncentive = require("./controllers/phpIncentive.js")
 const phpPaymentBal = require("./controllers/phpPaymentBalList.js");
 const phpPendingInvoice = require("./controllers/phpPendingInvoice.js");
 const phpSaleBookingTds = require("./controllers/saleBookingTds.js");
+const assetBrand = require("./controllers/assetsBrand.js");
+const assetModal = require("./controllers/assetsModal.js");
+const emailContent = require("./controllers/emailTempContent.js")
+const hobby = require("./controllers/hobby.js");
+const family = require("./controllers/family.js");
+const education = require('./controllers/education.js');
+const assetReson = require("./controllers/assetReason.js");
+const guardian = require("./controllers/guardian.js");
+const repairRequest = require("./controllers/repairRequest.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -278,17 +288,28 @@ router.delete("/delete_allocation/:id", sim.deleteAllocation);
 router.get("/alldataofsimallocment", sim.alldataofsimallocment);
 router.get("/get_asset_department_count", sim.getAssetDepartmentCount);
 router.get("/get_asset_users_of_dept/:dept_id", sim.getAssetUsersDepartment);
+router.get("/get_total_asset_in_category/:category_id", sim.getTotalAssetInCategory);
+router.get("/get_total_asset_in_category_allocated/:category_id", sim.getTotalAssetInCategoryAllocated);
+router.get("/show_asset_hr_data", sim.showAssetDataToHR);
+router.get("/show_asset_user_data/:user_id", sim.showAssetDataToUser);
 
 /* logo brand */
-router.post("/add_logo_brand", logoBrand.addLogoBrand);
-router.get("/get_all_logo_brands", logoBrand.getLogoBrands);
+router.post("/add_logo_category", logoBrand.addLogoBrandCat);
+router.get("/get_all_logo_categories", logoBrand.getLogoBrandsCat);
 router.get(
-  "/get_single_logobrand/:id",
+  "/get_single_category/:id",
 
-  logoBrand.getSingleLogoBrand
+  logoBrand.getSingleLogoBrandCat
 );
-router.put("/update_logo_brand", logoBrand.editLogoBrand);
-router.delete("/delete_logo_brand/:id", logoBrand.deleteLogoBrand);
+router.put("/update_logo_category", logoBrand.editLogoBrandCat);
+router.delete("/delete_logo_category/:id", logoBrand.deleteLogoBrandCat);
+router.post("/add_logo_brand", upload1.single('upload_logo'), logoBrand.addLogoBrand)
+router.get("/get_logo_image/:filename", logoBrand.getlogoImage)
+router.get("/get_logo_data", logoBrand.getLogoData)
+router.get("/get_single_logo_data/:logo_id", logoBrand.getSingleLogoData)
+router.get("/get_logo_data_for_brand/:brand_name", logoBrand.getLogoDataBasedBrand)
+router.delete("/delete_logo/:logo_id", logoBrand.deleteLogoBrand)
+router.delete("/delete_logo_based_brand/:brand_name", logoBrand.deleteLogoBrandBasedBrand)
 
 /* department */
 router.post("/add_department", department.addDepartment); //Done
@@ -774,12 +795,14 @@ router.post(
 router.get("/get_all_wfh_users", user.getAllWfhUsers);
 router.get("/get_all_login_history", user.getLoginHistory);
 router.post("/get_user_pre_sitting", user.getUserPresitting);
-router.get("/get_all_users_with_dob_doj", user.getAllUsersWithDoBAndDoj);
+router.get("/get_all_users_with_doj", user.getAllUsersWithDoj);
+router.get("/get_all_users_with_dob", user.getAllUsersWithDoB);
 router.get("/get_last_month_users", user.getLastMonthUsers);
 router.get("/get_all_filled_users", user.getAllFilledUsers);
 router.get("/get_all_percentage", user.getFilledPercentage);
 // router.post("/get_users_by_departments",user.getUsersByDepartment);
 // router.get("/get_first_time_login_users", user.getAllFirstLoginUsers)
+router.post("/get_user_graph_data", user.getUserGraphData)
 
 /* attendance */
 router.post("/add_attendance", attendance.addAttendance);
@@ -835,10 +858,10 @@ router.post("/get_distinct_depts", attendance.getDistinctDepts);
 router.post("/check_salary_status", attendance.checkSalaryStatus);
 router.get("/all_departments_of_wfh", attendance.allDeptsOfWfh);
 router.get("/dept_with_wfh", attendance.deptWithWFH);
-router.post(
-  "/save_all_depts_attendance",
-  attendance.addAttendanceAllDepartments
-);
+router.post("/save_all_depts_attendance", attendance.addAttendanceAllDepartments);
+router.get("/get_all_attendance_data", attendance.getAllAttendanceData);
+router.get("/get_salary_calculation_data", attendance.getSalarycalculationData);
+router.post("/get_users_count_by_dept", attendance.getUsersCountByDept);
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
@@ -1039,6 +1062,7 @@ router.delete(
   "/delete_asset_category/:category_id",
   assetCategory.deleteAssetCategory
 );
+router.get("/get_count_sub_category/:category_id", assetCategory.getAssetSubCategoryCount);
 
 /* Asset Sub Category Routes */
 router.post("/add_asset_sub_category", assetSubCategory.addAssetSubCategory);
@@ -1047,9 +1071,17 @@ router.get(
   assetSubCategory.getAssetSubCategorys
 );
 router.get(
-  "/get_single_asset_sub_category/:sub_category_id",
+  "/get_single_asset_sub_category/:category_id",
   assetSubCategory.getSingleAssetSubCategory
 );
+router.get(
+  "/get_single_asset_cat/:sub_category_id",
+  assetSubCategory.getSingleAssetCat
+);
+// router.get(
+//   "/get_single_category/:sub_category_id",
+//   assetSubCategory.getSingleAsset
+// );
 router.put("/update_asset_sub_category", assetSubCategory.editAssetSubCategory);
 router.delete(
   "/delete_asset_sub_category/:sub_category_id",
@@ -1137,7 +1169,7 @@ router.delete("/delete_user_doc/:id", userDocManagement.deleteDoc);
 //Swagger Route
 router.post("/add_dev_data", swaggerAccessManagement.addDevData);
 
-// City Routes
+// City Routes 
 router.post("/add_city", city.addCity);
 router.put("/update_city", city.editCity);
 router.get("/get_all_cities", city.getAllCities);
@@ -1145,93 +1177,94 @@ router.get("/get_single_city/:_id", city.getSingleCity);
 router.delete("/delete_city/:_id", city.deleteCity);
 
 /* php finance api */
-router.post(
-  "/add_php_finance_data_in_node",
-  phpFinance.savePhpFinanceDataInNode
-);
+router.post("/add_php_finance_data_in_node", phpFinance.savePhpFinanceDataInNode);
 router.get("/get_all_php_finance_data", phpFinance.getAllphpFinanceData);
-router.get(
-  "/get_all_php_finance_data_pending",
-  phpFinance.getAllphpFinanceDataPending
-);
-router.post(
-  "/add_php_payment_acc_data_in_node",
-  phpPayment.savePhpPaymentAccDataInNode
-);
+router.get("/get_all_php_finance_data_pending", phpFinance.getAllphpFinanceDataPending);
+router.post("/add_php_payment_acc_data_in_node", phpPayment.savePhpPaymentAccDataInNode);
 router.get("/get_all_php_payment_acc_data", phpPayment.getAllphpPaymentAccData);
-router.get(
-  "/get_all_php_payment_acc_data_pending",
-  phpPayment.getAllphpPaymentAccDataForStatus
-);
+router.get("/get_all_php_payment_acc_data_pending", phpPayment.getAllphpPaymentAccDataForStatus);
 router.put("/pending_approval_update", phpPayment.pendingApprovalUpdate);
-router.post(
-  "/add_php_payment_refund_data_in_node",
-  phpRefund.savePhpPaymentRefundInNode
-);
-router.get(
-  "/get_all_php_payment_refund_data",
-  phpRefund.getAllphpPaymentRefundData
-);
-router.get(
-  "/get_all_php_payment_refund_data_pending",
-  phpRefund.getAllphpPaymentRefundDataStatus
-);
-router.put(
-  "/pending_approval_refund_update",
-  upload.single("payment_screenshot"),
-  phpRefund.pendingApprovalRefundUpdate
-);
-router.post(
-  "/add_php_payment_incentive_data_in_node",
-  phpIncentive.savePhpIncentiveInNode
-);
-router.get(
-  "/get_all_php_payment_incentive_data",
-  phpIncentive.getAllphpIncentiveData
-);
-router.post(
-  "/add_php_payment_bal_data_in_node",
-  phpPaymentBal.savePhpPaymentBalDataInNode
-);
-router.get(
-  "/get_all_php_payment_bal_data",
-  phpPaymentBal.getAllphpPaymentBalData
-);
-router.put(
-  "/balance_payment_list_update",
-  phpPaymentBal.balancePaymentListUpdate
-);
-router.post(
-  "/add_php_pending_invoice_data_in_node",
-  phpPendingInvoice.savePhpPaymentPendingInvoiceDataInNode
-);
-router.get(
-  "/get_all_php_pending_invoice_data",
-  phpPendingInvoice.getAllphpPaymentPendingInvoiceData
-);
-router.post(
-  "/add_php_sale_booking_tds_data_in_node",
-  phpSaleBookingTds.savePhpSaleBookingTdsDataInNode
-);
-router.get(
-  "/get_all_php_sale_booking_tds_data",
-  phpSaleBookingTds.getAllphpSaleBookingTdsData
-);
-router.post(
-  "/add_php_sale_booking_tds_verification_data_in_node",
-  phpSaleBookingTds.savePhpSaleBookingTdsVerificationDataInNode
-);
-router.get(
-  "/get_all_php_sale_booking_tds_verification_data",
-  phpSaleBookingTds.getAllphpSaleBookingTdsVerificationData
-);
-router.get(
-  "/get_all_php_payment_acc_data_customers/:cust_id",
-  phpPayment.getAccListDataFromCustId
-);
+router.post("/add_php_payment_refund_data_in_node", phpRefund.savePhpPaymentRefundInNode);
+router.get("/get_all_php_payment_refund_data", phpRefund.getAllphpPaymentRefundData);
+router.get("/get_all_php_payment_refund_data_pending", phpRefund.getAllphpPaymentRefundDataStatus);
+router.put("/pending_approval_refund_update", upload.single("payment_screenshot"), phpRefund.pendingApprovalRefundUpdate);
+router.post("/add_php_payment_incentive_data_in_node", phpIncentive.savePhpIncentiveInNode);
+router.get("/get_all_php_payment_incentive_data", phpIncentive.getAllphpIncentiveData);
+router.post("/add_php_payment_bal_data_in_node", phpPaymentBal.savePhpPaymentBalDataInNode);
+router.get("/get_all_php_payment_bal_data", phpPaymentBal.getAllphpPaymentBalData);
+router.put("/balance_payment_list_update", phpPaymentBal.balancePaymentListUpdate);
+router.post("/add_php_pending_invoice_data_in_node", phpPendingInvoice.savePhpPaymentPendingInvoiceDataInNode);
+router.get("/get_all_php_pending_invoice_data", phpPendingInvoice.getAllphpPaymentPendingInvoiceData);
+router.post("/add_php_sale_booking_tds_data_in_node", phpSaleBookingTds.savePhpSaleBookingTdsDataInNode);
+router.get("/get_all_php_sale_booking_tds_data", phpSaleBookingTds.getAllphpSaleBookingTdsData);
+router.post("/add_php_sale_booking_tds_verification_data_in_node", phpSaleBookingTds.savePhpSaleBookingTdsVerificationDataInNode);
+router.get("/get_all_php_sale_booking_tds_verification_data", phpSaleBookingTds.getAllphpSaleBookingTdsVerificationData);
+router.get("/get_all_php_payment_acc_data_customers/:cust_id", phpPayment.getAccListDataFromCustId)
 
-/*   
-Bot Tools
-*/
-// router.get("/call_bot_tool", BotXController.callBotTools);
+// Asset Brand Routes 
+router.post("/add_asset_brand", assetBrand.addAssetBrand);
+router.put("/update_asset_brand", assetBrand.editAssetBrand);
+router.get("/get_all_asset_brands", assetBrand.getAssetBrands);
+router.get("/get_single_asset_brand/:id", assetBrand.getAssetBrandById);
+router.delete("/delete_asset_brand/:id", assetBrand.deleteAssetBrand);
+router.get("/get_asset_available_count_in_brand/:asset_brand_id", assetBrand.getTotalAvailableAssetInBrand);
+router.get("/get_asset_allocated_count_in_brand/:asset_brand_id", assetBrand.getTotalAllocatedAssetInBrand);
+
+// Asset Modal Routes 
+router.post("/add_asset_modal", assetModal.addAssetModal);
+router.put("/update_asset_modal", assetModal.editAssetModal);
+router.get("/get_all_asset_modals", assetModal.getAssetModals);
+router.get("/get_single_asset_modal/:id", assetModal.getAssetModalById);
+router.delete("/delete_asset_modal/:id", assetModal.deleteAssetModal);
+router.get("/get_asset_available_count_in_modal/:asset_modal_id", assetModal.getTotalAvailableAssetInModal);
+router.get("/get_asset_allocated_count_in_modal/:asset_modal_id", assetModal.getTotalAllocatedAssetInModal);
+
+/* email content routes */
+router.post("/add_email_content", emailContent.addEmailContent);
+router.put("/update_email_content", emailContent.editEmailContent);
+router.get("/get_all_email_contents", emailContent.getAllEmailContents);
+router.get("/get_single_email_content/:_id", emailContent.getSingleEmailContent);
+router.delete("/delete_email_content/:_id", emailContent.deleteEmailContent);
+// Hobbies  Routes 
+router.post("/add_hobby", hobby.addHobby);
+router.put("/update_hobby", hobby.editHobby);
+router.get("/get_all_hobbies", hobby.getHobbys);
+router.get("/get_single_hobby/:id", hobby.getHobbyById);
+router.delete("/delete_hobby/:id", hobby.deleteHobby);
+
+// Family Person  Routes 
+router.post("/add_family", family.addFamily);
+router.put("/update_family", family.editFamily);
+router.get("/get_all_families", family.getFamilys);
+router.get("/get_single_family/:user_id", family.getSingleFamily);
+router.delete("/delete_family/:id", family.deleteFamily);
+
+// Education Routes 
+router.post("/add_education", education.addEducation);
+router.put("/update_education", education.editEducation);
+router.get("/get_all_educations", education.getEducations);
+router.get("/get_single_education/:user_id", education.getSingleEducation);
+router.delete("/delete_education/:id", education.deleteEducation);
+
+// Gaurdian Routes
+router.post("/add_guardian", guardian.addGuardian);
+router.put("/update_guardian", guardian.editGuardian);
+router.get("/get_all_guardians", guardian.getGuardians);
+router.get("/get_single_guardian/:user_id", guardian.getSingleGuardian);
+router.delete("/delete_guardian/:id", guardian.deleteGuardian);
+
+// Asset Reason Routes
+router.post("/add_asset_reason", assetReson.addAssetReason);
+router.put("/update_asset_reason", assetReson.editAssetReason);
+router.get("/get_all_assetResons", assetReson.getAssetReasons);
+router.get("/get_single_assetReson/:id", assetReson.getAssetReasonById);
+router.delete("/delete_assetReson/:id", assetReson.deleteAssetReason);
+
+// Asset Repair Request Routes
+router.post("/add_repair_request", repairRequest.addRepairRequest);
+router.put("/update_repair_request", repairRequest.editRepairRequest);
+router.get("/get_all_repair_request", repairRequest.getAllRepairRequests);
+router.get("/get_single_repair_request/:id", repairRequest.getSingleRepairRequests);
+router.delete("/delete_repair_request/:id", repairRequest.deleteRepairRequest);
+
 module.exports = router;

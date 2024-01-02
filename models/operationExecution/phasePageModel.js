@@ -8,19 +8,19 @@ const phasePageSchema = new mongoose.Schema({
   },
   phaseName: {
     type: String,
-    required: [true, "phase name is required"]
+    // required: [true, "phase name is required"]
   },
   plan_id: {
     type: String,
-    required: [true, "plan id is required"]
+    // required: [true, "plan id is required"]
   },
   planName: {
     type: String,
-    required: [true, "plan name is required."]
+    // required: [true, "plan name is required."]
   },
   vendor_id: {
     type: String,
-    required: [true, "vendor is required"]
+    // required: [true, "vendor is required"]
   },
   p_id: {
     type: String,
@@ -73,7 +73,7 @@ const phasePageSchema = new mongoose.Schema({
   replacement_status: {
     type: String,
     default: 'inactive',
-    enum: ['active', 'inactive', 'replaced', 'replacement', 'pending']
+    enum: ['active', 'inactive', 'replaced', 'replacement', 'pending','rejected']
   },
   delete_status: {
     type: String,
@@ -88,14 +88,18 @@ const phasePageSchema = new mongoose.Schema({
     type: String,
     default: 'N/A',
   },
-  replacement_id: {
-    type: String,
-  },
-  updatedFrom: {
-    type: String,
-    default : ""
-  }
+  replacement_id:{
+    type:mongoose.SchemaTypes.ObjectId,
+   ref:'pageReplacementRecordModel',
+
+}
 });
+
+phasePageSchema.pre(/^find/,async function(next){
+  this.populate({
+    path:'replacement_id'
+  })
+})
 
 
 module.exports = mongoose.model(
