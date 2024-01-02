@@ -11,7 +11,7 @@ exports.getPostDataFromInsta = async (req, res) => {
 
     let si = 0;
 
-    // const apiurl = 'http://34.93.221.166:3000/api/get_single_logo_data/3';
+    // const apiurl = 'http://34.93.135.33:8080/api/get_single_logo_data/3';
     // let pages =["rvcjinsta", "bedroomtale", "thebackbencherrs", "adultsociety", "wildcasm", "thetrollfeeds", "akhanddose", "tube.indian", "wittymemebot", "couplesocietty", "thesarcasmicschool", "just.adulting", "chutiyapa_begins_from_here", "theindiansarcasm", "dekhpagli", "wow__chats", "school.days__", "papiduniyaa", "sarcasmicschool_", "the_engineer_bro", "theashleelduniya", "brocasm", "daily_over_dose", "gharrehkedekh", "thenastysociety", "thebackbenchrs", "sarcastictube", "studentsfacts.in", "theschooltrolls", "desi.company", "ashleelsansar", "johnnylaal"]
     // const apiurl = 'https://www.instagram.com/api/v1/users/web_profile_info/?username=rvcjinsta';
     const pages = [

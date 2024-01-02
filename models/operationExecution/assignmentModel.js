@@ -10,6 +10,9 @@ const assignmentSchema = new mongoose.Schema({
     // ref:'ExpertiseModel',
     type: String,
   },
+  exp_name:{
+    type: String,
+  },
   ass_by: {
     // type:mongoose.SchemaTypes.ObjectId,
     // ref:'userModels',
@@ -25,7 +28,7 @@ const assignmentSchema = new mongoose.Schema({
   },
   plan_id: {
     type: String,
-    required: [true, "plan id is required"]
+    // required: [true, "plan id is required"]
   },
   planName: {
     type: String,
@@ -85,7 +88,7 @@ const assignmentSchema = new mongoose.Schema({
   replacement_status: {
     type: String,
     default: 'inactive',
-    enum: ['active', 'inactive', 'replaced', 'replacement', 'pending']
+    enum: ['active', 'inactive', 'replaced', 'replacement', 'pending','rejected']
   },
   delete_status: {
     type: String,
@@ -105,8 +108,8 @@ const assignmentSchema = new mongoose.Schema({
   },
   ass_status: {
     type: String,
-    default: "assigned",
-    enum: ['assigned','pending','executed', 'verified', 'rejected']
+    
+    enum: ['assigned','unassigned','pending','executed', 'verified', 'rejected']
   },
   executed_at: {
     type: Date
@@ -137,6 +140,22 @@ assignmentSchema.plugin(AutoIncrement.plugin, {
   startAt: 1,
   incrementBy: 1,
 });
+
+// assignmentSchema.pre(['save', 'findOneAndUpdate'], async function (next) {
+//   try {
+//     const existingExpertise = await mongoose.model('assignmentModel').findOne({ ass_to: this.ass_to });
+
+//     // Set assignment_status based on the existence of the expertise document
+//     if(existingExpertise) next()
+//     if (!existingExpertise) {
+//       this.ass_status = 'unassigned';
+//     } 
+//     next();
+//   } catch (error) {
+//     next(error);
+//   }})
+
+
 
 module.exports = mongoose.model(
   "assignmentModel",

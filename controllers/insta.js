@@ -1570,7 +1570,7 @@ exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
 //     const axiosRequests = data.map(async (item) => {
 //         try {
 //             const result = await axios.get(
-//                 `http://34.93.221.166:3000/api/get_all_users`,
+//                 `http://34.93.135.33:8080/api/get_all_users`,
                
 //             );
 //             return result?.data;
