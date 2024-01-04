@@ -73,6 +73,11 @@ const projectxSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  page_rating: {
+    type: Number,
+    default: 0,
+    required:false
+  },
 
   updated_at: {
     type: Date,

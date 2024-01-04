@@ -17,7 +17,8 @@ exports.addProjectx = async (req, res) => {
     tracking,
     crawler_count,
     max_post_count_a_day,
-    avg_post_count_a_day
+    avg_post_count_a_day,
+    page_rating
   } = req.body;
   try {
     const projectxObj = new projectxSchema({
@@ -37,7 +38,8 @@ exports.addProjectx = async (req, res) => {
       tracking,
       crawler_count,
       max_post_count_a_day,
-      avg_post_count_a_day
+      avg_post_count_a_day,
+      page_rating
     });
     const savedprojectx = await projectxObj.save();
     if (!projectxObj) {

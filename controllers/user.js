@@ -179,7 +179,11 @@ exports.addUser = [upload, async (req, res) => {
             emergency_contact_person_name1: req.body.emergency_contact_person_name1,
             emergency_contact_person_name2: req.body.emergency_contact_person_name2,
             emergency_contact_relation1: req.body.emergency_contact_relation1,
-            emergency_contact_relation2: req.body.emergency_contact_relation2
+            emergency_contact_relation2: req.body.emergency_contact_relation2,
+                // field for insta module
+                user_level: req.body.user_level,
+                assign_cat: req.body.assign_cat
+                //end 
         })
         const simv = await simc.save();
 
@@ -429,8 +433,11 @@ exports.updateUser = [upload1, async (req, res) => {
             emergency_contact_person_name1: req.body.emergency_contact_person_name1,
             emergency_contact_person_name2: req.body.emergency_contact_person_name2,
             emergency_contact_relation1: req.body.emergency_contact_relation1,
-            emergency_contact_relation2: req.body.emergency_contact_relation2
-
+            emergency_contact_relation2: req.body.emergency_contact_relation2,
+             // field for insta module
+            user_level: req.body.user_level,
+            assign_cat: req.body.assign_cat
+            //end 
         }, { new: true });
         if (!editsim) {
             return res.status(500).send({ success: false })
@@ -609,6 +616,8 @@ exports.getAllUsers = async (req, res) => {
                     user_id: "$user_id",
                     user_name: "$user_name",
                     offer_later_status: "$offer_later_status",
+                    user_level: "$user_level",  // field for insta module
+                    assign_cat: "$assign_cat",   // field for insta module
                     user_designation: "$user_designation",
                     user_email_id: "$user_email_id",
                     user_login_id: "$user_login_id",
@@ -918,6 +927,8 @@ exports.getSingleUser = async (req, res) => {
                     offer_later_pdf_url: "$offer_later_pdf_url",
                     offer_later_acceptance_date: "$offer_later_acceptance_date",
                     offer_later_status: "$offer_later_status",
+                    user_level: "$user_level",  // field for insta module
+                    assign_cat: "$assign_cat",   // field for insta module
                     offer_later_reject_reason: "$offer_later_reject_reason",
                     user_id: "$user_id",
                     user_name: "$user_name",
