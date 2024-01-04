@@ -668,7 +668,19 @@ const userModel = new mongoose.Schema({
         type: String,
         required: false,
         default: ""
-    }
+    },
+    // field for insta module
+    user_level: {
+        type: Number,
+        required: false,
+        default: 0
+    },
+    assign_cat: {
+        type: Array,
+        required: false,
+        default: [ 17 ]
+    },
+    // end
 });
 
 AutoIncrement.initialize(mongoose.connection);

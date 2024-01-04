@@ -198,7 +198,12 @@ exports.trackPost = async (req, res) => {
                 music_info : req.body.data?.music_info,
                 location : req.body.data?.location,
                 sponsored : req.body.data?.sponsored,
-                page_category_id
+                page_category_id,
+                creator_rating: req.body?.creator_rating,
+                assigned_to: req.body?.assigned_to,
+                assigned_date: req.body?.assigned_date,
+                reassigned_to: req.body?.reassigned_to,
+                reassigned_date: req.body?.reassigned_date,
             });
             const instav = await creators.save();
             res.send({ instav, status: 200 });
@@ -288,6 +293,11 @@ exports.editInsta = async (req, res) => {
                 selector_date: req.body.selector_date,
                 interpretor_date: req.body.interpretor_date,
                 auditor_date: req.body.auditor_date,
+                creator_rating: req.body.creator_rating,
+                assigned_to: req.body.assigned_to,
+                assigned_date: req.body.assigned_date,
+                reassigned_to: req.body.reassigned_to,
+                reassigned_date: req.body.reassigned_date,
                 updatedAt: Date.now()
             },
             { new: true }
@@ -1676,7 +1686,7 @@ exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
 // }
 exports.insertDataIntoPostAnalytics = async (req,res)=>{
     try {
-    let shortCodeFind = req.body.shortcode;
+    let shortCodeFind =req.body?.response ? req.body.response?.shortcode : req.body?.shortcode
     
     /**
      * 15 Dec 2023
@@ -1748,7 +1758,12 @@ exports.insertDataIntoPostAnalytics = async (req,res)=>{
             sponsored,
             brand_id,
             crone_trak,
-            page_category_id } = findDataFromPost[0];
+            page_category_id,
+            creator_rating,
+            assigned_to,
+            assigned_date,
+            reassigned_to,
+            reassigned_date } = findDataFromPost[0];
 
             const savingRes = new instaPostAnalyticsModel({
             todayComment, 
@@ -1789,32 +1804,51 @@ exports.insertDataIntoPostAnalytics = async (req,res)=>{
             sponsored, 
             brand_id, //  ***
             crone_trak,  //
-            page_category_id
+            page_category_id,
+            creator_rating,
+            assigned_to,
+            assigned_date,
+            reassigned_to,
+            reassigned_date
             });
             const result =  await savingRes.save()
 
             if(result){
-            let updatedPost =  await instaP.findByIdAndUpdate(_id,{ $set : {
-                createdAt : Date.now(),
-                todayComment: req.body.data.comments_count.today,
-                todayLikes: req.body.data.likes_count.today,
-                todayViews: req.body.data.views_count.today,
-                postType: req.body.data.post_type,
-                allComments: req.body.data.comments_count.overall,
-                pastComment: req.body.data.comments_count.vs_previous,
-                allLike: req.body.data.likes_count.overall,
-                pastLike: req.body.data.likes_count.vs_previous,
-                allView: req.body.data.views_count.overall,
-                todayViews: req.body.data.views_count.today,
-                pastView: req.body.data.views_count.vs_previous,
-                title: req.body.data.title,
-                postedOn: req.body.data.posted_at,
-                location : req.body.data?.location,
-                music_info : req.body.data?.music_info,
-                sponsored : req.body.data?.sponsored,
-                crone_trak : parseInt(crone_trak) + 1
-
-            }})
+                let updateObj
+                if(req.body?.response){
+                    updateObj = {
+                                createdAt : Date.now(),
+                                allComments: req.body.response?.comments_count, 
+                                allLike: req.body.response?.likes_count, 
+                                allView: req.body.response?.views,
+                                title: req.body.response?.caption, 
+                                location : req.body.response?.location, 
+                                music_info : req.body.response?.music_info, 
+                                crone_trak : parseInt(crone_trak) + 1 
+                    }
+                } else {
+                    updateObj = {
+                                createdAt : Date.now(),
+                                todayComment: req.body.data.comments_count.today,
+                                todayLikes: req.body.data.likes_count.today,
+                                todayViews: req.body.data.views_count.today,
+                                postType: req.body.data.post_type,
+                                allComments: req.body.data.comments_count.overall,
+                                pastComment: req.body.data.comments_count.vs_previous,
+                                allLike: req.body.data.likes_count.overall,
+                                pastLike: req.body.data.likes_count.vs_previous,
+                                allView: req.body.data.views_count.overall,
+                                todayViews: req.body.data.views_count.today,
+                                pastView: req.body.data.views_count.vs_previous,
+                                title: req.body.data.title,
+                                postedOn: req.body.data.posted_at, 
+                                location : req.body.data?.location,  
+                                music_info : req.body.data?.music_info,  
+                                sponsored : req.body.data?.sponsored, 
+                                crone_trak : parseInt(crone_trak) + 1
+              }
+                }
+             let updatedPost =  await instaP.findByIdAndUpdate(_id,{ $set : updateObj})
                 if(!updatedPost){
                 return  res.send({ message: "Analytics data inserted sucessfully but insta post model not update properly.", status: 200 });
                 }
