@@ -49,6 +49,7 @@ const reportAssignToController = require("./controllers/Instagram/reportAssignTo
 const forYleticController = require("./controllers/Instagram/forYleticController.js");
 const BotXController = require("./controllers/Instagram/Bot_Tools/BotX.js");
 const withProxy = require("./controllers/Instagram/withproxy.js");
+const AlfredUserAnalytics = require("./controllers/Instagram/Alfred/Alfreduseranalytics.js");
 
 const role = require("./controllers/role.js");
 const kra = require("./controllers/kra.js");
@@ -1267,4 +1268,9 @@ router.get("/get_all_repair_request", repairRequest.getAllRepairRequests);
 router.get("/get_single_repair_request/:id", repairRequest.getSingleRepairRequests);
 router.delete("/delete_repair_request/:id", repairRequest.deleteRepairRequest);
 
+/*   
+Bot Tools
+*/
+// router.get("/call_bot_tool", BotXController.callBotTools);
+router.get("/alfred_user_analytics", AlfredUserAnalytics.alfreduseranalytics);
 module.exports = router;
