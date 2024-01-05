@@ -16,6 +16,7 @@ require("./controllers/autoMail.js");
 require("./controllers/assetAutoMail.js");
 require("./controllers/Instagram/forYleticController.js");
 require("./controllers/Instagram/withproxy.js");
+require("./controllers/Instagram/Crawler_module/dynamicCreatorCrawler.js");
 const schedule = require("node-schedule");
 const app = express();
 app.set('view engine', 'ejs');
@@ -39,8 +40,11 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 const instaBotXRoutes = require("./routes/instagram/bot_tools/botxRoutes.js");
 const AlfredRoutes = require("./routes/instagram/Alfred/alfreduseranalytics.js");
 app.use("/api", routes);
-app.use("/api", instaBotXRoutes);
 app.use("/api", AlfredRoutes);
+const cronRouter = require("./routes/instagram/crawler/creatorCronRoutes.js");
+app.use("/api", routes);
+app.use("/api", instaBotXRoutes);
+app.use("/api", cronRouter);
 
 
 /**

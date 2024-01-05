@@ -1,6 +1,6 @@
 const response = require('../../common/response');
 const cfInstaPostModel = require("../../models/Instagram/cfInstaPostModel");
-
+const schedule = require("node-schedule");
 exports.getPostDataFromInsta = async (req, res) => {
   // Use dynamic import for ESM module
   import('got').then((gotModule) => {
@@ -14,20 +14,20 @@ exports.getPostDataFromInsta = async (req, res) => {
     // const apiurl = 'http://34.93.135.33:8080/api/get_single_logo_data/3';
     // let pages =["rvcjinsta", "bedroomtale", "thebackbencherrs", "adultsociety", "wildcasm", "thetrollfeeds", "akhanddose", "tube.indian", "wittymemebot", "couplesocietty", "thesarcasmicschool", "just.adulting", "chutiyapa_begins_from_here", "theindiansarcasm", "dekhpagli", "wow__chats", "school.days__", "papiduniyaa", "sarcasmicschool_", "the_engineer_bro", "theashleelduniya", "brocasm", "daily_over_dose", "gharrehkedekh", "thenastysociety", "thebackbenchrs", "sarcastictube", "studentsfacts.in", "theschooltrolls", "desi.company", "ashleelsansar", "johnnylaal"]
     // const apiurl = 'https://www.instagram.com/api/v1/users/web_profile_info/?username=rvcjinsta';
-    const pages = [
-      "rvcjinsta", "bedroomtale", "thebackbencherrs", "adultsociety", "wildcasm",
-      "thetrollfeeds", "akhanddose", "tube.indian", "wittymemebot", "couplesocietty",
-      "thesarcasmicschool", "just.adulting", "chutiyapa_begins_from_here", "theindiansarcasm",
-      "dekhpagli", "wow__chats", "school.days__", "papiduniyaa", "sarcasmicschool_",
-      "the_engineer_bro", "theashleelduniya", "brocasm", "daily_over_dose", "gharrehkedekh",
-      "thenastysociety", "thebackbenchrs", "sarcastictube", "studentsfacts.in", "theschooltrolls",
-      "desi.company", "ashleelsansar", "johnnylaal"
-    ];
+    // const pages = [
+    //   "rvcjinsta", "bedroomtale", "thebackbencherrs", "adultsociety", "wildcasm",
+    //   "thetrollfeeds", "akhanddose", "tube.indian", "wittymemebot", "couplesocietty",
+    //   "thesarcasmicschool", "just.adulting", "chutiyapa_begins_from_here", "theindiansarcasm",
+    //   "dekhpagli", "wow__chats", "school.days__", "papiduniyaa", "sarcasmicschool_",
+    //   "the_engineer_bro", "theashleelduniya", "brocasm", "daily_over_dose", "gharrehkedekh",
+    //   "thenastysociety", "thebackbenchrs", "sarcastictube", "studentsfacts.in", "theschooltrolls",
+    //   "desi.company", "ashleelsansar", "johnnylaal"
+    // ];
     
     // Create an array with 1000 URLs by repeating the pages array
-    const urlA = Array.from({ length: 1000 }, (_, index) => {
+    const urlA = Array.from({ length: 1 }, (_, index) => {
       const username = pages[index % pages.length];
-      return `https://www.instagram.com/api/v1/users/web_profile_info/?username=${username}`;
+      return `https://www.instagram.com/api/v1/users/web_profile_info/?username=rvcjinsta`;
     });
     // const urlA = [...new Array(100)].map((u) => apiurl);
 
@@ -35,6 +35,7 @@ exports.getPostDataFromInsta = async (req, res) => {
       si++;
       if (si === serversList.length) si = 0;
       const [host, port] = serversList[si].split(':');
+      console.log({ host, port })
       return { host, port };
     };
 
@@ -62,33 +63,73 @@ exports.getPostDataFromInsta = async (req, res) => {
       }
     };
 
+    // const processWithRetry = async ({ url }) => {
+    //   try {
+    //     const ra = [...new Array(20)].map((r) => 1);
+    //     let apiresp;
+    //     let retryAttempt = 0;
+    //     const resp = await ra.reduce(async (previousPromise, nextID) => {
+    //       try {
+    //         const res = await previousPromise;
+    //         if (!res?.body && !apiresp) {
+    //           retryAttempt++;
+    //           return procreq({ url });
+    //         }
+    //         if (res?.body) apiresp = res?.body;
+    //         return Promise.resolve();
+    //       } catch (err) {
+    //         retryAttempt++;
+    //         return procreq({ url });
+    //       }
+    //     }, Promise.resolve());
+
+    //     return { retryAttempt, success: retryAttempt < 20 ? 'success' : 'error', data: apiresp && JSON.parse(apiresp)?.data?.user };
+    //     // return { retryAttempt, success: retryAttempt < 20 ? 'success' : 'error', data: apiresp?.data?.user?.biography };
+    //   } catch (err) {
+    //     console.log(err.message);
+    //     return { retryAttempt: 20, success: 'error', data: '' };
+    //   }
+    // };
     const processWithRetry = async ({ url }) => {
       try {
         const ra = [...new Array(20)].map((r) => 1);
         let apiresp;
         let retryAttempt = 0;
+        let positiveResponseReceived = false;
+    
         const resp = await ra.reduce(async (previousPromise, nextID) => {
           try {
+            if (positiveResponseReceived) {
+              // Break the loop if a positive response has been received
+              return Promise.resolve();
+            }
+    
             const res = await previousPromise;
+    
             if (!res?.body && !apiresp) {
               retryAttempt++;
               return procreq({ url });
             }
-            if (res?.body) apiresp = res?.body;
+    
+            if (res?.body) {
+              apiresp = res?.body;
+              positiveResponseReceived = true;
+            }
+    
             return Promise.resolve();
           } catch (err) {
             retryAttempt++;
             return procreq({ url });
           }
         }, Promise.resolve());
-
-        return { retryAttempt, success: retryAttempt < 20 ? 'success' : 'error', data: apiresp && JSON.parse(apiresp)?.data?.user };
-        // return { retryAttempt, success: retryAttempt < 20 ? 'success' : 'error', data: apiresp?.data?.user?.biography };
+    
+        return { retryAttempt, success: positiveResponseReceived ? 'success' : 'error', data: apiresp && JSON.parse(apiresp)?.data?.user };
       } catch (err) {
         console.log(err.message);
         return { retryAttempt: 20, success: 'error', data: '' };
       }
     };
+    
 
     const tryall = async () => {
       try {
@@ -99,6 +140,8 @@ exports.getPostDataFromInsta = async (req, res) => {
           // console.log(`Result ${index + 1}:`, result);
           if(result?.success !== 'error'){
             let resObjFromInsta = result?.data?.edge_owner_to_timeline_media?.edges
+            console.log(resObjFromInsta)
+            return res.send(resObjFromInsta)
             resObjFromInsta.forEach(async(result2, index2) => {
               let mainNode = result2?.node
               let obj = {
@@ -138,7 +181,7 @@ exports.getPostDataFromInsta = async (req, res) => {
                 // sponsored : resObjFromInsta.data?.sponsored,
                 // page_category_id
               }
-              console.log("Obj =>",obj)
+              // console.log("Obj =>",obj)
               const savingPost = new cfInstaPostModel(obj);
               const savedPost = await savingPost.save();
             })
@@ -156,3 +199,74 @@ exports.getPostDataFromInsta = async (req, res) => {
     console.error('Error loading got module:', error.message);
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+// schedule.scheduleJob("* * * * * *", async () => {
+//   console.log("here")
+//   let resCheck
+//   // Use dynamic import for ESM module
+//   import('got').then((gotModule) => {
+//     const got = gotModule.default;
+
+//     const tunnel = require('tunnel');
+//   const ipHostArray = require('./servers');
+// // Function to make requests with different IPs
+// async function makeRequestWithIP(ip) {
+//   const [ipAddress, port] = ip.split(':');
+//   try {
+//     const request = got('https://www.instagram.com/api/v1/users/web_profile_info/?username=rvcjInsta', {
+//       agent: {
+//         https: tunnel.httpsOverHttp({
+//           proxy: {
+//             host: ipAddress,
+//             port: parseInt(port),
+//           },
+//         }),
+//       }, headers: {
+//         "X-Csrftoken": "coUAyrH2eP4tWX8zizaGUh",
+//         "X-Ig-App-Id": "936619743392459",
+//       },
+//     });
+//     console.log(`Response from ${ip}:`, request);
+//     // You can add your handling for the response here
+//     resCheck = true
+//   } catch (error) {
+//     console.error(`Error with ${ip}:`, error.message);
+//     // Handle error as needed
+//   }
+// }
+
+// // Loop through the array and make requests with different IPs
+// async function makeRequests(url) {
+//   for (const  ip  of ipHostArray) {
+//     await makeRequestWithIP(ip);
+//   }
+// }
+
+// // Call the function to start making requests
+// if(!resCheck) makeRequests("rvcjinsta");
+
+//   }).catch((error) => {
+//     console.error('Error loading got module:', error.message);
+//   });
+
+// })
