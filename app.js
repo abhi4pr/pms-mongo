@@ -8,8 +8,8 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocumantion = require("./doc/swaggerDoc.js");
 const OpenAI = require("openai");
 const { swaggerConfig } = require("./doc/swaggerConfig.js");
-const errorController=require('./controllers/errorController.js')
-const swaggerAccessManagement=require('./doc/customization_src/controller/swaggerAccessManagement.js');
+const errorController = require('./controllers/errorController.js')
+const swaggerAccessManagement = require('./doc/customization_src/controller/swaggerAccessManagement.js');
 const { checkDevAuthentication } = require("./doc/customization_src/middleware/swaggerMiddleware.js");
 const path = require("path");
 require("./controllers/autoMail.js");
@@ -23,7 +23,7 @@ app.set('views', path.join(__dirname, 'doc/customization_src/doc_templates/pages
 // app.use(express.json());
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
-app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use(
   bodyParser.urlencoded({
@@ -37,8 +37,10 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 
 /* Route Configuration */
 const instaBotXRoutes = require("./routes/instagram/bot_tools/botxRoutes.js");
+const AlfredRoutes = require("./routes/instagram/Alfred/alfreduseranalytics.js");
 app.use("/api", routes);
 app.use("/api", instaBotXRoutes);
+app.use("/api", AlfredRoutes);
 
 
 /**
