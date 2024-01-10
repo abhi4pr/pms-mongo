@@ -6,11 +6,11 @@
  */
 module.exports = servers = [
   {
-    url: "http://localhost:8080",
+    url: "http://localhost:3000",
     description: "Local Server",
   },
   {
-    url: "http://34.93.135.33:8080",
+    url: "https://jarvis-work-backend.onrender.com",
     description: "Live Server",
   },
 ];

@@ -184,7 +184,7 @@ exports.getRooms = async (req, res) => {
       },
     ]);
 
-    const url = "http://34.93.135.33:8080/uploads/";
+    const url = "https://jarvis-work-backend.onrender.com/uploads/";
     const dataWithImageUrl = roomObj.map((room) => ({
       ...room,
       room_image_url: room.roomImage ? url + room.roomImage : null,

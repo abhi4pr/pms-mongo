@@ -6,8 +6,11 @@ const assignmentSchema = new mongoose.Schema({
     type: Number,
   },
   ass_to: {
-    // type:mongoose.SchemaTypes.ObjectId,
-    // ref:'ExpertiseModel',
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'ExpertiseModel',
+    // type: String,
+  },
+  exp_name: {
     type: String,
   },
   ass_by: {
@@ -25,7 +28,7 @@ const assignmentSchema = new mongoose.Schema({
   },
   plan_id: {
     type: String,
-    required: [true, "plan id is required"]
+    // required: [true, "plan id is required"]
   },
   planName: {
     type: String,
@@ -46,6 +49,14 @@ const assignmentSchema = new mongoose.Schema({
   postRemaining: {
     type: String,
     default: this.postPerPage
+  },
+  storyPerPage:{
+    type:Number,
+    // required: [true, "story per page is required`"]
+  },
+  storyRemaining: {
+    type: Number,
+    default: this.storyPerPage
   },
   campaignName: {
     type: String,
@@ -85,7 +96,7 @@ const assignmentSchema = new mongoose.Schema({
   replacement_status: {
     type: String,
     default: 'inactive',
-    enum: ['active', 'inactive', 'replaced', 'replacement', 'pending']
+    enum: ['active', 'inactive', 'replaced', 'replacement', 'pending', 'rejected']
   },
   delete_status: {
     type: String,
@@ -101,17 +112,18 @@ const assignmentSchema = new mongoose.Schema({
     default: 'N/A',
   },
   replacement_id: {
-    type: String,
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'pageReplacementRecordModel'
   },
   ass_status: {
     type: String,
-    default: "assigned",
-    enum: ['assigned','pending','executed', 'verified', 'rejected']
+    default:'unassigned',
+    enum: ['assigned', 'unassigned', 'pending', 'executed', 'verified', 'rejected']
   },
   executed_at: {
     type: Date
   },
-  
+
   verified_by: {
     // type:mongoose.SchemaTypes.ObjectId,
     // ref:'userModels',
@@ -125,7 +137,16 @@ const assignmentSchema = new mongoose.Schema({
   },
   updatedFrom: {
     type: String,
-    default : ""
+    default: ""
+  },
+
+  preAssignedTo: {
+    type: Array,
+    default: []
+  },
+  rejected_by:{
+    type:Array,
+    default: []
   }
 
 });
@@ -137,6 +158,14 @@ assignmentSchema.plugin(AutoIncrement.plugin, {
   startAt: 1,
   incrementBy: 1,
 });
+
+assignmentSchema.pre(/^find/,async function (next){
+  this.populate({
+    path:'ass_to'
+  })
+})
+
+
 
 module.exports = mongoose.model(
   "assignmentModel",

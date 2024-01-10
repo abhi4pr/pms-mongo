@@ -28,7 +28,7 @@ exports.addKra = async (req, res) => {
 exports.getJobResponById = async (req, res) => {
     try {
         const user_id = req.params.user_id;
-        const ImageUrl = 'http://34.93.135.33:8080/uploads/';
+        const ImageUrl = 'https://jarvis-work-backend.onrender.com/uploads/';
         const userJobResponsi = await jobResponsibilityModel.aggregate([
             {
                 $match: { user_id: parseInt(user_id) },

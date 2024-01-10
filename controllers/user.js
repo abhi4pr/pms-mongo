@@ -24,6 +24,10 @@ const helper = require('../helper/helper.js');
 const OrderRequest = require("../models/orderReqModel.js");
 const Sitting = require("../models/sittingModel.js");
 const { generateEmpId } = require("../helper/helper.js");
+const departmentModel = require("../models/departmentModel.js");
+const designationModel = require("../models/designationModel.js");
+const deptDesiAuthModel = require("../models/deptDesiAuthModel.js");
+const emailTempModel = require("../models/emailTempModel")
 
 const upload = multer({ dest: "uploads/" }).fields([
     { name: "image", maxCount: 1 },
@@ -51,7 +55,7 @@ exports.addUser = [upload, async (req, res) => {
             encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
         }
 
-        let empId =  await generateEmpId();
+        let empId = await generateEmpId(req.body.dept_id);
 
         const simc = new userModel({
             user_name: req.body.user_name,
@@ -159,7 +163,8 @@ exports.addUser = [upload, async (req, res) => {
             guardian_address: req.body.guardian_address,
             relation_with_guardian: req.body.relation_with_guardian,
             gaurdian_number: req.body.gaurdian_number,
-            emergency_contact: req.body.emergency_contact,
+            emergency_contact1: req.body.emergency_contact1,
+            emergency_contact2: req.body.emergency_contact2,
             ctc: req.body.ctc,
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files.annexure_pdf ? req.files.annexure_pdf[0].filename : '',
@@ -170,7 +175,16 @@ exports.addUser = [upload, async (req, res) => {
             latitude: req.body.latitude,
             longitude: req.body.longitude,
             beneficiary: req.body.beneficiary,
-            emp_id : empId
+            emp_id: empId,
+            alternate_contact: req.body.alternate_contact,
+            cast_type: req.body.cast_type,
+            emergency_contact_person_name1: req.body.emergency_contact_person_name1,
+            emergency_contact_person_name2: req.body.emergency_contact_person_name2,
+            emergency_contact_relation1: req.body.emergency_contact_relation1,
+            emergency_contact_relation2: req.body.emergency_contact_relation2,
+            document_percentage_mandatory: req.body.document_percentage_mandatory,
+            document_percentage_non_mandatory: req.body.document_percentage_non_mandatory,
+            document_percentage: req.body.document_percentage
         })
         const simv = await simc.save();
 
@@ -252,6 +266,18 @@ exports.addUser = [upload, async (req, res) => {
             };
 
             await userAuthModel.create(userAuthDocument);
+        }
+
+        const deptDesiData = await deptDesiAuthModel.find({});
+        for (const deptDesi of deptDesiData) {
+            if (deptDesi.dept_id == req.body.dept_id && deptDesi.desi_id == req.body.user_designation) {
+                const edit = await userAuthModel.findOneAndUpdate({ obj_id: deptDesi.obj_id }, {
+                    insert: deptDesi.insert,
+                    view: deptDesi.view,
+                    update: deptDesi.update,
+                    delete_flag: deptDesi.delete_flag
+                })
+            }
         }
 
         res.send({ simv, status: 200 });
@@ -400,7 +426,8 @@ exports.updateUser = [upload1, async (req, res) => {
             guardian_address: req.body.guardian_address,
             relation_with_guardian: req.body.relation_with_guardian,
             gaurdian_number: req.body.gaurdian_number,
-            emergency_contact: req.body.emergency_contact,
+            emergency_contact1: req.body.emergency_contact1,
+            emergency_contact2: req.body.emergency_contact2,
             ctc: req.body.ctc,
             offer_letter_send: req.body.offer_letter_send,
             annexure_pdf: req.files && req.files['annexure_pdf'] && req.files['annexure_pdf'][0] ? req.files['annexure_pdf'][0].filename : (existingUser && existingUser.annexure_pdf) || '',
@@ -413,8 +440,16 @@ exports.updateUser = [upload1, async (req, res) => {
             latitude: req.body.latitude,
             longitude: req.body.longitude,
             coc_flag: req.body.coc_flag,
-            beneficiary: req.body.beneficiary
-
+            beneficiary: req.body.beneficiary,
+            alternate_contact: req.body.alternate_contact,
+            cast_type: req.body.cast_type,
+            emergency_contact_person_name1: req.body.emergency_contact_person_name1,
+            emergency_contact_person_name2: req.body.emergency_contact_person_name2,
+            emergency_contact_relation1: req.body.emergency_contact_relation1,
+            emergency_contact_relation2: req.body.emergency_contact_relation2,
+            document_percentage_mandatory: req.body.document_percentage_mandatory,
+            document_percentage_non_mandatory: req.body.document_percentage_non_mandatory,
+            document_percentage: req.body.document_percentage
         }, { new: true });
         if (!editsim) {
             return res.status(500).send({ success: false })
@@ -431,7 +466,7 @@ exports.updateUser = [upload1, async (req, res) => {
 
 exports.getWFHUsersByDept = async (req, res) => {
     try {
-        const simc = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFH' }).lean();
+        const simc = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFHD' }).lean();
         if (!simc) {
             res.status(500).send({ success: false })
         }
@@ -556,6 +591,39 @@ exports.getAllUsers = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: 'userdocmanagementmodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'userdocuments'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$userdocuments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'documentmodels',
+                    localField: 'userdocuments.doc_id',
+                    foreignField: 'doc_id',
+                    as: 'documents'
+                }
+            },
+            {
+                $addFields: {
+                    requiredDocuments: {
+                        $filter: {
+                            input: "$documents",
+                            as: "doc",
+                            cond: "$$doc.isRequired"
+                        }
+                    }
+                }
+            },
+            {
                 $project: {
                     user_id: "$user_id",
                     user_name: "$user_name",
@@ -677,7 +745,8 @@ exports.getAllUsers = async (req, res) => {
                     guardian_address: "$guardian_address",
                     relation_with_guardian: "$relation_with_guardian",
                     gaurdian_number: "$gaurdian_number",
-                    emergency_contact: "$emergency_contact",
+                    emergency_contact1: "$emergency_contact1",
+                    emergency_contact2: "$emergency_contact2",
                     ctc: "$ctc",
                     offer_letter_send: "$offer_letter_send",
                     annexure_pdf: "$annexure_pdf",
@@ -688,34 +757,67 @@ exports.getAllUsers = async (req, res) => {
                     latitude: "$latitude",
                     longitude: "$longitude",
                     beneficiary: "$beneficiary",
-                    emp_id : "$emp_id"
+                    emp_id: "$emp_id",
+                    alternate_contact: "$alternate_contact",
+                    cast_type: "$cast_type",
+                    emergency_contact_person_name1: "$emergency_contact_person_name1",
+                    emergency_contact_person_name2: "$emergency_contact_person_name2",
+                    emergency_contact_relation1: "$emergency_contact_relation1",
+                    emergency_contact_relation2: "$emergency_contact_relation2",
+                    document_percentage_mandatory: "$document_percentage_mandatory",
+                    document_percentage_non_mandatory: "$document_percentage_non_mandatory",
+                    document_percentage: "$document_percentage",
+                    documentPercentage: {
+                        $multiply: [
+                            {
+                                $divide: [
+                                    { $size: "$requiredDocuments" },
+                                    { $size: "$documents" }
+                                ]
+                            },
+                            100
+                        ]
+                    }
                 }
             }
         ]).exec();
-        const userImagesBaseUrl = "http://34.93.135.33:8080/uploads/";
-        const dataWithImageUrl = singlesim.map((user) => ({
-            ...user,
-            image_url: user.image ? userImagesBaseUrl + user.image : null,
-            uid_url: user.UID ? userImagesBaseUrl + user.UID : null,
-            pan_url: user.pan ? userImagesBaseUrl + user.pan : null,
-            highest_upload_url: user.highest_upload
-                ? userImagesBaseUrl + user.highest_upload
-                : null,
-            other_upload_url: user.other_upload
-                ? userImagesBaseUrl + user.other_upload
-                : null,
-            tenth_marksheet_url: user.tenth_marksheet ? userImagesBaseUrl + user.tenth_marksheet : null,
-            twelveth_marksheet_url: user.twelveth_marksheet ? userImagesBaseUrl + user.twelveth_marksheet : null,
-            UG_Marksheet_url: user.UG_Marksheet ? userImagesBaseUrl + user.UG_Marksheet : null,
-            pasport_url: user.passport ? userImagesBaseUrl + user.passport : null,
-            pre_off_letter_url: user.pre_off_letter ? userImagesBaseUrl + user.pre_off_letter : null,
-            pre_expe_letter_url: user.pre_expe_letter ? userImagesBaseUrl + user.pre_expe_letter : null,
-            Pre_relieving_letter_url: user.pre_relieving_letter ? userImagesBaseUrl + user.pre_relieving_letter : null,
-            bankPassBook_Cheque_url: user.bankPassBook_Cheque ? userImagesBaseUrl + user.bankPassBook_Cheque : null,
-            joining_extend_document_url: user.joining_extend_document ? userImagesBaseUrl + user.joining_extend_document : null,
-            digital_signature_image_url: user.digital_signature_image ? userImagesBaseUrl + user.digital_signature_image : null,
-            annexure_pdf_url: user.annexure_pdf ? userImagesBaseUrl + user.annexure_pdf : null
-        }));
+        const userImagesBaseUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+        const fieldsToCheck = [
+            'user_name', 'PersonalEmail', 'PersonalNumber', 'fatherName', 'Gender', 'motherName',
+            'Hobbies', 'BloodGroup', 'SpokenLanguage', 'DO', 'Nationality', 'guardian_name',
+            'guardian_contact', 'emergency_contact', 'guardian_address', 'relation_with_guardian',
+            'current_address', 'current_city', 'current_state', 'current_pin_code',
+            'permanent_address', 'permanent_city', 'permanent_state', 'permanent_pin_code',
+        ];
+        const dataWithImageUrl = singlesim.map((user) => {
+            const filledFields = fieldsToCheck.filter(field => user[field] !== null && user[field] !== undefined && user[field] !== '').length;
+            const percentageFilled = (filledFields / fieldsToCheck.length) * 100;
+
+            return {
+                ...user,
+                image_url: user.image ? userImagesBaseUrl + user.image : null,
+                uid_url: user.UID ? userImagesBaseUrl + user.UID : null,
+                pan_url: user.pan ? userImagesBaseUrl + user.pan : null,
+                highest_upload_url: user.highest_upload
+                    ? userImagesBaseUrl + user.highest_upload
+                    : null,
+                other_upload_url: user.other_upload
+                    ? userImagesBaseUrl + user.other_upload
+                    : null,
+                tenth_marksheet_url: user.tenth_marksheet ? userImagesBaseUrl + user.tenth_marksheet : null,
+                twelveth_marksheet_url: user.twelveth_marksheet ? userImagesBaseUrl + user.twelveth_marksheet : null,
+                UG_Marksheet_url: user.UG_Marksheet ? userImagesBaseUrl + user.UG_Marksheet : null,
+                pasport_url: user.passport ? userImagesBaseUrl + user.passport : null,
+                pre_off_letter_url: user.pre_off_letter ? userImagesBaseUrl + user.pre_off_letter : null,
+                pre_expe_letter_url: user.pre_expe_letter ? userImagesBaseUrl + user.pre_expe_letter : null,
+                Pre_relieving_letter_url: user.pre_relieving_letter ? userImagesBaseUrl + user.pre_relieving_letter : null,
+                bankPassBook_Cheque_url: user.bankPassBook_Cheque ? userImagesBaseUrl + user.bankPassBook_Cheque : null,
+                joining_extend_document_url: user.joining_extend_document ? userImagesBaseUrl + user.joining_extend_document : null,
+                digital_signature_image_url: user.digital_signature_image ? userImagesBaseUrl + user.digital_signature_image : null,
+                annexure_pdf_url: user.annexure_pdf ? userImagesBaseUrl + user.annexure_pdf : null,
+                percentage_filled: percentageFilled.toFixed(2) + '%',
+            };
+        });
         if (dataWithImageUrl?.length === 0) {
             res
                 .status(200)
@@ -954,7 +1056,8 @@ exports.getSingleUser = async (req, res) => {
                     guardian_address: "$guardian_address",
                     relation_with_guardian: "$relation_with_guardian",
                     gaurdian_number: "$gaurdian_number",
-                    emergency_contact: "$emergency_contact",
+                    emergency_contact1: "$emergency_contact1",
+                    emergency_contact2: "$emergency_contact2",
                     ctc: "$ctc",
                     offer_letter_send: "$offer_letter_send",
                     profileflag: "$profileflag",
@@ -964,11 +1067,20 @@ exports.getSingleUser = async (req, res) => {
                     latitude: "$latitude",
                     longitude: "$longitude",
                     beneficiary: "$beneficiary",
-                    emp_id : "$emp_id"
+                    emp_id: "$emp_id",
+                    alternate_contact: "$alternate_contact",
+                    cast_type: "$cast_type",
+                    emergency_contact_person_name1: "$emergency_contact_person_name1",
+                    emergency_contact_person_name2: "$emergency_contact_person_name2",
+                    emergency_contact_relation1: "$emergency_contact_relation1",
+                    emergency_contact_relation2: "$emergency_contact_relation2",
+                    document_percentage_mandatory: "$document_percentage_mandatory",
+                    document_percentage_non_mandatory: "$document_percentage_non_mandatory",
+                    document_percentage: "$document_percentage",
                 }
             }
         ]).exec();
-        const userImagesBaseUrl = "http://34.93.135.33:8080/uploads/";
+        const userImagesBaseUrl = "https://jarvis-work-backend.onrender.com/uploads/";
         const dataWithImageUrl = singlesim.map((user) => ({
             ...user,
             image_url: user.image ? userImagesBaseUrl + user.image : null,
@@ -1019,12 +1131,12 @@ exports.deleteUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
     try {
-        // const simc = await userModel.find();
+
         const simc = await userModel.aggregate([
             {
                 $match: {
                     user_login_id: req.body.user_login_id.toLowerCase().trim(),
-                    // user_login_password:req.body.user_login_password
+
                 }
             },
             {
@@ -1046,31 +1158,27 @@ exports.loginUser = async (req, res) => {
                     sitting_id: '$sitting.sitting_id',
                     sitting_ref_no: '$sitting.sitting_ref_no',
                     first_login_flag: '$first_login_flag',
-                    // id: "$id",
                     name: '$user_name',
                     email: '$user_email_id',
                     dept_id: '$dept_id',
                     role_id: '$role_id',
                     id: "$user_id",
-                    // name: "$user_name",
-                    // email: "$user_email_id",
-                    // sitting_id: '$sitting_id',
                     room_id: '$room_id',
                     user_status: '$user_status',
                     user_login_password: '$user_login_password',
                     onboard_status: '$onboard_status',
-                    id: '$user_id',
                     user_login_id: '$user_login_id'
                 }
             }
         ]).exec();
 
         if (simc.length === 0) {
-            return res.status(500).send({ success: false })
+            return res.status(500).send({ error: "Invalid Login Id" });
         }
-        let role = req.body?.role_id
-        if (bcrypt.compareSync(req.body.user_login_password, simc[0]?.user_login_password) || role === constant.ADMIN_ROLE) {
-            // if (bcrypt.compareSync(req.body.user_login_password, simc[0].user_login_password)) {
+
+        const isPasswordValid = bcrypt.compareSync(req.body.user_login_password, simc[0]?.user_login_password || role === constant.ADMIN_ROLE);
+
+        if (isPasswordValid || simc[0]?.user_login_password) {
             const token = jwt.sign(
                 {
                     id: simc[0]?.id,
@@ -1080,7 +1188,6 @@ exports.loginUser = async (req, res) => {
                     role_id: simc[0]?.role_id,
                     dept_id: simc[0]?.dept_id,
                     room_id: simc[0]?.room_id,
-                    // Sitting_id: simc[0]?.Sitting_id,
                     sitting_ref_no: simc[0]?.sitting_ref_no,
                     onboard_status: simc[0]?.onboard_status,
                     user_status: simc[0]?.user_status,
@@ -1090,6 +1197,8 @@ exports.loginUser = async (req, res) => {
             );
 
             var currentDate = new Date();
+            currentDate.setHours(currentDate.getHours() + 5)
+            currentDate.setMinutes(currentDate.getMinutes() + 30)
             var formattedDateTime = currentDate.toLocaleString();
 
             if (simc[0].onboard_status == 2) {
@@ -1113,13 +1222,13 @@ exports.loginUser = async (req, res) => {
                 }
             }
 
-            return res.status(200).send({ token, user: simc[0] })
+            return res.status(200).send({ token, user: simc[0] });
         } else {
-            return res.status(200).send({ sms: 'Invalid Password' })
+            return res.status(500).send({ error: 'Invalid Password' });
         }
 
     } catch (err) {
-        return res.status(500).send({ error: err.message, sms: 'Error getting user details' })
+        return res.status(500).send({ error: err.message, sms: 'Error getting user details' });
     }
 }
 
@@ -1148,7 +1257,7 @@ exports.deliveryBoyByRoom = async (req, res) => {
 }
 
 exports.deliveryUser = async (req, res) => {
-    const ImageUrl = "http://34.93.135.33:8080/uploads/";
+    const ImageUrl = "https://jarvis-work-backend.onrender.com/uploads/";
     try {
         const delv = await userModel.aggregate([
             {
@@ -1304,7 +1413,10 @@ exports.deliveryUser = async (req, res) => {
                     guardian_address: "$guardian_address",
                     relation_with_guardian: "$relation_with_guardian",
                     gaurdian_number: "$gaurdian_number",
-                    emergency_contact: "$emergency_contact"
+                    emergency_contact: "$emergency_contact",
+                    document_percentage_mandatory: "$document_percentage_mandatory",
+                    document_percentage_non_mandatory: "$document_percentage_non_mandatory",
+                    document_percentage: "$document_percentage",
                 }
             }
         ]).exec();
@@ -1536,16 +1648,22 @@ exports.sendUserMail = async (req, res) => {
         const { email, subject, name, password, login_id, status, text, name2 } = req.body;
         const attachment = req.file;
         if (status == "onboarded") {
-            const templatePath = path.join(__dirname, "template.ejs");
-            const template = await fs.promises.readFile(templatePath, "utf-8");
+            // const templatePath = path.join(__dirname, "template.ejs");
+            // const template = await fs.promises.readFile(templatePath, "utf-8");
+            // const html = ejs.render(template, {email,password,name,login_id,text});
 
-            const html = ejs.render(template, {
-                email,
-                password,
-                name,
-                login_id,
-                text,
-            });
+            /* dynamic email temp code start */
+            let contentList = await emailTempModel.find({ email_for_id: 6 })
+            let content = contentList[0];
+
+            const filledEmailContent = content.email_content
+            .replace("{{user_name}}", name)
+            .replace("{{user_email}}", email)
+            .replace("{{user_password}}", password)
+            .replace("{{user_login_id}}", login_id);
+
+            const html = filledEmailContent;
+            /* dynamic email temp code end */
 
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
@@ -1573,13 +1691,18 @@ exports.sendUserMail = async (req, res) => {
             await mailTransporter.sendMail(mailOptions);
             res.sendStatus(200);
         } else if (status == "reportTo") {
-            const templatePath = path.join(__dirname, "reportTo.ejs");
-            const template = await fs.promises.readFile(templatePath, "utf-8");
+            // const templatePath = path.join(__dirname, "reportTo.ejs");
+            // const template = await fs.promises.readFile(templatePath, "utf-8");
+            // const html = ejs.render(template, { name, name2 });
 
-            const html = ejs.render(template, {
-                name,
-                name2
-            });
+            /* dynamic email temp code start */
+            let contentList = await emailTempModel.find({ email_for_id: 7 })
+            let content = contentList[0];
+
+            const filledEmailContent = content.email_content.replace("{{user_reportTo}}", name2);
+
+            const html = filledEmailContent;
+            /* dynamic email temp code end */
 
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
@@ -1607,16 +1730,36 @@ exports.sendUserMail = async (req, res) => {
             await mailTransporter.sendMail(mailOptions);
             res.sendStatus(200);
         } else {
-            const templatePath = path.join(__dirname, "template.ejs");
-            const template = await fs.promises.readFile(templatePath, "utf-8");
-            const html = ejs.render(template, {
-                email,
-                password,
-                name,
-                login_id,
-                text,
-            });
+            // const templatePath = path.join(__dirname, "template.ejs");
+            // const template = await fs.promises.readFile(templatePath, "utf-8");
+            // const html = ejs.render(template, {
+            //     email,
+            //     password,
+            //     name,
+            //     login_id,
+            //     text,
+            // });
 
+            // let mailTransporter = nodemailer.createTransport({
+            //     service: "gmail",
+            //     auth: {
+            //         user: "onboarding@creativefuel.io",
+            //         pass: "fjjmxuavwpescyat",
+            //     },
+            // });
+
+            /* dynamic email temp code start */
+            let contentList = await emailTempModel.find({ email_for_id: 8 })
+            let content = contentList[0];
+
+            const filledEmailContent = content.email_content
+            .replace("{{user_name}}", name)
+            .replace("{{user_email}}", email)
+            .replace("{{user_password}}", password)
+            .replace("{{user_login_id}}", login_id);
+
+            const html = filledEmailContent;
+            /* dynamic email temp code end */
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
@@ -1650,7 +1793,7 @@ exports.sendUserMail = async (req, res) => {
 
 exports.getUserByDeptAndWFH = async (req, res) => {
     try {
-        const delv = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFH' })
+        const delv = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFHD' })
         if (!delv) {
             res.status(500).send({ success: false })
         }
@@ -2097,7 +2240,7 @@ exports.sendMailAllWfoUser = async (req, res) => {
 
 exports.getAllWfhUsers = async (req, res) => {
     try {
-        const simc = await userModel.find({ job_type: 'WFH' }).lean();
+        const simc = await userModel.find({ job_type: 'WFHD' }).lean();
         if (simc.length === 0) {
             res.status(500).send({ success: false, message: "No record found" })
         }
@@ -2137,7 +2280,7 @@ exports.loginUserData = async (req, res) => {
         };
 
         if (user.image) {
-            userObject.image = `http://34.93.135.33:8080/uploads/${user.image}`;
+            userObject.image = `https://jarvis-work-backend.onrender.com/uploads/${user.image}`;
         } else {
             userObject.image = null;
         }
@@ -2164,16 +2307,49 @@ exports.forgotPass = async (req, res) => {
             user_login_password: encryptedPass
         });
 
-        const templatePath = path.join(__dirname, "forgotemailtemp.ejs");
-        const template = await fs.promises.readFile(templatePath, "utf-8");
-        const html = ejs.render(template, {
-            email,
-            password: getRandomPassword
+        // const templatePath = path.join(__dirname, "forgotemailtemp.ejs");
+        // const template = await fs.promises.readFile(templatePath, "utf-8");
+        // const html = ejs.render(template, {
+        //     email,
+        //     password: getRandomPassword
+        // });
 
-        });
-
+        /* dynamic email temp code start */
+        let contentList = await emailTempModel.find({ email_for_id: 9 })
+        let content = contentList[0];
+      
+        const filledEmailContent = content.email_content
+        .replace("{{user_email}}", email)
+        .replace("{{user_password}}", getRandomPassword);
+      
+        var html;
+        html = filledEmailContent;
+        /* dynamic email temp code end */
         if (updatePass) {
-            sendMail("Forgot password", html, email);
+            // sendMail("Forgot password", html, email);
+        /* dynamic email temp code start */
+            var transport = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                  user: "onboarding@creativefuel.io",
+                  pass: "fjjmxuavwpescyat",
+              },
+            });
+              
+            const mail = (subject, html,email) => {
+                let mailOptions = {
+                    from: "onboarding@creativefuel.io",
+                    to: email,
+                    // subject: "Forgot password",
+                    subject: content.email_sub,
+                    html: html,
+                };
+                transport.sendMail(mailOptions, function (error, info) {
+                    if (error) console.log(error);
+                    return info;
+                });
+            };
+        /* dynamic email temp code end */
         } else {
             return res.status(500).send({ sms: 'email couldn not send' });
         }
@@ -2186,10 +2362,36 @@ exports.forgotPass = async (req, res) => {
 
 exports.getLoginHistory = async (req, res) => {
     try {
-        const dataa = await userLoginHisModel.find({});
-        res.status(200).send({ data: dataa })
+        // const loginHistory = await userLoginHisModel.find({});
+        const loginHistory = await userLoginHisModel.aggregate([
+            {
+                $lookup: {
+                    from: 'usermodels',
+                    localField: 'user_id',
+                    foreignField: 'user_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$user",
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    user_id: 1,
+                    user_name: "$user.user_name",
+                    user_email_id: 1,
+                    login_date: 1,
+                    duration: 1,
+                    log_out_date: 1
+                }
+            }
+        ]).exec();
+        res.status(200).send({ data: loginHistory });
     } catch (error) {
-        res.status(500).send({ error: error.message, sms: "error getting user login history" })
+        res.status(500).send({ error: error.message, sms: "Error getting user login history" });
     }
 }
 
@@ -2262,32 +2464,52 @@ exports.getUserPresitting = async (req, res) => {
     }
 };
 
-exports.getAllUsersWithDoBAndDoj = async (req, res) => {
+exports.getAllUsersWithDoj = async (req, res) => {
     try {
         const currentDate = new Date();
         const currentDayMonth = currentDate.toISOString().slice(5, 10);
 
-        const allUsers = await userModel.find().select({ joining_date: 1, DOB: 1, user_name: 1, image: 1 });
+        const allUsers = await userModel.find().select({ user_id: 1, joining_date: 1, user_name: 1, image: 1, DOB: 1 });
 
         const filteredUsers = allUsers.map(user => {
             const userJoiningDate = user.joining_date?.toISOString().slice(5, 10);
-            const userDOB = user.DOB?.toISOString().slice(5, 10);
 
-            if (userJoiningDate === currentDayMonth && userDOB === currentDayMonth) {
+            if (userJoiningDate === currentDayMonth) {
+                const joiningYear = user.joining_date.getFullYear();
+                const currentYear = currentDate.getFullYear();
+                const totalYears = currentYear - joiningYear;
+                if (totalYears >= 1) {
+                    return {
+                        user_id: user.user_id,
+                        user_name: user.user_name,
+                        joining_date: user.joining_date,
+                        DOB: user.DOB,
+                        image: user.image,
+                        total_years: totalYears
+                    };
+                }
+            }
+            return null;
+        }).filter(Boolean);
+
+        res.json({ users: filteredUsers });
+    } catch (error) {
+        return res.status(500).send({ error: error.message });
+    }
+};
+
+exports.getAllUsersWithDoB = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const currentDayMonth = currentDate.toISOString().slice(5, 10);
+
+        const allUsers = await userModel.find().select({ user_id: 1, DOB: 1, user_name: 1, image: 1 });
+
+        const filteredUsers = allUsers.map(user => {
+            const userDOB = user.DOB?.toISOString().slice(5, 10);
+            if (userDOB === currentDayMonth) {
                 return {
-                    user_name: user.user_name,
-                    joining_date: user.joining_date,
-                    DOB: user.DOB,
-                    image: user.image
-                };
-            } else if (userJoiningDate === currentDayMonth) {
-                return {
-                    user_name: user.user_name,
-                    joining_date: user.joining_date,
-                    image: user.image
-                };
-            } else if (userDOB === currentDayMonth) {
-                return {
+                    user_id: user.user_id,
                     user_name: user.user_name,
                     DOB: user.DOB,
                     image: user.image
@@ -2303,24 +2525,23 @@ exports.getAllUsersWithDoBAndDoj = async (req, res) => {
     }
 };
 
-
 exports.getLastMonthUsers = async (req, res) => {
     try {
         const currentDate = new Date();
 
         const lastMonthStartDate = new Date(currentDate);
         lastMonthStartDate.setMonth(currentDate.getMonth() - 1);
-       
+
         const usersFromLastMonth = await userModel.find({
             created_At: {
                 $gte: lastMonthStartDate,
                 $lt: currentDate,
             }
-        }).select({ user_id: 1, user_name: 1, created_At: 1 });
+        }).select({ user_id: 1, user_name: 1, created_At: 1, joining_date: 1, image: 1 });
 
         res.json(usersFromLastMonth);
     } catch (err) {
-        console.error(err); 
+        console.error(err);
         res.status(500).json({ error: err.message, sms: 'Error getting users from last month' });
     }
 }
@@ -2328,7 +2549,7 @@ exports.getLastMonthUsers = async (req, res) => {
 exports.getAllFilledUsers = async (req, res) => {
     try {
         const userFields = Object.keys(userModel.schema.paths);
-        
+
         const andConditions = userFields.map(field => ({ [field]: { $exists: true, $ne: null } }));
 
         const usersWithAllFieldsFilled = await userModel.find({
@@ -2346,62 +2567,350 @@ exports.getAllFilledUsers = async (req, res) => {
     }
 }
 
+// exports.getFilledPercentage = async (req, res) => {
+//     try {
+//         const users = await userModel.find({ onboard_status: 2 }).select({
+//             user_id: 1,
+//             user_name: 1,
+//             PersonalEmail: 1,
+//             PersonalNumber: 1,
+//             fatherName: 1,
+//             Gender: 1,
+//             motherName: 1,
+//             Hobbies: 1,
+//             BloodGroup: 1,
+//             SpokenLanguage: 1,
+//             DO: 1,
+//             Nationality: 1,
+//             guardian_name: 1,
+//             guardian_contact: 1,
+//             emergency_contact: 1,
+//             guardian_address: 1,
+//             relation_with_guardian: 1,
+//             current_address: 1,
+//             current_city: 1,
+//             current_state: 1,
+//             current_pin_code: 1,
+//             permanent_address: 1,
+//             permanent_city: 1,
+//             permanent_state: 1,
+//             permanent_pin_code: 1,
+//             onboard_status: 1,
+//             dept_name: 1,
+//             desi_name: 1,
+//         });
+
+//         if (!users) {
+//             return res.status(500).send({ success: false });
+//         }
+
+//         const resultArray = [];
+//         const percentageResults = users.map(user => {
+//             const filledFields = Object.values(user._doc).filter(value => value !== null && value !== "" && value !== 0).length;
+
+//             const filledPercentage = (filledFields / 24) * 100;
+//             const result = { user_id: user.user_id, filledPercentage: filledPercentage.toFixed(2) };
+
+//             resultArray.push(result);
+
+//             return result;
+//         });
+
+//         const incompleteUsers = resultArray.filter(result => parseFloat(result.filledPercentage) < 100);
+//         const incompleteUsersDetails = incompleteUsers.map(incompleteUser => {
+//             const userDetail = users.find(user => user.user_id === incompleteUser.user_id);
+//             return { ...userDetail._doc, filledPercentage: incompleteUser.filledPercentage };
+//         });
+
+//         res.status(200).send({ incompleteUsersDetails });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).send({ error: err.message, sms: 'Error calculating filled percentage' });
+//     }
+// }  
+
 exports.getFilledPercentage = async (req, res) => {
     try {
-        const users = await userModel.find({onboard_status : 2}).select({
-            user_id:1,
-            user_name : 1,
-            PersonalEmail : 1,
-            PersonalNumber : 1,
-            fatherName : 1,
-            Gender : 1,
-            motherName : 1,
+        const users = await userModel.find({ onboard_status: 2 }).select({
+            user_id: 1,
+            user_name: 1,
+            PersonalEmail: 1,
+            PersonalNumber: 1,
+            fatherName: 1,
+            Gender: 1,
+            motherName: 1,
             Hobbies: 1,
-            BloodGroup : 1,
-            SpokenLanguage : 1,
-            DO : 1,
-            Nationality : 1,
-            guardian_name : 1,
-            guardian_contact :1,
+            BloodGroup: 1,
+            SpokenLanguage: 1,
+            DO: 1,
+            Nationality: 1,
+            guardian_name: 1,
+            guardian_contact: 1,
             emergency_contact: 1,
-            guardian_address : 1,
-            relation_with_guardian : 1,
-            current_address : 1,
-            current_city : 1,
-            current_state : 1,
-            current_pin_code : 1,
-            permanent_address : 1,
-            permanent_city : 1,
-            permanent_state : 1,
-            permanent_pin_code : 1,
-            onboard_status : 1
+            guardian_address: 1,
+            relation_with_guardian: 1,
+            current_address: 1,
+            current_city: 1,
+            current_state: 1,
+            current_pin_code: 1,
+            permanent_address: 1,
+            permanent_city: 1,
+            permanent_state: 1,
+            permanent_pin_code: 1,
+            onboard_status: 1,
+            dept_id: 1,
+            user_designation: 1,
         });
 
         if (!users) {
             return res.status(500).send({ success: false });
         }
 
-            const resultArray = [];
-            const percentageResults = users.map(user => {
-                    const filledFields = Object.values(user._doc).filter(value => value !== null && value !== "" && value !== 0).length;
-    
-                const filledPercentage = (filledFields / 24) * 100;
-                const result = { user_id: user.user_id, filledPercentage: filledPercentage.toFixed(2) };
-    
-                resultArray.push(result);
-    
-                return result;
+        const resultArray = [];
+        const percentageResults = users.map(user => {
+            const filledFields = Object.values(user._doc).filter(value => value !== null && value !== "" && value !== 0).length;
+
+            const filledPercentage = (filledFields / 24) * 100;
+            const result = { user_id: user.user_id, filledPercentage: filledPercentage.toFixed(2) };
+
+            resultArray.push(result);
+
+            return result;
+        });
+
+        const incompleteUsers = resultArray.filter(result => parseFloat(result.filledPercentage) < 100);
+        const incompleteUsersDetails = await Promise.all(incompleteUsers.map(async incompleteUser => {
+            const userDetail = await userModel.findOne({ user_id: incompleteUser.user_id }).select({});
+
+            const deptDetail = await departmentModel.findOne({ dept_id: userDetail.dept_id }).select({
+                dept_name: 1,
             });
-    
-            const incompleteUsers = resultArray.filter(result => parseFloat(result.filledPercentage) < 100);
-            const incompleteUsersDetails = incompleteUsers.map(incompleteUser => {
-                const userDetail = users.find(user => user.user_id === incompleteUser.user_id);
-                return userDetail._doc;
+
+            const desiDetail = await designationModel.findOne({ user_designation: userDetail.user_designation }).select({
+                desi_name: 1,
             });
-    
-            res.status(200).send({ results: percentageResults, incompleteUsersDetails });
+
+            return { ...userDetail._doc, filledPercentage: incompleteUser.filledPercentage, dept_name: deptDetail.dept_name, desi_name: desiDetail.desi_name };
+        }));
+
+        res.status(200).send({ incompleteUsersDetails });
     } catch (err) {
         console.error(err);
         res.status(500).send({ error: err.message, sms: 'Error calculating filled percentage' });
     }
 }
+
+exports.getUserGraphData = async (req, res) => {
+    try {
+        let result;
+
+        if (req.body.caseType == 'gender') {
+            result = await userModel.aggregate([
+                {
+                    $group: {
+                        _id: {
+                            dept_id: "$dept_id",
+                            gender: "$Gender",
+                        },
+                        count: { $sum: 1 },
+                    },
+                },
+                {
+                    $group: {
+                        _id: "$_id.dept_id",
+                        maleCount: {
+                            $sum: {
+                                $cond: [{ $eq: ["$_id.gender", "Male"] }, "$count", 0],
+                            },
+                        },
+                        femaleCount: {
+                            $sum: {
+                                $cond: [{ $eq: ["$_id.gender", "Female"] }, "$count", 0],
+                            },
+                        },
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "departmentmodels",
+                        localField: "_id",
+                        foreignField: "dept_id",
+                        as: "department",
+                    },
+                },
+                {
+                    $unwind: {
+                        path: "$department",
+                        preserveNullAndEmptyArrays: true
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        dept_id: "$_id",
+                        maleCount: 1,
+                        dept_name: "$department.dept_name",
+                        femaleCount: 1,
+                    },
+                },
+            ]);
+        } else if (req.body.caseType == 'job') {
+            result = await userModel.aggregate([
+                {
+                    $group: {
+                        _id: {
+                            dept_id: "$dept_id",
+                            job: "$job_type",
+                        },
+                        count: { $sum: 1 },
+                    },
+                },
+                {
+                    $group: {
+                        _id: "$_id.dept_id",
+                        wfhCount: {
+                            $sum: {
+                                $cond: [{ $eq: ["$_id.job", "WFHD"] }, "$count", 0],
+                            },
+                        },
+                        wfoCount: {
+                            $sum: {
+                                $cond: [{ $eq: ["$_id.job", "WFO"] }, "$count", 0],
+                            },
+                        },
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "departmentmodels",
+                        localField: "_id",
+                        foreignField: "dept_id",
+                        as: "department",
+                    },
+                },
+                {
+                    $unwind: {
+                        path: "$department",
+                        preserveNullAndEmptyArrays: true
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        dept_id: "$_id",
+                        wfhCount: 1,
+                        dept_name: "$department.dept_name",
+                        wfoCount: 1,
+                    },
+                },
+            ]);
+        } else if (req.body.caseType == 'year') {
+            result = await userModel.aggregate([
+                {
+                    $addFields: {
+                        convertedDate: { $toDate: "$joining_date" },
+                    },
+                },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$convertedDate" },
+                        },
+                        userjoined: { $sum: 1 },
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        year: "$_id.year",
+                        userjoined: 1,
+                    },
+                },
+            ]);
+        } else if (req.body.caseType == 'experience') {
+            result = await userModel.aggregate([
+                {
+                    $addFields: {
+                        convertedDate: { $toDate: "$joining_date" },
+                        experience: {
+                            $divide: [
+                                { $subtract: [new Date(), { $toDate: "$joining_date" }] },
+                                31536000000,
+                            ],
+                        },
+                    },
+                },
+                {
+                    $group: {
+                        _id: {
+                            years: {
+                                $subtract: [
+                                    { $floor: "$experience" },
+                                    { $mod: [{ $floor: "$experience" }, 2] },
+                                ],
+                            },
+                        },
+                        userCounts: { $sum: 1 },
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        years: "$_id.years",
+                        userCounts: 1,
+                    },
+                }
+            ]);
+        } else if (req.body.caseType == 'age') {
+            result = await userModel.aggregate([
+                {
+                    $addFields: {
+                        birthYear: { $year: { $toDate: "$DOB" } },
+                        age: {
+                            $subtract: [
+                                { $year: new Date() },
+                                { $year: { $toDate: "$DOB" } }
+                            ]
+                        }
+                    },
+                },
+                {
+                    $group: {
+                        _id: {
+                            ageGroup: {
+                                $switch: {
+                                    branches: [
+                                        { case: { $and: [{ $gte: ["$age", 10] }, { $lte: ["$age", 17] }] }, then: "10-17" },
+                                        { case: { $and: [{ $gte: ["$age", 18] }, { $lte: ["$age", 24] }] }, then: "18-24" },
+                                        { case: { $and: [{ $gte: ["$age", 25] }, { $lte: ["$age", 30] }] }, then: "25-30" },
+                                        { case: { $and: [{ $gte: ["$age", 31] }, { $lte: ["$age", 35] }] }, then: "31-35" },
+                                        { case: { $and: [{ $gte: ["$age", 36] }, { $lte: ["$age", 40] }] }, then: "36-40" },
+                                        { case: { $gte: ["$age", 41] }, then: "41+" }
+                                    ],
+                                    default: "Unknown"
+                                }
+                            }
+                        },
+                        userCount: { $sum: 1 },
+                    },
+                },
+                {
+                    $match: {
+                        "_id.ageGroup": { $ne: "Unknown" }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        age: "$_id.ageGroup",
+                        userCount: 1,
+                    },
+                }
+            ]);
+        }
+
+        res.status(200).send(result);
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: "Error creating user graph" });
+    }
+};
