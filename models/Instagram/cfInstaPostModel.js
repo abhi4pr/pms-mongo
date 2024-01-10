@@ -99,6 +99,7 @@ const cfInstaPostModel = new mongoose.Schema({
   shortCode: {
     type: String,
     required: false,
+    unique: true,
     default: "",
   },
   posttype_decision: {
@@ -170,11 +171,11 @@ const cfInstaPostModel = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
   music_info: {
     type: Object,
