@@ -158,10 +158,18 @@ exports.trackPost = async (req, res) => {
 
         let check = await instaP.findOne({ shortCode: req.body.shortcode })
         if (!check) {
+            let page_category_id = 0
+            const page_category_data = await projectxModel.findOne({
+                page_name: { $regex: new RegExp(req.body.data.creator.username?.toLowerCase(), 'i') }
+              });
+            
+              if (page_category_data) {
+                page_category_id = page_category_data?.page_category_id
+              } 
             const creators = new instaP({
                 handle: req.body.data?.handle ?? "",
                 postType: req.body.data.post_type,
-                creatorName: req.body.data.creator.username,
+                creatorName: req.body.data.creator.username, //
                 profile_pic_url: req.body.data.creator.profile_pic_url,
                 allComments: req.body.data.comments_count.overall,
                 brand_id: 0,
@@ -190,6 +198,12 @@ exports.trackPost = async (req, res) => {
                 music_info : req.body.data?.music_info,
                 location : req.body.data?.location,
                 sponsored : req.body.data?.sponsored,
+                page_category_id,
+                creator_rating: req.body?.creator_rating,
+                assigned_to: req.body?.assigned_to,
+                assigned_date: req.body?.assigned_date,
+                reassigned_to: req.body?.reassigned_to,
+                reassigned_date: req.body?.reassigned_date,
             });
             const instav = await creators.save();
             res.send({ instav, status: 200 });
@@ -260,6 +274,7 @@ exports.editInsta = async (req, res) => {
             req.body._id,
             {
                 posttype_decision: req.body.posttype_decision,
+                page_category_id: req.body.page_category_id,
                 postImage: req.body.postImage,
                 selector_name: req.body.selector_name,
                 interpretor_name: req.body.interpretor_name,
@@ -278,6 +293,11 @@ exports.editInsta = async (req, res) => {
                 selector_date: req.body.selector_date,
                 interpretor_date: req.body.interpretor_date,
                 auditor_date: req.body.auditor_date,
+                creator_rating: req.body.creator_rating,
+                assigned_to: req.body.assigned_to,
+                assigned_date: req.body.assigned_date,
+                reassigned_to: req.body.reassigned_to,
+                reassigned_date: req.body.reassigned_date,
                 updatedAt: Date.now()
             },
             { new: true }
@@ -653,45 +673,82 @@ exports.creatorStoriesCount = async (req, res) => {
 };
 exports.selectorNameCountInstaP = async (req, res) => {
     try {
-        const { selectData, startDate, endDate } = req.body
-        let startDateParse = new Date(startDate);
-        let endDateParse = new Date(endDate);
+        const { selectData, startDate, endDate, flagForField } = req.body;
+
+        if (![1, 2].includes(flagForField)) {
+            return res.status(200).json({
+                message: "Invalid flag value, you should provide 1 or 2, 1 for selector based data and 2 for interpretor based data."
+            });
+        }
         // const startDate = new Date("2023-01-01"); 
         // const endDate = new Date("2023-12-31");
-        //Flag 2 for all data fetch and flag 1 for perticular date range data fetch
+        const startDateParse = new Date(startDate);
+        const endDateParse = new Date(endDate);
+
+        let pipeline;
+
         if (selectData === 1) {
-            const query = await instaP.aggregate([
-                {
-                    $match: {
-                        selector_date: {
-                            $gte: startDateParse,
-                            $lte: endDateParse
+            if (flagForField === 1) {
+                pipeline = [
+                    {
+                        $match: {
+                            selector_date: {
+                                $gte: startDateParse,
+                                $lte: endDateParse
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$selector_name",
+                            count: { $sum: 1 }
                         }
                     }
-                },
-                {
-                    $group: {
-                        _id: "$selector_name",
-                        count: { $sum: 1 }
+                ];
+            } else if (flagForField === 2) {
+                pipeline = [
+                    {
+                        $match: {
+                            interpretor_date: {
+                                $gte: startDateParse,
+                                $lte: endDateParse
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$interpretor_name",
+                            count: { $sum: 1 }
+                        }
                     }
-                }
-            ]).exec();
-
-            res.status(200).send({ success: true, data: query });
+                ];
+            }
         } else if (selectData === 2) {
-            const query = await instaP.aggregate([
-                {
-                    $group: {
-                        _id: "$selector_name",
-                        count: { $sum: 1 }
+            if (flagForField === 1) {
+                pipeline = [
+                    {
+                        $group: {
+                            _id: "$selector_name",
+                            count: { $sum: 1 }
+                        }
                     }
-                }
-            ]).exec();
-
-            res.status(200).send({ success: true, data: query });
+                ];
+            } else if (flagForField === 2) {
+                pipeline = [
+                    {
+                        $group: {
+                            _id: "$interpretor_name",
+                            count: { $sum: 1 }
+                        }
+                    }
+                ];
+            }
         } else {
-            res.status(200).send({ success: false, message: "Please provide valid selectData" });
+            return res.status(200).json({ success: false, message: "Please provide valid selectData" });
         }
+        const query = await instaP.aggregate(pipeline).exec();
+        res.status(200).send({ success: true, data: query });
+
 
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "something went wrong" });
@@ -699,45 +756,82 @@ exports.selectorNameCountInstaP = async (req, res) => {
 };
 exports.selectorNameCountInstaS = async (req, res) => {
     try {
-        const { selectData, startDate, endDate } = req.body
+        const { selectData, startDate, endDate, flagForField } = req.body;
+
+        if (![1, 2].includes(flagForField)) {
+            return res.status(200).json({
+                message: "Invalid flag value, you should provide 1 or 2, 1 for selector based data and 2 for interpretor based data."
+            });
+        }
+
         let startDateParse = new Date(startDate);
         let endDateParse = new Date(endDate);
         // const startDate = new Date("2023-01-01"); 
         // const endDate = new Date("2023-12-31");
         //Flag 2 for all data fetch and flag 1 for perticular date range data fetch
+        let pipeline;
+
         if (selectData === 1) {
-            const query = await instaS.aggregate([
-                {
-                    $match: {
-                        selector_date: {
-                            $gte: startDateParse,
-                            $lte: endDateParse
+            if (flagForField === 1) {
+                pipeline = [
+                    {
+                        $match: {
+                            selector_date: {
+                                $gte: startDateParse,
+                                $lte: endDateParse
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$selector_name",
+                            count: { $sum: 1 }
                         }
                     }
-                },
-                {
-                    $group: {
-                        _id: "$selector_name",
-                        count: { $sum: 1 }
+                ];
+            } else if (flagForField === 2) {
+                pipeline = [
+                    {
+                        $match: {
+                            interpretor_date: {
+                                $gte: startDateParse,
+                                $lte: endDateParse
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$interpretor_name",
+                            count: { $sum: 1 }
+                        }
                     }
-                }
-            ]).exec();
-
-            res.status(200).send({ success: true, data: query });
+                ];
+            }
         } else if (selectData === 2) {
-            const query = await instaS.aggregate([
-                {
-                    $group: {
-                        _id: "$selector_name",
-                        count: { $sum: 1 }
+            if (flagForField === 1) {
+                pipeline = [
+                    {
+                        $group: {
+                            _id: "$selector_name",
+                            count: { $sum: 1 }
+                        }
                     }
-                }
-            ]).exec();
-
-            res.status(200).send({ success: true, data: query });
+                ];
+            } else if (flagForField === 2) {
+                pipeline = [
+                    {
+                        $group: {
+                            _id: "$interpretor_name",
+                            count: { $sum: 1 }
+                        }
+                    }
+                ];
+            }
         } else {
-            res.status(200).send({ success: false, message: "Please provide valid selectData" });
+            return res.status(200).json({ success: false, message: "Please provide valid selectData" });
         }
+        const query = await instaP.aggregate(pipeline).exec();
+        res.status(200).send({ success: true, data: query });
 
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "something went wrong" });
@@ -797,6 +891,14 @@ exports.trackStory = async (req, res) => {
             for (const data of req.body?.story_data?.stories) {
                 let check = await instaS.findOne({ shortcode: data?.shortcode })
                 if (!check) {
+                    let page_category_id = 0
+                    const page_category_data = await projectxModel.findOne({
+                     page_name: { $regex: new RegExp(req.body?.handle?.toLowerCase(), 'i') }
+                 });
+            
+                  if (page_category_data) {
+                   page_category_id = page_category_data?.page_category_id
+                  } 
                     const creators = new instaS({
                         creatorName: req.body?.handle,
                         mediaCont: req.body?.story_data?.media_count,
@@ -805,7 +907,8 @@ exports.trackStory = async (req, res) => {
                         shortcode: data?.shortcode,
                         links: data?.links,
                         hashtags: data?.hashtags,
-                        mentions: data?.mentions,
+                        mentions: data?.sticker_mentions,
+                        // mentions: data?.mentions,
                         locations: data?.locations,
                         music: data?.music,
                         posttype_decision: req.body?.posttype_decision,
@@ -816,6 +919,7 @@ exports.trackStory = async (req, res) => {
                         interpretor_decision: req.body?.interpretor_decision,
                         selector_decision: req.body?.selector_decision,
                         image_url: data?.image_url,
+                        page_category_id
                     })
                     await creators.save();
                 }
@@ -1140,7 +1244,7 @@ exports.getAnalytics = async (req, res) => {
 
 exports.getDynamicMultiReqAndResInsta = async (req, res) => {
     try {
-        const { model, request_key_1, request_key_2, request_value_1, request_value_2, flag, matchCondition, sortingFlag } = req.body;
+        const { model, request_key_1, request_key_2, request_value_1, request_value_2, flag, matchCondition, sortingFlag,sortingField } = req.body;
         const page = req.query?.page;
         const perPage = req.query?.perPage;
         const skip = (page - 1) * perPage;
@@ -1175,7 +1279,9 @@ exports.getDynamicMultiReqAndResInsta = async (req, res) => {
             let query = modelCollection.find(dataQuery);
 
             if (sortingFlag === 1) {
-                query = query.sort({ postedOn: -1 });
+                if(!sortingField) return res.status(200).json({ message: "Please Provide sortingField while performing sorting on data." });
+                query = query.sort({ [sortingField]: -1 });
+                // query = query.sort({ postedOn: -1 });
             }
             
             if (page && perPage) {
@@ -1461,6 +1567,42 @@ exports.instaPostAnalyticsBasedOnRating = async (req, res) =>{
         res.status(500).send({error:error.message,message:'Internal server error'})
     }
 };
+// exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
+//     try {
+//         const trackCreatorParams = {
+//             cron_expression: req.body.cron_expression,
+//             // cron_expression: "*/15 * * * *",
+//             tracking_expiry_at: req.body.tracking_expiry_at,
+//             // tracking_expiry_at: "2023-12-01 12:12:12.12",
+//             tracking: true
+//         };
+//     let data = req.body.data
+//     const axiosRequests = data.map(async (item) => {
+//         try {
+//             const result = await axios.get(
+//                 `https://jarvis-work-backend.onrender.com/api/get_all_users`,
+               
+//             );
+//             return result?.data;
+//         } catch (error) {
+//             console.log(error.message);
+//             // You may want to handle the error and decide what to return in case of failure
+//             return null;
+//         }
+//     });
+
+//     const resArr = await Promise.all(axiosRequests);
+
+//     // Check if all requests were successful before returning the response
+//     if (resArr.every((response) => response !== null)) {
+//         res.status(200).json({ message: "Requests successfully sent to third party.", data: resArr });
+//     } else {
+//         res.status(500).json({ message: "Some requests failed. Check logs for details." });
+//     }
+//     } catch (error) {
+//         res.status(500).send({error:error.message,message:'Internal server error'})
+//     }
+// };
 exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
     try {
         const trackCreatorParams = {
@@ -1476,6 +1618,7 @@ exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
             // if(index < 2 ){
     
                 try {
+                  
                   let result =  await axios.put(
                         `https://app.ylytic.com/ylytic/api/v1/rt_tracking/posts/${item.shortCode}`,
                         trackCreatorParams,
@@ -1486,7 +1629,7 @@ exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
                             },
                         }
                     );
-                    resArr.push(result?.data)
+                    // resArr.push(result?.data)
                 } catch (error) {
                     console.log(error.message)
                 }
@@ -1543,118 +1686,178 @@ exports.manuallyApplyTrackingOnShortcode = async (req, res) =>{
 // }
 exports.insertDataIntoPostAnalytics = async (req,res)=>{
     try {
-       let shortCodeFind = req.body.shortcode;
-        
-       let findDataFromPost = await instaP.find({ shortCode : shortCodeFind }).lean()
-       const { _id, __v, todayComment,
-        todayLikes,
-        todayViews,
-        selector_date,
-        auditor_date,
-        createdAt,
-        postType,
-        creatorName,
-        allComments,
-        pastComment,
-        allLike,
-        pastLike,
-        allView,
-        pastView,
-        title,
-        postedOn,
-        postUrl,
-        postImage,
-        shortCode,
-        posttype_decision,
-        selector_name,
-        interpretor_name,
-        auditor_name,
-        auditor_decision,
-        interpretor_decision,
-        selector_decision,
-        dateCol,
-        hashTag,
-        mentions,
-        interpretor_date,
-        handle,
-        updatedAt,
-        campaign_id,
-        location,
-        music_info,
-        sponsored,
-        brand_id,
-        crone_trak } = findDataFromPost[0];
- 
-       const savingRes = new instaPostAnalyticsModel({
-        todayComment, 
-        todayLikes,
-        todayViews,
-        selector_date, //
-        auditor_date, //
-        createdAt,
-        postType, 
-        creatorName, //
-        allComments,
-        pastComment,
-        allLike,
-        pastLike,
-        allView,
-        pastView,
-        title, 
-        postedOn,
-        postUrl, //
-        postImage, //
-        shortCode, //
-        posttype_decision, //
-        selector_name, //
-        interpretor_name, //
-        auditor_name, //
-        auditor_decision,  //
-        interpretor_decision, //
-        selector_decision, //
-        dateCol, //
-        hashTag, //
-        mentions, //
-        interpretor_date, //
-        handle, //
-        updatedAt, //  
-        campaign_id, // ***
-        location, 
-        music_info, 
-        sponsored, 
-        brand_id, //  ***
-        crone_trak  //
-         });
-        const result =  await savingRes.save()
-
-        if(result){
-          let updatedPost =  await instaP.findByIdAndUpdate(_id,{ $set : {
-             createdAt : Date.now(),
-             todayComment: req.body.data.comments_count.today,
-             todayLikes: req.body.data.likes_count.today,
-             todayViews: req.body.data.views_count.today,
-             postType: req.body.data.post_type,
-             allComments: req.body.data.comments_count.overall,
-             pastComment: req.body.data.comments_count.vs_previous,
-             allLike: req.body.data.likes_count.overall,
-             pastLike: req.body.data.likes_count.vs_previous,
-             allView: req.body.data.views_count.overall,
-             todayViews: req.body.data.views_count.today,
-             pastView: req.body.data.views_count.vs_previous,
-             title: req.body.data.title,
-             postedOn: req.body.data.posted_at,
-             location : req.body.data?.location,
-             music_info : req.body.data?.music_info,
-             sponsored : req.body.data?.sponsored,
-             crone_trak : parseInt(crone_trak) + 1
-
-          }})
-            if(!updatedPost){
-              return  res.send({ message: "Analytics data inserted sucessfully but insta post model not update properly.", status: 200 });
+    let shortCodeFind =req.body?.response ? req.body.response?.shortcode : req.body?.shortcode
+    
+    /**
+     * 15 Dec 2023
+     * {
+            "event_type": "rt_tracking_ig_add_post",
+            "shortcode": "CyKFBVjPUIL",
+            "connector": "instagram",
+            "data": {
+            "error": {
+                "code": "404",
+                "message": "Invalid Url"
             }
+            },
+            "url": "https://app.ylytic.com/InstaPost?id=657850e79eb8c8053c09b606"
         }
-             /* update insta p model post mean that are tracked */
-            //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+     * Checks if the error message in the request body is "Invalid Url". If it is, updates the
+     * crone_trak field of the corresponding document in the instaP collection to -1.
+     */
+    if(req.body?.data?.error?.message == "Invalid Url"){
+            let updatedPost =  await instaP.findOneAndUpdate({
+                        shortCode : shortCodeFind
+                    },
+                    {
+                        crone_trak : -1
+                    }, 
+                    { new: true })
+            
+        if(!updatedPost){
+                return  res.send({ message: "There is something error in updating crone track to -1.", status: 200 });
+                }
+    } else {
+
+            let findDataFromPost = await instaP.find({ shortCode : shortCodeFind }).lean()
+            const { _id, __v, todayComment,
+            todayLikes,
+            todayViews,
+            selector_date,
+            auditor_date,
+            createdAt,
+            postType,
+            creatorName,
+            allComments,
+            pastComment,
+            allLike,
+            pastLike,
+            allView,
+            pastView,
+            title,
+            postedOn,
+            postUrl,
+            postImage,
+            shortCode,
+            posttype_decision,
+            selector_name,
+            interpretor_name,
+            auditor_name,
+            auditor_decision,
+            interpretor_decision,
+            selector_decision,
+            dateCol,
+            hashTag,
+            mentions,
+            interpretor_date,
+            handle,
+            updatedAt,
+            campaign_id,
+            location,
+            music_info,
+            sponsored,
+            brand_id,
+            crone_trak,
+            page_category_id,
+            creator_rating,
+            assigned_to,
+            assigned_date,
+            reassigned_to,
+            reassigned_date } = findDataFromPost[0];
+
+            const savingRes = new instaPostAnalyticsModel({
+            todayComment, 
+            todayLikes,
+            todayViews,
+            selector_date, //
+            auditor_date, //
+            createdAt,
+            postType, 
+            creatorName, //
+            allComments,
+            pastComment,
+            allLike,
+            pastLike,
+            allView,
+            pastView,
+            title, 
+            postedOn,
+            postUrl, //
+            postImage, //
+            shortCode, //
+            posttype_decision, //
+            selector_name, //
+            interpretor_name, //
+            auditor_name, //
+            auditor_decision,  //
+            interpretor_decision, //
+            selector_decision, //
+            dateCol, //
+            hashTag, //
+            mentions, //
+            interpretor_date, //
+            handle, //
+            updatedAt, //  
+            campaign_id, // ***
+            location, 
+            music_info, 
+            sponsored, 
+            brand_id, //  ***
+            crone_trak,  //
+            page_category_id,
+            creator_rating,
+            assigned_to,
+            assigned_date,
+            reassigned_to,
+            reassigned_date
+            });
+            const result =  await savingRes.save()
+
+            if(result){
+                let updateObj
+                if(req.body?.response){
+                    updateObj = {
+                                createdAt : Date.now(),
+                                allComments: req.body.response?.comments_count, 
+                                allLike: req.body.response?.likes_count, 
+                                allView: req.body.response?.views,
+                                title: req.body.response?.caption, 
+                                location : req.body.response?.location, 
+                                music_info : req.body.response?.music_info, 
+                                crone_trak : parseInt(crone_trak) + 1 
+                    }
+                } else {
+                    updateObj = {
+                                createdAt : Date.now(),
+                                todayComment: req.body.data.comments_count.today,
+                                todayLikes: req.body.data.likes_count.today,
+                                todayViews: req.body.data.views_count.today,
+                                postType: req.body.data.post_type,
+                                allComments: req.body.data.comments_count.overall,
+                                pastComment: req.body.data.comments_count.vs_previous,
+                                allLike: req.body.data.likes_count.overall,
+                                pastLike: req.body.data.likes_count.vs_previous,
+                                allView: req.body.data.views_count.overall,
+                                todayViews: req.body.data.views_count.today,
+                                pastView: req.body.data.views_count.vs_previous,
+                                title: req.body.data.title,
+                                postedOn: req.body.data.posted_at, 
+                                location : req.body.data?.location,  
+                                music_info : req.body.data?.music_info,  
+                                sponsored : req.body.data?.sponsored, 
+                                crone_trak : parseInt(crone_trak) + 1
+              }
+                }
+             let updatedPost =  await instaP.findByIdAndUpdate(_id,{ $set : updateObj})
+                if(!updatedPost){
+                return  res.send({ message: "Analytics data inserted sucessfully but insta post model not update properly.", status: 200 });
+                }
+            }
+                /* update insta p model post mean that are tracked */
+                //  await instaP.findByIdAndUpdate(item._id,{ $set : {crone_trak : 1}})
+    }
+        
+       
        return res.send({ message:"Succefully perform operation.", status: 200 });
        
     } catch (error) {
@@ -1723,6 +1926,11 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
             shortCode: 1,
           };
           const postDataRespecticBrand = await instaP.find(filterForPost, projectionForPost);
+        //   const postDataRespecticBrand = await instaP.find({
+        //     filterForPost,
+        //     projectionForPost,
+        //     crone_trak: { "$ne": -1 }
+        //   });
           const documentCount = await instaP.countDocuments(filterForPost);
 
 
@@ -1739,8 +1947,11 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
           // Extract an array of unique shortcodes from uniqueShortcodes array
             const uniqueShortcodeValues = [...new Set(uniqueShortcodes.map(obj => obj.shortCode))];
             const resultArray1 = postDataRespecticBrand.filter(postData => {
-                  return !uniqueShortcodeValues.includes(postData.shortCode);
-             });
+                return (
+                  !uniqueShortcodeValues.includes(postData.shortCode) &&
+                  postData.crone_trak !== -1
+                );
+              });
             const resultArray2 = postDataRespecticBrand.filter(postData => {
                   return uniqueShortcodeValues.includes(postData.shortCode);
              });
@@ -1760,13 +1971,13 @@ exports.getCountBasedOnTrackedPost = async (req,res) => {
               */
              obj.brnads_data_count_rating = brnadsDataCount
              obj.insta_post_counts_based_on_brands = documentCount
-             obj.insta_post_shortcode = postDataRespecticBrand
+            //  obj.insta_post_shortcode = postDataRespecticBrand
              obj.short_code_match_in_analytics_counts = resultArray2 && resultArray2.length
-             obj.short_code_match_in_analytics = resultArray2
+            //  obj.short_code_match_in_analytics = resultArray2
              obj.short_code_not_match_in_analytics_model_count = resultArray1  && resultArray1.length
              obj.short_code_not_match_in_analytics = resultArray1
              obj.unique_shortcode_values_from_analytics_model_counts = uniqueShortcodeValues && uniqueShortcodeValues.length
-             obj.unique_shortcode_values_from_analytics = uniqueShortcodeValues
+            //  obj.unique_shortcode_values_from_analytics = uniqueShortcodeValues
             //  obj.unique_shortcodes_from_analytics = uniqueShortcodes
            
              return res.status(200).json({obj})

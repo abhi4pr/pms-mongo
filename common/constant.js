@@ -1,7 +1,7 @@
 module.exports = Object.freeze({
   base_url: "https://jarvis-work-backend.onrender.com",
-  // base_url: "https://jarvis-work-backend.onrender.com",
-  local_base_url: "http://localhost:8080",
+  // base_url: "http://34.93.221.166:3000",
+ local_base_url: "http://localhost:8080",
   CREATOR_INSIGHTS: "https://app.ylytic.com/ylytic/api/v1/rt_tracking/insights",
   CF_INSTA_API: "https://www.instagram.com/trolls_official/?__a=1&__d=dis",
   INSTA_C_MODELS: 1,

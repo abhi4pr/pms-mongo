@@ -8,8 +8,8 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocumantion = require("./doc/swaggerDoc.js");
 const OpenAI = require("openai");
 const { swaggerConfig } = require("./doc/swaggerConfig.js");
-const errorController=require('./controllers/errorController.js')
-const swaggerAccessManagement=require('./doc/customization_src/controller/swaggerAccessManagement.js');
+const errorController = require('./controllers/errorController.js')
+const swaggerAccessManagement = require('./doc/customization_src/controller/swaggerAccessManagement.js');
 const { checkDevAuthentication } = require("./doc/customization_src/middleware/swaggerMiddleware.js");
 const path = require("path");
 // const axios = require("axios");
@@ -18,6 +18,10 @@ require("./controllers/assetAutoMail.js");
 // const morgan = require("morgan");
 // const { createProxyMiddleware } = require("http-proxy-middleware");
 
+require("./controllers/Instagram/forYleticController.js");
+require("./controllers/Instagram/withproxy.js");
+require("./controllers/Instagram/Crawler_module/dynamicCreatorCrawler.js");
+const schedule = require("node-schedule");
 const app = express();
 // Logging the requests
 // app.use(morgan("dev"));
@@ -26,7 +30,7 @@ app.set('views', path.join(__dirname, 'doc/customization_src/doc_templates/pages
 // app.use(express.json());
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
-app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use(
   bodyParser.urlencoded({
@@ -37,7 +41,18 @@ app.use(
 );
 app.use(cors());
 app.use("/uploads", express.static(__dirname + "/uploads"));
+
+/* Route Configuration */
+const instaBotXRoutes = require("./routes/instagram/bot_tools/botxRoutes.js");
+const AlfredRoutes = require("./routes/instagram/Alfred/alfreduseranalytics.js");
+const proxyRoutes = require("./routes/instagram/crawler/proxiesIpRoutes.js");
 app.use("/api", routes);
+app.use("/api", AlfredRoutes);
+const cronRouter = require("./routes/instagram/crawler/creatorCronRoutes.js");
+app.use("/api", routes);
+app.use("/api", instaBotXRoutes);
+app.use("/api", cronRouter);
+app.use("/api", proxyRoutes);
 
 
 /**
@@ -77,6 +92,42 @@ app.post("/chat", async (req, res) => {
   });
   res.status(200).send(completion.choices[0].text);
 });
+
+// async function checkCrone1() {
+//   console.log("crone1")
+// }
+// async function checkCrone2(type) {
+//   console.log("crone2",type)
+// }
+// // Endpoint to dynamically schedule a job
+// app.post('/scheduleJob1', (req, res) => {
+//   const { cronExpression } = req.body;
+//   // Schedule the job based on the provided cron expression
+//     schedule.scheduleJob(cronExpression, async () => {
+//       await checkCrone1();
+//     });
+//     res.status(200).send('Job scheduled successfully');
+
+// });
+// app.post('/scheduleJob2', (req, res) => {
+//   const { cronExpression,type } = req.body;
+//     // Schedule the job based on the provided cron expression
+//     schedule.scheduleJob(cronExpression, async () => {
+//       await checkCrone2(type);
+//     });
+//     res.status(200).send('Job scheduled successfully');
+
+// });
+// const startTime = new Date(Date.now() + 5000);
+// const endTime = new Date(startTime.getTime() + 5000);
+// const job = schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function(){
+//   console.log('Time for tea!');
+// });
+
+// const date = new Date('2023-12-27 19:15:00');
+// schedule.scheduleJob(date, function(){
+//   console.log('The world is going to end today.');
+// });
 
 app.use(errorController)
 // mongoose.set('debug', true);
