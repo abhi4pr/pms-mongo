@@ -39,12 +39,14 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 /* Route Configuration */
 const instaBotXRoutes = require("./routes/instagram/bot_tools/botxRoutes.js");
 const AlfredRoutes = require("./routes/instagram/Alfred/alfreduseranalytics.js");
+const proxyRoutes = require("./routes/instagram/crawler/proxiesIpRoutes.js");
 app.use("/api", routes);
 app.use("/api", AlfredRoutes);
 const cronRouter = require("./routes/instagram/crawler/creatorCronRoutes.js");
 app.use("/api", routes);
 app.use("/api", instaBotXRoutes);
 app.use("/api", cronRouter);
+app.use("/api", proxyRoutes);
 
 
 /**
