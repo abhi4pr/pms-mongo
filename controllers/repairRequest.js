@@ -136,7 +136,7 @@ exports.getAllRepairRequests = async (req, res) => {
                 },
             ])
             .exec();
-        const assetRepairDataBaseUrl = "https://jarvis-work-backend.onrender.com/uploads/assets/";
+        const assetRepairDataBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/assets/";
         const dataWithImageUrl = assetsdata.map((assetrepairdatas) => ({
             ...assetrepairdatas,
             img1_url: assetrepairdatas.img1 ? assetRepairDataBaseUrl + assetrepairdatas.img1 : null,
@@ -221,7 +221,7 @@ exports.getAllRepairRequestsByAssetReasonId = async (req, res) => {
                 },
             ])
             .exec();
-        const assetRepairDataBaseUrl = "https://jarvis-work-backend.onrender.com/uploads/assets/";
+        const assetRepairDataBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/assets/";
         const dataWithImageUrl = assetsdata.map((assetrepairdatas) => ({
             ...assetrepairdatas,
             img1_url: assetrepairdatas.img1 ? assetRepairDataBaseUrl + assetrepairdatas.img1 : null,
@@ -293,7 +293,7 @@ exports.getSingleRepairRequests = async (req, res) => {
                 },
             ])
             .exec();
-        const assetRepairDataBaseUrl = "https://jarvis-work-backend.onrender.com/uploads/assets/";
+        const assetRepairDataBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/assets/";
         const dataWithImageUrl = assetsdata.map((assetrepairdatas) => ({
             ...assetrepairdatas,
             img1_url: assetrepairdatas.img1 ? assetRepairDataBaseUrl + assetrepairdatas.img1 : null,

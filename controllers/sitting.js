@@ -184,7 +184,7 @@ exports.getRooms = async (req, res) => {
       },
     ]);
 
-    const url = "https://jarvis-work-backend.onrender.com/uploads/";
+    const url = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
     const dataWithImageUrl = roomObj.map((room) => ({
       ...room,
       room_image_url: room.roomImage ? url + room.roomImage : null,

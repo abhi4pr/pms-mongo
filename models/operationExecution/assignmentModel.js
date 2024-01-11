@@ -13,9 +13,6 @@ const assignmentSchema = new mongoose.Schema({
   exp_name: {
     type: String,
   },
-  exp_name:{
-    type: String,
-  },
   ass_by: {
     // type:mongoose.SchemaTypes.ObjectId,
     // ref:'userModels',
@@ -167,6 +164,8 @@ assignmentSchema.pre(/^find/,async function (next){
     path:'ass_to'
   })
 })
+
+
 
 module.exports = mongoose.model(
   "assignmentModel",

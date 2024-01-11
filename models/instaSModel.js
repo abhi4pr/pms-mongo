@@ -119,11 +119,6 @@ const instaSModel = new mongoose.Schema({
         required: false,
         default: ""
     },
-    page_category_id: {   
-        type: Number, 
-        required: false,
-        default: 0 
-    },
 });
 
 module.exports = mongoose.model('instaSModel', instaSModel);

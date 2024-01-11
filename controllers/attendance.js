@@ -849,7 +849,7 @@ exports.addAttendance = async (req, res) => {
 
 exports.getSalaryByDeptIdMonthYear = async (req, res) => {
   try {
-    const imageUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+    const imageUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
 
     const getcreators = await attendanceModel
       .aggregate([
@@ -1008,7 +1008,7 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
 
 exports.getSalaryByMonthYear = async (req, res) => {
   try {
-    const imageUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+    const imageUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
 
     const getcreators = await attendanceModel
       .aggregate([
@@ -1173,7 +1173,7 @@ exports.getSalaryByFilter = async (req, res) => {
 
 exports.getSalaryByUserId = async (req, res) => {
   try {
-    const imageUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+    const imageUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
     const getcreators = await attendanceModel
       .aggregate([
         {
@@ -2219,7 +2219,7 @@ exports.addAttendanceAllDepartments = async (req, res) => {
 
 exports.getAllAttendanceData = async (req, res) => {
   try {
-    const imageUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+    const imageUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
 
     // const allAttendanceData = await attendanceModel.find();
     const allAttendanceData = await attendanceModel.aggregate([

@@ -178,11 +178,11 @@ const instaPModel = new mongoose.Schema({
     },
     createdAt:{
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
     updatedAt:{
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
     music_info: {
         type: Object, 
@@ -203,36 +203,6 @@ const instaPModel = new mongoose.Schema({
         type: Number, 
         required: false,
         default: 0 // 1 mean tracked and 0 mean not tracked
-    },
-    page_category_id: {   
-        type: Number, 
-        required: false,
-        default: 0 
-    },
-    creator_rating: {   
-        type: Number, 
-        required: false,
-        default: 0 
-    },
-    assigned_to: {   
-        type: Number, 
-        required: false,
-        default: 0 
-    },
-    assigned_date: {   
-        type: Date, 
-        required: false,
-        default: ""
-    },
-    reassigned_to: {   
-        type: Array, 
-        required: false,
-        default: []
-    },
-    reassigned_date: {   
-        type: Array, 
-        required: false,
-        default: []
     },
 });
 

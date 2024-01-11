@@ -3,6 +3,7 @@ const logoBrandModel = require('../models/logoBrandModel.js');
 const path = require("path");
 const constant = require('../common/constant.js');
 const helper = require('../helper/helper.js');
+
 exports.addLogoBrandCat = async (req, res) =>{
     try{
         const simc = new logoCategoryModel({
@@ -275,6 +276,7 @@ exports.deleteLogoBrand = async (req, res) =>{
         return res.status(400).json({success:false, message:err.message})
     })
 };
+
 exports.deleteLogoBrandBasedBrand = async (req, res) =>{
     logoBrandModel.deleteMany({brand_name:req.params.brand_name}).then(item =>{
         if(item){
@@ -293,6 +295,7 @@ exports.deleteLogoBrandBasedBrand = async (req, res) =>{
         return res.status(400).json({success:false, message:err.message})
     })
 };
+
 exports.getLogoBrandsCat = async (req, res) => {
     try{
         const simc = await logoCategoryModel.find();

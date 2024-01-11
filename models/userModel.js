@@ -18,7 +18,7 @@ const userModel = new mongoose.Schema({
     },
     user_login_id: {
         type: String,
-        required: [true, "User Login Id is Required"],
+        required: false,
         unique: true,
         default: ""
     },
@@ -29,8 +29,8 @@ const userModel = new mongoose.Schema({
     },
     user_name: {
         type: String,
-        required: [true, "PersonalEmail Is Required"],
-        unique: false,
+        required: false,
+        unique: true,
         default: ""
     },
     user_report_to_id: {

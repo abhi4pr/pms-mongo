@@ -26,6 +26,7 @@ exports.addDepartment = async (req, res) => {
     } else {
       return response.returnFalse(500, req, res, err.message, {});
     }
+
   }
 };
 

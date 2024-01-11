@@ -10,7 +10,6 @@ const campaignSchema = new mongoose.Schema({
   campaign_name: {
     type: String,
     required: true,
-    unique: true,
   },
   hash_tag: {
     type: String,

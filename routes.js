@@ -45,11 +45,6 @@ const attendance = require("./controllers/attendance.js");
 const instapage = require("./controllers/instaPage.js");
 const pageUniqueness = require("./controllers/pageUniqueness.js");
 const imageUpload = require("./controllers/Instagram/imageUpload.js");
-const reportAssignToController = require("./controllers/Instagram/reportAssignTo.js");
-const forYleticController = require("./controllers/Instagram/forYleticController.js");
-const BotXController = require("./controllers/Instagram/Bot_Tools/BotX.js");
-const withProxy = require("./controllers/Instagram/withproxy.js");
-const AlfredUserAnalytics = require("./controllers/Instagram/Alfred/Alfreduseranalytics.js");
 
 const role = require("./controllers/role.js");
 const kra = require("./controllers/kra.js");
@@ -78,7 +73,7 @@ const assignmentController = require('./controllers/operationExecution/assignmen
 const assignmentCommitController = require('./controllers/operationExecution/assignmentCommitController.js')
 const operationDasboard = require('./controllers/operationExecution/dashboard.controller.js')
 const pageReplacementController = require('./controllers/operationExecution/pageReplacementController.js')
-const preAssignmentController=require('./controllers/operationExecution/preAssignmentController.js')
+const preAssignmentController = require('./controllers/operationExecution/preAssignmentController.js')
 //opertaion + execution imports ends here`
 
 const city = require("./controllers/cityController.js");
@@ -106,6 +101,12 @@ const dataCategory = require("./controllers/dataCategory.js");
 const dataPlatform = require("./controllers/dataPlatform.js");
 const dataController = require("./controllers/data.js");
 const deptDesiAuth = require("./controllers/deptDesiAuth.js");
+const taskDelivery = require("./controllers/TMS/taskDelivery.js")
+const task = require("./controllers/TMS/task.js")
+const taskSequence = require("./controllers/TMS/taskSequence.js")
+
+/* Task Mangement Controller Import */
+const deptWiseStatus = require('./controllers/TMS/deptWiseStatus.js');
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -122,25 +123,16 @@ router.delete("/delete_demo/:_id", demoApi.deleteDemo);
 router.post("/campaignplan", campaignPlanController.createPlan);
 router.put("/campaignplan", campaignPlanController.updateBulk);
 router.get("/campaignplan/:id", campaignPlanController.getPlan);
-router.get(
-  "/campaignplan/singleplan/:id",
-  campaignPlanController.getSinglePlan
-);
-router.put(
-  "/campaignplan/singleplan/:id",
-  campaignPlanController.singlePlanUpdate
-);
-router.put("/updatePlan", campaignPlanController.updatePlan);
-router.put("/updatePhase", campaignPhaseController.updatePhase);
-router.put("/updateAssignment", assignmentController.updateAssignment);
+router.get('/campaignplan/singleplan/:id', campaignPlanController.getSinglePlan)
+router.put('/campaignplan/singleplan/:id', campaignPlanController.singlePlanUpdate)
+router.put('/updatePlan', campaignPlanController.updatePlan)
+router.put('/updatePhase', campaignPhaseController.updatePhase)
+router.put('/updateAssignment', assignmentController.updateAssignment)
 // router.get('/campaignplan/:id', campaignPlanController.getPlan)
 
-router.post("/campaignphase", campaignPhaseController.createPhase);
-router.get("/campaignphase/:id", campaignPhaseController.getAllPhase);
-router.get(
-  "/campaignphase/singlephase/:id",
-  campaignPhaseController.getSinglePhase
-);
+router.post('/campaignphase', campaignPhaseController.createPhase)
+router.get('/campaignphase/:id', campaignPhaseController.getAllPhase)
+router.get('/campaignphase/singlephase/:id', campaignPhaseController.getSinglePhase)
 
 router.post('/expertise', expertiseController.createExpert)
 router.get('/expertise', expertiseController.getAllExpert)
@@ -154,21 +146,21 @@ router.post('/assignment', assignmentController.createAssignment)
 router.get('/assignment', assignmentController.getAllGodamnAssignments)
 router.get('/assignment/:id', assignmentController.getSingleAssignment)
 
-router.get('/assignment/all/:id',assignmentController.getAllAssignmentToExpertee)
-router.get('/assignment/phase/:id',assignmentController.getAllAssignmentInPhase)
-router.get('/assignment/campaign/:id',assignmentController.getAllAssignmentInCampaign)
-router.post('/assignment/status',assignmentController.updateAssignmentStatus)
+router.get('/assignment/all/:id', assignmentController.getAllAssignmentToExpertee)
+router.get('/assignment/phase/:id', assignmentController.getAllAssignmentInPhase)
+router.get('/assignment/campaign/:id', assignmentController.getAllAssignmentInCampaign)
+router.post('/assignment/status', assignmentController.updateAssignmentStatus)
 
-router.post('/assignment/commit',assignmentCommitController.createAssComm)
-router.post('/assignment/bulk',assignmentController.createAssignmentBulk)
-router.get('/assignment/commit/:id',assignmentCommitController.getAllAssComm)
-router.get('/assignment/commit/single/:id',assignmentCommitController.getAssCommitAssId)
-router.put('/assignment/commit/single/:id',assignmentCommitController.updateSingleCommitment)
-router.post('/preassignment',preAssignmentController.createPreAssignment)
-router.get('/preassignment/:id',preAssignmentController.getPreAssignmentForExpertee)
-router.post('/preassignment/phase',preAssignmentController.getPreAssignmnetOnPhaseId)
-router.post('/preassignment/phase/update',preAssignmentController.preAssignmentUpdate)
-router.post('/operation_phase_dashboard',operationDasboard.phaseDashboard)
+router.post('/assignment/commit', assignmentCommitController.createAssComm)
+router.post('/assignment/bulk', assignmentController.createAssignmentBulk)
+router.get('/assignment/commit/:id', assignmentCommitController.getAllAssComm)
+router.get('/assignment/commit/single/:id', assignmentCommitController.getAssCommitAssId)
+router.put('/assignment/commit/single/:id', assignmentCommitController.updateSingleCommitment)
+router.post('/preassignment', preAssignmentController.createPreAssignment)
+router.get('/preassignment/:id', preAssignmentController.getPreAssignmentForExpertee)
+router.post('/preassignment/phase', preAssignmentController.getPreAssignmnetOnPhaseId)
+router.post('/preassignment/phase/update', preAssignmentController.preAssignmentUpdate)
+router.post('/operation_phase_dashboard', operationDasboard.phaseDashboard)
 
 router.post('/replacement/plan', pageReplacementController.createReplacementPlan)
 router.get('/replacement/plan', pageReplacementController.getAllRecord)
@@ -186,17 +178,10 @@ router.delete("/delete_image/:id", imageUpload.deleteImage)
 // router.post("/upload_img_on_server",upload1.single("imageToServer"), insta.uploadImageToServer)
 router.post("/add_tracked_post", insta.insertDataIntoPostAnalytics)
 // router.get("/analytics_based_on_rating",insta.instaPostAnalyticsBasedOnRating)
-router.post(
-  "/upload_img_on_server",
-  upload1.single("imageToServer"),
-  insta.uploadImageToServer
-);
-router.post("/add_tracked_post", insta.insertDataIntoPostAnalytics);
-router.put("/analytics_based_on_rating", insta.instaPostAnalyticsBasedOnRating);
-router.post(
-  "/manually_tracked_shortcode",
-  insta.manuallyApplyTrackingOnShortcode
-);
+router.post("/upload_img_on_server", upload1.single("imageToServer"), insta.uploadImageToServer)
+router.post("/add_tracked_post", insta.insertDataIntoPostAnalytics)
+router.put("/analytics_based_on_rating", insta.instaPostAnalyticsBasedOnRating)
+router.post("/manually_tracked_shortcode", insta.manuallyApplyTrackingOnShortcode)
 /**
  * Route handler for the POST request to retrieve data form different models bssed on provided matchCondition.
  * @param {string} "/get_post_analytics_data" - The endpoint for the request.
@@ -204,27 +189,21 @@ router.post(
  * @returns None
  */
 // router.post("/get_post_analytics_data", insta.getResBasedOnMatchForProvidedModel) //modified with cordination
-router.post(
-  "/get_data_on_match_condition",
-  insta.getResBasedOnMatchForProvidedModel
-);
-router.post("/image_to_text", insta.imageToText);
-router.post("/get_dynamic_key_value", insta.getDynamicReqAndResInstaP);
-router.post(
-  "/get_dynamic_multiple__key_value",
-  insta.getDynamicMultiReqAndResInsta
-);
-router.post("/get_dynamic_key_value_instas", insta.getDynamicReqAndResInstaS);
-router.get("/get_analytics", insta.getAnalytics);
+router.post("/get_data_on_match_condition", insta.getResBasedOnMatchForProvidedModel)
+router.post("/image_to_text", insta.imageToText)
+router.post("/get_dynamic_key_value", insta.getDynamicReqAndResInstaP)
+router.post("/get_dynamic_multiple__key_value", insta.getDynamicMultiReqAndResInsta)
+router.post("/get_dynamic_key_value_instas", insta.getDynamicReqAndResInstaS)
+router.get("/get_analytics", insta.getAnalytics)
 router.post("/track_creator_post", insta.trackCreator);
 router.get("/instagetcreators", insta.getCreators);
 router.post("/track_creator_posty", insta.trackCreatorY);
 router.put("/track_creator_puty/:pagename", insta.trackCreatorPutY);
 router.get("/track_creator_get/:pagename", insta.trackCreatorGet);
-router.post("/track_post_post", insta.trackPost); // add data into instap model
+router.post("/track_post_post", insta.trackPost);
 router.get("/instagetposts", insta.getPosts);
 router.post("/track_post_posty", insta.trackPostY);
-router.post("/track_story_post", insta.trackStory); // add data into instas model
+router.post("/track_story_post", insta.trackStory);
 router.put("/instaupdate", insta.editInsta);
 router.get("/post_type_dec_count", insta.postTypeDecCount);
 router.post("/creator_name_count", insta.creatorNameCount);
@@ -243,20 +222,6 @@ router.post("/creator_name_count_for_stories", insta.creatorNameCountForStory);
 router.post("/selector_name_count_instas", insta.selectorNameCountInstaS);
 router.post("/selector_name_count_instap", insta.selectorNameCountInstaP);
 router.post("/count_posted_on", insta.countBasedOnPostedOn);
-// router.get("/get_posts_from_insta", forYleticController.getPostsDataFromInsta);
-router.post("/get_posts_from_insta", withProxy.getPostDataFromInsta);
-/* "Report Assign to" routes for insta */
-router.post("/report_assign", reportAssignToController.addDataIntoReportAssign);
-router.get("/report_assign", reportAssignToController.getDataFromReportAssign);
-router.get(
-  "/report_assign/:id",
-  reportAssignToController.getSingleDataFromReportAssign
-);
-router.put("/report_assign", reportAssignToController.editDataToReportAssign);
-router.delete(
-  "/report_assign/:id",
-  reportAssignToController.deleteDataFromReportAssign
-);
 /*execution api*/
 router.post("/exe_inven_post", exe.exeInvenPost);
 router.get("/get_exe_inventory", exe.getExeInventory);
@@ -275,10 +240,7 @@ router.put("/edit_exe_ip_count_history", exe.updateIPCountHistory);
 router.post("/get_percentage", exe.getPercentage);
 router.get("/get_all_exe_ip_history", exe.getAllExeHistory);
 router.get("/get_stats_update_flag/:p_id", exe.getStatUpdateFlag);
-router.get(
-  "/get_distinct_count_history/:p_id?",
-  exe.getDistinctExeCountHistory
-);
+router.get("/get_distinct_count_history/:p_id?", exe.getDistinctExeCountHistory);
 router.post("/page_health_dashboard", exe.pageHealthDashboard);
 
 /*sim api*/
@@ -1365,75 +1327,27 @@ router.post("/add_dept_desi_auth", deptDesiAuth.addDeptDesiAuth);
 router.get("/get_single_desi_dept_auth/:desi_id", deptDesiAuth.getSingleDeptDesiAuthDetail);
 router.put("/update_dept_desi_auth", deptDesiAuth.updateDeptDesiAuth);
 
-// Asset Brand Routes 
-router.post("/add_asset_brand", assetBrand.addAssetBrand);
-router.put("/update_asset_brand", assetBrand.editAssetBrand);
-router.get("/get_all_asset_brands", assetBrand.getAssetBrands);
-router.get("/get_single_asset_brand/:id", assetBrand.getAssetBrandById);
-router.delete("/delete_asset_brand/:id", assetBrand.deleteAssetBrand);
-router.get("/get_asset_available_count_in_brand/:asset_brand_id", assetBrand.getTotalAvailableAssetInBrand);
-router.get("/get_asset_allocated_count_in_brand/:asset_brand_id", assetBrand.getTotalAllocatedAssetInBrand);
 
-// Asset Modal Routes 
-router.post("/add_asset_modal", assetModal.addAssetModal);
-router.put("/update_asset_modal", assetModal.editAssetModal);
-router.get("/get_all_asset_modals", assetModal.getAssetModals);
-router.get("/get_single_asset_modal/:id", assetModal.getAssetModalById);
-router.delete("/delete_asset_modal/:id", assetModal.deleteAssetModal);
-router.get("/get_asset_available_count_in_modal/:asset_modal_id", assetModal.getTotalAvailableAssetInModal);
-router.get("/get_asset_allocated_count_in_modal/:asset_modal_id", assetModal.getTotalAllocatedAssetInModal);
+// --------------------------------------------------------------Task Mangements all Routes------------------------------------------//
+router.post("/deptwisestatus", deptWiseStatus.addDeptWiseStatus);
+router.put("/deptwisestatus", deptWiseStatus.editDataDeptWiseStatus);
+router.get("/deptwisestatus", deptWiseStatus.getDeptWiseStatus);
+router.get("/deptwisestatus/:_id", deptWiseStatus.getSingleDeptWiseStatus);
+router.delete("/deptwisestatus/:_id", deptWiseStatus.deleteDataDeptWiseStatus);
 
-/* email content routes */
-router.post("/add_email_content", emailContent.addEmailContent);
-router.put("/update_email_content", emailContent.editEmailContent);
-router.get("/get_all_email_contents", emailContent.getAllEmailContents);
-router.get("/get_single_email_content/:_id", emailContent.getSingleEmailContent);
-router.delete("/delete_email_content/:_id", emailContent.deleteEmailContent);
-// Hobbies  Routes 
-router.post("/add_hobby", hobby.addHobby);
-router.put("/update_hobby", hobby.editHobby);
-router.get("/get_all_hobbies", hobby.getHobbys);
-router.get("/get_single_hobby/:id", hobby.getHobbyById);
-router.delete("/delete_hobby/:id", hobby.deleteHobby);
+router.post("/task_delivery", taskDelivery.addTaskDelivery)
+router.get("/task_delivery", taskDelivery.getTaskDelivery)
+router.put("/task_delivery", taskDelivery.editTaskDelivery)
+router.delete("/task_delivery", taskDelivery.deleteTaskDelivery)
 
-// Family Person  Routes 
-router.post("/add_family", family.addFamily);
-router.put("/update_family", family.editFamily);
-router.get("/get_all_families", family.getFamilys);
-router.get("/get_single_family/:user_id", family.getSingleFamily);
-router.delete("/delete_family/:id", family.deleteFamily);
+router.post("/task", task.addTask)
+router.get("/task", task.getTasks)
+router.put("/task", task.editTask)
+router.delete("/task", task.deleteTask)
 
-// Education Routes 
-router.post("/add_education", education.addEducation);
-router.put("/update_education", education.editEducation);
-router.get("/get_all_educations", education.getEducations);
-router.get("/get_single_education/:user_id", education.getSingleEducation);
-router.delete("/delete_education/:id", education.deleteEducation);
+router.post("/task_sequence", taskSequence.addSequence)
+router.get("/task_sequence", taskSequence.getSequences)
+router.put("/task_sequence", taskSequence.editTaskSequence)
+router.delete("/task_sequence", taskSequence.deleteTaskSequence)
 
-// Gaurdian Routes
-router.post("/add_guardian", guardian.addGuardian);
-router.put("/update_guardian", guardian.editGuardian);
-router.get("/get_all_guardians", guardian.getGuardians);
-router.get("/get_single_guardian/:user_id", guardian.getSingleGuardian);
-router.delete("/delete_guardian/:id", guardian.deleteGuardian);
-
-// Asset Reason Routes
-router.post("/add_asset_reason", assetReson.addAssetReason);
-router.put("/update_asset_reason", assetReson.editAssetReason);
-router.get("/get_all_assetResons", assetReson.getAssetReasons);
-router.get("/get_single_assetReson/:id", assetReson.getAssetReasonById);
-router.delete("/delete_assetReson/:id", assetReson.deleteAssetReason);
-
-// Asset Repair Request Routes
-router.post("/add_repair_request", repairRequest.addRepairRequest);
-router.put("/update_repair_request", repairRequest.editRepairRequest);
-router.get("/get_all_repair_request", repairRequest.getAllRepairRequests);
-router.get("/get_single_repair_request/:id", repairRequest.getSingleRepairRequests);
-router.delete("/delete_repair_request/:id", repairRequest.deleteRepairRequest);
-
-/*   
-Bot Tools
-*/
-// router.get("/call_bot_tool", BotXController.callBotTools);
-router.get("/alfred_user_analytics", AlfredUserAnalytics.alfreduseranalytics);
 module.exports = router;

@@ -628,8 +628,6 @@ exports.getAllUsers = async (req, res) => {
                     user_id: "$user_id",
                     user_name: "$user_name",
                     offer_later_status: "$offer_later_status",
-                    user_level: "$user_level",  // field for insta module
-                    assign_cat: "$assign_cat",   // field for insta module
                     user_designation: "$user_designation",
                     user_email_id: "$user_email_id",
                     user_login_id: "$user_login_id",
@@ -783,7 +781,7 @@ exports.getAllUsers = async (req, res) => {
                 }
             }
         ]).exec();
-        const userImagesBaseUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+        const userImagesBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
         const fieldsToCheck = [
             'user_name', 'PersonalEmail', 'PersonalNumber', 'fatherName', 'Gender', 'motherName',
             'Hobbies', 'BloodGroup', 'SpokenLanguage', 'DO', 'Nationality', 'guardian_name',
@@ -942,8 +940,6 @@ exports.getSingleUser = async (req, res) => {
                     offer_later_pdf_url: "$offer_later_pdf_url",
                     offer_later_acceptance_date: "$offer_later_acceptance_date",
                     offer_later_status: "$offer_later_status",
-                    user_level: "$user_level",  // field for insta module
-                    assign_cat: "$assign_cat",   // field for insta module
                     offer_later_reject_reason: "$offer_later_reject_reason",
                     user_id: "$user_id",
                     user_name: "$user_name",
@@ -1084,7 +1080,7 @@ exports.getSingleUser = async (req, res) => {
                 }
             }
         ]).exec();
-        const userImagesBaseUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+        const userImagesBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
         const dataWithImageUrl = singlesim.map((user) => ({
             ...user,
             image_url: user.image ? userImagesBaseUrl + user.image : null,
@@ -1135,10 +1131,12 @@ exports.deleteUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
     try {
+
         const simc = await userModel.aggregate([
             {
                 $match: {
                     user_login_id: req.body.user_login_id.toLowerCase().trim(),
+
                 }
             },
             {
@@ -1259,7 +1257,7 @@ exports.deliveryBoyByRoom = async (req, res) => {
 }
 
 exports.deliveryUser = async (req, res) => {
-    const ImageUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+    const ImageUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
     try {
         const delv = await userModel.aggregate([
             {
@@ -2282,7 +2280,7 @@ exports.loginUserData = async (req, res) => {
         };
 
         if (user.image) {
-            userObject.image = `https://jarvis-work-backend.onrender.com/uploads/${user.image}`;
+            userObject.image = `https://api-dot-react-migration-project.el.r.appspot.com/uploads/${user.image}`;
         } else {
             userObject.image = null;
         }
@@ -2533,6 +2531,7 @@ exports.getLastMonthUsers = async (req, res) => {
 
         const lastMonthStartDate = new Date(currentDate);
         lastMonthStartDate.setMonth(currentDate.getMonth() - 1);
+
         const usersFromLastMonth = await userModel.find({
             created_At: {
                 $gte: lastMonthStartDate,
@@ -2550,6 +2549,7 @@ exports.getLastMonthUsers = async (req, res) => {
 exports.getAllFilledUsers = async (req, res) => {
     try {
         const userFields = Object.keys(userModel.schema.paths);
+
         const andConditions = userFields.map(field => ({ [field]: { $exists: true, $ne: null } }));
 
         const usersWithAllFieldsFilled = await userModel.find({

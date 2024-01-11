@@ -1152,7 +1152,7 @@ exports.getAllExeHistory = async (req, res) => {
 exports.getExeIpCountHistory = async (req, res) => {
     try {
         const cocData = await exeCountHisModel.find({ p_id: req.params.p_id, stats_update_flag: true }).lean();
-        const exeImagesBaseUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+        const exeImagesBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
         const dataWithImageUrl = cocData.map((exe) => ({
             ...exe,
             media_url: exe.media ? exeImagesBaseUrl + exe.media : null,
@@ -1309,7 +1309,7 @@ exports.getDistinctExeCountHistory = async (req, res) => {
                     .sort({ creation_date: -1 })
                     .lean();
 
-                const exeImagesBaseUrl = "https://jarvis-work-backend.onrender.com/uploads/";
+                const exeImagesBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
 
                 // Map URLs here if needed, similar to your existing logic
                 const dataWithImageUrl = {

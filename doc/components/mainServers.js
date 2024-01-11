@@ -10,7 +10,7 @@ module.exports = servers = [
     description: "Local Server",
   },
   {
-    url: "https://jarvis-work-backend.onrender.com",
+    url: "https://api-dot-react-migration-project.el.r.appspot.com",
     description: "Live Server",
   },
 ];

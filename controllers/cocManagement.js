@@ -57,6 +57,7 @@ exports.editCoc = async (req, res) => {
             remarks: req.body.remarks,
             updated_by: req.body.updated_by
         }, { new: true })
+
         const simc = new cocHisModel({
             coc_id: req.body._id,
             display_sequence: req.body.display_sequence,

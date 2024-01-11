@@ -193,36 +193,6 @@ const instaPostAnalyticsModel = new mongoose.Schema({
         required: false,
         default: 0 // 1 mean tracked and 0 mean not tracked
     },
-    page_category_id: {   
-        type: Number, 
-        required: false,
-        default: 0 
-    },
-    creator_rating: {   
-        type: Number, 
-        required: false,
-        default: 0 
-    },
-    assigned_to: {   
-        type: Number, 
-        required: false,
-        default: 0 
-    },
-    assigned_date: {   
-        type: Date, 
-        required: false,
-        default: ""
-    },
-    reassigned_to: {   
-        type: Array, 
-        required: false,
-        default: []
-    },
-    reassigned_date: {   
-        type: Array, 
-        required: false,
-        default: []
-    },
 });
 
 module.exports = mongoose.model('instaPostAnalyticsModel', instaPostAnalyticsModel);
