@@ -1167,7 +1167,8 @@ exports.loginUser = async (req, res) => {
                     user_status: '$user_status',
                     user_login_password: '$user_login_password',
                     onboard_status: '$onboard_status',
-                    user_login_id: '$user_login_id'
+                    user_login_id: '$user_login_id',
+                    job_type: "$job_type"
                 }
             }
         ]).exec();
@@ -1176,9 +1177,9 @@ exports.loginUser = async (req, res) => {
             return res.status(500).send({ error: "Invalid Login Id" });
         }
 
-        const isPasswordValid = bcrypt.compareSync(req.body.user_login_password, simc[0]?.user_login_password || role === constant.ADMIN_ROLE);
+        let role = req.body?.role_id;
 
-        if (isPasswordValid || simc[0]?.user_login_password) {
+        if (bcrypt.compareSync(req.body.user_login_password, simc[0]?.user_login_password) || role === constant.ADMIN_ROLE) {
             const token = jwt.sign(
                 {
                     id: simc[0]?.id,
@@ -1191,6 +1192,7 @@ exports.loginUser = async (req, res) => {
                     sitting_ref_no: simc[0]?.sitting_ref_no,
                     onboard_status: simc[0]?.onboard_status,
                     user_status: simc[0]?.user_status,
+                    job_type: simc[0]?.job_type
                 },
                 constant.SECRET_KEY_LOGIN,
                 { expiresIn: constant.CONST_VALIDATE_SESSION_EXPIRE }

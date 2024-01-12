@@ -31,7 +31,7 @@ exports.addFinance = async (req, res) => {
 
 exports.getFinances = async (req, res) => {
   try {
-    const financeImagesBaseUrl = "http://44.211.225.140:8000/user_images/";
+    const financeImagesBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/user_images/";
     const simc = await financeModel.aggregate([
       {
         $lookup: {

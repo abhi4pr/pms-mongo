@@ -1,10 +1,10 @@
 const { default: mongoose } = require("mongoose");
-const AutoIncrement = require("mongoose-auto-increment");
+// const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const repairRequestModel = new mongoose.Schema({
     repair_id: {
         type: Number,
-        required: true,
+        required: false,
     },
     sim_id: {
         type: Number,
@@ -50,6 +50,30 @@ const repairRequestModel = new mongoose.Schema({
         required: false,
         default: ""
     },
+    recovery_remark: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    recovery_image_upload1: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    recovery_image_upload2: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    recovery_by: {
+        type: Number,
+        required: false,
+        default: 0
+    },
+    recovery_date_time: {
+        type: Date,
+        default: Date.now,
+    },
     status: {
         type: String,
         required: false,
@@ -74,7 +98,7 @@ const repairRequestModel = new mongoose.Schema({
     asset_reason_id: {
         type: Number,
         required: false,
-        default:0
+        default: 0
     },
     acknowledge_date: {
         type: Date,
@@ -100,15 +124,34 @@ const repairRequestModel = new mongoose.Schema({
         type: String,
         default: "",
     },
+    scrap_remark: {
+        type: String,
+        default: "",
+    },
+    accept_date_time: {
+        type: Date,
+        default: Date.now,
+    },
+    accept_by: {
+        type: Number,
+        required: false,
+        default: 0
+    }
 });
 
-AutoIncrement.initialize(mongoose.connection);
-repairRequestModel.plugin(AutoIncrement.plugin, {
-    model: "repairRequestModels",
-    field: "repair_id",
-    startAt: 1,
-    incrementBy: 1,
+repairRequestModel.pre('save', async function (next) {
+    if (!this.repair_id) {
+      const lastAgency = await this.constructor.findOne({}, {}, { sort: { 'repair_id': -1 } });
+  
+      if (lastAgency && lastAgency.repair_id) {
+        this.repair_id = lastAgency.repair_id + 1;
+      } else {
+        this.repair_id = 1;
+      }
+    }
+    next();
 });
+
 module.exports = mongoose.model(
     "repairRequestModel",
     repairRequestModel
