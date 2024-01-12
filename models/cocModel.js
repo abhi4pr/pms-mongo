@@ -30,7 +30,7 @@ const cocModel = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true,
+    required: false,
     default: "",
   },
   remarks: {
