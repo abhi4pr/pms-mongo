@@ -1,6 +1,7 @@
 const simModel = require("../models/simModel.js");
 const simAlloModel = require("../models/simAlloModel.js");
 const userModel = require("../models/userModel.js");
+const vari = require("../variables");
 
 exports.addSim = async (req, res) => {
   try {
@@ -132,7 +133,7 @@ exports.addSim = async (req, res) => {
 
 exports.getSims = async (req, res) => {
   try {
-    const assetsImagesUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
+    const assetsImagesUrl = `${vari.IMAGE_URL}/`;
     const simc = await simModel
       .aggregate([
         {
@@ -618,6 +619,20 @@ exports.getAllocatedAssestByUserId = async (req, res) => {
           },
         },
         {
+          $lookup: {
+            from: "usermodels",
+            localField: "submitted_by",
+            foreignField: "user_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: {
+            path: "$user",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
           $project: {
             _id: "$_id",
             user_id: "$user_id",
@@ -636,6 +651,8 @@ exports.getAllocatedAssestByUserId = async (req, res) => {
             type: "$type",
             allo_id: "$allo_id",
             submitted_at: "$submitted_at",
+            submitted_by: "$submitted_by",
+            submitted_by_name: "$user.user_name"
           },
         },
       ])
@@ -1237,7 +1254,7 @@ exports.getTotalAssetInCategoryAllocated = async (req, res) => {
 
 exports.showAssetDataToHR = async (req, res) => {
   try {
-    const imageUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
+    const imageUrl = `${vari.IMAGE_URL}/`;
     const HrData = await simModel
       .aggregate([
         {
@@ -1397,6 +1414,19 @@ exports.showAssetDataToHR = async (req, res) => {
             req_by_name: "$userdata.user_name",
             req_by_designation: "$designation.desi_name",
             req_by_department: "$department.dept_name",
+            img1: {
+              $concat: [imageUrl, "$repair.img1"]
+            },
+            img2: {
+              $concat: [imageUrl, "$repair.img2"]
+            },
+            img3: {
+              $concat: [imageUrl, "$repair.img3"]
+            },
+            img4: {
+              $concat: [imageUrl, "$repair.img4"]
+            },
+            req_date: "$repair.repair_request_date_time"
           },
         },
       ])
@@ -1512,6 +1542,20 @@ exports.showAssetDataToUser = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "assetrequestmodels",
+          localField: "sim_id",
+          foreignField: "sim_id",
+          as: "assetrequest",
+        },
+      },
+      {
+        $unwind: {
+          path: "$assetrequest",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $project: {
           _id: "$_id",
           sim_id: "$sim_id",
@@ -1537,7 +1581,10 @@ exports.showAssetDataToUser = async (req, res) => {
           priority: "$repair.priority",
           req_by: "$repair.req_by",
           req_by_name: "$userdata.user_name",
-          req_date: "$repair.repair_request_date_time"
+          req_date: "$repair.repair_request_date_time",
+          detail: "$assetrequest.detail",
+          priority: "$assetrequest.priority",
+          asset_request_status: "$assetrequest.asset_request_status"
         },
       },
     ]).exec();

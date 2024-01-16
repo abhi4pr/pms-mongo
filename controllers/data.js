@@ -5,6 +5,8 @@ const path = require("path");
 const constant = require('../common/constant.js');
 const helper = require('../helper/helper.js');
 const mongoose = require('mongoose');
+const { storage } = require("../common/uploadFile.js")
+const vari = require("../variables.js")
 
 exports.addData = async (req, res) => {
     try {
@@ -18,11 +20,21 @@ exports.addData = async (req, res) => {
             platform_id: req.body.platform_id,
             brand_id: req.body.brand_id,
             content_type_id: req.body.content_type_id,
-            data_upload: req.file.filename,
+            // data_upload: req.file.filename,
             created_by: req.body.created_by,
             updated_by: req.body.updated_by,
             designed_by: req.body.designed_by
         });
+
+        const bucketName = vari.BUCKET_NAME;
+        const bucket = storage.bucket(bucketName);
+        const blob = bucket.file(req.file.originalname);
+        data.data_upload = blob.name;
+        const blobStream = blob.createWriteStream();
+
+        blobStream.on("finish", () => { return res.status(200).send("Success") });
+        blobStream.end(req.file.buffer);
+
         const simv = await data.save();
         return response.returnTrue(
             200,
@@ -141,6 +153,7 @@ exports.getDatas = async (req, res) => {
             {
                 $project: {
                     _id: 1,
+                    data_id: 1,
                     data_name: 1,
                     cat_id: 1,
                     sub_cat_id: 1,
@@ -167,7 +180,7 @@ exports.getDatas = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/uploads/dataimages/`,
+                                    `${constant.base_url}/`,
                                     '$data_upload'
                                 ]
                             },
@@ -319,7 +332,7 @@ exports.getSingleData = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/uploads/dataimages/`,
+                                    `${constant.base_url}/`,
                                     '$data_upload'
                                 ]
                             },
@@ -331,7 +344,7 @@ exports.getSingleData = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/uploads/dataimages/`,
+                                    `${constant.base_url}/`,
                                     '$data_upload'
                                 ]
                             },
@@ -358,7 +371,7 @@ exports.getDataBasedDataName = async (req, res) => {
         const productData = await dataModel.aggregate([
             {
                 $match: {
-                    data_name: req.params.data_name
+                    data_id: parseInt(req.params.data_id)
                 }
             },
             {
@@ -462,6 +475,7 @@ exports.getDataBasedDataName = async (req, res) => {
             {
                 $project: {
                     _id: 1,
+                    data_id: "$data_id",
                     data_name: "$data_name",
                     cat_id: "$cat_id",
                     sub_cat_id: "$sub_cat_id",
@@ -488,7 +502,7 @@ exports.getDataBasedDataName = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/uploads/dataimages/`,
+                                    `${constant.base_url}/`,
                                     '$data_upload'
                                 ]
                             },
@@ -500,7 +514,7 @@ exports.getDataBasedDataName = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/uploads/dataimages/`,
+                                    `${constant.base_url}/`,
                                     '$data_upload'
                                 ]
                             },
@@ -592,3 +606,121 @@ exports.editDataNew = async (req, res) => {
         res.status(500).send({ error: err.message, sms: 'error udpdating data details' })
     }
 }
+
+exports.DistinctCreatedByWithUserName = async (req, res) => {
+    try {
+        const distinctCreatedByValues = await dataModel.aggregate([
+            {
+                $group: {
+                    _id: "$created_by"
+                }
+            },
+            {
+                $lookup: {
+                    from: "usermodels",
+                    localField: "_id",
+                    foreignField: "user_id",
+                    as: "userDetails"
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    user_name: { $arrayElemAt: ["$userDetails.user_name", 0] }
+                }
+            }
+        ]);
+
+        return res.status(200).json({ success: true, data: distinctCreatedByValues });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.DistinctDesignedByWithUserName = async (req, res) => {
+    try {
+        const distinctCreatedByValues = await dataModel.aggregate([
+            {
+                $group: {
+                    _id: "$designed_by"
+                }
+            },
+            {
+                $lookup: {
+                    from: "usermodels",
+                    localField: "_id",
+                    foreignField: "user_id",
+                    as: "userDetails"
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    user_name: { $arrayElemAt: ["$userDetails.user_name", 0] }
+                }
+            }
+        ]);
+
+        return res.status(200).json({ success: true, data: distinctCreatedByValues });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.ImagesWithDataName = async (req, res) => {
+    try {
+        const { data_name } = req.params;
+
+        const productData = await dataModel.aggregate([
+            {
+                $match: {
+                    data_name: data_name
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    data_name: 1,
+                    data_type: 1,
+                    size_in_mb: 1,
+                    remark: 1,
+                    data_image: {
+                        $cond: {
+                            if: { $ne: ['$data_upload', null] },
+                            then: {
+                                $concat: [
+                                    constant.base_url,
+                                    '/',
+                                    '$data_upload'
+                                ]
+                            },
+                            else: null
+                        }
+                    },
+                    data_image_download: {
+                        $cond: {
+                            if: { $ne: ['$data_upload', null] },
+                            then: {
+                                $concat: [
+                                    constant.base_url,
+                                    '/',
+                                    '$data_upload'
+                                ]
+                            },
+                            else: null
+                        }
+                    }
+                },
+            },
+        ]);
+
+        if (productData.length === 0) {
+            return res.status(404).json({ message: "No Record Found" });
+        }
+
+        res.status(200).json(productData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message, message: 'Error getting data details' });
+    }
+};

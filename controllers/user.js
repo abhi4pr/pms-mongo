@@ -269,17 +269,23 @@ exports.addUser = [upload, async (req, res) => {
         }
 
         const deptDesiData = await deptDesiAuthModel.find({});
-        for (const deptDesi of deptDesiData) {
-            if (deptDesi.dept_id == req.body.dept_id && deptDesi.desi_id == req.body.user_designation) {
-                const edit = await userAuthModel.findOneAndUpdate({ obj_id: deptDesi.obj_id }, {
-                    insert: deptDesi.insert,
-                    view: deptDesi.view,
-                    update: deptDesi.update,
-                    delete_flag: deptDesi.delete_flag
-                })
-            }
-        }
 
+        await Promise.all(deptDesiData.map(async (deptDesi) => {
+            if (deptDesi && deptDesi.dept_id == req.body.dept_id && deptDesi.desi_id == req.body.user_designation) {
+                const updatedData = await userAuthModel.updateMany(
+                    { obj_id: deptDesi.obj_id },
+                    {
+                        $set: {
+                            insert: deptDesi.insert,
+                            view: deptDesi.view,
+                            update: deptDesi.update,
+                            delete_flag: deptDesi.delete_flag
+                        }
+                    },
+                    { new: true }
+                );
+            }
+        }));
         res.send({ simv, status: 200 });
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'This user cannot be created' })
@@ -781,7 +787,7 @@ exports.getAllUsers = async (req, res) => {
                 }
             }
         ]).exec();
-        const userImagesBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
+        const userImagesBaseUrl = `${vari.IMAGE_URL}/`;
         const fieldsToCheck = [
             'user_name', 'PersonalEmail', 'PersonalNumber', 'fatherName', 'Gender', 'motherName',
             'Hobbies', 'BloodGroup', 'SpokenLanguage', 'DO', 'Nationality', 'guardian_name',
@@ -1080,7 +1086,7 @@ exports.getSingleUser = async (req, res) => {
                 }
             }
         ]).exec();
-        const userImagesBaseUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
+        const userImagesBaseUrl = `${vari.IMAGE_URL}/`;
         const dataWithImageUrl = singlesim.map((user) => ({
             ...user,
             image_url: user.image ? userImagesBaseUrl + user.image : null,
@@ -1168,7 +1174,8 @@ exports.loginUser = async (req, res) => {
                     user_login_password: '$user_login_password',
                     onboard_status: '$onboard_status',
                     user_login_id: '$user_login_id',
-                    job_type: "$job_type"
+                    invoice_template_no: "$invoice_template_no",
+                    digital_signature_image: "$digital_signature_image"
                 }
             }
         ]).exec();
@@ -1178,7 +1185,6 @@ exports.loginUser = async (req, res) => {
         }
 
         let role = req.body?.role_id;
-
         if (bcrypt.compareSync(req.body.user_login_password, simc[0]?.user_login_password) || role === constant.ADMIN_ROLE) {
             const token = jwt.sign(
                 {
@@ -1192,7 +1198,8 @@ exports.loginUser = async (req, res) => {
                     sitting_ref_no: simc[0]?.sitting_ref_no,
                     onboard_status: simc[0]?.onboard_status,
                     user_status: simc[0]?.user_status,
-                    job_type: simc[0]?.job_type
+                    invoice_template_no: simc[0].invoice_template_no,
+                    digital_signature_image: simc[0].digital_signature_image
                 },
                 constant.SECRET_KEY_LOGIN,
                 { expiresIn: constant.CONST_VALIDATE_SESSION_EXPIRE }
@@ -1259,7 +1266,7 @@ exports.deliveryBoyByRoom = async (req, res) => {
 }
 
 exports.deliveryUser = async (req, res) => {
-    const ImageUrl = "https://api-dot-react-migration-project.el.r.appspot.com/uploads/";
+    const ImageUrl = `${vari.IMAGE_URL}/`;
     try {
         const delv = await userModel.aggregate([
             {
@@ -1659,10 +1666,10 @@ exports.sendUserMail = async (req, res) => {
             let content = contentList[0];
 
             const filledEmailContent = content.email_content
-            .replace("{{user_name}}", name)
-            .replace("{{user_email}}", email)
-            .replace("{{user_password}}", password)
-            .replace("{{user_login_id}}", login_id);
+                .replace("{{user_name}}", name)
+                .replace("{{user_email}}", email)
+                .replace("{{user_password}}", password)
+                .replace("{{user_login_id}}", login_id);
 
             const html = filledEmailContent;
             /* dynamic email temp code end */
@@ -1755,10 +1762,10 @@ exports.sendUserMail = async (req, res) => {
             let content = contentList[0];
 
             const filledEmailContent = content.email_content
-            .replace("{{user_name}}", name)
-            .replace("{{user_email}}", email)
-            .replace("{{user_password}}", password)
-            .replace("{{user_login_id}}", login_id);
+                .replace("{{user_name}}", name)
+                .replace("{{user_email}}", email)
+                .replace("{{user_password}}", password)
+                .replace("{{user_login_id}}", login_id);
 
             const html = filledEmailContent;
             /* dynamic email temp code end */
@@ -2282,7 +2289,7 @@ exports.loginUserData = async (req, res) => {
         };
 
         if (user.image) {
-            userObject.image = `https://api-dot-react-migration-project.el.r.appspot.com/uploads/${user.image}`;
+            userObject.image = `${vari.IMAGE_URL}/${user.image}`;
         } else {
             userObject.image = null;
         }
@@ -2319,26 +2326,26 @@ exports.forgotPass = async (req, res) => {
         /* dynamic email temp code start */
         let contentList = await emailTempModel.find({ email_for_id: 9 })
         let content = contentList[0];
-      
+
         const filledEmailContent = content.email_content
-        .replace("{{user_email}}", email)
-        .replace("{{user_password}}", getRandomPassword);
-      
+            .replace("{{user_email}}", email)
+            .replace("{{user_password}}", getRandomPassword);
+
         var html;
         html = filledEmailContent;
         /* dynamic email temp code end */
         if (updatePass) {
             // sendMail("Forgot password", html, email);
-        /* dynamic email temp code start */
+            /* dynamic email temp code start */
             var transport = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
-                  user: "onboarding@creativefuel.io",
-                  pass: "fjjmxuavwpescyat",
-              },
+                    user: "onboarding@creativefuel.io",
+                    pass: "fjjmxuavwpescyat",
+                },
             });
-              
-            const mail = (subject, html,email) => {
+
+            const mail = (subject, html, email) => {
                 let mailOptions = {
                     from: "onboarding@creativefuel.io",
                     to: email,
@@ -2351,7 +2358,7 @@ exports.forgotPass = async (req, res) => {
                     return info;
                 });
             };
-        /* dynamic email temp code end */
+            /* dynamic email temp code end */
         } else {
             return res.status(500).send({ sms: 'email couldn not send' });
         }

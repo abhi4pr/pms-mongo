@@ -10,7 +10,7 @@ module.exports = servers = [
     description: "Local Server",
   },
   {
-    url: "https://api-dot-react-migration-project.el.r.appspot.com",
+    url: "http://34.93.221.166:3000",
     description: "Live Server",
   },
 ];
