@@ -1,7 +1,8 @@
 const simModel = require("../models/simModel.js");
 const simAlloModel = require("../models/simAlloModel.js");
 const userModel = require("../models/userModel.js");
-const vari = require("../variables");
+const vari = require("../variables.js");
+const {storage} = require('../common/uploadFile.js')
 
 exports.addSim = async (req, res) => {
   try {
@@ -31,7 +32,7 @@ exports.addSim = async (req, res) => {
       hrAuditPeriod: req.body.hrAuditPeriod || 0,
       selfAuditUnit: req.body.selfAuditUnit || 0,
       hrAuditUnit: req.body.hrAuditUnit || 0,
-      invoiceCopy: req.file?.filename,
+      // invoiceCopy: req.file?.filename,
       assetsValue: req.body.assetsValue,
       assetsCurrentValue: req.body.assetsCurrentValue,
       last_hr_audit_date: req.body.last_hr_audit_date,
@@ -43,6 +44,15 @@ exports.addSim = async (req, res) => {
       asset_brand_id: req.body.asset_brand_id,
       asset_modal_id: req.body.asset_modal_id,
     });
+
+    const bucketName = vari.BUCKET_NAME;
+    const bucket = storage.bucket(bucketName);
+    const blob = bucket.file(req.file.originalname);
+    simc.invoiceCopy = blob.name;
+    const blobStream = blob.createWriteStream();
+    blobStream.on("finish", () => { return res.status(200).send("Success") });
+    blobStream.end(req.file.buffer);
+
     const simv = await simc.save();
     res.send({ simv, status: 200 });
   } catch (err) {
@@ -133,7 +143,7 @@ exports.addSim = async (req, res) => {
 
 exports.getSims = async (req, res) => {
   try {
-    const assetsImagesUrl = `${vari.IMAGE_URL}/`;
+    const assetsImagesUrl = `${vari.IMAGE_URL}`;
     const simc = await simModel
       .aggregate([
         {
@@ -387,7 +397,7 @@ exports.editSim = async (req, res) => {
         hrAuditPeriod: req.body.hrAuditPeriod || 0,
         selfAuditUnit: req.body.selfAuditUnit || 0,
         hrAuditUnit: req.body.hrAuditUnit || 0,
-        invoiceCopy: req.file?.filename,
+        invoiceCopy: req.file?.originalname,
         assetsValue: req.body.assetsValue,
         assetsCurrentValue: req.body.assetsCurrentValue,
         asset_financial_type: req.body.asset_financial_type,
@@ -400,9 +410,21 @@ exports.editSim = async (req, res) => {
     if (!editsim) {
       res.status(500).send({ success: false });
     }
-    res.status(200).send({ success: true, data: editsim });
+
+    const bucketName = vari.BUCKET_NAME;
+    const bucket = storage.bucket(bucketName);
+    const blob = bucket.file(req.file.originalname);
+    editsim.invoiceCopy = blob.name;
+    const blobStream = blob.createWriteStream();
+    blobStream.on("finish", () => { 
+      editsim.save();
+      return res.status(200).send("Success") 
+    });
+    blobStream.end(req.file.buffer);
+
+    return res.status(200).send({ success: true, data: editsim });
   } catch (err) {
-    res
+    return res
       .status(500)
       .send({ error: err.message, sms: "Error updating sim details" });
   }
@@ -633,6 +655,48 @@ exports.getAllocatedAssestByUserId = async (req, res) => {
           },
         },
         {
+          $lookup: {
+            from: "assetrequestmodels",
+            localField: "sim_id",
+            foreignField: "sim_id",
+            as: "assetrequest",
+          },
+        },
+        {
+          $unwind: {
+            path: "$assetrequest",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "usermodels",
+            localField: "assetrequest.request_by",
+            foreignField: "user_id",
+            as: "userRequest",
+          },
+        },
+        {
+          $unwind: {
+            path: "$userRequest",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "usermodels",
+            localField: "assetrequest.multi_tag",
+            foreignField: "user_id",
+            as: "userMulti",
+          },
+        },
+        {
+          $unwind: {
+            path: "$userMulti",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
           $project: {
             _id: "$_id",
             user_id: "$user_id",
@@ -652,7 +716,13 @@ exports.getAllocatedAssestByUserId = async (req, res) => {
             allo_id: "$allo_id",
             submitted_at: "$submitted_at",
             submitted_by: "$submitted_by",
-            submitted_by_name: "$user.user_name"
+            submitted_by_name: "$user.user_name",
+            asset_request_detail: "$assetrequest.detail",
+            asset_request_priority: "$assetrequest.priority",
+            asset_request_asset_request_status: "$assetrequest.asset_request_status",
+            asset_request_request_by: "$assetrequest.request_by",
+            asset_request_request_by_name: "$userRequest.user_name",
+            asset_request_multi_tag_name: "$userMulti.user_name"
           },
         },
       ])
@@ -1254,7 +1324,7 @@ exports.getTotalAssetInCategoryAllocated = async (req, res) => {
 
 exports.showAssetDataToHR = async (req, res) => {
   try {
-    const imageUrl = `${vari.IMAGE_URL}/`;
+    const imageUrl = `${vari.IMAGE_URL}`;
     const HrData = await simModel
       .aggregate([
         {
@@ -1556,6 +1626,20 @@ exports.showAssetDataToUser = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "usermodels",
+          localField: "assetrequest.multi_tag",
+          foreignField: "user_id",
+          as: "userMulti",
+        },
+      },
+      {
+        $unwind: {
+          path: "$userMulti",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $project: {
           _id: "$_id",
           sim_id: "$sim_id",
@@ -1582,9 +1666,13 @@ exports.showAssetDataToUser = async (req, res) => {
           req_by: "$repair.req_by",
           req_by_name: "$userdata.user_name",
           req_date: "$repair.repair_request_date_time",
-          detail: "$assetrequest.detail",
-          priority: "$assetrequest.priority",
-          asset_request_status: "$assetrequest.asset_request_status"
+          asset_request_detail: "$assetrequest.detail",
+          asset_request_priority: "$assetrequest.priority",
+          asset_request_asset_request_status: "$assetrequest.asset_request_status",
+          asset_request_request_by: "$assetrequest.request_by",
+          asset_request_by_name: "$userRequest.user_name",
+          asset_request_multi_tag_name: "$userMulti.user_name",
+          asset_repair_request_status: "$repair.status"
         },
       },
     ]).exec();

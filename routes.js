@@ -104,7 +104,8 @@ const deptDesiAuth = require("./controllers/deptDesiAuth.js");
 const assetRequest = require("./controllers/assetRequest.js");
 const taskDelivery = require("./controllers/TMS/taskDelivery.js")
 const task = require("./controllers/TMS/task.js")
-const taskSequence = require("./controllers/TMS/taskSequence.js")
+const taskSequence = require("./controllers/TMS/taskSequence.js");
+const assetReturnRequest = require("./controllers/assetReturn.js");
 
 /* Task Mangement Controller Import */
 const deptWiseStatus = require('./controllers/TMS/deptWiseStatus.js');
@@ -367,13 +368,13 @@ router.delete(
 //Register Campaign
 router.post(
   "/register_campaign",
-  upload.single("excel_file"),
+  upload1.single("excel_file"),
   registerCampaign.addRegisterCampaign
 );
 router.get("/register_campaign", registerCampaign.getRegisterCampaigns);
 router.put(
   "/register_campaign",
-  upload.single("excel_file"),
+  upload1.single("excel_file"),
   registerCampaign.editRegisterCampaign
 );
 router.delete("/register_campaign/:id", registerCampaign.deleteRegisterCmp);
@@ -471,14 +472,14 @@ router.delete("/content/:id", contentType.deleteContentType);
 router.post(
   "/add_finance",
 
-  upload.single("screenshot"),
+  upload1.single("screenshot"),
   finance.addFinance
 );
 router.get("/get_finances", finance.getFinances);
 router.put(
   "/edit_finance",
 
-  upload.single("screenshot"),
+  upload1.single("screenshot"),
   finance.editFinance
 );
 router.delete("/delete_finance", finance.deleteFinance);
@@ -492,8 +493,8 @@ router.delete("/delete_sitting/:id", sitting.deleteSitting);
 router.get("/not_alloc_sitting", sitting.getNotAllocSitting);
 
 /* Sitting Routes */
-router.post("/add_room", upload.single("room_image"), sitting.addRoom);
-router.put("/update_room", upload.single("room_image"), sitting.editRoom);
+router.post("/add_room", upload1.single("room_image"), sitting.addRoom);
+router.put("/update_room", upload1.single("room_image"), sitting.editRoom);
 router.get("/get_all_rooms", sitting.getRooms);
 router.get("/get_room/:id", sitting.getRoomById);
 router.delete("/delete_room/:id", sitting.deleteRoom);
@@ -593,7 +594,7 @@ router.delete(
 /* Content Management Routes */
 router.post(
   "/add_contentMgnt",
-  upload.single("content"),
+  upload1.single("content"),
   contentM.addcontentManagement
 );
 router.get(
@@ -608,7 +609,7 @@ router.get(
 );
 router.put(
   "/update_contentMgnt",
-  upload.single("content"),
+  upload1.single("content"),
   contentM.editcontentManagement
 );
 router.delete(
@@ -837,13 +838,13 @@ router.delete("/delete_commitment/:id", cmtController.deleteCmt);
 //Product
 router.post(
   "/add_product",
-  upload.single("Product_image"), //upload1
+  upload1.single("Product_image"), //upload1
 
   productController.addProduct
 ); //done
 router.put(
   "/update_productupdate",
-  upload.single("Product_image"), //upload1
+  upload1.single("Product_image"), //upload1
 
   productController.editProduct
 ); //done
@@ -1022,9 +1023,9 @@ router.delete("/delete_leadmast", leadmast.deleteLeadMast);
 
 /*sim api*/
 router.get("/get_all_sims", sim.getSims); // done
-router.post("/add_sim", upload.single("invoiceCopy"), sim.addSim); //done
+router.post("/add_sim", upload1.single("invoiceCopy"), sim.addSim); //done
 router.get("/get_single_sim/:id", sim.getSingleSim); // done
-router.put("/update_sim", upload.single("invoiceCopy"), sim.editSim); //done
+router.put("/update_sim", upload1.single("invoiceCopy"), sim.editSim); //done
 router.delete("/delete_sim/:id", sim.deleteSim); //done
 router.post("/add_sim_allocation", sim.addAllocation); //done
 router.get("/get_all_allocations", sim.getAllocations);
@@ -1137,6 +1138,13 @@ router.delete(
   assetsImage.deleteAssetImage
 );
 
+// Asset Return Request Routes
+router.post("/assetreturn", assetReturnRequest.addAssetReturnRequest);
+router.put("/assetreturn", assetReturnRequest.editAssetReturnRequest);
+router.get("/assetreturn", assetReturnRequest.getAssetReturnRequests);
+router.get("/assetreturn/:_id", assetReturnRequest.getAssetReturnRequestById);
+router.delete("/assetreturn/:_id", assetReturnRequest.deleteAssetReturnRequest);
+
 //---------------------------------------------------------------------------All Routes OF Asset Module Ends Here ---------------------------------------------------------------------------------------------------//
 
 /* Page Uniqueness routes for insta */
@@ -1219,7 +1227,7 @@ router.put("/pending_approval_update", phpPayment.pendingApprovalUpdate);
 router.post("/add_php_payment_refund_data_in_node", phpRefund.savePhpPaymentRefundInNode);
 router.get("/get_all_php_payment_refund_data", phpRefund.getAllphpPaymentRefundData);
 router.get("/get_all_php_payment_refund_data_pending", phpRefund.getAllphpPaymentRefundDataStatus);
-router.put("/pending_approval_refund_update", upload.single("payment_screenshot"), phpRefund.pendingApprovalRefundUpdate);
+router.put("/pending_approval_refund_update", upload1.single("payment_screenshot"), phpRefund.pendingApprovalRefundUpdate);
 router.post("/add_php_payment_incentive_data_in_node", phpIncentive.savePhpIncentiveInNode);
 router.get("/get_all_php_payment_incentive_data", phpIncentive.getAllphpIncentiveData);
 router.post("/add_php_payment_bal_data_in_node", phpPaymentBal.savePhpPaymentBalDataInNode);
@@ -1339,7 +1347,7 @@ router.post("/add_data", upload1.single('data_upload'), dataController.addData);
 router.get("/get_all_datas", dataController.getDatas);
 router.get("/get_data_based_data_name/:data_id", dataController.getDataBasedDataName);
 router.get(
-  "/get_single_data/:_id",
+  "/get_single_data/:data_id",
   dataController.getSingleData
 );
 router.put("/update_data", upload1.single('data_upload'), dataController.editData);

@@ -10,6 +10,7 @@ const vari = require("../variables.js")
 
 exports.addData = async (req, res) => {
     try {
+        // const subCatIds = req.body.sub_cat_id.split(',').map(id => mongoose.Types.ObjectId(id.trim()));
         const data = new dataModel({
             data_name: req.body.data_name,
             remark: req.body.remark,
@@ -31,7 +32,6 @@ exports.addData = async (req, res) => {
         const blob = bucket.file(req.file.originalname);
         data.data_upload = blob.name;
         const blobStream = blob.createWriteStream();
-
         blobStream.on("finish", () => { return res.status(200).send("Success") });
         blobStream.end(req.file.buffer);
 
@@ -180,7 +180,7 @@ exports.getDatas = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/`,
+                                    `${constant.base_url}`,
                                     '$data_upload'
                                 ]
                             },
@@ -204,7 +204,7 @@ exports.getSingleData = async (req, res) => {
         const singlesim = await dataModel.aggregate([
             {
                 $match: {
-                    _id: mongoose.Types.ObjectId(req.params._id),
+                    data_id: parseInt(req.params.data_id),
                 }
             },
             {
@@ -308,6 +308,7 @@ exports.getSingleData = async (req, res) => {
             {
                 $project: {
                     _id: 1,
+                    data_id: 1,
                     data_name: 1,
                     cat_id: 1,
                     sub_cat_id: 1,
@@ -332,7 +333,7 @@ exports.getSingleData = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/`,
+                                    `${constant.base_url}`,
                                     '$data_upload'
                                 ]
                             },
@@ -344,7 +345,7 @@ exports.getSingleData = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/`,
+                                    `${constant.base_url}`,
                                     '$data_upload'
                                 ]
                             },
@@ -502,7 +503,7 @@ exports.getDataBasedDataName = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/`,
+                                    `${constant.base_url}`,
                                     '$data_upload'
                                 ]
                             },
@@ -514,7 +515,7 @@ exports.getDataBasedDataName = async (req, res) => {
                             if: { $ne: ['$data_upload', null] },
                             then: {
                                 $concat: [
-                                    `${constant.base_url}/`,
+                                    `${constant.base_url}`,
                                     '$data_upload'
                                 ]
                             },
@@ -535,7 +536,7 @@ exports.getDataBasedDataName = async (req, res) => {
 
 exports.editData = async (req, res) => {
     try {
-        const editsim = await demoModel.findByIdAndUpdate(req.body._id, {
+        const editsim = await dataModel.findOneAndUpdate({ data_id: req.body.data_id }, {
             data_name: req.body.data_name,
             remark: req.body.remark,
             data_type: req.body.data_type,
@@ -545,16 +546,27 @@ exports.editData = async (req, res) => {
             platform_id: req.body.platform_id,
             brand_id: req.body.brand_id,
             content_type_id: req.body.content_type_id,
-            data_upload: req?.file?.filename,
+            data_upload: req.file?.originalname,
             created_by: req.body.created_by,
             updated_at: req.body.updated_at,
             updated_by: req.body.updated_by,
             designed_by: req.body.designed_by
         }, { new: true })
 
+        const bucketName = vari.BUCKET_NAME;
+        const bucket = storage.bucket(bucketName);
+        const blob = bucket.file(req.file.originalname);
+        editsim.data_upload = blob.name;
+        const blobStream = blob.createWriteStream();
+        blobStream.on("finish", () => { 
+            editsim.save();
+            return res.status(200).send("Success") 
+        });
+        blobStream.end(req.file.buffer);
+
         res.status(200).send({ success: true, data: editsim })
     } catch (err) {
-        res.status(500).send({ error: err, sms: 'Error updating data details' })
+        res.status(500).send({ error: err.message, sms: 'Error updating data details' })
     }
 };
 
@@ -690,7 +702,6 @@ exports.ImagesWithDataName = async (req, res) => {
                             then: {
                                 $concat: [
                                     constant.base_url,
-                                    '/',
                                     '$data_upload'
                                 ]
                             },
@@ -703,7 +714,6 @@ exports.ImagesWithDataName = async (req, res) => {
                             then: {
                                 $concat: [
                                     constant.base_url,
-                                    '/',
                                     '$data_upload'
                                 ]
                             },
