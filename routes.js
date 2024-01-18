@@ -1346,11 +1346,12 @@ router.delete("/delete_data_platform/:_id", dataPlatform.deleteDataPlatform);
 router.post("/add_data", upload1.single('data_upload'), dataController.addData);
 router.get("/get_all_datas", dataController.getDatas);
 router.get("/get_data_based_data_name/:data_id", dataController.getDataBasedDataName);
+router.get("/get_data_based_data_name_new/:data_name", dataController.getDataBasedDataNameNew);
 router.get(
   "/get_single_data/:data_id",
   dataController.getSingleData
 );
-router.put("/update_data", upload1.single('data_upload'), dataController.editData);
+router.put("/update_data", dataController.editData);
 router.delete("/delete_data/:_id", dataController.deleteData);
 router.delete("/delete_data_based_data/:data_name", dataController.deleteDataBasedData);
 router.put("/edit_data_new", dataController.editDataNew);
