@@ -2,7 +2,8 @@ const phpPaymentBalListModel = require("../models/phpPaymentBalListModel.js");
 const axios = require('axios');
 const FormData = require('form-data');
 const vari = require('../variables.js');
-const {storage} = require('../common/uploadFile.js')
+const { storage } = require('../common/uploadFile.js')
+const response = require("../common/response.js");
 
 async function checkIfDataExists(sale_booking_id) {
     const query = { sale_booking_id: sale_booking_id };
@@ -35,6 +36,7 @@ exports.savePhpPaymentBalDataInNode = async (req, res) => {
                     campaign_amount: data.campaign_amount,
                     sale_booking_date: data.sale_booking_date,
                     user_id: data.user_id,
+                    username: data.username,
                     created_by: data.created_by,
                     manager_approval: data.manager_approval,
                     invoice_creation_status: data.invoice_creation_status,
@@ -56,6 +58,7 @@ exports.savePhpPaymentBalDataInNode = async (req, res) => {
                                 campaign_amount: data.campaign_amount,
                                 sale_booking_date: data.sale_booking_date,
                                 user_id: data.user_id,
+                                username: data.username,
                                 created_by: data.created_by,
                                 manager_approval: data.manager_approval,
                                 invoice_creation_status: data.invoice_creation_status,
@@ -84,22 +87,8 @@ exports.savePhpPaymentBalDataInNode = async (req, res) => {
 
 exports.getAllphpPaymentBalData = async (req, res) => {
     try {
-        const getData = await phpPaymentBalListModel.find({})
-        // .select( { _id: 1,
-        //     sale_booking_id: 1,
-        //     campaign_amount: 1,
-        //     sale_booking_date: 1,
-        //     user_id: 1,
-        //     created_by: 1,
-        //     manager_approval: 1,
-        //     invoice_creation_status: 1,
-        //     salesexe_credit_approval: 1,
-        //     payment_update_id: 1,
-        //     payment_amount: 1,
-        //     payment_type: 1,
-        //     cust_name: 1,
-        //     total_paid_amount: 1,
-        //     sno: 1})
+        const getData = await phpPaymentBalListModel.find({}).sort({ sno: 1 });
+
         res.status(200).send({ data: getData })
     } catch (error) {
         res.status(500).send({ error: error.message, sms: "error getting php payment account data" })
@@ -108,25 +97,35 @@ exports.getAllphpPaymentBalData = async (req, res) => {
 
 exports.balancePaymentListUpdate = async (req, res) => {
     try {
-        let payment_screenshot;
-        
-        const bucketName = vari.BUCKET_NAME;
-        const bucket = storage.bucket(bucketName);
-        const blob = bucket.file(req.file.originalname);
-        payment_screenshot = blob.name;
-        const blobStream = blob.createWriteStream();
-        blobStream.on("finish", () => { res.status(200).send("Success") });
-        blobStream.end(req.file.buffer);
+        // let payment_screenshot;
 
         const editPendingApprovalRefundData = await phpPaymentBalListModel.findOneAndUpdate(
-            { sale_booking_id: parseInt(req.body.sale_booking_id) },
+            { sale_booking_id: req.body.sale_booking_id },
             {
-
+                loggedin_user_id: req.body.loggedin_user_id,
+                payment_update_id: req.body.payment_update_id,
+                payment_detail_id: req.body.payment_detail_id,
+                payment_type: req.body.payment_type,
+                payment_mode: req.body.payment_mode,
                 status: req.body.status,
-                payment_screenshot
+                payment_screenshot: req.file?.originalname,
+                paid_amount: req.body.paid_amount
             },
             { new: true }
         );
+
+        if (req.file && req.file.originalname) {
+            const bucketName = vari.BUCKET_NAME;
+            const bucket = storage.bucket(bucketName);
+            const blob = bucket.file(req.file.originalname);
+            editPendingApprovalRefundData.payment_screenshot = blob.name;
+            const blobStream = blob.createWriteStream();
+            blobStream.on("finish", () => { 
+                // res.status(200).send("Success") 
+            });
+            blobStream.end(req.file.buffer);
+        }
+
         if (!editPendingApprovalRefundData) {
             return response.returnFalse(
                 200,

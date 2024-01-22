@@ -1044,6 +1044,7 @@ router.get("/get_total_asset_in_category_allocated/:category_id", sim.getTotalAs
 router.get("/show_asset_hr_data", sim.showAssetDataToHR);
 router.get("/show_asset_user_data/:user_id", sim.showAssetDataToUser);
 router.get("/show_new_asset_user_data/:user_id", sim.showNewAssetDataToUser);
+router.get("/show_asset_user_data_report/:user_id", sim.showAssetDataToUserReport);
 
 /* Asset Category Routes */
 router.post("/add_asset_category", assetCategory.addAssetCategory);
@@ -1245,6 +1246,7 @@ router.get("/get_all_php_payment_bal_data", phpPaymentBal.getAllphpPaymentBalDat
 router.put("/balance_payment_list_update", phpPaymentBal.balancePaymentListUpdate);
 router.post("/add_php_pending_invoice_data_in_node", phpPendingInvoice.savePhpPaymentPendingInvoiceDataInNode);
 router.get("/get_all_php_pending_invoice_data", phpPendingInvoice.getAllphpPaymentPendingInvoiceData);
+router.put("/pending_invoice_update", upload1.single("invoice"), phpPendingInvoice.pendingInvoiceUpdate);
 router.post("/add_php_sale_booking_tds_data_in_node", phpSaleBookingTds.savePhpSaleBookingTdsDataInNode);
 router.get("/get_all_php_sale_booking_tds_data", phpSaleBookingTds.getAllphpSaleBookingTdsData);
 router.post("/add_php_sale_booking_tds_verification_data_in_node", phpSaleBookingTds.savePhpSaleBookingTdsVerificationDataInNode);
@@ -1401,7 +1403,8 @@ router.put("/task_sequence", taskSequence.editTaskSequence)
 router.delete("/task_sequence/:_id", taskSequence.deleteTaskSequence)
 
 //phpVendorRequest Routes
-router.post("/phpvendorpaymentrequest", upload1.single('evidence'), phpVendorPaymentRequest.addPhpVendorPaymentRequest);
+router.post("/phpvendorpaymentrequest", upload1.single('evidence'), phpVendorPaymentRequest.addPhpVendorPaymentRequestAdd);
+router.get("/phpvendor_insert_data_node", phpVendorPaymentRequest.addPhpVendorPaymentRequestSet);
 router.get("/phpvendorpaymentrequest", phpVendorPaymentRequest.getPhpVendorPaymentRequests);
 router.get("/phpvendorpaymentrequest/:request_id", phpVendorPaymentRequest.getSinglePhpVendorPaymentRequest)
 router.put("/phpvendorpaymentrequest", upload1.single('evidence'), phpVendorPaymentRequest.updatePhpVendorPaymentRequest)

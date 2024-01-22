@@ -29,7 +29,7 @@ const designationModel = require("../models/designationModel.js");
 const deptDesiAuthModel = require("../models/deptDesiAuthModel.js");
 const emailTempModel = require("../models/emailTempModel");
 const vari = require("../variables.js");
-const {storage} = require('../common/uploadFile.js');
+const { storage } = require('../common/uploadFile.js');
 
 // const upload = multer({ dest: "uploads/" }).fields([
 //     { name: "image", maxCount: 1 },
@@ -215,7 +215,9 @@ exports.addUser = [upload, async (req, res) => {
         const blob = bucket.file(req.files.image[0].originalname);
         simc.image = blob.name;
         const blobStream = blob.createWriteStream();
-        blobStream.on("finish", () => { res.status(200).send("Success") });
+        blobStream.on("finish", () => { 
+            // res.status(200).send("Success") 
+        });
         blobStream.end(req.files.image[0].buffer);
 
         const simv = await simc.save();
@@ -457,7 +459,8 @@ exports.updateUser = [upload, async (req, res) => {
             bankPassBook_Cheque: req.files && req.files['bankPassBook_Cheque'] && req.files['bankPassBook_Cheque'][0] ? req.files['bankPassBook_Cheque'][0].filename : (existingUser && existingUser.bankPassBook_Cheque) || '',
             joining_extend_document: req.files && req.files['joining_extend_document'] && req.files['joining_extend_document'][0] ? req.files['joining_extend_document'][0].filename : (existingUser && existingUser.joining_extend_document) || '',
             userSalaryStatus: req.body.userSalaryStatus,
-            digital_signature_image: req.files && req.files['digital_signature_image'] && req.files['digital_signature_image'][0] ? req.files['digital_signature_image'][0].filename : (existingUser && existingUser.digital_signature_image) || '',
+            // digital_signature_image: req.files && req.files['digital_signature_image'] && req.files['digital_signature_image'][0] ? req.files['digital_signature_image'][0].filename : (existingUser && existingUser.digital_signature_image) || '',
+            digital_signature_image: req.files && req.files?.digital_signature_image && req.files?.digital_signature_image[0] ? req.files?.digital_signature_image[0].originalname : '',
             bank_name: req.body.bank_name,
             ifsc_code: req.body.ifsc_code,
             account_no: req.body.account_no,
@@ -504,14 +507,26 @@ exports.updateUser = [upload, async (req, res) => {
             const blob = bucket.file(req.files.image[0].originalname);
             editsim.image = blob.name;
             const blobStream = blob.createWriteStream();
-            blobStream.on("finish", () => { 
+            blobStream.on("finish", () => {
                 editsim.save();
-                res.status(200).send("Success") 
+                // res.status(200).send("Success") 
             });
             blobStream.end(req.files.image[0].buffer);
-        }else{
-            return res.status(200).send({ success: true, data: editsim })
         }
+        if (req.files.digital_signature_image && req.files.digital_signature_image[0].originalname) {
+            const bucketName = vari.BUCKET_NAME;
+            const bucket = storage.bucket(bucketName);
+            const blob = bucket.file(req.files.digital_signature_image[0].originalname);
+            editsim.digital_signature_image = blob.name;
+            const blobStream = blob.createWriteStream();
+            blobStream.on("finish", () => {
+                editsim.save();
+                // res.status(200).send("Success") 
+            });
+            blobStream.end(req.files.digital_signature_image[0].buffer);
+        }
+
+        return res.status(200).send({ success: true, data: editsim })
     } catch (err) {
         return res.status(500).send({ error: err.message, sms: 'Error updating user details' })
     }
@@ -1222,7 +1237,8 @@ exports.loginUser = async (req, res) => {
                     onboard_status: '$onboard_status',
                     user_login_id: '$user_login_id',
                     invoice_template_no: "$invoice_template_no",
-                    digital_signature_image: "$digital_signature_image"
+                    // digital_signature_image: "$digital_signature_image"
+                    digital_signature_image: { $concat: [vari.IMAGE_URL, "$digital_signature_image"] }
                 }
             }
         ]).exec();
