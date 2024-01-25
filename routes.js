@@ -74,6 +74,10 @@ const assignmentCommitController = require('./controllers/operationExecution/ass
 const operationDasboard = require('./controllers/operationExecution/dashboard.controller.js')
 const pageReplacementController = require('./controllers/operationExecution/pageReplacementController.js')
 const preAssignmentController = require('./controllers/operationExecution/preAssignmentController.js')
+const agencyController = require('./controllers/operationExecution/campaignMasterController/agencyController.js')
+const goalController=require('./controllers/operationExecution/campaignMasterController/goalController.js')
+const serviceController = require('./controllers/operationExecution/campaignMasterController/serviceController.js')
+const industryController = require('./controllers/operationExecution/campaignMasterController/industryController.js')
 //opertaion + execution imports ends here`
 
 const city = require("./controllers/cityController.js");
@@ -124,6 +128,7 @@ router.put("/update_demo", upload1.single("t13"), demoApi.editDemo);
 router.delete("/delete_demo/:_id", demoApi.deleteDemo);
 
 /*operation+execution api starts*/
+
 router.post("/campaignplan", campaignPlanController.createPlan);
 router.put("/campaignplan", campaignPlanController.updateBulk);
 router.get("/campaignplan/:id", campaignPlanController.getPlan);
@@ -165,11 +170,38 @@ router.get('/preassignment/:id', preAssignmentController.getPreAssignmentForExpe
 router.post('/preassignment/phase', preAssignmentController.getPreAssignmnetOnPhaseId)
 router.post('/preassignment/phase/update', preAssignmentController.preAssignmentUpdate)
 router.post('/operation_phase_dashboard', operationDasboard.phaseDashboard)
+router.post('/operation_plan_dashboard', operationDasboard.planDashboard)
 
 router.post('/replacement/plan', pageReplacementController.createReplacementPlan)
 router.get('/replacement/plan', pageReplacementController.getAllRecord)
 router.get('/replacement/:id', pageReplacementController.getSingleRecord)
 router.post('/replacement/status', pageReplacementController.replacementStatus)
+
+router.post('/agency',agencyController.createAgency)
+router.get('/agency',agencyController.getAllAgency)
+router.put('/agency/:id',agencyController.updateAgency)
+router.get('/agency/:id',agencyController.getSingleAgency)
+router.delete('/agency/:id',agencyController.deleteAgency)
+
+router.post('/goal', goalController.createGoal)
+router.get('/goal',goalController.getAllGoal)
+router.put('/goal/:id',goalController.updateGoal)
+router.get('/goal/:id',goalController.getSingleGoal)
+router.delete('/goal/:id',goalController.deleteGoal)
+
+router.post('/industry', industryController.createIndustry)
+router.get('/industry',industryController.getAllIndustry)
+router.put('/industry/:id',industryController.updateIndustry)
+router.get('/industry/:id',industryController.getSingleIndustry)
+router.delete('/industry/:id',industryController.deleteIndustry)
+
+router.post('/services', serviceController.createService)
+router.get('/services',serviceController.getAllService)
+router.put('/services/:id',serviceController.updateService)
+router.get('/services/:id',serviceController.getSingleService)
+router.delete('/services/:id',serviceController.deleteService)
+
+
 
 /*operation+execution api ends*/
 /*insta api*/
@@ -825,6 +857,7 @@ router.get("/get_all_attendance_data", attendance.getAllAttendanceData);
 router.get("/get_salary_calculation_data", attendance.getSalarycalculationData);
 router.post("/get_users_count_by_dept", attendance.getUsersCountByDept);
 router.put("/update_attendance", attendance.updateAttendance);
+router.get("/get_all_disputes", attendance.allAttendanceDisputeDatas);
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
@@ -1113,9 +1146,11 @@ router.get("/get_asset_allocated_count_in_modal/:asset_modal_id", assetModal.get
 router.post("/assetrequest", assetRequest.addAssetRequest);
 router.put("/assetrequest", assetRequest.editAssetRequest);
 router.get("/assetrequest", assetRequest.getAssetRequests);
-router.get("/assetrequest/:_id", assetRequest.getAssetRequestById);
+router.get("/assetrequest/:id", assetRequest.getAssetRequestById);
 router.delete("/assetrequest/:_id", assetRequest.deleteAssetRequest);
 router.get("/assetrequest/:user_id", assetRequest.showAssetRequestData);
+router.get("/show_asset_with_status", assetRequest.showAssetWithStatus);
+
 
 // Asset Reason Routes
 router.post("/add_asset_reason", assetReson.addAssetReason);

@@ -30,6 +30,12 @@ const deptDesiAuthModel = require("../models/deptDesiAuthModel.js");
 const emailTempModel = require("../models/emailTempModel");
 const vari = require("../variables.js");
 const { storage } = require('../common/uploadFile.js');
+const documentHisModel = require("../models/documentHisModel.js")
+const educationModel = require("../models/educationModel.js");
+const familyModel = require('../models/familyModel.js');
+const guardianModel = require('../models/guardianModel.js');
+const orderReqModel = require('../models/orderReqModel.js');
+const simAlloModel = require('../models/simAlloModel.js');
 
 // const upload = multer({ dest: "uploads/" }).fields([
 //     { name: "image", maxCount: 1 },
@@ -252,22 +258,28 @@ exports.addUser = [upload, async (req, res) => {
         const tdsDeduction = netSalary * (simv.tds_per) / 100;
         const ToPay = netSalary - tdsDeduction;
 
-        const lastInserted = new attendanceModel({
-            dept: simv.dept_id,
-            user_id: simv.user_id,
-            user_name: req.body.user_name,
-            noOfabsent: 0,
-            month: joiningMonth,
-            year: joiningYear,
-            bonus: 0,
-            total_salary: simv.salary,
-            tds_deduction: tdsDeduction,
-            net_salary: netSalary,
-            toPay: ToPay,
-            remark: "",
-            created_by: 99
+        const checkIfAttendanceExist = await attendanceModel.findOne({
+            month: req.body.month,
+            year: req.body.year  
         })
-        await lastInserted.save();
+        if(checkIfAttendanceExist){
+            const lastInserted = new attendanceModel({
+                dept: simv.dept_id,
+                user_id: simv.user_id,
+                user_name: req.body.user_name,
+                noOfabsent: 0,
+                month: joiningMonth,
+                year: joiningYear,
+                bonus: 0,
+                total_salary: simv.salary && simv.salary.toFixed(2),
+                tds_deduction: tdsDeduction && tdsDeduction.toFixed(2),
+                net_salary: netSalary && netSalary.toFixed(2),
+                toPay: ToPay && ToPay.toFixed(2),
+                remark: "",
+                created_by: 99
+            })
+            await lastInserted.save();
+        }
 
         const objectData = await objModel.find();
         const objects = objectData;
@@ -1195,6 +1207,27 @@ exports.deleteUser = async (req, res) => {
     }).catch(err => {
         return res.status(400).json({ success: false, message: err })
     })
+    // try{
+    //     const deleteuser = await userModel.deleteOne({ user_id: req.params.id });
+    //     if(deleteuser){
+    //         await attendanceModel.deleteMany({user_id: req.params.id});
+    //         await documentHisModel.deleteMany({user_id: req.params.id});
+    //         await educationModel.deleteMany({user_id: req.params.id});
+    //         await familyModel.deleteMany({user_id: req.params.id});
+    //         await guardianModel.deleteMany({user_id: req.params.id});
+    //         await jobResponsibilityModel.deleteMany({user_id: req.params.id});
+    //         await notificationModel.deleteOne({user_id: req.params.id});
+    //         await orderReqModel.deleteMany({user_id: req.params.id});
+    //         await separationModel.deleteOne({user_id: req.params.id});
+    //         await simAlloModel.deleteMany({user_id: req.params.id});
+    //         await userAuthModel.deleteMany({user_id: req.params.id});
+    //         await userDocManagmentModel.deleteMany({user_id: req.params.id});
+    //         await userLoginHisModel.deleteMany({user_id: req.params.id});
+    //         await userOtherFieldModel.deleteMany({user_id: req.params.id});
+    //     }
+    // }catch(err){
+    //     return res.status(500).json({success: false, sms:err.message})
+    // }
 };
 
 exports.loginUser = async (req, res) => {
@@ -1725,10 +1758,9 @@ exports.sendUserMail = async (req, res) => {
             // const html = ejs.render(template, {email,password,name,login_id,text});
 
             /* dynamic email temp code start */
-            let contentList = await emailTempModel.find({ email_for_id: 6 })
-            let content = contentList[0];
+            const contentList = await emailTempModel.findOne({email_for_id:6});
 
-            const filledEmailContent = content.email_content
+            const filledEmailContent = contentList.email_content
                 .replace("{{user_name}}", name)
                 .replace("{{user_email}}", email)
                 .replace("{{user_password}}", password)
@@ -1748,7 +1780,7 @@ exports.sendUserMail = async (req, res) => {
             let mailOptions = {
                 from: "onboarding@creativefuel.io",
                 to: email,
-                subject: subject,
+                subject: contentList.email_sub,
                 html: html,
                 attachments: attachment
                     ? [
@@ -1768,10 +1800,9 @@ exports.sendUserMail = async (req, res) => {
             // const html = ejs.render(template, { name, name2 });
 
             /* dynamic email temp code start */
-            let contentList = await emailTempModel.find({ email_for_id: 7 })
-            let content = contentList[0];
+            const contentList = await emailTempModel.findOne({ email_for_id: 7 })
 
-            const filledEmailContent = content.email_content.replace("{{user_reportTo}}", name2);
+            const filledEmailContent = contentList.email_content.replace("{{user_reportTo}}", name2);
 
             const html = filledEmailContent;
             /* dynamic email temp code end */
@@ -1787,7 +1818,7 @@ exports.sendUserMail = async (req, res) => {
             let mailOptions = {
                 from: "onboarding@creativefuel.io",
                 to: email,
-                subject: subject,
+                subject: contentList.email_sub,
                 html: html,
                 attachments: attachment
                     ? [
@@ -1802,29 +1833,11 @@ exports.sendUserMail = async (req, res) => {
             await mailTransporter.sendMail(mailOptions);
             res.sendStatus(200);
         } else {
-            // const templatePath = path.join(__dirname, "template.ejs");
-            // const template = await fs.promises.readFile(templatePath, "utf-8");
-            // const html = ejs.render(template, {
-            //     email,
-            //     password,
-            //     name,
-            //     login_id,
-            //     text,
-            // });
-
-            // let mailTransporter = nodemailer.createTransport({
-            //     service: "gmail",
-            //     auth: {
-            //         user: "onboarding@creativefuel.io",
-            //         pass: "fjjmxuavwpescyat",
-            //     },
-            // });
-
+            
             /* dynamic email temp code start */
-            let contentList = await emailTempModel.find({ email_for_id: 8 })
-            let content = contentList[0];
+            let contentList = await emailTempModel.findOne({ email_for_id: 8 })
 
-            const filledEmailContent = content.email_content
+            const filledEmailContent = contentList.email_content
                 .replace("{{user_name}}", name)
                 .replace("{{user_email}}", email)
                 .replace("{{user_password}}", password)
@@ -1843,7 +1856,7 @@ exports.sendUserMail = async (req, res) => {
             let mailOptions = {
                 from: "onboarding@creativefuel.io",
                 to: email,
-                subject: subject,
+                subject: contentList.email_sub,
                 html: html,
                 attachments: attachment
                     ? [
@@ -2352,7 +2365,7 @@ exports.loginUserData = async (req, res) => {
         };
 
         if (user.image) {
-            userObject.image = `${vari.IMAGE_URL}/${user.image}`;
+            userObject.image = `${vari.IMAGE_URL}${user.image}`;
         } else {
             userObject.image = null;
         }
@@ -2387,19 +2400,16 @@ exports.forgotPass = async (req, res) => {
         // });
 
         /* dynamic email temp code start */
-        let contentList = await emailTempModel.find({ email_for_id: 9 })
-        let content = contentList[0];
+        let contentList = await emailTempModel.findOne({ email_for_id: 9 })
 
-        const filledEmailContent = content.email_content
+        const filledEmailContent = contentList.email_content
             .replace("{{user_email}}", email)
             .replace("{{user_password}}", getRandomPassword);
 
         var html;
         html = filledEmailContent;
         /* dynamic email temp code end */
-        if (updatePass) {
-            // sendMail("Forgot password", html, email);
-            /* dynamic email temp code start */
+
             var transport = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
@@ -2408,23 +2418,19 @@ exports.forgotPass = async (req, res) => {
                 },
             });
 
-            const mail = (subject, html, email) => {
-                let mailOptions = {
-                    from: "onboarding@creativefuel.io",
-                    to: email,
-                    // subject: "Forgot password",
-                    subject: content.email_sub,
-                    html: html,
-                };
-                transport.sendMail(mailOptions, function (error, info) {
-                    if (error) console.log(error);
-                    return info;
-                });
+            let mailOptions = {
+                from: "onboarding@creativefuel.io",
+                to: email,
+                // subject: "Forgot password",
+                subject: contentList.email_sub,
+                html: html,
             };
-            /* dynamic email temp code end */
-        } else {
-            return res.status(500).send({ sms: 'email couldn not send' });
-        }
+
+            transport.sendMail(mailOptions, function (error, info) {
+                if (error) console.log(error);
+                return info;
+            });
+
         return res.status(200).send({ message: 'Successfully Sent email.' })
 
     } catch (err) {
