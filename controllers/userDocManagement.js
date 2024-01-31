@@ -133,6 +133,7 @@ exports.editDoc = async (req, res) => {
         doc_image,
       },
     });
+
     if (req.file) {
       const bucketName = vari.BUCKET_NAME;
       const bucket = storage.bucket(bucketName);
@@ -146,15 +147,15 @@ exports.editDoc = async (req, res) => {
       blobStream.end(req.file.buffer);
     }
 
-    // if (doc_image) {
-    //   const result = helper.fileRemove(
-    //     editDocObj?.doc_image,
-    //     "../uploads/userDocuments"
-    //   );
-    //   if (result?.status == false) {
-    //     console.log(result.msg);
-    //   }
-    // }
+    if (doc_image) {
+      const result = helper.fileRemove(
+        editDocObj?.doc_image,
+        "../uploads/userDocuments"
+      );
+      if (result?.status == false) {
+        console.log(result.msg);
+      }
+    }
     if (!editDocObj) {
       return response.returnFalse(200, req, res, "No record found", {});
     }

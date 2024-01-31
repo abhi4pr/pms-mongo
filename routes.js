@@ -859,6 +859,7 @@ router.get("/get_salary_calculation_data", attendance.getSalarycalculationData);
 router.post("/get_users_count_by_dept", attendance.getUsersCountByDept);
 router.put("/update_attendance", attendance.updateAttendance);
 router.get("/get_all_disputes", attendance.allAttendanceDisputeDatas);
+router.get("/get_user_disputes/:user_id", attendance.getUserAttendanceDisputeDatas);
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
@@ -1184,6 +1185,7 @@ router.put("/assetreturn", assetReturnRequest.editAssetReturnRequest);
 router.get("/assetreturn", assetReturnRequest.getAssetReturnRequests);
 router.get("/assetreturn/:_id", assetReturnRequest.getAssetReturnRequestById);
 router.delete("/assetreturn/:_id", assetReturnRequest.deleteAssetReturnRequest);
+router.get("/show_return_asset_to_reportL1/:user_id", assetReturnRequest.showReturnAssetDataToUserReport);
 
 //---------------------------------------------------------------------------All Routes OF Asset Module Ends Here ---------------------------------------------------------------------------------------------------//
 
