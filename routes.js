@@ -134,6 +134,8 @@ router.put("/campaignplan", campaignPlanController.updateBulk);
 router.get("/campaignplan/:id", campaignPlanController.getPlan);
 router.get('/campaignplan/singleplan/:id', campaignPlanController.getSinglePlan)
 router.put('/campaignplan/singleplan/:id', campaignPlanController.singlePlanUpdate)
+router.post('/campaignplan/singleplan', campaignPlanController.deleteSinglePlan)
+router.delete('/campaignplan/bulk/:id', campaignPlanController.deleteEntirePlan)
 router.put('/updatePlan', campaignPlanController.updatePlan)
 router.put('/updatePhase', campaignPhaseController.updatePhase)
 router.put('/updateAssignment', assignmentController.updateAssignment)
@@ -142,6 +144,8 @@ router.put('/updateAssignment', assignmentController.updateAssignment)
 router.post('/campaignphase', campaignPhaseController.createPhase)
 router.get('/campaignphase/:id', campaignPhaseController.getAllPhase)
 router.get('/campaignphase/singlephase/:id', campaignPhaseController.getSinglePhase)
+router.post('/campaignphase/singlephase', campaignPhaseController.deleteSinglePage)
+router.delete('/campaignphase/bulk/:id', campaignPhaseController.deleteEntirePhase)
 
 router.post('/expertise', expertiseController.createExpert)
 router.get('/expertise', expertiseController.getAllExpert)
@@ -859,7 +863,7 @@ router.get("/get_salary_calculation_data", attendance.getSalarycalculationData);
 router.post("/get_users_count_by_dept", attendance.getUsersCountByDept);
 router.put("/update_attendance", attendance.updateAttendance);
 router.get("/get_all_disputes", attendance.allAttendanceDisputeDatas);
-router.get("/get_user_disputes/:user_id", attendance.getUserAttendanceDisputeDatas);
+router.get("/get_all_disputes/:user_id", attendance.getUserAttendanceDisputeDatas);
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
@@ -1169,6 +1173,7 @@ router.get("/get_single_repair_request/:id", repairRequest.getSingleRepairReques
 router.get("/get_all_repair_request_by_asset_reasonId/:id", repairRequest.getAllRepairRequestsByAssetReasonId);
 router.delete("/delete_repair_request/:id", repairRequest.deleteRepairRequest);
 router.get("/show_repair_request_asset_data_to_reportL1/:user_id", repairRequest.showRepairRequestAssetDataToUserReport);
+router.get("/show_asset_repair_request_data_to_user/:user_id", repairRequest.showAssetRepairRequestDataToUser);
 
 /* Assets Images master */
 router.post("/add_assets_images", assetsImage.addAssetImage);
@@ -1298,6 +1303,11 @@ router.put("/update_email_content", emailContent.editEmailContent);
 router.get("/get_all_email_contents", emailContent.getAllEmailContents);
 router.get("/get_single_email_content/:_id", emailContent.getSingleEmailContent);
 router.delete("/delete_email_content/:_id", emailContent.deleteEmailContent);
+router.post("/add_email_event", emailContent.addEmailEvent);
+router.put("/update_email_event", emailContent.editEmailEvent);
+router.get("/get_all_email_events", emailContent.getAllEmailEvents);
+router.get("/get_single_email_event/:_id", emailContent.getSingleEmailEvent);
+
 // Hobbies  Routes 
 router.post("/add_hobby", hobby.addHobby);
 router.put("/update_hobby", hobby.editHobby);
