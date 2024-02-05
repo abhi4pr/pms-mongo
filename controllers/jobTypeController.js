@@ -3,7 +3,13 @@ const jobTypeModel = require("../models/jobTypeModel");
 exports.addJobType = async (req, res) => {
     try {
         const { job_type, job_type_description, created_by, created_at } = req.body;
-
+        const checkDuplicacy = await jobTypeModel.findOne({job_type: req.body.job_type})
+        if(checkDuplicacy){
+            return res.status(409).send({
+                data: [],
+                message: "Job type already exist",
+            });
+        }
         const jobtypeObj = new jobTypeModel({
             job_type, job_type_description, created_by, created_at
         });
@@ -53,9 +59,15 @@ exports.getJobType = async (req, res) => {
 
 exports.editJobType = async (req, res) => {
     try {
-
+        const checkDuplicacy = await jobTypeModel.findOne({job_type: req.body.job_type})
+        if(checkDuplicacy){
+            return res.status(409).send({
+                data: [],
+                message: "Job type already exist",
+            });
+        }
         const editJObTypeObj = await jobTypeModel.findByIdAndUpdate(
-            req.body._id, // Filter condition
+            req.body._id, 
             req.body,
             { new: true }
         );

@@ -28,6 +28,7 @@ const departmentModel = require("../models/departmentModel.js");
 const designationModel = require("../models/designationModel.js");
 const deptDesiAuthModel = require("../models/deptDesiAuthModel.js");
 const emailTempModel = require("../models/emailTempModel");
+const emailEventModel = require("../models/emailEventModel");
 const vari = require("../variables.js");
 const { storage } = require('../common/uploadFile.js');
 const documentHisModel = require("../models/documentHisModel.js")
@@ -228,7 +229,6 @@ exports.addUser = [upload, async (req, res) => {
         }
 
         const simv = await simc.save();
-        res.send({ simv, status: 200 });
 
         // Genreate a pdf file for offer later
         if (simv?.offer_letter_send) {
@@ -247,47 +247,46 @@ exports.addUser = [upload, async (req, res) => {
         //End Generate documents for respective user id
 
         if (simv) {
-            const joining = simv.joining_date;
-            const convertDate = new Date(joining);
-            const extractDate = convertDate.getDate();
-            const joiningMonth = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(convertDate);
-            const joiningYear = String(convertDate.getUTCFullYear());
-            const work_days = 31 - extractDate;
-            const bonus = 0;
-            const presentDays = work_days - 0;
-            const perdaysal = simv.salary / 30;
-            const totalSalary = perdaysal * presentDays;
-            const netSalary = totalSalary + bonus;
-            const tdsDeduction = netSalary * (simv.tds_per) / 100;
-            const ToPay = netSalary - tdsDeduction;
+            // const joining = simv.joining_date;
+            // const convertDate = new Date(joining);
+            // const extractDate = convertDate.getDate();
+            // const joiningMonth = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(convertDate);
+            // const joiningYear = String(convertDate.getUTCFullYear());
+            // const work_days = 31 - extractDate;
+            // const bonus = 0;
+            // const presentDays = work_days - 0;
+            // const perdaysal = simv.salary / 30;
+            // const totalSalary = perdaysal * presentDays;
+            // const netSalary = totalSalary + bonus;
+            // const tdsDeduction = netSalary * (simv.tds_per) / 100;
+            // const ToPay = netSalary - tdsDeduction;
 
-            const checkIfAttendanceExist = await attendanceModel.findOne({
-                month: req.body.month,
-                year: req.body.year
-            })
-            if (checkIfAttendanceExist) {
-                const lastInserted = new attendanceModel({
-                    dept: simv.dept_id,
-                    user_id: simv.user_id,
-                    user_name: req.body.user_name,
-                    noOfabsent: 0,
-                    month: joiningMonth,
-                    year: joiningYear,
-                    bonus: 0,
-                    total_salary: simv.salary && simv.salary.toFixed(2),
-                    tds_deduction: tdsDeduction && tdsDeduction.toFixed(2),
-                    net_salary: netSalary && netSalary.toFixed(2),
-                    toPay: ToPay && ToPay.toFixed(2),
-                    remark: "",
-                    created_by: 99
-                })
-                await lastInserted.save();
-            }
+            // const checkIfAttendanceExist = await attendanceModel.findOne({
+            //     month: req.body.month,
+            //     year: req.body.year
+            // })
+            // if (checkIfAttendanceExist) {
+            //     const lastInserted = new attendanceModel({
+            //         dept: simv.dept_id,
+            //         user_id: simv.user_id,
+            //         user_name: req.body.user_name,
+            //         noOfabsent: 0,
+            //         month: joiningMonth,
+            //         year: joiningYear,
+            //         bonus: 0,
+            //         total_salary: simv.salary && simv.salary.toFixed(2),
+            //         tds_deduction: tdsDeduction && tdsDeduction.toFixed(2),
+            //         net_salary: netSalary && netSalary.toFixed(2),
+            //         toPay: ToPay && ToPay.toFixed(2),
+            //         remark: "",
+            //         created_by: 99
+            //     })
+            //     await lastInserted.save();
+            // }
 
             const objectData = await objModel.find();
-            const objects = objectData;
 
-            for (const object of objects) {
+            for (const object of objectData) {
                 const objectId = object.obj_id;
                 let insert = 0;
                 let view = 0;
@@ -319,8 +318,10 @@ exports.addUser = [upload, async (req, res) => {
             const deptDesiData = await deptDesiAuthModel.find({});
             await Promise.all(deptDesiData.map(async (deptDesi) => {
                 if (deptDesi && deptDesi.dept_id == req.body.dept_id && deptDesi.desi_id == req.body.user_designation) {
-                    const updatedData = await userAuthModel.updateMany(
-                        { obj_id: deptDesi.obj_id },
+                    const updatedData = await userAuthModel.updateOne(
+                        { obj_id: deptDesi.obj_id,
+                          Juser_id: simv.user_id
+                        },
                         {
                             $set: {
                                 insert: deptDesi.insert,
@@ -334,9 +335,9 @@ exports.addUser = [upload, async (req, res) => {
                 }
             }));
         }
-        // res.send({ simv, status: 200 });
+        res.send({ simv, status: 200 });
     } catch (err) {
-        res.status(500).send({ error: err.message, sms: 'This user cannot be created' })
+        return res.status(500).send({ error: err.message, sms: 'This user cannot be created' })
     }
 }];
 
@@ -515,30 +516,17 @@ exports.updateUser = [upload, async (req, res) => {
         if (editsim?.offer_later_status == true || (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== ""))) {
             helper.generateOfferLaterPdf(editsim)
         }
-
-        if (req.files && req.files?.image[0]?.originalname) {
+        
+        if (req.files && req.files.digital_signature_image && req.files.digital_signature_image[0]?.originalname) {
             const bucketName = vari.BUCKET_NAME;
             const bucket = storage.bucket(bucketName);
-            const blob = bucket.file(req.files.image[0].originalname);
-            editsim.image = blob.name;
-            const blobStream = blob.createWriteStream();
-            blobStream.on("finish", () => {
-                editsim.save();
-                // res.status(200).send("Success") 
-            });
-            blobStream.end(req.files.image[0].buffer);
-        }
-        if (req.files && req.files?.digital_signature_image[0]?.originalname) {
-            const bucketName = vari.BUCKET_NAME;
-            const bucket = storage.bucket(bucketName);
-            const blob = bucket.file(req.files.digital_signature_image[0].originalname);
+            const blob = bucket.file(req.files?.digital_signature_image[0]?.originalname);
             editsim.digital_signature_image = blob.name;
             const blobStream = blob.createWriteStream();
             blobStream.on("finish", () => {
                 editsim.save();
-                // res.status(200).send("Success") 
             });
-            blobStream.end(req.files.digital_signature_image[0].buffer);
+            blobStream.end(req.files.digital_signature_image[0]?.buffer);
         }
 
         return res.status(200).send({ success: true, data: editsim })
@@ -1019,6 +1007,20 @@ exports.getSingleUser = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: 'subdepartmentmodels',
+                    localField: 'department.dept_id',
+                    foreignField: 'dept_id',
+                    as: 'subDepartment'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$subDepartment",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $project: {
                     show_rocket: "$show_rocket",
                     offer_later_pdf_url: "$offer_later_pdf_url",
@@ -1027,6 +1029,8 @@ exports.getSingleUser = async (req, res) => {
                     offer_later_reject_reason: "$offer_later_reject_reason",
                     user_id: "$user_id",
                     user_name: "$user_name",
+                    sub_dept_id:"$subDepartment.sub_dept_id",
+                    sub_dept_name:"$subDepartment.sub_dept_name",
                     user_designation: "$user_designation",
                     user_email_id: "$user_email_id",
                     user_login_id: "$user_login_id",
@@ -1757,12 +1761,8 @@ exports.sendUserMail = async (req, res) => {
         const { email, subject, name, password, login_id, status, text, name2 } = req.body;
         const attachment = req.file;
         if (status == "onboarded") {
-            // const templatePath = path.join(__dirname, "template.ejs");
-            // const template = await fs.promises.readFile(templatePath, "utf-8");
-            // const html = ejs.render(template, {email,password,name,login_id,text});
-
             /* dynamic email temp code start */
-            const contentList = await emailTempModel.findOne({ email_for_id: 6 });
+            const contentList = await emailTempModel.findOne({ email_for_id: '65be3457ad52cfd11fa27e53', send_email:true});
 
             const filledEmailContent = contentList.email_content
                 .replace("{{user_name}}", name)
@@ -1804,51 +1804,13 @@ exports.sendUserMail = async (req, res) => {
             // const html = ejs.render(template, { name, name2 });
 
             /* dynamic email temp code start */
-            const contentList = await emailTempModel.findOne({ email_for_id: 7 })
+            const contentList = await emailTempModel.findOne({ email_for_id: '65be343aad52cfd11fa27e52', send_email:true })
 
             const filledEmailContent = contentList.email_content.replace("{{user_reportTo}}", name2);
 
             const html = filledEmailContent;
             /* dynamic email temp code end */
 
-            let mailTransporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                    user: "onboarding@creativefuel.io",
-                    pass: "fjjmxuavwpescyat",
-                },
-            });
-
-            let mailOptions = {
-                from: "onboarding@creativefuel.io",
-                to: email,
-                subject: contentList.email_sub,
-                html: html,
-                attachments: attachment
-                    ? [
-                        {
-                            filename: attachment.originalname,
-                            path: attachment.path,
-                        },
-                    ]
-                    : [],
-            };
-
-            await mailTransporter.sendMail(mailOptions);
-            res.sendStatus(200);
-        } else {
-
-            /* dynamic email temp code start */
-            let contentList = await emailTempModel.findOne({ email_for_id: 8 })
-
-            const filledEmailContent = contentList.email_content
-                .replace("{{user_name}}", name)
-                .replace("{{user_email}}", email)
-                .replace("{{user_password}}", password)
-                .replace("{{user_login_id}}", login_id);
-
-            const html = filledEmailContent;
-            /* dynamic email temp code end */
             let mailTransporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
@@ -2417,7 +2379,7 @@ exports.forgotPass = async (req, res) => {
         // });
 
         /* dynamic email temp code start */
-        let contentList = await emailTempModel.findOne({ email_for_id: 9 })
+        let contentList = await emailTempModel.findOne({ email_for_id: '65be3461ad52cfd11fa27e54', send_email:true })
 
         const filledEmailContent = contentList.email_content
             .replace("{{user_email}}", email)
