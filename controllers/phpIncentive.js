@@ -1,4 +1,5 @@
 const phpIncentiveModel = require("../models/phpIncentiveModel.js");
+const response = require("../common/response.js");
 const axios = require('axios');
 const FormData = require('form-data');
 
@@ -22,7 +23,7 @@ exports.savePhpIncentiveInNode = async (req, res) => {
             }
         )
         const responseData = response.data.body;
-      
+
         for (const data of responseData) {
 
             const existingData = await checkIfDataExists(data.incentive_request_id)
@@ -84,3 +85,31 @@ exports.getAllphpIncentiveData = async (req, res) => {
         res.status(500).send({ error: error.message, sms: "error getting php incentive refund data" })
     }
 }
+
+exports.editPhpIncentiveData = async (req, res) => {
+    try {
+        const editIncentive = await phpIncentiveModel.findOneAndUpdate(
+            { incentive_request_id: req.body.incentive_request_id },
+            {
+                requested_amount: req.body.requested_amount,
+                payment_type: req.body.payment_type,
+                reason: req.body.reason,
+                requested_date: req.body.requested_date,
+                paid_amount: req.body.paid_amount
+            },
+            { new: true }
+        );
+        if (!editIncentive) {
+            return response.returnFalse(
+                200,
+                req,
+                res,
+                "No Reord Found With This Incentive Id",
+                {}
+            );
+        }
+        return response.returnTrue(200, req, res, "Updation Successfully", editIncentive);
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+};

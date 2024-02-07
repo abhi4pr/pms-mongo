@@ -424,7 +424,7 @@ exports.addAttendance = async (req, res) => {
               });
               const instav = await creators.save();
             }
-            res.send({ status: 200 });
+            return res.send({ status: 200 });
           });
       } else {
         const Dept = dept || "";
@@ -503,7 +503,7 @@ exports.addAttendance = async (req, res) => {
               });
               const instav = await creators.save();
             }
-            res.send({ status: 200 });
+            return res.send({ status: 200 });
           });
         } else if (
           req.body.user_id == check1[0].user_id &&
@@ -561,7 +561,7 @@ exports.addAttendance = async (req, res) => {
             },
             { new: true }
           ).sort({ attendence_id: 1 });
-          res.send({ status: 200 });
+          return res.send({ status: 200 });
         }
       }
     }
@@ -1353,7 +1353,15 @@ exports.getSalaryByUserId = async (req, res) => {
             },
             attendence_status_flow: 1,
             disputed_reason: "$disputed_reason",
-            disputed_date: "$disputed_date"
+            disputed_date: "$disputed_date",
+            current_address: "$user.current_address",
+            current_city: "$user.current_city",
+            current_state: "$user.current_state",
+            current_pin_code: "$user.current_pin_code",
+            permanent_address: "$user.permanent_address",
+            permanent_city: "$user.permanent_city",
+            permanent_state: "$user.permanent_state",
+            permanent_pin_code: "$user.permanent_pin_code",
           },
         },
         // {

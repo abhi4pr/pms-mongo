@@ -1285,6 +1285,7 @@ router.get("/get_all_php_payment_refund_data_pending", phpRefund.getAllphpPaymen
 router.put("/pending_approval_refund_update", upload1.single("payment_screenshot"), phpRefund.pendingApprovalRefundUpdate);
 router.post("/add_php_payment_incentive_data_in_node", phpIncentive.savePhpIncentiveInNode);
 router.get("/get_all_php_payment_incentive_data", phpIncentive.getAllphpIncentiveData);
+router.put("/edit_php_payment_incentive_data", phpIncentive.editPhpIncentiveData);
 router.post("/add_php_payment_bal_data_in_node", phpPaymentBal.savePhpPaymentBalDataInNode);
 router.get("/get_all_php_payment_bal_data", phpPaymentBal.getAllphpPaymentBalData);
 router.put("/balance_payment_list_update", phpPaymentBal.balancePaymentListUpdate);
@@ -1404,7 +1405,7 @@ router.put("/update_data_platform", dataPlatform.editDataPlatform);
 router.delete("/delete_data_platform/:_id", dataPlatform.deleteDataPlatform);
 
 //Data Routes
-router.post("/add_data", upload1.single('data_upload'), dataController.addData);
+router.post("/add_data", dataController.addData);
 router.get("/get_all_datas", dataController.getDatas);
 router.get("/get_data_based_data_name/:data_id", dataController.getDataBasedDataName);
 router.get("/get_data_based_data_name_new/:data_name", dataController.getDataBasedDataNameNew);
@@ -1413,7 +1414,7 @@ router.get(
   dataController.getSingleData
 );
 router.put("/update_data", dataController.editData);
-router.delete("/delete_data/:data_id", dataController.deleteData);
+router.delete("/delete_data/:_id", dataController.deleteData);
 router.delete("/delete_data_based_data/:data_name", dataController.deleteDataBasedData);
 router.put("/edit_data_new", dataController.editDataNew);
 router.get("/distinct_created_by", dataController.DistinctCreatedByWithUserName);
