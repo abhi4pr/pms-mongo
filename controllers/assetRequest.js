@@ -2,6 +2,7 @@ const response = require("../common/response.js");
 const assetRequestModel = require("../models/assetRequestModel.js");
 const simModel = require("../models/simModel.js");
 const assetHistoryModel = require("../models/assetHistoryModel.js");
+const assetsSubCategoryModel = require("../models/assetsSubCategoryModel.js");
 const mongoose = require('mongoose');
 
 exports.addAssetRequest = async (req, res) => {
@@ -22,7 +23,8 @@ exports.addAssetRequest = async (req, res) => {
             action_by: savedassetrequestdata.request_by,
             asset_detail: savedassetrequestdata.detail,
             action_to: 0,
-            asset_remark: ""
+            asset_remark: "",
+            asset_action: "New Asset Created"
         };
 
         const newAssetHistory = await assetHistoryModel.create(assetHistoryData);
@@ -370,7 +372,7 @@ exports.getAssetRequestById = async (req, res) => {
         ]);
 
         if (!singleAssetRequest || singleAssetRequest.length === 0) {
-            res.status(500).send({ success: false });
+            res.status(404).send({ success: false });
             return;
         }
 

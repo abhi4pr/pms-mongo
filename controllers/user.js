@@ -441,7 +441,7 @@ exports.updateUser = [upload, async (req, res) => {
             joining_date_extend_reason: req.body.joining_date_extend_reason,
             joining_date_reject_reason: req.body.joining_date_reject_reason,
             invoice_template_no: req.body.invoice_template_no,
-            image: req.files && req.files?.image && req.files?.image[0] ? req.files?.image[0].originalname : '',
+            image: req.files && req.files?.image && req.files?.image[0] ? req.files?.image[0].originalname : existingUser.image,
             UID: req.files && req.files['UID'] && req.files['UID'][0] ? req.files['UID'][0].filename : (existingUser && existingUser.UID) || '',
             pan: req.files && req.files['pan'] && req.files['pan'][0] ? req.files['pan'][0].filename : (existingUser && existingUser.pan) || '',
             tenth_marksheet: req.files && req.files['tenth_marksheet'] && req.files['tenth_marksheet'][0] ? req.files['tenth_marksheet'][0].filename : (existingUser && existingUser.tenth_marksheet) || '',
@@ -499,17 +499,53 @@ exports.updateUser = [upload, async (req, res) => {
         if (editsim?.offer_later_status == true || (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== ""))) {
             helper.generateOfferLaterPdf(editsim)
         }
+       
+        if (req.files && req.files.image && req.files.image[0]?.originalname) {
+            const bucketName = vari.BUCKET_NAME;
+            const bucket = storage.bucket(bucketName);
+        
+            const currentDate = new Date();
+            const fileNamef = `${currentDate.getTime()}.jpg`;
+        
+            const blob = bucket.file(fileNamef);
+            editsim.image = blob.name;
+        
+            const saveBlobPromise = new Promise((resolve, reject) => {
+                const blobStream = blob.createWriteStream();
+                blobStream.on("finish", () => {
+                    resolve();
+                });
+                blobStream.end(req.files.image[0]?.buffer);
+            });
+        
+            try {
+                await saveBlobPromise;
+                editsim.save();
+            } catch (error) {
+                console.error("Error saving image:", error);
+            }
+        }
+        
 
         if (req.files && req.files.digital_signature_image && req.files.digital_signature_image[0]?.originalname) {
             const bucketName = vari.BUCKET_NAME;
             const bucket = storage.bucket(bucketName);
             const blob = bucket.file(req.files?.digital_signature_image[0]?.originalname);
             editsim.digital_signature_image = blob.name;
-            const blobStream = blob.createWriteStream();
-            blobStream.on("finish", () => {
+
+            const saveBlobPromise = new Promise((resolve, reject) => {
+                const blobStream = blob.createWriteStream();
+                blobStream.on("finish", () => {
+                    resolve();
+                });
+                blobStream.end(req.files.digital_signature_image[0]?.buffer);
+            })
+            try{
+                await saveBlobPromise;
                 editsim.save();
-            });
-            blobStream.end(req.files.digital_signature_image[0]?.buffer);
+            }catch(err){
+                console.log('error', err)
+            }
         }
 
         return res.status(200).send({ success: true, data: editsim })
@@ -1746,7 +1782,7 @@ exports.sendUserMail = async (req, res) => {
         const attachment = req.file;
         if (status == "onboarded") {
             /* dynamic email temp code start */
-            const contentList = await emailTempModel.findOne({ email_for_id: '65be3457ad52cfd11fa27e53', send_email: true });
+            const contentList = await emailTempModel.findOne({ email_for_id: '65bde0335629ebe4e2a71ae3', send_email: true });
 
             const filledEmailContent = contentList.email_content
                 .replace("{{user_name}}", name)
@@ -1761,7 +1797,7 @@ exports.sendUserMail = async (req, res) => {
                 service: "gmail",
                 auth: {
                     user: "onboarding@creativefuel.io",
-                    pass: "fjjmxuavwpescyat",
+                    pass: "jinrajpukgvynmci",
                 },
             });
 
@@ -1799,7 +1835,7 @@ exports.sendUserMail = async (req, res) => {
                 service: "gmail",
                 auth: {
                     user: "onboarding@creativefuel.io",
-                    pass: "fjjmxuavwpescyat",
+                    pass: "jinrajpukgvynmci",
                 },
             });
 
@@ -2241,7 +2277,7 @@ exports.sendMailAllWfoUser = async (req, res) => {
                 service: "gmail",
                 auth: {
                     user: "onboarding@creativefuel.io",
-                    pass: "fjjmxuavwpescyat",
+                    pass: "jinrajpukgvynmci",
                 },
             });
 
@@ -2545,33 +2581,26 @@ exports.forgotPass = async (req, res) => {
             .replace("{{user_email}}", email)
             .replace("{{user_password}}", getRandomPassword);
 
-        var html;
-        html = filledEmailContent;
+        const html = filledEmailContent;
         /* dynamic email temp code end */
 
-        var transport = nodemailer.createTransport({
+        let transport = nodemailer.createTransport({
             service: "gmail",
             auth: {
                 user: "onboarding@creativefuel.io",
-                pass: "fjjmxuavwpescyat",
+                pass: "jinrajpukgvynmci",
             },
         });
 
         let mailOptions = {
             from: "onboarding@creativefuel.io",
             to: email,
-            // subject: "Forgot password",
             subject: contentList.email_sub,
             html: html,
         };
 
-        transport.sendMail(mailOptions, function (error, info) {
-            if (error) console.log(error);
-            return info;
-        });
-
+        await transport.sendMail(mailOptions);
         return res.status(200).send({ message: 'Successfully Sent email.' })
-
     } catch (err) {
         return res.status(500).send({ error: err.message, message: 'Error Sending Mail' })
     }
@@ -3186,3 +3215,15 @@ exports.getAllUsersWithObj = async (req, res) => {
         res.status(500).json({ error: err.message, sms: 'Error getting users from last month' });
     }
 }
+
+exports.getAllSalesUsers = async (req, res) => {
+    try {
+        const salesUsers = await userModel.find({ dept_id: 36 });
+        if (!salesUsers) {
+            return response.returnFalse(200, req, res, "No Reord Found...", []);
+        }
+        res.status(200).send(salesUsers)
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+};

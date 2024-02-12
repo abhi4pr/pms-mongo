@@ -78,6 +78,8 @@ const agencyController = require('./controllers/operationExecution/campaignMaste
 const goalController = require('./controllers/operationExecution/campaignMasterController/goalController.js')
 const serviceController = require('./controllers/operationExecution/campaignMasterController/serviceController.js')
 const industryController = require('./controllers/operationExecution/campaignMasterController/industryController.js')
+
+const directPlanCreationController = require('./controllers/operationExecution/directPlanCreationController.js')
 //opertaion + execution imports ends here`
 
 const city = require("./controllers/cityController.js");
@@ -112,6 +114,8 @@ const taskSequence = require("./controllers/TMS/taskSequence.js");
 const assetReturnRequest = require("./controllers/assetReturn.js");
 const newCoc = require('./controllers/cocManagementNew.js')
 const phpVendorPaymentRequest = require("./controllers/phpVendorPaymentRequest.js");
+const assetHistory = require("./controllers/assetHistory.js");
+const dataOperation = require("./controllers/dataOperation.js");
 
 /* Task Mangement Controller Import */
 const deptWiseStatus = require('./controllers/TMS/deptWiseStatus.js');
@@ -173,6 +177,7 @@ router.post('/preassignment', preAssignmentController.createPreAssignment)
 router.get('/preassignment/:id', preAssignmentController.getPreAssignmentForExpertee)
 router.post('/preassignment/phase', preAssignmentController.getPreAssignmnetOnPhaseId)
 router.post('/preassignment/phase/update', preAssignmentController.preAssignmentUpdate)
+router.post('/preassignment/acceptall', preAssignmentController.acceptAllPreAssignments)
 router.post('/operation_phase_dashboard', operationDasboard.phaseDashboard)
 router.post('/operation_plan_dashboard', operationDasboard.planDashboard)
 
@@ -205,6 +210,12 @@ router.put('/services/:id', serviceController.updateService)
 router.get('/services/:id', serviceController.getSingleService)
 router.delete('/services/:id', serviceController.deleteService)
 
+
+router.post('/directplan', directPlanCreationController.createX)
+router.get('/directplan', directPlanCreationController.getAllPlans)
+router.get('/directplan/:id', directPlanCreationController.getSinglePlan)
+router.put('/directplan/:id', directPlanCreationController.updateSinglePlan)
+router.delete('/directplan/:id', directPlanCreationController.deleteSinglePlan)
 
 
 /*operation+execution api ends*/
@@ -799,6 +810,7 @@ router.get("/get_all_percentage", user.getFilledPercentage);
 // router.get("/get_first_time_login_users", user.getAllFirstLoginUsers)
 router.post("/get_user_graph_data", user.getUserGraphData)
 router.get("/get_users_with_status", user.getUsersWithStatus);
+router.get("/get_all_sales_users", user.getAllSalesUsers);
 
 //---------------------------------------------------------------------------All Routes OF User Module Ends Here ---------------------------------------------------------------------------------------------------//
 
@@ -1193,6 +1205,10 @@ router.get("/assetreturn/:_id", assetReturnRequest.getAssetReturnRequestById);
 router.delete("/assetreturn/:_id", assetReturnRequest.deleteAssetReturnRequest);
 router.get("/show_return_asset_to_reportL1/:user_id", assetReturnRequest.showReturnAssetDataToUserReport);
 
+//Asset History Routes
+router.get("/get_all_asset_history", assetHistory.getAllAssetsHistrory);
+router.get("/get_single_asset_history/:sim_id", assetHistory.getSingleAssetHistory);
+
 //---------------------------------------------------------------------------All Routes OF Asset Module Ends Here ---------------------------------------------------------------------------------------------------//
 
 /* Page Uniqueness routes for insta */
@@ -1216,6 +1232,7 @@ router.get("/newcoc", newCoc.getAllNewCocs);
 router.get("/newcoc/:_id", newCoc.getSingleNewCoc);
 router.put("/newcoc", newCoc.editNewCoc);
 router.delete("/newcoc/:_id", newCoc.deleteNewCoc);
+router.get("/latest_newcoc", newCoc.getLatestNewCoc);
 
 /* Document master */
 router.post("/add_doc", documentController.addDocument);
@@ -1458,5 +1475,15 @@ router.get("/phpvendor_insert_data_node", phpVendorPaymentRequest.addPhpVendorPa
 router.get("/phpvendorpaymentrequest", phpVendorPaymentRequest.getPhpVendorPaymentRequests);
 router.get("/phpvendorpaymentrequest/:request_id", phpVendorPaymentRequest.getSinglePhpVendorPaymentRequest)
 router.put("/phpvendorpaymentrequest", upload1.single('evidence'), phpVendorPaymentRequest.updatePhpVendorPaymentRequest)
+
+//Data Operation Routes
+router.post("/dataoperation", dataOperation.addOperationData);
+router.get("/dataoperation", dataOperation.getOprationDatas);
+router.get("/dataoperation/:data_id", dataOperation.getSingleOprationData);
+router.put("/dataoperation", dataOperation.editOperationData);
+router.delete("/dataoperation/:_id", dataOperation.deleteOperationData);
+router.delete("/dataoperationwithdataname/:data_name", dataOperation.deleteDataBasedData);
+router.get("/get_data_operation_based_data_name_new/:data_name", dataOperation.getOperationDataBasedDataNameNew);
+router.put("/editdataoperationname", dataOperation.editOperationDataName);
 
 module.exports = router;

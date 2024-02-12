@@ -4,9 +4,20 @@ const userModel = require("../models/userModel.js");
 const vari = require("../variables.js");
 const { storage } = require('../common/uploadFile.js');
 const assetHistoryModel = require("../models/assetHistoryModel.js");
+const assetRequestModel = require("../models/assetRequestModel.js");
+const assetsSubCategoryModel = require("../models/assetsSubCategoryModel.js");
+const response = require("../common/response.js");
 
 exports.addSim = async (req, res) => {
   try {
+    const checkDuplicacy = await simModel.findOne({ sim_no: req.body.sim_no })
+    if (checkDuplicacy) {
+      return res.status(409).send({
+        data: [],
+        message: "asset id already exist",
+      });
+    }
+
     const nextHrDate = new Date();
     nextHrDate.setDate(nextHrDate.getDate() + 30);
     const updatedDateString = nextHrDate.toISOString();
@@ -26,13 +37,13 @@ exports.addSim = async (req, res) => {
       category_id: req.body.category_id,
       sub_category_id: req.body.sub_category_id,
       vendor_id: req.body.vendor_id,
-      inWarranty: req.body.inWarranty || "",
-      warrantyDate: req.body.warrantyDate || "",
-      dateOfPurchase: req.body.dateOfPurchase || "",
-      selfAuditPeriod: req.body.selfAuditPeriod || 0,
-      hrAuditPeriod: req.body.hrAuditPeriod || 0,
-      selfAuditUnit: req.body.selfAuditUnit || 0,
-      hrAuditUnit: req.body.hrAuditUnit || 0,
+      inWarranty: req.body.inWarranty,
+      warrantyDate: req.body.warrantyDate,
+      dateOfPurchase: req.body.dateOfPurchase,
+      selfAuditPeriod: req.body.selfAuditPeriod,
+      hrAuditPeriod: req.body.hrAuditPeriod,
+      selfAuditUnit: req.body.selfAuditUnit,
+      hrAuditUnit: req.body.hrAuditUnit,
       // invoiceCopy: req.file?.filename,
       assetsValue: req.body.assetsValue,
       assetsCurrentValue: req.body.assetsCurrentValue,
@@ -66,7 +77,8 @@ exports.addSim = async (req, res) => {
       action_by: simv.created_by,
       asset_detail: "",
       action_to: 0,
-      asset_remark: simv.Remarks
+      asset_remark: simv.Remarks,
+      asset_action: "Asset Created"
     };
 
     const newAssetHistory = await assetHistoryModel.create(assetHistoryData);
@@ -85,20 +97,20 @@ exports.getSims = async (req, res) => {
     const assetsImagesUrl = `${vari.IMAGE_URL}`;
     const simc = await simModel
       .aggregate([
-        {
-          $lookup: {
-            from: "usermodels",
-            localField: "user_id",
-            foreignField: "user_id",
-            as: "userdata",
-          },
-        },
-        {
-          $unwind: {
-            path: "$userdata",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
+        // {
+        //   $lookup: {
+        //     from: "usermodels",
+        //     localField: "user_id",
+        //     foreignField: "user_id",
+        //     as: "userdata",
+        //   },
+        // },
+        // {
+        //   $unwind: {
+        //     path: "$userdata",
+        //     preserveNullAndEmptyArrays: true,
+        //   },
+        // },
         {
           $lookup: {
             from: "assetscategorymodels",
@@ -141,20 +153,20 @@ exports.getSims = async (req, res) => {
             // preserveNullAndEmptyArrays: true,
           },
         },
-        {
-          $lookup: {
-            from: "usermodels",
-            localField: "created_by",
-            foreignField: "user_id",
-            as: "user",
-          },
-        },
-        {
-          $unwind: {
-            path: "$user",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
+        // {
+        //   $lookup: {
+        //     from: "usermodels",
+        //     localField: "created_by",
+        //     foreignField: "user_id",
+        //     as: "user",
+        //   },
+        // },
+        // {
+        //   $unwind: {
+        //     path: "$user",
+        //     preserveNullAndEmptyArrays: true,
+        //   },
+        // },
         {
           $lookup: {
             from: "simallomodels",
@@ -236,12 +248,19 @@ exports.getSims = async (req, res) => {
             created_by: "$created_by",
             assetsCurrentValue: "$assetsCurrentValue",
             Remarks: "$Remarks",
-            user_name: "$userdata.user_name",
+            // user_name: "$userdata.user_name",
             category_name: "$category.category_name",
             sub_category_name: "$subcategory.sub_category_name",
             vendor_name: "$vendor.vendor_name",
-            created_by_name: "$user.user_name",
-            allocated_username: "$allocated_username.user_name",
+            // created_by_name: "$user.user_name",
+            // allocated_username: "$allocated_username.user_name",
+            // allocated_username: {
+            //   $cond: {
+            //     if: { $ne: ["$simallocation.user_id", 0] },
+            //     then: "$allocated_username.user_name",
+            //     else: ""
+            //   }
+            // },
             Last_updated_date: "$Last_updated_date",
             invoiceCopy_url: { $concat: [assetsImagesUrl, "$invoiceCopy"] },
             submitted_at: "$simallocation.submitted_at",
@@ -251,6 +270,13 @@ exports.getSims = async (req, res) => {
             asset_modal_id: "$asset_modal_id",
             asset_brand_name: "$assetBrand.asset_brand_name",
             asset_modal_name: "$assetModal.asset_modal_name",
+            allocated_username: {
+              $cond: {
+                if: { $eq: ["$status", "Allocated"] },
+                then: "$allocated_username.user_name",
+                else: ""
+              }
+            },
             date_difference: {
               $cond: [
                 {
@@ -295,13 +321,92 @@ exports.getSims = async (req, res) => {
 
 exports.getSingleSim = async (req, res) => {
   try {
-    const singlesim = await simModel.findOne({
-      sim_id: parseInt(req.params.id),
-    });
+    const singlesim = await simModel
+      .aggregate([
+        {
+          $match: { sim_id: parseInt(req.params.id) }
+        },
+        {
+          $lookup: {
+            from: "assetscategorymodels",
+            localField: "category_id",
+            foreignField: "category_id",
+            as: "category",
+          },
+        },
+        {
+          $unwind: {
+            path: "$category",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "assetssubcategorymodels",
+            localField: "sub_category_id",
+            foreignField: "sub_category_id",
+            as: "subcategory",
+          },
+        },
+        {
+          $unwind: {
+            path: "$subcategory",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "vendormodels",
+            localField: "vendor_id",
+            foreignField: "vendor_id",
+            as: "vendor",
+          },
+        },
+        {
+          $unwind: {
+            path: "$vendor",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            _id: "$_id",
+            sim_id: "$sim_id",
+            user_id: "$user_id",
+            asset_id: "$sim_no",
+            status: "$status",
+            asset_type: "$s_type",
+            assetsName: "$assetsName",
+            assetsOtherID: "$assetsOtherID",
+            category_id: "$category_id",
+            sub_category_id: "$sub_category_id",
+            vendor_id: "$vendor_id",
+            inWarranty: "$inWarranty",
+            warrantyDate: "$warrantyDate",
+            dateOfPurchase: "$dateOfPurchase",
+            hrAuditPeriod: "$hrAuditPeriod",
+            hrAuditUnit: "$hrAuditUnit",
+            selfAuditPeriod: "$selfAuditPeriod",
+            selfAuditUnit: "$selfAuditUnit",
+            invoiceCopy: "$invoiceCopy",
+            assetsValue: "$assetsValue",
+            created_by: "$created_by",
+            asset_financial_type: "$asset_financial_type",
+            assetsCurrentValue: "$assetsCurrentValue",
+            Remarks: "$Remarks",
+            category_name: "$category.category_name",
+            sub_category_name: "$subcategory.sub_category_name",
+            vendor_name: "$vendor.vendor_name"
+          },
+        },
+      ])
+      .exec();
     if (!singlesim) {
       return res.status(500).send({ success: false });
     }
-    res.status(200).send({ data: singlesim });
+
+    const result = singlesim[0];
+    res.status(200).send({ data: result });
   } catch (err) {
     res.status(500).send({ error: err, sms: "Error getting sim details" });
   }
@@ -322,7 +427,7 @@ exports.editSim = async (req, res) => {
         category_id: req.body.category_id,
         sub_category_id: req.body.sub_category_id,
         vendor_id: req.body.vendor_id,
-        inWarranty: req.body.inWarranty || "",
+        inWarranty: req.body.inWarranty,
         warrantyDate: req.body.warrantyDate,
         dateOfPurchase: req.body.dateOfPurchase,
         selfAuditPeriod: req.body.selfAuditPeriod || 0,
@@ -400,6 +505,19 @@ exports.addAllocation = async (req, res) => {
       submitted_at: req.body.submitted_at,
     });
     const simv = await simc.save();
+
+    const assetHistoryData = {
+      sim_id: simv.sim_id,
+      action_date_time: simv.Creation_date,
+      action_by: simv.created_by,
+      asset_detail: "",
+      action_to: simv.submitted_by,
+      asset_remark: simv.Remarks,
+      asset_action: "Asset Allocated"
+    };
+
+    const newAssetHistory = await assetHistoryModel.create(assetHistoryData);
+
     res.send({ simv, status: 200 });
   } catch (err) {
     res.status(500).send({ error: err, sms: "This sim cannot allocate" });
@@ -549,6 +667,17 @@ exports.getAllocatedAssestByUserId = async (req, res) => {
       },
       {
         $lookup: {
+          from: "usermodels",
+          localField: "user_id",
+          foreignField: "user_id",
+          as: "userData"
+        }
+      },
+      {
+        $unwind: "$userData"
+      },
+      {
+        $lookup: {
           from: "assetscategorymodels",
           localField: "sim.category_id",
           foreignField: "category_id",
@@ -659,6 +788,7 @@ exports.getAllocatedAssestByUserId = async (req, res) => {
           preserveNullAndEmptyArrays: true
         }
       },
+      { $sort: { "repairrequest.req_date": -1 } },
       {
         $group: {
           _id: "$_id",
@@ -673,7 +803,7 @@ exports.getAllocatedAssestByUserId = async (req, res) => {
           submitted_at: { $first: "$submitted_at" },
           created_by: { $first: "$created_by" },
           status: { $first: "$status" },
-          user_name: { $first: "$user.user_name" },
+          user_name: { $first: "$userData.user_name" },
           s_type: { $first: "$sim.s_type" },
           sim_id: { $first: "$sim.sim_id" },
           type: { $first: "$type" },
@@ -738,6 +868,7 @@ exports.getAllocationDataByAlloId = async (req, res) => {
           $project: {
             _id: "$_id",
             sim_no: "$sim_no",
+            user_id: "$user_id",
             // provider: "$provider",
             Remarks: "$Remarks",
             created_by: "$created_by",
@@ -771,11 +902,41 @@ exports.getAllocationDataByAlloId = async (req, res) => {
 
 exports.editAllocation = async (req, res) => {
   try {
-    const editsim = await simAlloModel.findOneAndUpdate(
-      { allo_id: req.body.allo_id },
-      {
+    const findSimId = await simAlloModel.findOne({ sim_id: req.body.sim_id });
+
+    if (findSimId) {
+      const updateFields = {};
+      const allowedFields = ['user_id', 'sim_id', 'Remarks', 'created_by', 'submitted_by', 'reason', 'status', 'deleted_status', 'submitted_at'];
+
+      allowedFields.forEach((field) => {
+        if (req.body[field] !== undefined) {
+          updateFields[field] = req.body[field];
+        }
+      });
+      const editSim = await simAlloModel.findOneAndUpdate(
+        { sim_id: parseInt(req.body.sim_id) },
+        updateFields,
+        { new: true }
+      );
+
+      const assetHistoryData = {
+        sim_id: editSim.sim_id,
+        action_date_time: editSim.Creation_date,
+        action_by: editSim.created_by,
+        asset_detail: "",
+        action_to: editSim.submitted_by,
+        asset_remark: editSim.Remarks,
+        asset_action: "Asset Allocated Updated"
+      };
+
+      const newAssetHistory = await assetHistoryModel.create(assetHistoryData);
+      return response.returnTrue(200, req, res, "Asset allocation Update Successfully", editSim);
+    } else {
+      const simc = new simAlloModel({
         user_id: req.body.user_id,
         sim_id: req.body.sim_id,
+        category_id: req.body.category_id,
+        sub_category_id: req.body.sub_category_id,
         Remarks: req.body.Remarks,
         // dept_id: req.body.dept_id,
         created_by: req.body.created_by,
@@ -784,15 +945,24 @@ exports.editAllocation = async (req, res) => {
         status: req.body.status,
         deleted_status: req.body.deleted_status,
         submitted_at: req.body.submitted_at,
-      },
-      { new: true }
-    );
-    if (!editsim) {
-      res.status(500).send({ success: false });
+      });
+      const simv = await simc.save();
+
+      const assetHistoryData = {
+        sim_id: simv.sim_id,
+        action_date_time: simv.Creation_date,
+        action_by: simv.created_by,
+        asset_detail: "",
+        action_to: simv.submitted_by,
+        asset_remark: simv.Remarks,
+        asset_action: "Asset Allocated"
+      };
+
+      const newAssetHistory = await assetHistoryModel.create(assetHistoryData);
+      return response.returnTrue(200, req, res, "Asset allocation added Successfully", simv);
     }
-    res.status(200).send({ success: true, data: editsim });
   } catch (err) {
-    res
+    return res
       .status(500)
       .send({ error: err.message, sms: "Error updating asset allocation" });
   }
@@ -981,6 +1151,74 @@ exports.alldataofsimallocment = async (req, res) => {
   }
 };
 
+// exports.getAssetDepartmentCount = async (req, res) => {
+//   try {
+//     const simc = await simAlloModel.aggregate([
+//       {
+//         $lookup: {
+//           from: "usermodels",
+//           localField: "user_id",
+//           foreignField: "user_id",
+//           as: "user",
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: "$user",
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "departmentmodels",
+//           localField: "user.dept_id",
+//           foreignField: "dept_id",
+//           as: "department",
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: "$department",
+//           // preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $project: {
+//           _id: "$_id",
+//           user_id: "$user_id",
+//           user_name: "$user.user_name",
+//           dept_id: "$user.dept_id",
+//           dept_name: "$department.dept_name"
+//         }
+//       },
+//       {
+//         $group: {
+//           _id: "$user_id",
+//           dept_name: { $first: "$dept_name" },
+//           count: { $sum: 1 },
+//           user_id: { $first: "$user_id" },
+//           user_name: { $first: "$user_name" },
+//           dept_id: { $first: "$dept_id" },
+//           // category_id: { $first: "$category_id" },
+//           // category_name: { $first: "$category_name" },
+//           // sub_category_id: { $first: "$sub_category_id" },
+//           // sub_category_name: { $first: "$sub_category_name" }
+//         },
+//       }
+//     ]);
+
+//     if (!simc || simc.length === 0) {
+//       res.status(404).send({ success: false, message: "No data found" });
+//     } else {
+//       res.status(200).send({ data: simc });
+//     }
+//   } catch (err) {
+//     res
+//       .status(500)
+//       .send({ error: err.message, message: "Error getting user count of department" });
+//   }
+// };
+
 exports.getAssetDepartmentCount = async (req, res) => {
   try {
     const simc = await simAlloModel.aggregate([
@@ -1009,35 +1247,6 @@ exports.getAssetDepartmentCount = async (req, res) => {
       {
         $unwind: {
           path: "$department",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "assetscategorymodels",
-          localField: "category_id",
-          foreignField: "category_id",
-          as: "category",
-        },
-      },
-      {
-        $unwind: {
-          path: "$category",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "assetssubcategorymodels",
-          localField: "sub_category_id",
-          foreignField: "sub_category_id",
-          as: "subcategory",
-        },
-      },
-      {
-        $unwind: {
-          path: "$subcategory",
-          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -1047,28 +1256,27 @@ exports.getAssetDepartmentCount = async (req, res) => {
           user_name: "$user.user_name",
           dept_id: "$user.dept_id",
           dept_name: "$department.dept_name",
-          category_id: "$category.category_id",
-          category_name: "$category.category_name",
-          sub_category_id: "$subcategory.sub_category_id",
-          sub_category_name: "$subcategory.sub_category_name"
         }
       },
       {
         $group: {
-          _id: "$dept_id",
+          _id: "$user_id",
           dept_name: { $first: "$dept_name" },
-          count: { $sum: 1 },
-          user_id: { $first: "$user_id" },
+          count: { $addToSet: "$dept_id" },
           user_name: { $first: "$user_name" },
-          dept_id: { $first: "$dept_id" },
-          category_id: { $first: "$category_id" },
-          category_name: { $first: "$category_name" },
-          sub_category_id: { $first: "$sub_category_id" },
-          sub_category_name: { $first: "$sub_category_name" },
-
-          // user_id : { $first: "$user_id" }
+          dept_id: { $first: "$dept_id" }
         },
-      }
+      },
+      {
+        $project: {
+          _id: 0,
+          user_id: "$_id",
+          dept_id: 1,
+          user_name: 1,
+          dept_name: 1,
+          count: { $size: "$count" },
+        },
+      },
     ]);
 
     if (!simc || simc.length === 0) {
@@ -1077,40 +1285,153 @@ exports.getAssetDepartmentCount = async (req, res) => {
       res.status(200).send({ data: simc });
     }
   } catch (err) {
-    res
-      .status(500)
-      .send({ error: err.message, message: "Error getting user count of department" });
+    res.status(500).send({ error: err.message, message: "Error getting user count of department" });
   }
 };
+
+
+// exports.getAssetUsersDepartment = async (req, res) => {
+//   try {
+//     const dept_id = parseInt(req.params.dept_id);
+//     const userDetails = await simAlloModel.aggregate([
+//       {
+//         $lookup: {
+//           from: 'simmodels',
+//           localField: 'sim_id',
+//           foreignField: 'sim_id',
+//           as: 'simDetails',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$simDetails',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: 'assetscategorymodels',
+//           localField: 'simDetails.category_id',
+//           foreignField: 'category_id',
+//           as: 'categoryDetails',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$categoryDetails',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: 'assetssubcategorymodels',
+//           localField: 'simDetails.sub_category_id',
+//           foreignField: 'sub_category_id',
+//           as: 'subcategoryDetails',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$subcategoryDetails',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: 'usermodels',
+//           localField: 'user_id',
+//           foreignField: 'user_id',
+//           as: 'userDetails',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$userDetails',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: 'departmentmodels',
+//           localField: 'userDetails.dept_id',
+//           foreignField: 'dept_id',
+//           as: 'department',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$department',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $match: {
+//           "userDetails.dept_id": parseInt(dept_id),
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: '$user_id',
+//           dept_id: { $first: '$userDetails.dept_id' },
+//           user_id: { $first: '$user_id' },
+//           user_name: { $first: '$userDetails.user_name' },
+//           sim_id: { $first: '$sim_id' },
+//           asset_name: { $first: '$simDetails.assetsName' },
+//           dept_name: { $first: '$department.dept_name' },
+//           category_id: { $first: '$simDetails.category_id' },
+//           sub_category_id: { $first: '$simDetails.sub_category_id' },
+//           category_name: { $first: '$categoryDetails.category_name' },
+//           sub_category_name: { $first: '$subcategoryDetails.sub_category_name' },
+//         },
+//       },
+//       {
+//         $project: {
+//           _id: 1,
+//           dept_id: 1,
+//           user_id: 1,
+//           sim_id: 1,
+//           asset_name: 1,
+//           user_name: 1,
+//           dept_name: 1,
+//           category_id: 1,
+//           sub_category_id: 1,
+//           category_name: 1,
+//           sub_category_name: 1,
+//         },
+//       },
+//     ]);
+
+//     res.status(200).send({ data: userDetails });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: error.message, sms: 'Internal Server Error' });
+//   }
+// };
+
 
 exports.getAssetUsersDepartment = async (req, res) => {
   try {
     const dept_id = parseInt(req.params.dept_id);
-    const userDetails = await userModel.aggregate([
-      {
-        $match: {
-          dept_id: dept_id
-        },
-      },
+    const userDetails = await simAlloModel.aggregate([
       {
         $lookup: {
-          from: 'simAlloModel',
-          localField: 'user_id',
-          foreignField: 'user_id',
-          as: 'simAlloDetails',
+          from: 'simmodels',
+          localField: 'sim_id', // Adjust this field if necessary
+          foreignField: 'sim_id',
+          as: 'simDetails',
         },
       },
       {
         $unwind: {
-          path: '$simAlloDetails',
+          path: '$simDetails',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $lookup: {
           from: 'assetscategorymodels',
-          localField: 'category_id',
-          foreignField: 'simAlloDetails.category_id',
+          localField: 'simDetails.category_id',
+          foreignField: 'category_id',
           as: 'categoryDetails',
         },
       },
@@ -1123,8 +1444,8 @@ exports.getAssetUsersDepartment = async (req, res) => {
       {
         $lookup: {
           from: 'assetssubcategorymodels',
-          localField: 'sub_category_id',
-          foreignField: 'simAlloDetails.sub_category_id',
+          localField: 'simDetails.sub_category_id',
+          foreignField: 'sub_category_id',
           as: 'subcategoryDetails',
         },
       },
@@ -1135,25 +1456,66 @@ exports.getAssetUsersDepartment = async (req, res) => {
         },
       },
       {
-        $project: {
-          dept_id: 1,
-          user_id: 1,
-          user_name: 1,
-          category_id: '$categoryDetails.category_id',
-          sub_category_id: '$subcategoryDetails.sub_category_id',
-          category_name: '$categoryDetails.category_name',
-          sub_category_name: '$subcategoryDetails.sub_category_name',
+        $lookup: {
+          from: 'usermodels',
+          localField: 'user_id',
+          foreignField: 'user_id',
+          as: 'userDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'departmentmodels',
+          localField: 'userDetails.dept_id',
+          foreignField: 'dept_id',
+          as: 'department',
+        },
+      },
+      {
+        $unwind: {
+          path: '$department',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $match: {
+          "userDetails.dept_id": dept_id, // No need to parse again if it's already a number
         },
       },
       {
         $group: {
-          _id: '$dept_id',
+          _id: '$user_id',
+          dept_id: { $first: '$userDetails.dept_id' },
           user_id: { $first: '$user_id' },
-          user_name: { $first: '$user_name' },
-          category_id: { $first: '$category_id' },
-          sub_category_id: { $first: '$sub_category_id' },
-          category_name: { $first: '$category_name' },
-          sub_category_name: { $first: '$sub_category_name' },
+          user_name: { $first: '$userDetails.user_name' },
+          sim_id: { $first: '$sim_id' },
+          asset_name: { $first: '$simDetails.asset_name' },
+          dept_name: { $first: '$department.dept_name' },
+          category_id: { $first: '$simDetails.category_id' },
+          sub_category_id: { $first: '$simDetails.sub_category_id' },
+          category_name: { $first: '$categoryDetails.category_name' },
+          sub_category_name: { $first: '$subcategoryDetails.sub_category_name' },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          dept_id: 1,
+          user_id: 1,
+          sim_id: 1,
+          asset_name: 1,
+          user_name: 1,
+          dept_name: 1,
+          category_id: 1,
+          sub_category_id: 1,
+          category_name: 1,
+          sub_category_name: 1,
         },
       },
     ]);
@@ -1164,6 +1526,243 @@ exports.getAssetUsersDepartment = async (req, res) => {
     res.status(500).json({ error: error.message, sms: 'Internal Server Error' });
   }
 };
+
+// exports.getAssetUsersDepartment = async (req, res) => {
+//   try {
+//     const dept_id = parseInt(req.params.dept_id);
+//     const userDetails = await simAlloModel.aggregate([
+//       {
+//         $lookup: {
+//           from: 'simmodels',
+//           localField: 'sim_id',
+//           foreignField: 'sim_id',
+//           as: 'sim',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$sim',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: 'assetscategorymodels',
+//           localField: 'simDetails.category_id',
+//           foreignField: 'category_id',
+//           as: 'categoryDetails',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$categoryDetails',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: 'assetssubcategorymodels',
+//           localField: 'simDetails.sub_category_id',
+//           foreignField: 'sub_category_id',
+//           as: 'subcategoryDetails',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$subcategoryDetails',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: 'usermodels',
+//           localField: 'user_id',
+//           foreignField: 'user_id',
+//           as: 'userDetails',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$userDetails',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: 'departmentmodels',
+//           localField: 'userDetails.dept_id',
+//           foreignField: 'dept_id',
+//           as: 'department',
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: '$department',
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $match: {
+//           "userDetails.dept_id": dept_id,
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: '$user_id',
+//           dept_id: { $first: '$userDetails.dept_id' },
+//           user_id: { $first: '$user_id' },
+//           user_name: { $first: '$userDetails.user_name' },
+//           sim_id: { $first: '$sim_id' },
+//           asset_name: { $first: '$sim.asset_name' },
+//           dept_name: { $first: '$department.dept_name' },
+//           category_id: { $first: '$sim.category_id' },
+//           sub_category_id: { $first: '$sim.sub_category_id' },
+//           category_name: { $first: '$categoryDetails.category_name' },
+//           sub_category_name: { $first: '$subcategoryDetails.sub_category_name' },
+//         },
+//       },
+//       {
+//         $project: {
+//           _id: 1,
+//           dept_id: 1,
+//           user_id: 1,
+//           sim_id: 1,
+//           asset_name: 1,
+//           user_name: 1,
+//           dept_name: 1,
+//           category_id: 1,
+//           sub_category_id: 1,
+//           category_name: 1,
+//           sub_category_name: 1,
+//         },
+//       },
+//     ]);
+
+//     res.status(200).send({ data: userDetails });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: error.message, sms: 'Internal Server Error' });
+//   }
+// };
+
+exports.getAssetUsersDepartment = async (req, res) => {
+  try {
+    const dept_id = parseInt(req.params.dept_id);
+    const userDetails = await simAlloModel.aggregate([
+      {
+        $lookup: {
+          from: 'simmodels',
+          localField: 'sim_id',
+          foreignField: 'sim_id',
+          as: 'sim',
+        },
+      },
+      {
+        $unwind: {
+          path: '$sim',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'assetscategorymodels',
+          localField: 'sim.category_id',
+          foreignField: 'category_id',
+          as: 'categoryDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$categoryDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'assetssubcategorymodels',
+          localField: 'sim.sub_category_id',
+          foreignField: 'sub_category_id',
+          as: 'subcategoryDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$subcategoryDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'usermodels',
+          localField: 'user_id',
+          foreignField: 'user_id',
+          as: 'userDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'departmentmodels',
+          localField: 'userDetails.dept_id',
+          foreignField: 'dept_id',
+          as: 'department',
+        },
+      },
+      {
+        $unwind: {
+          path: '$department',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $match: {
+          "userDetails.dept_id": dept_id,
+        },
+      },
+      {
+        $group: {
+          _id: '$user_id',
+          dept_id: { $first: '$userDetails.dept_id' },
+          user_id: { $first: '$user_id' },
+          user_name: { $first: '$userDetails.user_name' },
+          sim_id: { $first: '$sim_id' },
+          asset_name: { $first: '$sim.assetsName' },
+          dept_name: { $first: '$department.dept_name' },
+          category_id: { $first: '$sim.category_id' },
+          sub_category_id: { $first: '$sim.sub_category_id' },
+          category_name: { $first: '$categoryDetails.category_name' },
+          sub_category_name: { $first: '$subcategoryDetails.sub_category_name' },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          dept_id: 1,
+          user_id: 1,
+          sim_id: 1,
+          asset_name: 1,
+          user_name: 1,
+          dept_name: 1,
+          category_id: 1,
+          sub_category_id: 1,
+          category_name: 1,
+          sub_category_name: 1,
+        },
+      },
+    ]);
+
+    res.status(200).send({ data: userDetails });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message, sms: 'Internal Server Error' });
+  }
+};
+
 
 exports.getTotalAssetInCategory = async (req, res) => {
   try {
@@ -1662,211 +2261,50 @@ exports.showAssetDataToUser = async (req, res) => {
   }
 };
 
-// exports.showNewAssetDataToUser = async (req, res) => {
-//   try {
-//     const { user_id } = req.params;
-//     const userData = await simModel.aggregate([
-//       {
-//         $lookup: {
-//           from: "assetrequestmodels",
-//           localField: "sub_category_id",
-//           foreignField: "sub_category_id",
-//           as: "repair",
-//         },
-//       },
-//       {
-//         $unwind: {
-//           path: "$repair",
-//           preserveNullAndEmptyArrays: true,
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "usermodels",
-//           localField: "repair.request_by",
-//           foreignField: "user_id",
-//           as: "userdata",
-//         },
-//       },
-//       {
-//         $unwind: {
-//           path: "$userdata",
-//           preserveNullAndEmptyArrays: true,
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "assetscategorymodels",
-//           localField: "category_id",
-//           foreignField: "category_id",
-//           as: "category",
-//         },
-//       },
-//       {
-//         $unwind: {
-//           path: "$category",
-//           preserveNullAndEmptyArrays: true,
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "assetssubcategorymodels",
-//           localField: "sub_category_id",
-//           foreignField: "sub_category_id",
-//           as: "subcategory",
-//         },
-//       },
-//       {
-//         $unwind: {
-//           path: "$subcategory",
-//           preserveNullAndEmptyArrays: true,
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "vendormodels",
-//           localField: "vendor_id",
-//           foreignField: "vendor_id",
-//           as: "vendor",
-//         },
-//       },
-//       {
-//         $unwind: {
-//           path: "$vendor",
-//           preserveNullAndEmptyArrays: true,
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "assetbrandmodels",
-//           localField: "asset_brand_id",
-//           foreignField: "asset_brand_id",
-//           as: "brand",
-//         },
-//       },
-//       {
-//         $unwind: {
-//           path: "$brand",
-//           preserveNullAndEmptyArrays: true,
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "assetmodalmodels",
-//           localField: "asset_modal_id",
-//           foreignField: "asset_modal_id",
-//           as: "modal",
-//         },
-//       },
-//       {
-//         $unwind: {
-//           path: "$modal",
-//           preserveNullAndEmptyArrays: true,
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "usermodels",
-//           localField: "repair.multi_tag",
-//           foreignField: "user_id",
-//           as: "userMulti",
-//         },
-//       },
-//       {
-//         $unwind: {
-//           path: "$userMulti",
-//           preserveNullAndEmptyArrays: true,
-//         },
-//       },
-//       {
-//         $project: {
-//           _id: "$_id",
-//           sim_id: "$sim_id",
-//           asset_id: "$sim_no",
-//           asset_name: "$assetsName",
-//           status: "$status",
-//           category_id: "$category_id",
-//           sub_category_id: "$sub_category_id",
-//           vendor_id: "$vendor_id",
-//           inWarranty: "$inWarranty",
-//           warrantyDate: "$warrantyDate",
-//           dateOfPurchase: "$dateOfPurchase",
-//           category_name: "$category.category_name",
-//           sub_category_name: "$subcategory.sub_category_name",
-//           vendor_name: "$vendor.vendor_name",
-//           vendor_contact_no: "$vendor.vendor_contact_no",
-//           vendor_email_id: "$vendor.vendor_email_id",
-//           multi_tag: "$repair.multi_tag",
-//           asset_brand_id: "$brand.asset_brand_id",
-//           asset_brand_name: "$brand.asset_brand_name",
-//           asset_modal_id: "$modal.asset_modal_id",
-//           asset_modal_name: "$modal.asset_modal_name",
-//           priority: "$repair.priority",
-//           req_by: "$repair.request_by",
-//           req_by_name: "$userdata.user_name",
-//           req_date: "$repair.date_and_time_of_asset_request",
-//           asset_request_by_name: "$userRequest.user_name",
-//           asset_request_multi_tag_name: "$userMulti.user_name",
-//           asset_new_request_status: "$repair.asset_request_status"
-//         },
-//       },
-//     ]).exec();
-//     if (!userData) {
-//       return res.status(500).json({ success: false, message: "No data found" });
-//     }
-//     // const filteredData = userData.filter((item) => {
-//     //   const multiTagArray = item.multi_tag.join(',');
-//     //   return multiTagArray.includes(user_id);
-//     // });
-//     // if (filteredData.length === 0) {
-//     //   return res.status(404).json({ success: false, message: "No data found for the user_id" });
-//     // }
-//     // res.status(200).json({ data: filteredData });
-//     const filteredData = userData.filter((item) => {
-//       const multiTagArray = item.multi_tag ? item.multi_tag.join(',') : '';
-//       return multiTagArray.includes(user_id);
-//     });
-
-//     if (filteredData.length === 0) {
-//       return res.status(404).json({ success: false, message: "No data found for the user_id" });
-//     }
-
-//     res.status(200).json({ data: filteredData });
-//   } catch (err) {
-//     res.status(500).send({ error: err.message, sms: "Error getting user details" });
-//   }
-// };
-
-
 exports.showNewAssetDataToUser = async (req, res) => {
   try {
     const { user_id } = req.params;
-    const userData = await simModel.aggregate([
+
+    const userData = await assetRequestModel.aggregate([
       {
         $lookup: {
-          from: "assetrequestmodels",
+          from: "simmodels",
           localField: "sub_category_id",
           foreignField: "sub_category_id",
-          as: "repair",
+          as: "sim",
         },
       },
       {
         $unwind: {
-          path: "$repair",
+          path: "$sim",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $lookup: {
           from: "usermodels",
-          localField: "repair.request_by",
+          localField: "multi_tag",
           foreignField: "user_id",
-          as: "requestingUser",
+          as: "userdata1",
         },
       },
       {
         $unwind: {
-          path: "$requestingUser",
+          path: "$userdata1",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "usermodels",
+          localField: "request_by",
+          foreignField: "user_id",
+          as: "userdataRequest",
+        },
+      },
+      {
+        $unwind: {
+          path: "$userdataRequest",
           preserveNullAndEmptyArrays: true,
         },
       },
@@ -1874,7 +2312,7 @@ exports.showNewAssetDataToUser = async (req, res) => {
         $lookup: {
           from: "assetscategorymodels",
           localField: "category_id",
-          foreignField: "category_id",
+          foreignField: "sim.category_id",
           as: "category",
         },
       },
@@ -1895,187 +2333,76 @@ exports.showNewAssetDataToUser = async (req, res) => {
       {
         $unwind: {
           path: "$subcategory",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "vendormodels",
-          localField: "vendor_id",
-          foreignField: "vendor_id",
-          as: "vendor",
-        },
-      },
-      {
-        $unwind: {
-          path: "$vendor",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "assetbrandmodels",
-          localField: "asset_brand_id",
-          foreignField: "asset_brand_id",
-          as: "brand",
-        },
-      },
-      {
-        $unwind: {
-          path: "$brand",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "assetmodalmodels",
-          localField: "asset_modal_id",
-          foreignField: "asset_modal_id",
-          as: "modal",
-        },
-      },
-      {
-        $unwind: {
-          path: "$modal",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "usermodels",
-          localField: "repair.multi_tag",
-          foreignField: "user_id",
-          as: "userMulti",
-        },
-      },
-      {
-        $unwind: {
-          path: "$userMulti",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $project: {
-          _id: "$_id",
-          sim_id: "$sim_id",
-          asset_id: "$sim_no",
-          asset_name: "$assetsName",
-          status: "$status",
-          category_id: "$category_id",
-          sub_category_id: "$sub_category_id",
-          vendor_id: "$vendor_id",
-          inWarranty: "$inWarranty",
-          warrantyDate: "$warrantyDate",
-          dateOfPurchase: "$dateOfPurchase",
-          category_name: "$category.category_name",
-          sub_category_name: "$subcategory.sub_category_name",
-          vendor_name: "$vendor.vendor_name",
-          vendor_contact_no: "$vendor.vendor_contact_no",
-          vendor_email_id: "$vendor.vendor_email_id",
-          multi_tag: "$repair.multi_tag",
-          multi_tag_names: "$userMulti.user_name",
-          asset_brand_id: "$brand.asset_brand_id",
-          asset_brand_name: "$brand.asset_brand_name",
-          asset_modal_id: "$modal.asset_modal_id",
-          asset_modal_name: "$modal.asset_modal_name",
-          priority: "$repair.priority",
-          req_by: "$repair.request_by",
-          req_by_name: "$requestingUser.user_name",
-          req_date: "$repair.date_and_time_of_asset_request",
-          asset_request_by_name: "$userMulti.user_name",
-          asset_new_request_status: "$repair.asset_request_status"
+          // preserveNullAndEmptyArrays: true,
         },
       },
       {
         $group: {
           _id: "$_id",
-          data: { $first: "$$ROOT" },
-          multiTagNames: { $addToSet: "$userMulti.user_name" }
-        }
+          sim_id: { $first: "$sim.sim_id" },
+          asset_id: { $first: "$sim.sim_no" },
+          asset_name: { $first: "$sim.assetsName" },
+          status: { $first: "$sim.status" },
+          category_id: { $first: "$sim.category_id" },
+          category_name: { $first: "$category.category_name" },
+          sub_category_id: { $first: "$sub_category_id" },
+          sub_category_name: { $first: "$subcategory.sub_category_name" },
+          vendor_id: { $first: "$sim.vendor_id" },
+          inWarranty: { $first: "$sim.inWarranty" },
+          warrantyDate: { $first: "$sim.warrantyDate" },
+          dateOfPurchase: { $first: "$sim.dateOfPurchase" },
+          multi_tag: { $first: "$multi_tag" },
+          priority: { $first: "$priority" },
+          req_date: { $first: "$date_and_time_of_asset_request" },
+          asset_request_multi_tag_name: { $first: "$userdata1.user_name" },
+          asset_new_request_status: { $first: "$assetRequest.asset_request_status" },
+          asset_request_by: { $first: "$request_by" },
+          req_by_name: { $first: "$userdataRequest.user_name" }
+        },
       },
-      {
-        $addFields: {
-          multi_tag_names: {
-            $reduce: {
-              input: "$multiTagNames",
-              initialValue: "",
-              in: { $concat: ["$$value", { $cond: [{ $eq: ["$$value", ""] }, "", ", "] }, "$$this"] }
-            }
-          }
-        }
-      },
-      { $replaceRoot: { newRoot: "$data" } }
+      // {
+      //   $project: {
+      //     _id: "$_id",
+      //     sim_id: "$sim.sim_id",
+      //     asset_id: "$sim.sim_no",
+      //     asset_name: "$sim.assetsName",
+      //     status: "$sim.status",
+      //     category_id: "$sim.category_id",
+      //     sub_category_id: "$sim.sub_category_id",
+      //     vendor_id: "$sim.vendor_id",
+      //     inWarranty: "$sim.inWarranty",
+      //     warrantyDate: "$sim.warrantyDate",
+      //     dateOfPurchase: "$sim.dateOfPurchase",
+      //     multi_tag: "$multi_tag",
+      //     priority: "$priority",
+      //     req_date: "$date_and_time_of_asset_request",
+      //     asset_request_multi_tag_name: "$userdata1.user_name",
+      //     asset_new_request_status: "$assetRequest.asset_request_status",
+      //     asset_request_id: "$assetRequest._id"
+      //   },
+      // },
     ]).exec();
 
-    if (!userData || userData.length === 0) {
-      return res.status(404).json({ success: false, message: "No data found" });
+    if (!userData) {
+      return res.status(500).json({ success: false, message: "No data found" });
     }
 
-    const filteredData = userData.filter((item) => {
-      const multiTagArray = item.multi_tag ? item.multi_tag.join(',') : '';
-      return multiTagArray.includes(user_id);
-    });
-
-    if (filteredData.length === 0) {
+    if (userData.length === 0) {
       return res.status(404).json({ success: false, message: "No data found for the user_id" });
     }
 
-    res.status(200).json({ data: filteredData });
+    res.status(200).json({ data: userData });
   } catch (err) {
-    console.error(err);
     res.status(500).send({ error: err.message, sms: "Error getting user details" });
   }
-};
-
+}
 
 // Asset Request to Report L1
 exports.showAssetDataToUserReport = async (req, res) => {
   try {
     const { user_id } = req.params;
 
-    const userData = await simModel.aggregate([
-      {
-        $lookup: {
-          from: "assetrequestmodels",
-          localField: "sub_category_id",
-          foreignField: "sub_category_id",
-          as: "assetRequest",
-        },
-      },
-      {
-        $unwind: {
-          path: "$assetRequest",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      // {
-      //   $lookup: {
-      //     from: "usermodels",
-      //     localField: "assetRequest.request_by",
-      //     foreignField: "user_id",
-      //     as: "userdata",
-      //   },
-      // },
-      // {
-      //   $unwind: {
-      //     path: "$userdata",
-      //     preserveNullAndEmptyArrays: true,
-      //   },
-      // },
-      {
-        $lookup: {
-          from: "assetscategorymodels",
-          localField: "category_id",
-          foreignField: "category_id",
-          as: "category",
-        },
-      },
-      {
-        $unwind: {
-          path: "$category",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
+    const userData = await assetRequestModel.aggregate([
       {
         $lookup: {
           from: "assetssubcategorymodels",
@@ -2087,55 +2414,13 @@ exports.showAssetDataToUserReport = async (req, res) => {
       {
         $unwind: {
           path: "$subcategory",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "vendormodels",
-          localField: "vendor_id",
-          foreignField: "vendor_id",
-          as: "vendor",
-        },
-      },
-      {
-        $unwind: {
-          path: "$vendor",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "assetbrandmodels",
-          localField: "asset_brand_id",
-          foreignField: "asset_brand_id",
-          as: "brand",
-        },
-      },
-      {
-        $unwind: {
-          path: "$brand",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "assetmodalmodels",
-          localField: "asset_modal_id",
-          foreignField: "asset_modal_id",
-          as: "modal",
-        },
-      },
-      {
-        $unwind: {
-          path: "$modal",
-          preserveNullAndEmptyArrays: true,
+          // preserveNullAndEmptyArrays: true,
         },
       },
       {
         $lookup: {
           from: "usermodels",
-          localField: "assetRequest.request_by",
+          localField: "request_by",
           foreignField: "user_id",
           as: "userdata",
         },
@@ -2153,36 +2438,18 @@ exports.showAssetDataToUserReport = async (req, res) => {
       },
       {
         $project: {
-          _id: "$assetRequest._id",
-          sim_id: "$sim_id",
-          asset_id: "$sim_no",
-          asset_name: "$assetsName",
-          status: "$status",
-          category_id: "$category_id",
-          sub_category_id: "$sub_category_id",
-          vendor_id: "$vendor_id",
-          inWarranty: "$inWarranty",
-          warrantyDate: "$warrantyDate",
-          dateOfPurchase: "$dateOfPurchase",
+          _id: "$_id",
           category_name: "$category.category_name",
           sub_category_name: "$subcategory.sub_category_name",
-          vendor_name: "$vendor.vendor_name",
-          vendor_contact_no: "$vendor.vendor_contact_no",
-          vendor_email_id: "$vendor.vendor_email_id",
-          multi_tag: "$assetRequest.multi_tag",
-          asset_brand_id: "$brand.asset_brand_id",
-          asset_brand_name: "$brand.asset_brand_name",
-          asset_modal_id: "$modal.asset_modal_id",
-          asset_modal_name: "$modal.asset_modal_name",
-          priority: "$assetRequest.priority",
-          req_by: "$assetRequest.request_by",
+          multi_tag: "$multi_tag",
+          priority: "$priority",
+          req_by: "$request_by",
           req_by_name: "$userdata.user_name",
-          req_date: "$assetRequest.date_and_time_of_asset_request",
+          req_date: "$date_and_time_of_asset_request",
           asset_request_by_name: "$userRequest.user_name",
           asset_request_multi_tag_name: "$userdata.user_name",
-          asset_new_request_status: "$assetRequest.asset_request_status",
-          users_manager: "$userMulti.Report_L1",
-          asset_request_id: "$assetRequest._id"
+          asset_new_request_status: "$asset_request_status",
+          users_manager: "$userMulti.Report_L1"
         },
       },
     ]).exec();
