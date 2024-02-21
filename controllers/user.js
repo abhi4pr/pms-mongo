@@ -79,8 +79,18 @@ const upload = multer({
     { name: "annexure_pdf", maxCount: 1 }
 ]);
 
+// let userCounter = 0;
+// let invoice_template_no = 1;
 exports.addUser = [upload, async (req, res) => {
     try {
+
+        const latestUser = await userModel.findOne({}).sort({ created_At: -1 });
+        let latestInvoiceNo = latestUser.invoice_template_no + 1;
+
+        if (latestInvoiceNo > 12) {
+            latestInvoiceNo = 1
+        }
+
         let encryptedPass;
         if (req.body.user_login_password) {
             encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
@@ -112,6 +122,8 @@ exports.addUser = [upload, async (req, res) => {
             level: req.body.level,
             room_id: req.body.room_id,
             salary: req.body.salary,
+            year_salary: req.body.year_salary,
+            att_status: req.body.att_status,
             SpokenLanguages: req.body.SpokenLanguages,
             Gender: req.body.Gender,
             Nationality: req.body.Nationality,
@@ -123,8 +135,8 @@ exports.addUser = [upload, async (req, res) => {
             BloodGroup: req.body.BloodGroup,
             MartialStatus: req.body.MartialStatus,
             DateofMarriage: req.body.DateofMarriage,
-            tds_applicable: req.body.tds_applicable,
-            tds_per: req.body.tds_per,
+            tds_applicable: req.body.salary >= 30000 ? 'Yes' : req.body.tds_applicable,
+            tds_per: req.body.salary >= 30000 ? 1 : req.body.tds_per,
             onboard_status: req.body.onboard_status,
             image_remark: req.body.image_remark,
             image_validate: req.body.image_validate,
@@ -170,7 +182,7 @@ exports.addUser = [upload, async (req, res) => {
             joining_date_extend: req.body.joining_date_extend,
             joining_date_extend_status: req.body.joining_date_extend_status,
             joining_date_extend_reason: req.body.joining_date_extend_reason,
-            invoice_template_no: req.body.invoice_template_no,
+            invoice_template_no: latestInvoiceNo,
             // image: req.files.image ? req.files.image[0].filename : '',
             UID: req.files.UID ? req.files.UID[0].filename : '',
             pan: req.files.pan ? req.files.pan[0].filename : '',
@@ -215,7 +227,8 @@ exports.addUser = [upload, async (req, res) => {
             emergency_contact_relation2: req.body.emergency_contact_relation2,
             document_percentage_mandatory: req.body.document_percentage_mandatory,
             document_percentage_non_mandatory: req.body.document_percentage_non_mandatory,
-            document_percentage: req.body.document_percentage
+            document_percentage: req.body.document_percentage,
+            bank_type: req.body.bank_type
         })
 
         if (req.files.image && req.files.image[0].originalname) {
@@ -228,6 +241,9 @@ exports.addUser = [upload, async (req, res) => {
             blobStream1.end(req.files.image[0].buffer);
         }
 
+        // if(req.body.salary>= 30000){
+
+        // }
         const simv = await simc.save();
 
         // Genreate a pdf file for offer later
@@ -343,6 +359,321 @@ exports.addUser = [upload, async (req, res) => {
 }];
 
 
+exports.addUserForGeneralInformation = [upload, async (req, res) => {
+    try {
+        let encryptedPass;
+        //for user password encription
+        if (req.body.user_login_password) {
+            encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
+        }
+
+        //user data obj create 
+        const simc = new userModel({
+            //for personal information
+            user_name: req.body.user_name,
+            PersonalEmail: req.body.Personal_email,
+            PersonalNumber: req.body.personal_number,
+            alternate_contact: req.body.alternate_contact,
+            Gender: req.body.Gender,
+            DOB: req.body.DOB,
+            Age: req.body.Age,
+            Nationality: req.body.Nationality,
+            MartialStatus: req.body.MartialStatus,
+            created_by: req.body.created_by,
+            //for official information
+            job_type: req.body.job_type,
+            dept_id: req.body.dept_id,
+            sub_dept_id: req.body.sub_dept_id == null ? 0 : req.body.sub_dept_id,
+            user_designation: req.body.user_designation,
+            Report_L1: req.body.report_L1,
+            Report_L2: req.body.report_L2,
+            Report_L3: req.body.report_L3,
+            role_id: req.body.role_id,
+            user_email_id: req.body.user_email_id, //for offical
+            user_contact_no: req.body.user_contact_no, //for offical
+            user_login_id: req.body.user_login_id.toLowerCase().trim(),
+            user_login_password: encryptedPass,
+            joining_date: req.body.joining_date,
+            sitting_id: req.body.sitting_id,
+            room_id: req.body.room_id,
+        })
+
+        if (req.files && req.files.image && req.files.image[0].originalname) {
+            const bucketName = vari.BUCKET_NAME;
+            const bucket = storage.bucket(bucketName);
+            const blob1 = bucket.file(req.files.image[0].originalname);
+            simc.image = blob1.name;
+            const blobStream1 = blob1.createWriteStream();
+            blobStream1.on("finish", () => { });
+            blobStream1.end(req.files.image[0].buffer);
+        }
+
+        const simv = await simc.save();
+
+        // Genreate a pdf file for offer later
+        if (simv?.offer_letter_send) {
+            helper.generateOfferLaterPdf(simv);
+
+        }
+        //Generate documents for respective user id
+        const docs = await documentModel.find();
+        if (docs.length !== 0) {
+            const newDocuments = docs.map(item => ({
+                doc_id: item._id,
+                user_id: simv?.user_id,
+            }));
+            await userDocManagmentModel.insertMany(newDocuments);
+        }
+        //End Generate documents for respective user id
+
+        if (simv) {
+            const objectData = await objModel.find();
+
+            for (const object of objectData) {
+                const objectId = object.obj_id;
+                let insert = 0;
+                let view = 0;
+                let update = 0;
+                let delete_flag = 0;
+
+                if (simv.role_id === 1) {
+                    insert = 1;
+                    view = 1;
+                    update = 1;
+                    delete_flag = 1;
+                }
+
+                const userAuthDocument = {
+                    Juser_id: simv.user_id,
+                    obj_id: objectId,
+                    insert: insert,
+                    view: view,
+                    update: update,
+                    delete_flag: delete_flag,
+                    creation_date: new Date(),
+                    created_by: simv.created_by || 0,
+                    last_updated_by: simv.created_by || 0,
+                    last_updated_date: new Date(),
+                };
+
+                await userAuthModel.create(userAuthDocument);
+            }
+            const deptDesiData = await deptDesiAuthModel.find({});
+            await Promise.all(deptDesiData.map(async (deptDesi) => {
+                if (deptDesi && deptDesi.dept_id == req.body.dept_id && deptDesi.desi_id == req.body.user_designation) {
+                    const updatedData = await userAuthModel.updateOne(
+                        {
+                            obj_id: deptDesi.obj_id,
+                            Juser_id: simv.user_id
+                        },
+                        {
+                            $set: {
+                                insert: deptDesi.insert,
+                                view: deptDesi.view,
+                                update: deptDesi.update,
+                                delete_flag: deptDesi.delete_flag
+                            }
+                        },
+                        { new: true }
+                    );
+                }
+            }));
+        }
+
+        //send success response
+        res.send({ simv, status: 200 });
+    } catch (err) {
+        return res.status(500).send({ error: err.message, sms: 'This user cannot be created' })
+    }
+}];
+
+exports.updateUserForPersonalInformation = [upload, async (req, res) => {
+    try {
+        //check user exist or not
+        const existingUser = await userModel.findOne({ user_id: req.params.user_id });
+
+        //if user not exist then return error
+        if (!existingUser) {
+            return res.status(404).send({ success: false, message: 'User not found' });
+        }
+
+        //user details update in DB
+        const editsim = await userModel.findOneAndUpdate({ user_id: parseInt(req.params.user_id) }, {
+            //for personal information
+            user_name: req.body.user_name,
+            PersonalEmail: req.body.Personal_email,
+            PersonalNumber: req.body.personal_number,
+            alternate_contact: req.body.alternate_contact,
+            Gender: req.body.Gender,
+            DOB: req.body.DOB,
+            Age: req.body.Age,
+            Nationality: req.body.Nationality,
+            MartialStatus: req.body.MartialStatus,
+            created_by: req.body.created_by
+        }, { new: true });
+
+        if (!editsim) {
+            return res.status(500).send({ success: false })
+        }
+        // Genreate a pdf file for offer later
+        if (editsim?.offer_later_status == true || (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== ""))) {
+            helper.generateOfferLaterPdf(editsim)
+        }
+
+        if (req.files && req.files.image && req.files.image[0]?.originalname) {
+            const bucketName = vari.BUCKET_NAME;
+            const bucket = storage.bucket(bucketName);
+
+            const currentDate = new Date();
+            const fileNamef = `${currentDate.getTime()}.jpg`;
+
+            const blob = bucket.file(fileNamef);
+            editsim.image = blob.name;
+
+            const saveBlobPromise = new Promise((resolve, reject) => {
+                const blobStream = blob.createWriteStream();
+                blobStream.on("finish", () => {
+                    resolve();
+                });
+                blobStream.end(req.files.image[0]?.buffer);
+            });
+
+            try {
+                await saveBlobPromise;
+                editsim.save();
+            } catch (error) {
+                console.error("Error saving image:", error);
+            }
+        }
+
+
+        if (req.files && req.files.digital_signature_image && req.files.digital_signature_image[0]?.originalname) {
+            const bucketName = vari.BUCKET_NAME;
+            const bucket = storage.bucket(bucketName);
+            const blob = bucket.file(req.files?.digital_signature_image[0]?.originalname);
+            editsim.digital_signature_image = blob.name;
+
+            const saveBlobPromise = new Promise((resolve, reject) => {
+                const blobStream = blob.createWriteStream();
+                blobStream.on("finish", () => {
+                    resolve();
+                });
+                blobStream.end(req.files.digital_signature_image[0]?.buffer);
+            })
+            try {
+                await saveBlobPromise;
+                editsim.save();
+            } catch (err) {
+                console.log('error', err)
+            }
+        }
+
+        return res.status(200).send({ success: true, data: editsim })
+    } catch (err) {
+        return res.status(500).send({ error: err.message, sms: 'Error while updating user personal information details' })
+    }
+}];
+
+exports.updateUserForOfficialInformation = async (req, res) => {
+    try {
+        let encryptedPass;
+        if (req.body.user_login_password) {
+            encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
+        }
+
+        const existingUser = await userModel.findOne({ user_id: req.params.user_id });
+
+        if (!existingUser) {
+            return res.status(404).send({ success: false, message: 'User not found' });
+        }
+
+        //user details update in DB
+        const editsim = await userModel.findOneAndUpdate({ user_id: parseInt(req.params.user_id) }, {
+            //for official information
+            job_type: req.body.job_type,
+            dept_id: req.body.dept_id,
+            sub_dept_id: isNaN(req.body.sub_dept_id) ? 0 : req.body.sub_dept_id,
+            user_designation: req.body.user_designation,
+            Report_L1: isNaN(req.body.report_L1) ? 0 : req.body.report_L1,
+            Report_L2: isNaN(req.body.report_L2) ? 0 : req.body.report_L2,
+            Report_L3: isNaN(req.body.report_L3) ? 0 : req.body.report_L3,
+            role_id: req.body.role_id,
+            user_email_id: req.body.user_email_id, //for offical
+            user_contact_no: req.body.user_contact_no, //for offical
+            user_login_id: req.body.user_login_id.toLowerCase().trim(),
+            user_login_password: encryptedPass,
+            joining_date: req.body.joining_date,
+            sitting_id: req.body.sitting_id,
+            room_id: req.body.room_id,
+        }, { new: true });
+
+        if (!editsim) {
+            return res.status(500).send({ success: false })
+        }
+
+        //return the succes response
+        return res.status(200).send({ success: true, data: editsim })
+    } catch (err) {
+        return res.status(500).send({ error: err.message, sms: 'Error while updating user personal information details' })
+    }
+};
+
+exports.updateUserInformation = async (req, res) => {
+    try {
+        //    const { id } = req.params;
+        const { current_address, current_city, current_state, current_pin_code, BloodGroup, Hobbies, SpokenLanguages, } = req.body;
+        const updateProfile = await userModel.findOne({ user_id: req.params.user_id });
+        if (!updateProfile) {
+            return res.status(404).send("User not found");
+        }
+        const profileUpdate = await userModel.findOneAndUpdate(
+            { user_id: req.params.user_id },
+            {
+                $set: {
+                    current_address: current_address, current_city: current_city, current_state: current_state,
+                    current_pin_code: current_pin_code, BloodGroup: BloodGroup, Hobbies: Hobbies, SpokenLanguages: SpokenLanguages
+                }
+            },
+            { new: true }
+        );
+        return res.status(200).json({
+            status: 200,
+            message: "profile updated successfully!",
+            profileUpdate,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: "Unexpected error,please try again later!",
+        });
+    }
+};
+
+exports.updateBankInformation = async (req, res) => {
+    try {
+        const { bank_name, ifsc_code, beneficiary, } = req.body;
+        const updateBankProfile = await userModel.findOne({ user_id: req.params.user_id });
+        if (!updateBankProfile) {
+            return res.status(404).send("User not found");
+        }
+        const bankprofileUpdate = await userModel.findOneAndUpdate(
+            { user_id: req.params.user_id },
+            { $set: { bank_name: bank_name, ifsc_code: ifsc_code, beneficiary: beneficiary } },
+            { new: true }
+        );
+        return res.status(200).json({
+            status: 200,
+            message: "Bank profile updated successfully!",
+            bankprofileUpdate,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: "Unexpected error,please try again later!",
+        });
+    }
+};
+
 exports.updateUser = [upload, async (req, res) => {
     try {
         let encryptedPass;
@@ -355,6 +686,7 @@ exports.updateUser = [upload, async (req, res) => {
         if (!existingUser) {
             return res.status(404).send({ success: false, message: 'User not found' });
         }
+
 
         const editsim = await userModel.findOneAndUpdate({ user_id: parseInt(req.body.user_id) }, {
             user_name: req.body.user_name,
@@ -379,7 +711,9 @@ exports.updateUser = [upload, async (req, res) => {
             // releaving_date: req.body.releaving_date,
             level: req.body.level,
             room_id: req.body.room_id,
-            salary: isNaN(req.body.salary) ? 0 : req.body.salary,
+            salary: req.body.salary,
+            att_status: req.body.att_status,
+            year_salary: req.body.year_salary,
             SpokenLanguages: req.body.SpokenLanguages,
             Gender: req.body.Gender,
             Nationality: req.body.Nationality,
@@ -392,8 +726,8 @@ exports.updateUser = [upload, async (req, res) => {
             BloodGroup: req.body.BloodGroup,
             MartialStatus: req.body.MartialStatus,
             DateofMarriage: req.body.DateofMarriage,
-            tds_applicable: req.body.tds_applicable,
-            tds_per: req.body.tds_per,
+            tds_applicable: (req.body.salary >= 30000 || req.body.ctc >= 100000) ? 'Yes' : req.body.tds_applicable,
+            tds_per: (req.body.salary >= 30000 || req.body.ctc >= 100000) ? 1 : req.body.tds_per,
             onboard_status: req.body.onboard_status,
             image_remark: req.body.image_remark,
             image_validate: req.body.image_validate,
@@ -489,7 +823,8 @@ exports.updateUser = [upload, async (req, res) => {
             document_percentage_mandatory: req.body.document_percentage_mandatory,
             document_percentage_non_mandatory: req.body.document_percentage_non_mandatory,
             document_percentage: req.body.document_percentage,
-            show_rocket: req.body.show_rocket
+            show_rocket: req.body.show_rocket,
+            bank_type: req.body.bank_type
         }, { new: true });
 
         if (!editsim) {
@@ -499,17 +834,17 @@ exports.updateUser = [upload, async (req, res) => {
         if (editsim?.offer_later_status == true || (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== ""))) {
             helper.generateOfferLaterPdf(editsim)
         }
-       
+
         if (req.files && req.files.image && req.files.image[0]?.originalname) {
             const bucketName = vari.BUCKET_NAME;
             const bucket = storage.bucket(bucketName);
-        
+
             const currentDate = new Date();
             const fileNamef = `${currentDate.getTime()}.jpg`;
-        
+
             const blob = bucket.file(fileNamef);
             editsim.image = blob.name;
-        
+
             const saveBlobPromise = new Promise((resolve, reject) => {
                 const blobStream = blob.createWriteStream();
                 blobStream.on("finish", () => {
@@ -517,7 +852,7 @@ exports.updateUser = [upload, async (req, res) => {
                 });
                 blobStream.end(req.files.image[0]?.buffer);
             });
-        
+
             try {
                 await saveBlobPromise;
                 editsim.save();
@@ -525,7 +860,7 @@ exports.updateUser = [upload, async (req, res) => {
                 console.error("Error saving image:", error);
             }
         }
-        
+
 
         if (req.files && req.files.digital_signature_image && req.files.digital_signature_image[0]?.originalname) {
             const bucketName = vari.BUCKET_NAME;
@@ -540,10 +875,10 @@ exports.updateUser = [upload, async (req, res) => {
                 });
                 blobStream.end(req.files.digital_signature_image[0]?.buffer);
             })
-            try{
+            try {
                 await saveBlobPromise;
                 editsim.save();
-            }catch(err){
+            } catch (err) {
                 console.log('error', err)
             }
         }
@@ -556,7 +891,7 @@ exports.updateUser = [upload, async (req, res) => {
 
 exports.getWFHUsersByDept = async (req, res) => {
     try {
-        const simc = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFHD' }).lean();
+        const simc = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFHD', att_status: "onboarded" }).lean();
         if (!simc) {
             res.status(500).send({ success: false })
         }
@@ -747,6 +1082,7 @@ exports.getAllUsers = async (req, res) => {
                     highest_upload: "$highest_upload",
                     other_upload: "$other_upload",
                     salary: "$salary",
+                    year_salary: "$year_salary",
                     SpokenLanguages: "$SpokenLanguages",
                     Gender: "$Gender",
                     Nationality: "$Nationality",
@@ -805,6 +1141,7 @@ exports.getAllUsers = async (req, res) => {
                     current_city: "$current_city",
                     current_state: "$current_state",
                     current_pin_code: "$current_pin_code",
+                    att_status: "$att_status",
                     permanent_address: "$permanent_address",
                     permanent_city: "$permanent_city",
                     permanent_state: "$permanent_state",
@@ -850,6 +1187,7 @@ exports.getAllUsers = async (req, res) => {
                     emp_id: "$emp_id",
                     alternate_contact: "$alternate_contact",
                     cast_type: "$cast_type",
+                    bank_type: "$bank_type",
                     emergency_contact_person_name1: "$emergency_contact_person_name1",
                     emergency_contact_person_name2: "$emergency_contact_person_name2",
                     emergency_contact_relation1: "$emergency_contact_relation1",
@@ -1070,6 +1408,7 @@ exports.getSingleUser = async (req, res) => {
                     Report_L2: "$Report_L2",
                     Report_L3: "$Report_L3",
                     PersonalEmail: "$PersonalEmail",
+                    att_status: "$att_status",
                     level: "$level",
                     joining_date: "$joining_date",
                     releaving_date: "$releaving_date",
@@ -1079,6 +1418,7 @@ exports.getSingleUser = async (req, res) => {
                     highest_upload: "$highest_upload",
                     other_upload: "$other_upload",
                     salary: "$salary",
+                    year_salary: "$year_salary",
                     SpokenLanguages: "$SpokenLanguages",
                     Gender: "$Gender",
                     Nationality: "$Nationality",
@@ -1091,7 +1431,7 @@ exports.getSingleUser = async (req, res) => {
                     MartialStatus: "$MartialStatus",
                     DateOfMarriage: "$DateOfMarriage",
                     onboard_status: "$onboard_status",
-                    tbs_applicable: "$tbs_applicable",
+                    tbs_applicable: "$tds_applicable",
                     tds_per: "$tds_per",
                     image_remark: "$image_remark",
                     image_validate: "$image_validate",
@@ -1184,6 +1524,7 @@ exports.getSingleUser = async (req, res) => {
                     document_percentage_mandatory: "$document_percentage_mandatory",
                     document_percentage_non_mandatory: "$document_percentage_non_mandatory",
                     document_percentage: "$document_percentage",
+                    bank_type: "$bank_type"
                 }
             }
         ]).exec();
@@ -1297,6 +1638,7 @@ exports.loginUser = async (req, res) => {
                     onboard_status: '$onboard_status',
                     user_login_id: '$user_login_id',
                     invoice_template_no: "$invoice_template_no",
+                    job_type: "$job_type",
                     // digital_signature_image: "$digital_signature_image"
                     digital_signature_image: { $concat: [vari.IMAGE_URL, "$digital_signature_image"] }
                 }
@@ -1779,6 +2121,7 @@ exports.userObjectAuth = async (req, res) => {
 exports.sendUserMail = async (req, res) => {
     try {
         const { email, subject, name, password, login_id, status, text, name2 } = req.body;
+
         const attachment = req.file;
         if (status == "onboarded") {
             /* dynamic email temp code start */
@@ -1797,7 +2140,7 @@ exports.sendUserMail = async (req, res) => {
                 service: "gmail",
                 auth: {
                     user: "onboarding@creativefuel.io",
-                    pass: "jinrajpukgvynmci",
+                    pass: "yraixlmukhteijoa",
                 },
             });
 
@@ -1835,7 +2178,7 @@ exports.sendUserMail = async (req, res) => {
                 service: "gmail",
                 auth: {
                     user: "onboarding@creativefuel.io",
-                    pass: "jinrajpukgvynmci",
+                    pass: "yraixlmukhteijoa",
                 },
             });
 
@@ -2277,7 +2620,7 @@ exports.sendMailAllWfoUser = async (req, res) => {
                 service: "gmail",
                 auth: {
                     user: "onboarding@creativefuel.io",
-                    pass: "jinrajpukgvynmci",
+                    pass: "yraixlmukhteijoa",
                 },
             });
 
@@ -2382,6 +2725,7 @@ exports.getAllWfhUsers = async (req, res) => {
                     salary: "$salary",
                     SpokenLanguages: "$SpokenLanguages",
                     Gender: "$Gender",
+                    att_status: "$att_status",
                     Nationality: "$Nationality",
                     DOB: "$DOB",
                     Age: "$Age",
@@ -2588,7 +2932,7 @@ exports.forgotPass = async (req, res) => {
             service: "gmail",
             auth: {
                 user: "onboarding@creativefuel.io",
-                pass: "jinrajpukgvynmci",
+                pass: "yraixlmukhteijoa",
             },
         });
 
@@ -3223,6 +3567,206 @@ exports.getAllSalesUsers = async (req, res) => {
             return response.returnFalse(200, req, res, "No Reord Found...", []);
         }
         res.status(200).send(salesUsers)
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+};
+
+exports.assignAllObjInUserAuth = async (req, res) => {
+    try {
+        const user = await userModel.findOne({ user_id: req.params.user_id });
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        const existingObjectIds = (await userAuthModel.find({ Juser_id: user.user_id })).map(obj => obj.obj_id);
+
+        const objectData = await objModel.find();
+
+        let objectsToInsert = [];
+        for (const object of objectData) {
+            if (!existingObjectIds.includes(object.obj_id)) {
+                objectsToInsert.push(object);
+            }
+        }
+
+        for (const object of objectsToInsert) {
+            const userAuthDocument = {
+                Juser_id: user.user_id,
+                obj_id: object.obj_id,
+                insert: 0,
+                view: 0,
+                update: 0,
+                delete_flag: 0,
+                creation_date: new Date(),
+                created_by: user.created_by || 0,
+                last_updated_by: user.created_by || 0,
+                last_updated_date: new Date(),
+            };
+
+            await userAuthModel.create(userAuthDocument);
+        }
+
+        res.status(200).send("Objects inserted in userAuth Model");
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+};
+
+exports.checkLoginExist = async (req, res) => {
+    try {
+        const findData = await userModel.findOne({ user_login_id: req.body.user_login_id });
+        if (!findData) {
+            return response.returnFalse(200, req, res, "login id available", []);
+        }
+        return response.returnFalse(200, req, res, 'login id not available', [])
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+};
+
+exports.getAllUsersWithInvoiceNo = async (req, res) => {
+    try {
+        const findData = await userModel.aggregate([
+            {
+                $match: {
+                    job_type: "WFHD"
+                }
+            },
+            {
+                $group: {
+                    _id: "$invoice_template_no",
+                    count: { $sum: 1 },
+                    users: { $push: "$$ROOT" }
+                }
+            }
+        ]);
+        if (!findData) {
+            return response.returnFalse(200, req, res, "invoice_template_no is not available", []);
+        }
+        return response.returnTrue(200, req, res, findData)
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+};
+
+exports.getUsers = async (req, res) => {
+    try {
+        const findData = await userModel.find({ job_type: "WFHD", att_status: "onboarded" }).select({ user_id: 1, user_name: 1, dept_id: 1 });
+        if (!findData) {
+            return response.returnFalse(200, req, res, "login id available", []);
+        }
+        return response.returnTrue(200, req, res, 'login id not available', findData)
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+};
+
+
+function monthNameToNumber(monthName) {
+    const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
+
+    const monthIndex = months.findIndex(
+        (m) => m.toLowerCase() === monthName.toLowerCase()
+    );
+
+    // Adding 1 because months are zero-indexed in JavaScript (0-11)
+    return monthIndex !== -1 ? monthIndex + 1 : null;
+}
+
+exports.getAllUsersCountsWithJoiningDate = async (req, res) => {
+    try {
+        let month = req.body.month;
+        let year = req.body.year;
+        let deptId = req.body.dept_id;
+        const monthNumber = monthNameToNumber(month);
+        const joiningMonth = String(monthNumber).padStart(
+            2,
+            "0"
+        );
+        const bodyMonthYear = `${year}` + `${joiningMonth}`;
+        const findData = await userModel.aggregate([
+            {
+                $match: {
+                    job_type: "WFHD",
+                    dept_id: deptId,
+                    att_status: "onboarded",
+                    $expr: {
+                        $lte: [
+                            {
+                                $dateToString: {
+                                    date: "$joining_date",
+                                    format: "%Y%m"
+                                }
+                            },
+                            bodyMonthYear
+                        ]
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$dept_id",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+        return response.returnTrue(200, req, res, findData);
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+};
+
+exports.getAllWithDigitalSignatureImageUsers = async (req, res) => {
+    try {
+        const allData = await userModel.aggregate([
+            {
+                $match: {
+                    job_type: "WFHD",
+                    digital_signature_image: ""
+                }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    user_id: 1,
+                    user_name: 1,
+                    dept_id: 1,
+                    dept_name: "$department.dept_name"
+                }
+            }
+        ]);
+
+        if (!allData) {
+            return response.returnFalse(200, req, res, "No Data Found", []);
+        }
+        return response.returnTrue(200, req, res, "all Data Fetched Successfully", allData)
     } catch (err) {
         return response.returnFalse(500, req, res, err.message, {});
     }

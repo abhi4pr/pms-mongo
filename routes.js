@@ -71,6 +71,7 @@ const campaignPhaseController = require("./controllers/operationExecution/campai
 const expertiseController = require('./controllers/operationExecution/expertiseController.js')
 const assignmentController = require('./controllers/operationExecution/assignmentController.js')
 const assignmentCommitController = require('./controllers/operationExecution/assignmentCommitController.js')
+const assignmentDashboardController = require('./controllers/operationExecution/dashboards/assignmentDashboard.js')
 const operationDasboard = require('./controllers/operationExecution/dashboard.controller.js')
 const pageReplacementController = require('./controllers/operationExecution/pageReplacementController.js')
 const preAssignmentController = require('./controllers/operationExecution/preAssignmentController.js')
@@ -116,6 +117,10 @@ const newCoc = require('./controllers/cocManagementNew.js')
 const phpVendorPaymentRequest = require("./controllers/phpVendorPaymentRequest.js");
 const assetHistory = require("./controllers/assetHistory.js");
 const dataOperation = require("./controllers/dataOperation.js");
+const attendanceDispute = require("./controllers/attendanceDispute.js");
+const userUpdateHistory = require("./controllers/userUpdateHistory.js");
+const userTraining = require("./controllers/userTraining.js");
+const nodePhpVendorPaymentMode = require("./controllers/nodePhpVendorPaymentMode.js");
 
 /* Task Mangement Controller Import */
 const deptWiseStatus = require('./controllers/TMS/deptWiseStatus.js');
@@ -167,6 +172,7 @@ router.get('/assignment/all/:id', assignmentController.getAllAssignmentToExperte
 router.get('/assignment/phase/:id', assignmentController.getAllAssignmentInPhase)
 router.get('/assignment/campaign/:id', assignmentController.getAllAssignmentInCampaign)
 router.post('/assignment/status', assignmentController.updateAssignmentStatus)
+router.post('/assignment/campaign/dashboard', assignmentDashboardController.AssignmentDashCampaign)
 
 router.post('/assignment/commit', assignmentCommitController.createAssComm)
 router.post('/assignment/bulk', assignmentController.createAssignmentBulk)
@@ -354,6 +360,10 @@ router.get(
   "/get_single_designation/:desi_id",
   designation.getSingleDesignation
 ); //Done
+router.get(
+  "/get_all_designations_by_deptId/:dept_id",
+  designation.getAllDesignationByDeptID
+);
 router.delete("/delete_designation/:desi_id", designation.deleteDesignation); //Done
 router.get("/get_all_designations", designation.getDesignations); //Done
 
@@ -525,6 +535,7 @@ router.post(
   finance.addFinance
 );
 router.get("/get_finances", finance.getFinances);
+router.get("/get_wfhd_financial_year_data", finance.getWFHFinancialYearData);
 router.put(
   "/edit_finance",
 
@@ -532,6 +543,8 @@ router.put(
   finance.editFinance
 );
 router.delete("/delete_finance", finance.deleteFinance);
+router.post("/set_utr_data", upload1.single("excel"), finance.setUtrData)
+router.post("/get_wfhd_tds_users", finance.getWFHDTDSUsers)
 
 /* Sitting Routes */
 router.post("/add_sitting", sitting.addSitting);
@@ -734,8 +747,14 @@ router.delete("/insta_brand/:id", instaBrand.deleteInstaBrand);
 //---------------------------------------------------------------------------All Routes OF User Module Starts Here ---------------------------------------------------------------------------------------------------//
 
 router.post("/add_user", user.addUser);
+router.post("/add_user_for_general_information", user.addUserForGeneralInformation);
 router.post("/forgot_pass", user.forgotPass);
 router.put("/update_user", user.updateUser);
+router.put("/update_user_for_personal_information/:user_id", user.updateUserForPersonalInformation);
+router.put("/update_user_for_official_information/:user_id", user.updateUserForOfficialInformation);
+router.put("/update_user_for_other_details/:user_id", user.updateUserInformation);
+router.put("/update_user_for_bank_details/:user_id", user.updateBankInformation);
+
 router.get("/get_wfh_user/:dept_id", user.getWFHUsersByDept);
 router.get("/get_all_users", user.getAllUsers);
 router.get("/get_single_user/:id", user.getSingleUser);
@@ -811,6 +830,12 @@ router.get("/get_all_percentage", user.getFilledPercentage);
 router.post("/get_user_graph_data", user.getUserGraphData)
 router.get("/get_users_with_status", user.getUsersWithStatus);
 router.get("/get_all_sales_users", user.getAllSalesUsers);
+router.get("/all_objs_in_user_auth/:user_id", user.assignAllObjInUserAuth);
+router.post("/check_login_exist", user.checkLoginExist);
+router.get("/get_all_userS_with_invoiceno", user.getAllUsersWithInvoiceNo);
+router.get("/users", user.getUsers);
+router.post("/get_all_users_counts_with_joining_date", user.getAllUsersCountsWithJoiningDate);
+router.get("/get_users_without_digital_signature_image", user.getAllWithDigitalSignatureImageUsers);
 
 //---------------------------------------------------------------------------All Routes OF User Module Ends Here ---------------------------------------------------------------------------------------------------//
 
@@ -874,8 +899,8 @@ router.get("/get_all_attendance_data", attendance.getAllAttendanceData);
 router.get("/get_salary_calculation_data", attendance.getSalarycalculationData);
 router.post("/get_users_count_by_dept", attendance.getUsersCountByDept);
 router.put("/update_attendance", attendance.updateAttendance);
-router.get("/get_all_disputes", attendance.allAttendanceDisputeDatas);
-router.get("/get_all_disputes/:user_id", attendance.getUserAttendanceDisputeDatas);
+// router.get("/get_all_disputes", attendance.allAttendanceDisputeDatas);
+// router.get("/get_all_disputes/:user_id", attendance.getUserAttendanceDisputeDatas);
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
@@ -883,6 +908,15 @@ router.put("/update_commitment", cmtController.editCmt);
 router.get("/get_all_commitments", cmtController.getCmt);
 router.get("/get_single_commitment/:id", cmtController.getCmtById);
 router.delete("/delete_commitment/:id", cmtController.deleteCmt);
+
+
+//--------------------------------------------------------------All Routes of Attendance Disputes------------------------------------------------------------------------------------------------------------------//
+
+router.post("/add_attendance_dispute", attendanceDispute.addAttendanceDispute);
+router.put("/update_attendance_dispute", attendanceDispute.editAttendanceDispute);
+router.get("/get_all_disputes", attendanceDispute.getAttendanceDisputes);
+router.get("/get_all_disputes/:user_id", attendanceDispute.getSingleAttendanceDispute);
+router.delete("/delete_attendance_dispute/:_id", attendanceDispute.deleteAttendanceDispute);
 
 //---------------------------------------------------------------------------All Routes OF Attendance Module Ends Here ---------------------------------------------------------------------------------------------------//
 
@@ -1485,5 +1519,24 @@ router.delete("/dataoperation/:_id", dataOperation.deleteOperationData);
 router.delete("/dataoperationwithdataname/:data_name", dataOperation.deleteDataBasedData);
 router.get("/get_data_operation_based_data_name_new/:data_name", dataOperation.getOperationDataBasedDataNameNew);
 router.put("/editdataoperationname", dataOperation.editOperationDataName);
+
+//user update history routes 
+router.post('/update_user_history', userUpdateHistory.addUserUpdateHistory);
+router.get("/get_single_user_update_history/:user_id", userUpdateHistory.getSingleUserUpdateHistory)
+
+
+// user Training Routes
+router.post("/add_user_training", userTraining.addUserTraining);
+router.get("/get_user_trainings", userTraining.getUserTrainings);
+router.get("/get_single_user_training/:user_id", userTraining.getSingleUserTraining);
+router.put("/update_user_training", userTraining.editUserTraining);
+router.delete("/delete_user_training/:_id", userTraining.deleteUserTraining);
+
+// node php payment mode Routes
+router.post("/add_payment_mode", nodePhpVendorPaymentMode.addPaymentMode);
+router.get("/get_all_payment_mode", nodePhpVendorPaymentMode.getAllPaymentMode);
+router.get("/get_single_payment_mode/:_id", nodePhpVendorPaymentMode.getSinglePaymentMode);
+router.put("/edit_payment_mode/:_id", nodePhpVendorPaymentMode.editPaymentMode);
+router.delete("/delete_payment_mode/:_id", nodePhpVendorPaymentMode.deletePaymentMode);
 
 module.exports = router;

@@ -60,10 +60,15 @@ const dataOperationModel = new mongoose.Schema({
         default: 0
     },
     designed_by: {
-        type: Number,
+        type: String,
         required: false,
         default: 0
     },
+    // designed_by: {
+    //     type: Number,
+    //     required: false,
+    //     default: 0
+    // },
     date_of_completion: {
         type: String,
         default: ""
@@ -123,6 +128,13 @@ const dataOperationModel = new mongoose.Schema({
     no_logo: {
         type: String,
         required: false
+    },
+    feedback: {
+        type: String,
+        required: false
+    },
+    public_usage: {
+        type: String
     }
 });
 
