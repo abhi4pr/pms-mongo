@@ -87,7 +87,7 @@ exports.addUser = [upload, async (req, res) => {
         const latestUser = await userModel.findOne({}).sort({ created_At: -1 });
         let latestInvoiceNo = latestUser.invoice_template_no + 1;
 
-        if (latestInvoiceNo > 12) {
+        if (latestInvoiceNo > 9) {
             latestInvoiceNo = 1
         }
 
@@ -620,22 +620,29 @@ exports.updateUserForOfficialInformation = async (req, res) => {
 
 exports.updateUserInformation = async (req, res) => {
     try {
-        //    const { id } = req.params;
-        const { current_address, current_city, current_state, current_pin_code, BloodGroup, Hobbies, SpokenLanguages, } = req.body;
-        const updateProfile = await userModel.findOne({ user_id: req.params.user_id });
+        const { current_address, current_city, current_state, current_pin_code, BloodGroup, Hobbies, SpokenLanguages, cast_type } = req.body;
+        const updateProfile = await userModel.findOne({
+            user_id: req.params.user_id
+        });
         if (!updateProfile) {
             return res.status(404).send("User not found");
         }
-        const profileUpdate = await userModel.findOneAndUpdate(
-            { user_id: req.params.user_id },
-            {
-                $set: {
-                    current_address: current_address, current_city: current_city, current_state: current_state,
-                    current_pin_code: current_pin_code, BloodGroup: BloodGroup, Hobbies: Hobbies, SpokenLanguages: SpokenLanguages
-                }
-            },
-            { new: true }
-        );
+        const profileUpdate = await userModel.findOneAndUpdate({
+            user_id: req.params.user_id
+        }, {
+            $set: {
+                current_address: current_address,
+                current_city: current_city,
+                current_state: current_state,
+                current_pin_code: current_pin_code,
+                BloodGroup: BloodGroup,
+                Hobbies: Hobbies,
+                SpokenLanguages: SpokenLanguages,
+                cast_type: cast_type
+            }
+        }, {
+            new: true
+        });
         return res.status(200).json({
             status: 200,
             message: "profile updated successfully!",
@@ -651,14 +658,19 @@ exports.updateUserInformation = async (req, res) => {
 
 exports.updateBankInformation = async (req, res) => {
     try {
-        const { bank_name, ifsc_code, beneficiary, } = req.body;
+        const { bank_name, ifsc_code, beneficiary, bank_Account_No, account_Type, branch_Name } = req.body;
         const updateBankProfile = await userModel.findOne({ user_id: req.params.user_id });
         if (!updateBankProfile) {
             return res.status(404).send("User not found");
         }
         const bankprofileUpdate = await userModel.findOneAndUpdate(
             { user_id: req.params.user_id },
-            { $set: { bank_name: bank_name, ifsc_code: ifsc_code, beneficiary: beneficiary } },
+            {
+                $set: {
+                    bank_name: bank_name, ifsc_code: ifsc_code, beneficiary: beneficiary, bank_Account_No: bank_Account_No,
+                    account_Type: account_Type, branch_Name: branch_Name
+                }
+            },
             { new: true }
         );
         return res.status(200).json({
@@ -703,7 +715,7 @@ exports.updateUser = [upload, async (req, res) => {
             sitting_id: req.body.sitting_id,
             job_type: req.body.job_type,
             personal_number: req.body.personal_number,
-            Report_L1: isNaN(req.body.report_L1) ? 0 : req.body.report_L1,
+            Report_L1: req.body.report_L1,
             Report_L2: isNaN(req.body.report_L2) ? 0 : req.body.report_L2,
             Report_L3: isNaN(req.body.report_L3) ? 0 : req.body.report_L3,
             Personal_email: req.body.Personal_email,
@@ -3771,3 +3783,5 @@ exports.getAllWithDigitalSignatureImageUsers = async (req, res) => {
         return response.returnFalse(500, req, res, err.message, {});
     }
 };
+
+
