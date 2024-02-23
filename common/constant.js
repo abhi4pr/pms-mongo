@@ -13,20 +13,20 @@ module.exports = Object.freeze({
   SWAGGER_DEVELOPER: 2,
 
   /* JWT  */
-  SECRET_KEY_LOGIN:"thisissecret12",
-  SECRET_KEY_DOC_LOGIN:"docloginsect1234d",
-  CONST_VALIDATE_SESSION_EXPIRE_DOC:"1h",
-  CONST_SESSION_TIME_FOR_SWAGGER : 1500000,  //   1/2 hours
+  SECRET_KEY_LOGIN: "thisissecret12",
+  SECRET_KEY_DOC_LOGIN: "docloginsect1234d",
+  CONST_VALIDATE_SESSION_EXPIRE_DOC: "1h",
+  CONST_SESSION_TIME_FOR_SWAGGER: 1500000,  //   1/2 hours
   CONST_VALIDATE_SESSION_EXPIRE: '24h',
   CONST_EMAIL_VERIFICATION_EXPIRED: '10m',
 
-  /* Response messages */ 
+  /* Response messages */
 
   //Common msg
-  CREATED_SUCCESSFULLY :"Data Created Successfully...",
-  DELETED_SUCCESSFULLY :"Data Deleted Successfully...",
-  UPDATED_SUCCESSFULLY :"Data Updated Successfully...",
-  FETCH_SUCCESSFULLY :"Data Updated Successfully...",
-  NO_RECORD_FOUND:"No Record found..."
- 
+  CREATED_SUCCESSFULLY: "Data Created Successfully...",
+  DELETED_SUCCESSFULLY: "Data Deleted Successfully...",
+  UPDATED_SUCCESSFULLY: "Data Updated Successfully...",
+  FETCH_SUCCESSFULLY: "Data Updated Successfully...",
+  NO_RECORD_FOUND: "No Record found..."
+
 });

@@ -20,7 +20,7 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'doc/customization_src/doc_templates/pages'));
-app.use(express.static(path.join(__dirname,'./build')))
+app.use(express.static(path.join(__dirname, './build')))
 app.use(bodyParser.json({ limit: '500mb' }));
 
 app.use(
