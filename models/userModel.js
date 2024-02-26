@@ -30,7 +30,7 @@ const userModel = new mongoose.Schema({
     user_name: {
         type: String,
         required: false,
-        unique: true,
+        unique: false,
         default: ""
     },
     user_report_to_id: {
@@ -107,7 +107,7 @@ const userModel = new mongoose.Schema({
     },
     releaving_date: {
         type: Date,
-        default: Date.now
+        // default: Date.now
     },
     level: {
         type: String,
@@ -176,7 +176,7 @@ const userModel = new mongoose.Schema({
     },
     DateOfMarriage: {
         type: Date,
-        default: Date.now
+        // default: Date.now
     },
     tds_applicable: {
         type: String,
@@ -204,6 +204,11 @@ const userModel = new mongoose.Schema({
         default: ""
     },
     uid_remark: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    upi_Id: {
         type: String,
         required: false,
         default: ""
@@ -507,6 +512,16 @@ const userModel = new mongoose.Schema({
         default: ""
     },
     bank_name: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    account_type: {
+        type: String,
+        required: false,
+        default: ""
+    },
+    branch_name: {
         type: String,
         required: false,
         default: ""

@@ -87,7 +87,7 @@ exports.addUser = [upload, async (req, res) => {
         const latestUser = await userModel.findOne({}).sort({ created_At: -1 });
         let latestInvoiceNo = latestUser.invoice_template_no + 1;
 
-        if (latestInvoiceNo > 12) {
+        if (latestInvoiceNo > 9) {
             latestInvoiceNo = 1
         }
 
@@ -228,7 +228,8 @@ exports.addUser = [upload, async (req, res) => {
             document_percentage_mandatory: req.body.document_percentage_mandatory,
             document_percentage_non_mandatory: req.body.document_percentage_non_mandatory,
             document_percentage: req.body.document_percentage,
-            bank_type: req.body.bank_type
+            bank_type: req.body.bank_type,
+            upi_Id: req.body.upi_Id
         })
 
         if (req.files.image && req.files.image[0].originalname) {
@@ -393,9 +394,11 @@ exports.addUserForGeneralInformation = [upload, async (req, res) => {
             user_contact_no: req.body.user_contact_no, //for offical
             user_login_id: req.body.user_login_id.toLowerCase().trim(),
             user_login_password: encryptedPass,
+            user_status: req.body.user_status,
             joining_date: req.body.joining_date,
             sitting_id: req.body.sitting_id,
             room_id: req.body.room_id,
+            upi_Id: req.body.upi_Id,
         })
 
         if (req.files && req.files.image && req.files.image[0].originalname) {
@@ -487,8 +490,12 @@ exports.addUserForGeneralInformation = [upload, async (req, res) => {
     }
 }];
 
-exports.updateUserForPersonalInformation = [upload, async (req, res) => {
+exports.updateUserForGeneralInformation = [upload, async (req, res) => {
     try {
+        let encryptedPass;
+        if (req.body.user_login_password) {
+            encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
+        }
         //check user exist or not
         const existingUser = await userModel.findOne({ user_id: req.params.user_id });
 
@@ -507,9 +514,28 @@ exports.updateUserForPersonalInformation = [upload, async (req, res) => {
             Gender: req.body.Gender,
             DOB: req.body.DOB,
             Age: req.body.Age,
+            upi_Id: req.body.upi_Id,
             Nationality: req.body.Nationality,
             MartialStatus: req.body.MartialStatus,
-            created_by: req.body.created_by
+            created_by: req.body.created_by,
+            //for official information
+            job_type: req.body.job_type,
+            dept_id: req.body.dept_id,
+            sub_dept_id: isNaN(req.body.sub_dept_id) ? 0 : req.body.sub_dept_id,
+            user_designation: req.body.user_designation,
+            Report_L1: isNaN(req.body.report_L1) ? 0 : req.body.report_L1,
+            Report_L2: isNaN(req.body.report_L2) ? 0 : req.body.report_L2,
+            Report_L3: isNaN(req.body.report_L3) ? 0 : req.body.report_L3,
+            role_id: req.body.role_id,
+            user_email_id: req.body.user_email_id, //for offical
+            user_contact_no: req.body.user_contact_no, //for offical
+            user_login_id: req.body.user_login_id.toLowerCase().trim(),
+            user_login_password: encryptedPass,
+            user_status: req.body.user_status,
+            joining_date: req.body.joining_date,
+            sitting_id: req.body.sitting_id,
+            room_id: req.body.room_id,
+            upi_Id: req.body.upi_Id,
         }, { new: true });
 
         if (!editsim) {
@@ -574,68 +600,45 @@ exports.updateUserForPersonalInformation = [upload, async (req, res) => {
     }
 }];
 
-exports.updateUserForOfficialInformation = async (req, res) => {
-    try {
-        let encryptedPass;
-        if (req.body.user_login_password) {
-            encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
-        }
-
-        const existingUser = await userModel.findOne({ user_id: req.params.user_id });
-
-        if (!existingUser) {
-            return res.status(404).send({ success: false, message: 'User not found' });
-        }
-
-        //user details update in DB
-        const editsim = await userModel.findOneAndUpdate({ user_id: parseInt(req.params.user_id) }, {
-            //for official information
-            job_type: req.body.job_type,
-            dept_id: req.body.dept_id,
-            sub_dept_id: isNaN(req.body.sub_dept_id) ? 0 : req.body.sub_dept_id,
-            user_designation: req.body.user_designation,
-            Report_L1: isNaN(req.body.report_L1) ? 0 : req.body.report_L1,
-            Report_L2: isNaN(req.body.report_L2) ? 0 : req.body.report_L2,
-            Report_L3: isNaN(req.body.report_L3) ? 0 : req.body.report_L3,
-            role_id: req.body.role_id,
-            user_email_id: req.body.user_email_id, //for offical
-            user_contact_no: req.body.user_contact_no, //for offical
-            user_login_id: req.body.user_login_id.toLowerCase().trim(),
-            user_login_password: encryptedPass,
-            joining_date: req.body.joining_date,
-            sitting_id: req.body.sitting_id,
-            room_id: req.body.room_id,
-        }, { new: true });
-
-        if (!editsim) {
-            return res.status(500).send({ success: false })
-        }
-
-        //return the succes response
-        return res.status(200).send({ success: true, data: editsim })
-    } catch (err) {
-        return res.status(500).send({ error: err.message, sms: 'Error while updating user personal information details' })
-    }
-};
-
 exports.updateUserInformation = async (req, res) => {
     try {
-        //    const { id } = req.params;
-        const { current_address, current_city, current_state, current_pin_code, BloodGroup, Hobbies, SpokenLanguages, } = req.body;
-        const updateProfile = await userModel.findOne({ user_id: req.params.user_id });
+        const { current_address, current_city, current_state, current_pin_code,
+            permanent_address, permanent_city, permanent_state, permanent_pin_code,
+            BloodGroup, Hobbies, SpokenLanguages,
+            cast_type, upi_Id } = req.body;
+
+        //current user find for update details
+        const updateProfile = await userModel.findOne({
+            user_id: req.params.user_id
+        });
+
+        //check user is not find
         if (!updateProfile) {
             return res.status(404).send("User not found");
         }
-        const profileUpdate = await userModel.findOneAndUpdate(
-            { user_id: req.params.user_id },
-            {
-                $set: {
-                    current_address: current_address, current_city: current_city, current_state: current_state,
-                    current_pin_code: current_pin_code, BloodGroup: BloodGroup, Hobbies: Hobbies, SpokenLanguages: SpokenLanguages
-                }
-            },
-            { new: true }
-        );
+
+        //user details update
+        const profileUpdate = await userModel.findOneAndUpdate({
+            user_id: req.params.user_id
+        }, {
+            $set: {
+                current_address: current_address,
+                current_city: current_city,
+                current_state: current_state,
+                current_pin_code: current_pin_code,
+                permanent_address: permanent_address,
+                permanent_city: permanent_city,
+                permanent_state: permanent_state,
+                permanent_pin_code: permanent_pin_code,
+                BloodGroup: BloodGroup,
+                Hobbies: Hobbies,
+                SpokenLanguages: SpokenLanguages,
+                cast_type: cast_type,
+                upi_Id: upi_Id
+            }
+        }, {
+            new: true
+        });
         return res.status(200).json({
             status: 200,
             message: "profile updated successfully!",
@@ -651,16 +654,26 @@ exports.updateUserInformation = async (req, res) => {
 
 exports.updateBankInformation = async (req, res) => {
     try {
-        const { bank_name, ifsc_code, beneficiary, } = req.body;
+        const { bank_name, account_no, ifsc_code, beneficiary, account_type, branch_name, upi_id } = req.body;
         const updateBankProfile = await userModel.findOne({ user_id: req.params.user_id });
         if (!updateBankProfile) {
             return res.status(404).send("User not found");
         }
-        const bankprofileUpdate = await userModel.findOneAndUpdate(
-            { user_id: req.params.user_id },
-            { $set: { bank_name: bank_name, ifsc_code: ifsc_code, beneficiary: beneficiary } },
-            { new: true }
-        );
+        const bankprofileUpdate = await userModel.findOneAndUpdate({
+            user_id: req.params.user_id
+        }, {
+            $set: {
+                bank_name: bank_name,
+                account_no: account_no,
+                ifsc_code: ifsc_code,
+                beneficiary: beneficiary,
+                account_type: account_type,
+                branch_name: branch_name,
+                upi_Id: upi_id
+            }
+        }, {
+            new: true
+        });
         return res.status(200).json({
             status: 200,
             message: "Bank profile updated successfully!",
@@ -703,7 +716,7 @@ exports.updateUser = [upload, async (req, res) => {
             sitting_id: req.body.sitting_id,
             job_type: req.body.job_type,
             personal_number: req.body.personal_number,
-            Report_L1: isNaN(req.body.report_L1) ? 0 : req.body.report_L1,
+            Report_L1: req.body.report_L1,
             Report_L2: isNaN(req.body.report_L2) ? 0 : req.body.report_L2,
             Report_L3: isNaN(req.body.report_L3) ? 0 : req.body.report_L3,
             Personal_email: req.body.Personal_email,
@@ -824,7 +837,8 @@ exports.updateUser = [upload, async (req, res) => {
             document_percentage_non_mandatory: req.body.document_percentage_non_mandatory,
             document_percentage: req.body.document_percentage,
             show_rocket: req.body.show_rocket,
-            bank_type: req.body.bank_type
+            bank_type: req.body.bank_type,
+            upi_Id: req.body.upi_Id,
         }, { new: true });
 
         if (!editsim) {
@@ -1052,6 +1066,8 @@ exports.getAllUsers = async (req, res) => {
                 $project: {
                     user_id: "$user_id",
                     user_name: "$user_name",
+                    account_type: "$account_type",
+                    branch_name: "$branch_name",
                     offer_later_status: "$offer_later_status",
                     user_designation: "$user_designation",
                     user_email_id: "$user_email_id",
@@ -1195,6 +1211,7 @@ exports.getAllUsers = async (req, res) => {
                     document_percentage_mandatory: "$document_percentage_mandatory",
                     document_percentage_non_mandatory: "$document_percentage_non_mandatory",
                     document_percentage: "$document_percentage",
+                    upi_Id: "$upi_Id",
                     documentPercentage: {
                         $multiply: [
                             {
@@ -1524,7 +1541,10 @@ exports.getSingleUser = async (req, res) => {
                     document_percentage_mandatory: "$document_percentage_mandatory",
                     document_percentage_non_mandatory: "$document_percentage_non_mandatory",
                     document_percentage: "$document_percentage",
-                    bank_type: "$bank_type"
+                    bank_type: "$bank_type",
+                    account_type: "$account_type",
+                    branch_name: "$branch_name",
+                    upi_Id: "$upi_Id"
                 }
             }
         ]).exec();
@@ -3771,3 +3791,5 @@ exports.getAllWithDigitalSignatureImageUsers = async (req, res) => {
         return response.returnFalse(500, req, res, err.message, {});
     }
 };
+
+
