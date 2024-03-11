@@ -61,6 +61,14 @@ exports.addSim = async (req, res) => {
       const bucketName = vari.BUCKET_NAME;
       const bucket = storage.bucket(bucketName);
       const blob = bucket.file(req.file.originalname);
+      const [exists] = await blob.exists();
+      if (exists) {
+        const currentDate = new Date().toISOString().replace(/:/g, '-');
+        const newFileName = `${currentDate}_${req.file.originalname}`;
+        const newBlob = bucket.file(newFileName);
+        await blob.move(newBlob);
+        roomImage = newFileName;
+      }
       simc.invoiceCopy = blob.name;
       const blobStream = blob.createWriteStream();
       blobStream.on("finish", () => {
@@ -213,7 +221,7 @@ exports.getSims = async (req, res) => {
           $lookup: {
             from: "assetmodalmodels",
             localField: "asset_modal_id",
-            foreignField: "asset_brand_id",
+            foreignField: "asset_modal_id",
             as: "assetModal",
           },
         },
@@ -369,6 +377,34 @@ exports.getSingleSim = async (req, res) => {
           },
         },
         {
+          $lookup: {
+            from: "assetbrandmodels",
+            localField: "asset_brand_id",
+            foreignField: "asset_brand_id",
+            as: "assetBrand",
+          },
+        },
+        {
+          $unwind: {
+            path: "$assetBrand",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "assetmodalmodels",
+            localField: "asset_modal_id",
+            foreignField: "asset_modal_id",
+            as: "assetModal",
+          },
+        },
+        {
+          $unwind: {
+            path: "$assetModal",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
           $project: {
             _id: "$_id",
             sim_id: "$sim_id",
@@ -396,7 +432,12 @@ exports.getSingleSim = async (req, res) => {
             Remarks: "$Remarks",
             category_name: "$category.category_name",
             sub_category_name: "$subcategory.sub_category_name",
-            vendor_name: "$vendor.vendor_name"
+            vendor_name: "$vendor.vendor_name",
+            asset_brand_id: "$asset_brand_id",
+            asset_modal_id: "$asset_modal_id",
+            asset_brand_name: "$assetBrand.asset_brand_name",
+            asset_modal_name: "$assetModal.asset_modal_name",
+            depreciation_percentage: "$depreciation_percentage"
           },
         },
       ])
