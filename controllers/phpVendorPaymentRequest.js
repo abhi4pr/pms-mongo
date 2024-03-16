@@ -4,7 +4,7 @@ const { storage } = require("../common/uploadFile.js")
 const vari = require("../variables.js")
 const constant = require('../common/constant.js');
 const axios = require("axios")
-const FormData = require('form-data');
+// const FormData = require('form-data');
 
 exports.addPhpVendorPaymentRequestAdd = async (req, res) => {
     try {
@@ -51,7 +51,7 @@ exports.addPhpVendorPaymentRequestAdd = async (req, res) => {
             const blobStream = blob.createWriteStream();
             blobStream.
                 on("finish", () => {
-                    // res.status(200).send("Success")
+                    // res.status(200).send("Success") 
                 });
             blobStream.end(req.file.buffer);
         }
@@ -176,7 +176,7 @@ exports.getPhpVendorPaymentRequests = async (req, res) => {
 
         const modifiedData = vendorpaymentdata.map(vendorPaymentRequest => ({
             ...vendorPaymentRequest.toObject(),
-            evidence: `https://storage.cloud.google.com/dev-backend-bucket/${vendorPaymentRequest.evidence}`
+            evidence: `https://storage.cloud.google.com/node-prod-bucket/${vendorPaymentRequest.evidence}`
         }));
 
         return res.status(200).send({
