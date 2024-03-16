@@ -267,3 +267,16 @@ exports.updatePhpVendorPaymentRequest = async (req, res) => {
         return response.returnFalse(500, req, res, err.message, {});
     }
 };
+
+
+exports.deletePhpVendorPaymentRequest = async (req, res) => {
+    phpVendorPaymentRequestModel.deleteOne({ request_id: req.params.request_id }).then(item => {
+        if (item) {
+            return res.status(200).json({ success: true, message: 'Php Vendor Payment Request deleted' })
+        } else {
+            return res.status(404).json({ success: false, message: 'Php Vendor Payment Request not found' })
+        }
+    }).catch(err => {
+        return res.status(400).json({ success: false, message: err })
+    })
+};
