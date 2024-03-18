@@ -176,7 +176,7 @@ exports.getPhpVendorPaymentRequests = async (req, res) => {
 
         const modifiedData = vendorpaymentdata.map(vendorPaymentRequest => ({
             ...vendorPaymentRequest.toObject(),
-            evidence: `https://storage.cloud.google.com/node-prod-bucket/${vendorPaymentRequest.evidence}`
+            evidence: `${vari.IMAGE_URL}${vendorPaymentRequest.evidence}`
         }));
 
         return res.status(200).send({
