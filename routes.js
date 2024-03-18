@@ -1653,7 +1653,8 @@ router.post("/phpvendorpaymentrequest", upload1.single('evidence'), phpVendorPay
 router.get("/phpvendor_insert_data_node", phpVendorPaymentRequest.addPhpVendorPaymentRequestSet);
 router.get("/phpvendorpaymentrequest", phpVendorPaymentRequest.getPhpVendorPaymentRequests);
 router.get("/phpvendorpaymentrequest/:request_id", phpVendorPaymentRequest.getSinglePhpVendorPaymentRequest)
-router.put("/phpvendorpaymentrequest", upload1.single('evidence'), phpVendorPaymentRequest.updatePhpVendorPaymentRequest)
+router.put("/phpvendorpaymentrequest", upload1.single('evidence'), phpVendorPaymentRequest.updatePhpVendorPaymentRequest);
+router.delete("/deletephpvendorpaymentrequest/:request_id", phpVendorPaymentRequest.deletePhpVendorPaymentRequest);
 
 //Data Operation Routes
 router.post("/dataoperation", dataOperation.addOperationData);
