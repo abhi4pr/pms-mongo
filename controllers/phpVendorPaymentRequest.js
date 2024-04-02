@@ -222,7 +222,7 @@ exports.getSinglePhpVendorPaymentRequest = async (req, res) => {
 exports.updatePhpVendorPaymentRequest = async (req, res) => {
     try {
         const updatedData = await phpVendorPaymentRequestModel.findOneAndUpdate(
-            { request_id: req.body.request_id },
+            { _id: req.body._id },
             {
                 status: 1,
                 evidence: req.files?.evidence,
