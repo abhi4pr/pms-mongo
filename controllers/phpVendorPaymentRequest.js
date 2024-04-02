@@ -176,7 +176,7 @@ exports.getPhpVendorPaymentRequests = async (req, res) => {
 
         const modifiedData = vendorpaymentdata.map(vendorPaymentRequest => ({
             ...vendorPaymentRequest.toObject(),
-            evidence: `https://storage.cloud.google.com/node-prod-bucket/${vendorPaymentRequest.evidence}`
+            evidence: `${vari.IMAGE_URL}${vendorPaymentRequest.evidence}`
         }));
 
         return res.status(200).send({
@@ -222,7 +222,7 @@ exports.getSinglePhpVendorPaymentRequest = async (req, res) => {
 exports.updatePhpVendorPaymentRequest = async (req, res) => {
     try {
         const updatedData = await phpVendorPaymentRequestModel.findOneAndUpdate(
-            { request_id: req.body.request_id },
+            { _id: req.body._id },
             {
                 status: 1,
                 evidence: req.files?.evidence,

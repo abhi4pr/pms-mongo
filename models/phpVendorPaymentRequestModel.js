@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const phpVendorPaymentRequestModel = new mongoose.Schema({
     request_id: {
         type: Number,
-        required: true,
-        unique: true
+        required: true
     },
     vendor_id: {
         type: Number,
