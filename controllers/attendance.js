@@ -1016,7 +1016,7 @@ exports.totalSalary = async (req, res) => {
 exports.updateSalary = async (req, res) => {
   try {
     const editsim = await attendanceModel.findOneAndUpdate(
-      { attendence_id: req.body.attendence_id },
+      { attendence_id: req.body.attendence_id, month: req.body.month },
       {
         sendToFinance: req.body.sendToFinance,
       },
