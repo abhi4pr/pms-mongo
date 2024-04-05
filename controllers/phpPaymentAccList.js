@@ -126,3 +126,26 @@ exports.getAccListDataFromCustId = async (req, res) => {
         res.status(500).send({ error: error.message, sms: "error getting php payment account data of customer details" })
     }
 }
+
+exports.updateHideStatusForPhpPaymentAccData = async (req, res) => {
+    try {
+        //fields update in the collection
+        const editHideStatusForPhpPaymentAccData = await phpPaymentAccListModel.findOneAndUpdate({
+            _id: req.params.id
+        }, {
+            is_hide: req.body.is_hide
+        }, {
+            new: true
+        });
+
+        //if not found check
+        if (!editHideStatusForPhpPaymentAccData) {
+            return response.returnFalse(200, req, res, "No Reord Found ", {});
+        }
+
+        //success response send
+        return response.returnTrue(200, req, res, "Updation Successfully", editHideStatusForPhpPaymentAccData);
+    } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+}
