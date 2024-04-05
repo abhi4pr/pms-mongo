@@ -1,6 +1,7 @@
 const phpPaymentAccListModel = require("../models/phpPaymentAccListModel.js");
 const phpFinanceModel = require("../models/phpFinanceModel.js");
 const axios = require('axios');
+const response = require("../common/response.js");
 const FormData = require('form-data');
 
 async function checkIfDataExists(id) {
@@ -137,7 +138,7 @@ exports.updateHideStatusForPhpPaymentAccData = async (req, res) => {
         }, {
             new: true
         });
-
+        console.log("dddddddddddd", editHideStatusForPhpPaymentAccData);
         //if not found check
         if (!editHideStatusForPhpPaymentAccData) {
             return response.returnFalse(200, req, res, "No Reord Found ", {});
