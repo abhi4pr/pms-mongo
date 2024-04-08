@@ -1349,6 +1349,7 @@ router.put(
 // router.post("/get_user_doc/:id", userDocManagement.getUserDoc);
 router.post("/get_user_doc", userDocManagement.getUserDoc);
 router.delete("/delete_user_doc/:id", userDocManagement.deleteDoc);
+router.get("/get_doc_by_userid/:user_id", userDocManagement.getDocsByUserID);
 
 //Swagger Route
 router.post("/add_dev_data", swaggerAccessManagement.addDevData);

@@ -195,3 +195,46 @@ exports.deleteDoc = async (req, res) => {
     return response.returnFalse(500, req, res, err.message, {});
   }
 };
+
+exports.getDocsByUserID = async (req, res) => {
+  try {
+    const financeImagesBaseUrl = vari.IMAGE_URL;
+    const simc = await userDocManagmentModel.aggregate([
+      {
+        $match: {
+          user_id: parseInt(req.params.user_id),
+          status: "Approved"
+        }
+      },
+      {
+        $lookup: {
+          from: "documentmodels",
+          localField: "doc_id",
+          foreignField: "_id",
+          as: "document_data",
+        },
+      },
+      {
+        $unwind: {
+          path: "$document_data",
+          // preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          doc_type: "$document_data.doc_type",
+          description: "$document_data.description",
+          doc_image_url: { $concat: [financeImagesBaseUrl, "$doc_image"] },
+        },
+      }
+    ]);
+    if (!simc) {
+      res.status(500).send({ success: false });
+    }
+    res.status(200).send(simc);
+  } catch (err) {
+    res
+      .status(500)
+      .send({ error: err.message, sms: "Error getting all documents" });
+  }
+};
