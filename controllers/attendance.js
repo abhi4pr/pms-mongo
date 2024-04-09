@@ -883,15 +883,15 @@ exports.getSalaryByUserId = async (req, res) => {
             permanent_pin_code: "$user.permanent_pin_code",
           },
         },
-        // {
-        //   $group: {
-        //     _id: "$user_id",
-        //     data: { $first: "$$ROOT" },
-        //   },
-        // },
-        // {
-        //   $replaceRoot: { newRoot: "$data" },
-        // },
+        {
+          $group: {
+            _id: "$attendence_id",
+            data: { $first: "$$ROOT" },
+          },
+        },
+        {
+          $replaceRoot: { newRoot: "$data" },
+        },
       ])
       .exec();
     if (getcreators?.length === 0) {

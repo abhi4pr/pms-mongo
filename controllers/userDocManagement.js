@@ -5,6 +5,7 @@ const { default: mongoose } = require("mongoose");
 const helper = require("../helper/helper.js");
 const vari = require("../variables.js");
 const { storage } = require('../common/uploadFile.js')
+const documentModel = require("../models/documentModel.js");
 
 exports.addUserDoc = async (req, res) => {
   try {
@@ -193,5 +194,34 @@ exports.deleteDoc = async (req, res) => {
     }
   } catch (err) {
     return response.returnFalse(500, req, res, err.message, {});
+  }
+};
+
+exports.getDocsByUserID = async (req, res) => {
+  try {
+    const user_id = parseInt(req.params.user_id);
+    const simData = await userDocManagmentModel.find({ user_id: user_id, status: "Approved" });
+    if (simData.length === 0) {
+      return res.status(404).json({ message: "No documents found for this user." });
+    }
+
+    const docIds = simData.map(doc => doc.doc_id);
+
+    const documents = await documentModel.find({ _id: { $in: docIds } });
+
+    if (documents.length === 0) {
+      return res.status(404).json({ message: "No documents found in documentModel collection." });
+    }
+
+    const docResponse = documents.map(doc => ({
+      doc_type: doc.doc_type,
+      description: doc.description,
+      doc_image_url: vari.IMAGE_URL + simData.find(data => data.doc_id.equals(doc._id)).doc_image
+    }));
+
+    res.status(200).json(docResponse);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message, sms: "Error getting all documents" });
   }
 };
