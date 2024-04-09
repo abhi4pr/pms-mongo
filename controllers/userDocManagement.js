@@ -5,6 +5,7 @@ const { default: mongoose } = require("mongoose");
 const helper = require("../helper/helper.js");
 const vari = require("../variables.js");
 const { storage } = require('../common/uploadFile.js')
+const documentModel = require("../models/documentModel.js");
 
 exports.addUserDoc = async (req, res) => {
   try {
@@ -198,43 +199,29 @@ exports.deleteDoc = async (req, res) => {
 
 exports.getDocsByUserID = async (req, res) => {
   try {
-    const financeImagesBaseUrl = vari.IMAGE_URL;
-    const simc = await userDocManagmentModel.aggregate([
-      {
-        $match: {
-          user_id: parseInt(req.params.user_id),
-          status: "Approved"
-        }
-      },
-      {
-        $lookup: {
-          from: "documentmodels",
-          localField: "doc_id",
-          foreignField: "_id",
-          as: "document_data",
-        },
-      },
-      {
-        $unwind: {
-          path: "$document_data",
-          // preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $project: {
-          doc_type: "$document_data.doc_type",
-          description: "$document_data.description",
-          doc_image_url: { $concat: [financeImagesBaseUrl, "$doc_image"] },
-        },
-      }
-    ]);
-    if (!simc) {
-      res.status(500).send({ success: false });
+    const user_id = parseInt(req.params.user_id);
+    const simData = await userDocManagmentModel.find({ user_id: user_id, status: "Approved" });
+    if (simData.length === 0) {
+      return res.status(404).json({ message: "No documents found for this user." });
     }
-    res.status(200).send(simc);
+
+    const docIds = simData.map(doc => doc.doc_id);
+
+    const documents = await documentModel.find({ _id: { $in: docIds } });
+
+    if (documents.length === 0) {
+      return res.status(404).json({ message: "No documents found in documentModel collection." });
+    }
+
+    const docResponse = documents.map(doc => ({
+      doc_type: doc.doc_type,
+      description: doc.description,
+      doc_image_url: vari.IMAGE_URL + simData.find(data => data.doc_id.equals(doc._id)).doc_image
+    }));
+
+    res.status(200).json(docResponse);
   } catch (err) {
-    res
-      .status(500)
-      .send({ error: err.message, sms: "Error getting all documents" });
+    console.error(err);
+    res.status(500).json({ error: err.message, sms: "Error getting all documents" });
   }
 };
