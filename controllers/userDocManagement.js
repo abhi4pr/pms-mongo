@@ -225,3 +225,15 @@ exports.getDocsByUserID = async (req, res) => {
     res.status(500).json({ error: err.message, sms: "Error getting all documents" });
   }
 };
+
+
+exports.updateUserDoc = async (req, res) => {
+  try {
+    const editsim = await userDocManagmentModel.findByIdAndUpdate(req.body._id, {
+      status: "Verification Pending",
+    }, { new: true })
+    res.status(200).send({ success: true, data: editsim })
+  } catch (err) {
+    res.status(500).send({ error: err, sms: 'Error updating doc details' })
+  }
+};
