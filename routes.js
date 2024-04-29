@@ -1370,6 +1370,7 @@ router.get("/get_all_php_finance_data", phpFinance.getAllphpFinanceData);
 router.get("/get_all_php_finance_data_pending", phpFinance.getAllphpFinanceDataPending);
 router.post("/add_php_payment_acc_data_in_node", phpPayment.savePhpPaymentAccDataInNode);
 router.get("/get_all_php_payment_acc_data", phpPayment.getAllphpPaymentAccData);
+router.post("/add_payment_acc_data", phpPayment.addAccListData);
 router.get("/get_all_php_payment_acc_data_pending", phpPayment.getAllphpPaymentAccDataForStatus);
 router.put("/update_hide_status_php_payment_acc_data/:id", phpPayment.updateHideStatusForPhpPaymentAccData);
 router.put("/pending_approval_update", phpPayment.pendingApprovalUpdate);
