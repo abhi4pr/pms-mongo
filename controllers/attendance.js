@@ -4,6 +4,7 @@ const userModels = require("../models/userAuthModel.js");
 const userModel = require("../models/userModel.js");
 const vari = require("../variables.js");
 const billingHeaderModel = require("../models/billingheaderModel.js");
+const separationModel = require("../models/separationModel.js");
 
 async function doesUserExistInAttendance(userId, month, year) {
   const results = await attendanceModel.find({
@@ -31,19 +32,60 @@ function monthNameToNumber(monthName) {
   ];
 
   const monthIndex = months.findIndex(
-    (m) => m.toLowerCase() === monthName.toLowerCase()
+    (m) => m.toLowerCase() === monthName?.toLowerCase()
   );
 
   // Adding 1 because months are zero-indexed in JavaScript (0-11)
   return monthIndex !== -1 ? monthIndex + 1 : null;
 }
 
-let attendanceIdCounter = 1;
-const getNextAttendanceId = () => {
-  return new Promise((resolve) => {
-    resolve(attendanceIdCounter++);
-  });
+
+const getLatestAttendanceId = async () => {
+  try {
+    const latestAttendance = await attendanceModel.findOne().sort({ attendence_id: -1 });
+    // console.log("latestAttendance", latestAttendance);
+    if (latestAttendance) {
+      return latestAttendance.attendence_id;
+    }
+    return 0;
+  } catch (error) {
+    console.error("Error finding latest attendance ID:", error);
+    throw error;
+  }
 };
+
+let attendanceIdCounter;
+
+const initializeAttendanceIdCounter = async () => {
+  try {
+    const latestAttendanceId = await getLatestAttendanceId();
+    attendanceIdCounter = latestAttendanceId + 1;
+  } catch (error) {
+    console.error("Error initializing attendanceIdCounter:", error);
+    throw error;
+  }
+};
+
+initializeAttendanceIdCounter();
+
+const getNextAttendanceId = () => {
+  if (attendanceIdCounter === undefined) {
+    throw new Error("attendanceIdCounter is not initialized. Call initializeAttendanceIdCounter() first.");
+  }
+  return attendanceIdCounter++;
+};
+
+// function getLastDateOfMonth(month, year) {
+//   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+//   const monthIndex = monthNames.indexOf(month);
+//   if (monthIndex === -1) {
+//     throw new Error('Invalid month name');
+//   }
+
+//   let nextMonth = new Date(year, monthIndex + 1, 1);
+//   let lastDateOfMonth = new Date(nextMonth - 1);
+//   return lastDateOfMonth.getDate();
+// }
 
 exports.addAttendance = async (req, res) => {
   try {
@@ -70,6 +112,8 @@ exports.addAttendance = async (req, res) => {
         message: "Please Added First Billing Header For This Department",
       });
     }
+
+    // const monthLastValue = getLastDateOfMonth(month, year);
 
     const attendanceData = await userModel.aggregate([
       {
@@ -116,51 +160,62 @@ exports.addAttendance = async (req, res) => {
         const check2 = await userModel.find({
           job_type: "WFHD",
           dept_id: req.body.dept,
-          att_status: 'onboarded'
+          att_status: 'onboarded',
+          user_status: "Active"
         });
 
-        let resignedOrSuspendedUsers = attendanceData
-          .filter(
-            (attendance) =>
-              attendance.status === "Resigned" ||
-              attendance.status === "Suspended"
-          )
-          .map((attendance) => attendance.user_id);
+        let filteredUserData = check2.map(user => {
+          const attendance = attendanceData.find(data => data.user_id === user.user_id);
+          if (attendance) {
+            return { ...user.toObject(), ...attendance };
+          } else {
+            return user.toObject();
+          }
+        });
 
-        let filteredUserData = check2.filter(
-          (user) => !resignedOrSuspendedUsers.includes(user.user_id)
-        );
         filteredUserData?.length > 0 &&
           filteredUserData.map(async (user) => {
+            //logic for separation
+            const resignDate = user.resignation_date;
+
+            const resignConvertDate = new Date(resignDate);
+
+            const resignMonth = resignConvertDate.toLocaleString('default', { month: 'long' });
+
+            const resignMonthNum = resignConvertDate.getUTCMonth() + 1;
+
+            const resignYear = String(resignConvertDate.getUTCFullYear());
+            const resignExtractDate = resignConvertDate.getDate();
+            const resignMonthYear = `${resignYear}` + `${resignMonthNum}`;
+
             var work_days;
+            const absent = noOfabsent == undefined ? 0 : req.body.noOfabsent;
             const joining = user.joining_date;
             const convertDate = new Date(joining);
+            // const extractJodDate = convertDate.getDate() - 1;
             const extractDate = convertDate.getDate() - 1;
-            const joiningMonth = String(convertDate.getUTCMonth() + 1).padStart(
-              2,
-              "0"
-            );
+            const joiningMonth = String(convertDate.getUTCMonth() + 1);
             const joiningYear = String(convertDate.getUTCFullYear());
             const mergeJoining = parseInt(joiningMonth + joiningYear);
             const monthNumber = monthNameToNumber(month);
             const mergeJoining1 = `${monthNumber}` + `${year}`;
             if (mergeJoining == mergeJoining1) {
-              work_days = 30 - extractDate - noOfabsent;
-            } else {
-              work_days = 30 - noOfabsent;
+              if (extractDate < 15) {
+                work_days = 15 - extractDate - absent;
+              } else {
+                work_days = 30 - extractDate - absent;
+              }
+            } else if (user.status == "Resigned") {
+              work_days = (30 - resignExtractDate) - absent;
             }
-
+            else {
+              work_days = 30 - absent;
+            }
             const bodymonth = `${year}` + `${monthNumber}`;
-            // const bodyMonth = year + monthNumber;
-            // console.log("bodyMonth", bodymonth);
 
             const joiningMonthNumber = convertDate.getUTCMonth() + 1;
             const joiningYearNumber = convertDate.getUTCFullYear();
             const mergeMonthYear = `${joiningYearNumber}` + `${joiningMonthNumber}`;
-            // const mergeMonthYear = joiningYearNumber + joiningMonthNumber;
-            // console.log("mergeMonthYear", mergeMonthYear);
-
-
 
             if (mergeMonthYear <= bodymonth) {
               const userExistsInAttendance = await doesUserExistInAttendance(
@@ -169,21 +224,19 @@ exports.addAttendance = async (req, res) => {
                 req.body.year
               );
               if (!userExistsInAttendance) {
-                // console.log("lopp inner")
-                const presentDays = work_days - 0;
-                // console.log("presentDays", presentDays);
+                const presentDays = work_days;
+
                 const perdaysal = user.salary / 30;
-                // console.log("perdaysal", perdaysal);
+
                 const totalSalary = perdaysal * presentDays;
-                // console.log("totalSalary", totalSalary);
+
                 const Bonus = bonus == undefined ? 0 : req.body.bonus;
-                // console.log('bonus', req.body.bonus)
+
                 const netSalary = totalSalary + Bonus;
-                // console.log("netSalary", netSalary);
+
                 const tdsDeduction = (netSalary * user.tds_per) / 100;
-                // console.log("tdsDeduction", tdsDeduction);
+
                 const ToPay = netSalary - tdsDeduction;
-                // console.log("ToPay", ToPay);
                 const salary = user.salary;
                 let invoiceNo = await createNextInvoiceNumber(user.user_id, month, year);
 
@@ -194,7 +247,7 @@ exports.addAttendance = async (req, res) => {
                   user_id: user.user_id,
                   invoiceNo: invoiceNo,
                   user_name: user.user_name,
-                  noOfabsent: noOfabsent,
+                  noOfabsent: absent,
                   present_days: presentDays,
                   month_salary: totalSalary && totalSalary.toFixed(2),
                   month: req.body.month,
@@ -212,7 +265,12 @@ exports.addAttendance = async (req, res) => {
                   disputed_date: req.body.disputed_date,
                   salary_deduction: req.body.salary_deduction
                 });
-                const instav = await creators.save();
+
+                if (user.status == "Resigned" && resignMonthYear < bodymonth) {
+                  console.log("User Exist ");
+                } else {
+                  const instav = await creators.save();
+                }
               }
               // res.send({ status: 200 });
             }
@@ -254,9 +312,9 @@ exports.addAttendance = async (req, res) => {
             const monthNumber = monthNameToNumber(month);
             const mergeJoining1 = `${monthNumber}` + `${year}`;
             if (mergeJoining == mergeJoining1) {
-              work_days = 30 - extractDate;
+              work_days = monthLastValue - extractDate;
             } else {
-              work_days = 30;
+              work_days = monthLastValue;
             }
             const userExistsInAttendance = await doesUserExistInAttendance(
               user.user_id,
@@ -264,8 +322,8 @@ exports.addAttendance = async (req, res) => {
               req.body.year
             );
             if (!userExistsInAttendance) {
-              const presentDays = work_days - 0;
-              const perdaysal = user.salary / 30;
+              const presentDays = work_days;
+              const perdaysal = user.salary / work_days;
               const totalSalary = perdaysal * presentDays;
               const Bonus = bonus || 0;
               const netSalary = totalSalary + Bonus;
@@ -310,11 +368,14 @@ exports.addAttendance = async (req, res) => {
             user_id: parseInt(req.body.user_id),
           });
 
-          // const joining = results4[0].joining_date;
-          // const convertDate = new Date(joining);
-          // const extractDate = convertDate.getDate();
+          const findSeparationData = await separationModel.findOne({ user_id: req.body.user_id })
+          const resignDate = findSeparationData?.resignation_date;
+          const resignConvertDate = new Date(resignDate);
+          const resignExtractDate = resignConvertDate?.getDate();
 
           var work_days;
+          const absent = noOfabsent == undefined ? 0 : req.body.noOfabsent;
+          const salaryDeduction = salary_deduction == undefined ? 0 : req.body.salary_deduction;
           const joining = results4[0].joining_date;
           const convertDate = new Date(joining);
           const extractDate = convertDate.getDate() - 1;
@@ -327,16 +388,24 @@ exports.addAttendance = async (req, res) => {
           const monthNumber = monthNameToNumber(month);
           const mergeJoining1 = `${monthNumber}` + `${year}`;
           if (mergeJoining == mergeJoining1) {
-            work_days = 30 - extractDate - noOfabsent;
-          } else {
-            work_days = 30 - noOfabsent;
+            if (extractDate < 15) {
+              work_days = 15 - extractDate - absent;
+            } else {
+              work_days = 30 - extractDate - absent;
+            }
+            // work_days = monthLastValue - extractDate - absent;
+          } else if (findSeparationData?.status == "Resigned") {
+            work_days = (30 - resignExtractDate) - absent;
+          }
+          else {
+            work_days = 30 - absent;
           }
 
           const present_days = work_days;
           const perdaysal = results4[0].salary / 30;
           const totalSalary = perdaysal * present_days;
-          const Bonus = bonus || 0;
-          const netSalary = Bonus ? totalSalary + Bonus - salary_deduction : totalSalary - salary_deduction;
+          const Bonus = bonus == undefined ? 0 : req.body.bonus;
+          const netSalary = (totalSalary + parseInt(Bonus)) - salaryDeduction;
           const tdsDeduction = (netSalary * results4[0].tds_per) / 100;
           const ToPay = netSalary - tdsDeduction;
           const salary = results4[0].salary;
@@ -352,7 +421,7 @@ exports.addAttendance = async (req, res) => {
             {
               dept: req.body.dept,
               user_id: req.body.user_id,
-              noOfabsent: No_of_absent,
+              noOfabsent: absent,
               month: req.body.month,
               year: req.body.year,
               bonus: Bonus,
@@ -372,6 +441,7 @@ exports.addAttendance = async (req, res) => {
             },
             { new: true }
           ).sort({ attendence_id: 1 });
+          // console.log("edit", editsim)
           return res.send({ status: 200 });
         }
       }
@@ -383,7 +453,6 @@ exports.addAttendance = async (req, res) => {
       .send({ error: error.message, sms: "error while adding data" });
   }
 };
-
 
 
 exports.getSalaryByDeptIdMonthYear = async (req, res) => {
@@ -883,15 +952,15 @@ exports.getSalaryByUserId = async (req, res) => {
             permanent_pin_code: "$user.permanent_pin_code",
           },
         },
-        {
-          $group: {
-            _id: "$attendence_id",
-            data: { $first: "$$ROOT" },
-          },
-        },
-        {
-          $replaceRoot: { newRoot: "$data" },
-        },
+        // {
+        //   $group: {
+        //     _id: "$user_id",
+        //     data: { $first: "$$ROOT" },
+        //   },
+        // },
+        // {
+        //   $replaceRoot: { newRoot: "$data" },
+        // },
       ])
       .exec();
     if (getcreators?.length === 0) {
@@ -1009,6 +1078,91 @@ exports.totalSalary = async (req, res) => {
       error: error.message,
       status: 500,
       sms: "error getting all salary",
+    });
+  }
+};
+
+exports.currentMonthAllDeptTotalSalary = async (req, res) => {
+  try {
+
+    //months name array create
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    //current date get
+    const currentDate = new Date();
+    const currentMonthNumber = currentDate.getMonth();
+    const currentMonthName = months[currentMonthNumber].toString();
+
+    //get data from the aggregation query
+    const query = await attendanceModel.aggregate([{
+      $match: {
+        month: currentMonthName
+      }
+    }, {
+      $group: {
+        _id: null,
+        totalSalary: { $sum: "$total_salary" },
+        totalBonus: { $sum: "$bonus" },
+        totalTdsDeduction: { $sum: "$tds_deduction" },
+        totalSalaryDeduction: { $sum: "$salary_deduction" }
+      }
+    }]).exec();
+
+    //success response send
+    res.send({ status: 200, data: query });
+  } catch (error) {
+    return res.send({
+      error: error.message,
+      status: 500,
+      sms: "Error in current month all department data."
+    });
+  }
+};
+
+exports.singleDeptWholeYearTotalSalary = async (req, res) => {
+  try {
+    //current date find
+    const currentDate = new Date();
+    //current date to year get
+    const currentYear = currentDate.getFullYear().toString();
+    //get dept id from params
+    const deptId = req.params?.id;
+    //aggregation through data get
+    const query = await attendanceModel.aggregate([{
+      $match: {
+        year: parseInt(currentYear),
+        dept: parseInt(deptId)
+      }
+    }, {
+      $group: {
+        _id: 0,
+        totalsalary: { $sum: "$total_salary" },
+        totalBonus: { $sum: "$bonus" },
+        totaltdsdeduction: { $sum: "$tds_deduction" },
+        totalsalarydeduction: { $sum: "$salary_deduction" },
+      }
+    }]).exec();
+
+    //send success response
+    res.send({ status: 200, data: query });
+  } catch (error) {
+    return res.send({
+      error: error.message,
+      status: 500,
+      sms: "error in single dept whole year getting all salary",
     });
   }
 };
@@ -1251,7 +1405,185 @@ exports.getMonthYearData = async (req, res) => {
   }
 };
 
+const getMonthYearDataFunc = async function () {
+  try {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonthIndex = currentDate.getMonth() + 1;
+    const numberOfMonths = 6;
+    const months = [
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+      "January",
+      "February",
+      "March",
+    ];
 
+    let startYear = currentYear;
+    let startMonthIndex = currentMonthIndex;
+
+    if (startMonthIndex <= months.indexOf("March")) {
+      startYear--;
+    }
+
+    const monthYearArray = months.map((month, index) => {
+      const loopMonthIndex = ((startMonthIndex + index - 1) % 12) + 1;
+      const loopYear =
+        startYear + Math.floor((startMonthIndex + index - 1) / 12);
+
+      return {
+        month,
+        year:
+          loopMonthIndex <= currentMonthIndex
+            ? loopYear
+            : parseInt(loopYear) +
+            parseInt(
+              month == "January" || month == "February" || month == "March"
+                ? 1
+                : 0
+            ),
+      };
+    });
+
+    const aggregationPipeline = [
+      {
+        $group: {
+          _id: {
+            month: "$month",
+            year: "$year",
+            dept: "$dept"
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            month: "$_id.month",
+            year: "$_id.year"
+          },
+          deptCount: { $sum: 1 }
+        }
+      }
+    ];
+
+    const dbResult = await attendanceModel.aggregate(aggregationPipeline);
+
+    const dbSet = new Set(
+      dbResult.map((item) => `${item._id.month}-${item._id.year}`)
+    );
+
+    const actualExistingResult = monthYearArray.map((item) => {
+      const dateStr = `${item.month}-${item.year}`;
+      const existingData = dbSet.has(dateStr) ? 1 : 0;
+
+      const deptCount = dbResult.find(entry => entry._id.month === item.month && entry._id.year === item.year)?.deptCount || 0;
+
+      item.deptCount = deptCount;
+      item.atdGenerated = existingData;
+
+      return item;
+    });
+
+    const response = { data: [...actualExistingResult] };
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const getMonthYearDataCurrentFy = async function () {
+  try {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonthIndex = currentDate.getMonth() + 1;
+    const numberOfMonths = 6;
+    const months = [
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+      "January",
+      "February",
+      "March",
+    ];
+    let startYear = currentYear;
+    let startMonthIndex = currentMonthIndex;
+    // Adjusting the start year if the current month is January to March
+    if (startMonthIndex >= months.indexOf("January") + 1 && startMonthIndex <= months.indexOf("March") + 1) {
+      startYear--;
+    }
+    const monthYearArray = months.map((month, index) => {
+      const loopMonthIndex = ((startMonthIndex + index - 1) % 12) + 1;
+      const loopYear =
+        startYear + Math.floor((startMonthIndex + index - 1) / 12);
+      return {
+        month,
+        year: loopYear,
+      };
+    });
+    const aggregationPipeline = [
+      {
+        $group: {
+          _id: {
+            month: "$month",
+            year: "$year",
+            dept: "$dept"
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            month: "$_id.month",
+            year: "$_id.year"
+          },
+          deptCount: { $sum: 1 }
+        }
+      }
+    ];
+    const dbResult = await attendanceModel.aggregate(aggregationPipeline);
+    const dbSet = new Set(
+      dbResult.map((item) => `${item._id.month}-${item._id.year}`)
+    );
+    const actualExistingResult = monthYearArray.map((item) => {
+      const dateStr = `${item.month}-${item.year}`;
+      const existingData = dbSet.has(dateStr) ? 1 : 0;
+      const deptCount = dbResult.find(entry => entry._id.month === item.month && entry._id.year === item.year)?.deptCount || 0;
+      item.deptCount = deptCount;
+      item.atdGenerated = existingData;
+      return item;
+    });
+    const response = { data: [...actualExistingResult] };
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+exports.getMonthYearDataMerged = async (req, res) => {
+  try {
+    //get data from 2023 fy 
+    let data1 = await getMonthYearDataFunc();
+    //get data from current fy 
+    let data2 = await getMonthYearDataCurrentFy();
+    const response = { data: [...data1.data, ...data2.data] };
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ error: error.message, sms: "error getting data" });
+  }
+}
 
 exports.getDistinctDepts = async (req, res) => {
   try {
@@ -1796,7 +2128,6 @@ exports.getAllAttendanceData = async (req, res) => {
       .sort({ _id: -1 })
       .exec();
 
-    console.log("dddddddddd", latestEntry.month, "year", latestEntry.year)
     // const allAttendanceData = await attendanceModel.find();
     const allAttendanceData = await attendanceModel.aggregate([
       {
@@ -1992,6 +2323,140 @@ exports.getSalarycalculationData = async (req, res) => {
       error: error.message,
       status: 500,
       sms: "Error getting grouped attendance data",
+    });
+  }
+};
+
+exports.getSalaryCalculationWithFilterData = async (req, res) => {
+  try {
+    let matchQueryObj = {};
+    const filterOption = req.query?.filterOption;
+
+    //check if query filter data is available
+    if (filterOption && filterOption != '') {
+      //current Quater data array for the months
+      let firstQuter = ["January", "February", "March"];
+      let secondQuter = ["April", "May", "June"];
+      let thirdQuter = ["July", "August", "September"];
+      let fourthQuter = ["October", "November", "December"];
+
+      //months name array create
+      const months = [...firstQuter, ...secondQuter, ...thirdQuter, ...fourthQuter]
+
+      //current date get
+      const currentDate = new Date();
+
+      //current date to year get
+      let currentYear = currentDate.getFullYear();
+      let previousYear = currentYear - 1;
+
+      //current date to month number get
+      let currentMonthNumber = currentDate.getMonth();
+      let previousMonthNumber = currentMonthNumber - 1;
+
+      //condition check for the months number
+      if (previousMonthNumber < 0) {
+        previousMonthNumber = 11;
+        currentYear = currentYear - 1;
+      }
+
+      //months number to name finds
+      const currentMonthName = months[currentMonthNumber].toString();
+      const prevoiusMonthName = months[previousMonthNumber].toString();
+
+      // Determine the current quarter based on the current month number
+      let currentQuarter;
+      if (currentMonthNumber >= 0 && currentMonthNumber <= 2) {
+        currentQuarter = firstQuter;
+      } else if (currentMonthNumber >= 3 && currentMonthNumber <= 5) {
+        currentQuarter = secondQuter;
+      } else if (currentMonthNumber >= 6 && currentMonthNumber <= 8) {
+        currentQuarter = thirdQuter;
+      } else {
+        currentQuarter = fourthQuter;
+      }
+
+      //current month data get condition
+      if (filterOption == "this_month") {
+        matchQueryObj = {
+          month: currentMonthName,
+          year: parseInt(currentYear)
+        }
+      }
+      //current quater data get condition
+      if (filterOption == "this_quater") {
+        matchQueryObj = {
+          month: {
+            $in: currentQuarter
+          },
+          year: parseInt(currentYear)
+        }
+      }
+      //current yesr data get condition
+      if (filterOption == "this_year") {
+        matchQueryObj = {
+          year: parseInt(currentYear)
+        }
+      }
+      //previous month data get condition
+      if (filterOption == "previous_month") {
+        matchQueryObj = {
+          month: prevoiusMonthName,
+          year: parseInt(currentYear)
+        }
+      }
+      //previous year data get condition
+      if (filterOption == "previous_year") {
+        matchQueryObj = {
+          year: parseInt(previousYear)
+        }
+      }
+    }
+
+    //filter condition wise data get from DB collection.
+    const groupedAttendanceData = await attendanceModel.aggregate([{
+      $match: matchQueryObj
+    }, {
+      $group: {
+        _id: {
+          dept: "$dept",
+          month: "$month",
+          year: "$year"
+        },
+        totalSalary: { $sum: "$total_salary" },
+        disbursedSalary: { $sum: "$disbursedSalary" },
+        totalUsers: { $sum: 1 },
+      }
+    }, {
+      $lookup: {
+        from: "departmentmodels",
+        localField: "_id.dept",
+        foreignField: "dept_id",
+        as: "department",
+      }
+    }, {
+      $unwind: "$department",
+    }, {
+      $project: {
+        _id: 0,
+        dept_id: "$_id.dept",
+        month: "$_id.month",
+        year: "$_id.year",
+        totalSalary: 1,
+        disbursedSalary: 1,
+        pendingAmount: { $subtract: ["$totalSalary", "$disbursedSalary"] },
+        dept_name: "$department.dept_name",
+        totalUsers: 1
+      }
+    }]);
+
+    //success response send
+    return res.status(200).send({ data: groupedAttendanceData });
+  } catch (error) {
+    return res.send({
+      error: error.message,
+      status: 500,
+      sms: "Error in getting grouped attendance data with filter",
     });
   }
 };
@@ -2302,3 +2767,69 @@ exports.updateAttendance = async (req, res) => {
 //     res.status(500).send("Internal Server Error");
 //   }
 // };
+
+
+//delete api
+exports.deleteAttecndenceData = async (req, res) => {
+  try {
+    const { dept, month, year } = req.body;
+
+    if (!dept || !month || !year) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+    const attendanceDataDeleted = await attendanceModel.deleteMany({
+      dept: dept,
+      month: month,
+      year: year
+    });
+    if (attendanceDataDeleted.deletedCount === 0) {
+      return res.status(404).json({ error: 'No attendance data found for the provided criteria' });
+    }
+    return res.status(200).json({
+      status: 200,
+      message: 'Attendance data deleted successfully!',
+      data: attendanceDataDeleted
+    });
+  } catch (error) {
+    console.error('Error deleting attendance data:', error);
+    return res.status(500).json({
+      error: 'Internal server error'
+    });
+  }
+};
+
+
+
+
+// exports.deleteAttecndenceData = async (req, res) => {
+//   try {
+//     const { dept, month, year } = req.body;
+//     console.log("req.body------------------------------------", req.body)
+//     if (!dept || !month || !year) {
+//       return res.status(400).json({ error: 'Missing required parameters' });
+//     }
+//     const matchingDocuments = await attendanceModel.aggregate([{
+//       $match: {
+//         dept: dept,
+//         month: month,
+//         year: year
+//       }
+//     }]);
+//     const attendanceDataDeleted = await attendanceModel.deleteMany({
+//       dept: dept,
+//       month: month,
+//       year: year
+//     });
+
+//     return res.status(200).json({
+//       status: 200,
+//       message: 'Attendance data deleted successfully!',
+//       data: attendanceDataDeleted
+//     });
+//   } catch (error) {
+//     console.error('Error deleting attendance data:', error);
+//     return res.status(500).json({
+//       error: 'Internal server error'
+//     });
+//   }
+// }

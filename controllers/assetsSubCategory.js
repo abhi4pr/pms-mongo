@@ -118,9 +118,6 @@ exports.getAssetSubCategorys = async (req, res) => {
             });
         }
 
-        // Sort the result array based on sub_category_id
-        result.sort((a, b) => b.sub_category_id - a.sub_category_id);
-
         return response.returnTrue(
             200,
             req,
@@ -132,6 +129,24 @@ exports.getAssetSubCategorys = async (req, res) => {
         return response.returnFalse(500, req, res, err.message, {});
     }
 };
+
+
+// exports.getAssetSubCategorys = async (req, res) => {
+//     try {
+//         const assetSubCategories = await assetsSubCategoryModel.find();
+//         if (assetSubCategories.length === 0) {
+//             res
+//                 .status(200)
+//                 .send({ success: true, data: [], message: "No Record found" });
+//         } else {
+//             res.status(200).send({ data: assetSubCategories });
+//         }
+//     } catch (err) {
+//         res
+//             .status(500)
+//             .send({ error: err.message, message: "Error getting all brandcategorydata" });
+//     }
+// };
 
 exports.getSingleAssetSubCategory = async (req, res) => {
     try {
@@ -300,7 +315,7 @@ exports.getTotalAssetInSubCategory = async (req, res) => {
                 {
                     $unwind: {
                         path: "$subcategory",
-                        preserveNullAndEmptyArrays: true,
+                        // preserveNullAndEmptyArrays: true,
                     },
                 },
                 {
@@ -324,7 +339,8 @@ exports.getTotalAssetInSubCategory = async (req, res) => {
             return res.status(404).send({ success: false, message: 'No assets found for the given sub_category_id' });
         }
 
-        res.status(200).send({ success: true, data: assets });
+        const subCatLength = assets.length;
+        res.status(200).send({ success: true, count: subCatLength, data: assets });
     } catch (err) {
         console.error(err);
         res.status(500).send({ success: false, error: err, message: 'Error getting asset details' });
@@ -385,10 +401,22 @@ exports.getTotalAssetInSubCategoryAllocated = async (req, res) => {
         if (!assets || assets.length === 0) {
             return res.status(404).send({ success: false, message: 'No assets found for the given sub_category_id' });
         }
-
-        res.status(200).send({ success: true, data: assets });
+        const subCatLength = assets.length;
+        res.status(200).send({ success: true, count: subCatLength, data: assets });
     } catch (err) {
         console.error(err);
         res.status(500).send({ success: false, error: err, message: 'Error getting asset details' });
     }
 };
+
+exports.getAssetBySubCat = async (req, res) => {
+    try {
+        const singleAsset = await simModel.find({ sub_category_id: parseInt(req.params.sub_category_id), status: "Available" }).select({ sim_id: 1, assetsName: 1 });
+        if (!singleAsset) {
+            return res.status(500).send({ success: false });
+        }
+        res.status(200).send({ data: singleAsset });
+    } catch (error) {
+        res.status(500).send({ error: error.message, sms: "Error getting asset details" });
+    }
+}

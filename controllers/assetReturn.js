@@ -2,6 +2,7 @@ const assetReturnModel = require("../models/assetReturnModel.js");
 const simModel = require("../models/simModel.js");
 const userModel = require("../models/userModel.js");
 const assetHistoryModel = require("../models/assetHistoryModel.js");
+const assetReturnSumModel = require("../models/assetReturnSumModel.js");
 const multer = require("multer");
 const mongoose = require("mongoose");
 const vari = require("../variables.js");
@@ -318,10 +319,10 @@ exports.editAssetReturnRequest = [
             };
 
             if (req.files) {
-                updateFields.return_asset_image_1 = req.files["return_asset_image_1"] ? req.files["return_asset_image_1"][0].filename : assetReturnRequest.return_asset_image_1;
-                updateFields.return_asset_image_2 = req.files["return_asset_image_2"] ? req.files["return_asset_image_2"][0].filename : assetReturnRequest.return_asset_image_2;
-                updateFields.recover_asset_image_1 = req.files["recover_asset_image_1"] ? req.files["recover_asset_image_1"][0].filename : assetReturnRequest.recover_asset_image_1;
-                updateFields.recover_asset_image_2 = req.files["recover_asset_image_2"] ? req.files["recover_asset_image_2"][0].filename : assetReturnRequest.recover_asset_image_2;
+                updateFields.return_asset_image_1 = req.files?.return_asset_image_1 ? req.files.return_asset_image_1[0].originalname : assetReturnRequest.return_asset_image_1;
+                updateFields.return_asset_image_2 = req.files?.return_asset_image_2 ? req.files.return_asset_image_2[0].originalname : assetReturnRequest.return_asset_image_2;
+                updateFields.recover_asset_image_1 = req.files?.recover_asset_image_1 ? req.files.recover_asset_image_1[0].originalname : assetReturnRequest.recover_asset_image_1;
+                updateFields.recover_asset_image_2 = req.files?.recover_asset_image_2 ? req.files.recover_asset_image_2[0].originalname : assetReturnRequest.recover_asset_image_2;
             }
 
             const editAssetReturn = await assetReturnModel.findOneAndUpdate(
@@ -373,6 +374,22 @@ exports.editAssetReturnRequest = [
                 });
                 blobStream4.end(req.files.recover_asset_image_2[0].buffer);
             }
+
+            if (req.body.asset_return_status === "RecovedByHR") {
+                const returnSummaryData = {
+                    sim_id: editAssetReturn.sim_id,
+                    return_asset_data_time: editAssetReturn.return_asset_data_time,
+                    asset_return_remark: editAssetReturn.asset_return_remark,
+                    recover_asset_image_1: editAssetReturn.recover_asset_image_1,
+                    recover_asset_image_2: editAssetReturn.recover_asset_image_2,
+                    asset_return_by: editAssetReturn.asset_return_by,
+                    asset_return_recover_by: editAssetReturn.asset_return_recover_by,
+                    asset_return_recover_by_remark: editAssetReturn.asset_return_recover_by_remark
+                };
+
+                await assetReturnSumModel.create(returnSummaryData);
+            }
+
 
             res.status(200).send({
                 success: true,
@@ -512,6 +529,11 @@ exports.showReturnReturnAllData = async (req, res) => {
         const imageUrl = vari.IMAGE_URL;
         const userData = await assetReturnModel.aggregate([
             {
+                $match: {
+                    asset_return_status: "RecovedByHR"
+                }
+            },
+            {
                 $lookup: {
                     from: "simmodels",
                     localField: "sim_id",
@@ -551,12 +573,12 @@ exports.showReturnReturnAllData = async (req, res) => {
                     assetName: "$sim.assetsName",
                     asset_return_by_name: "$user.user_name",
                     //   asset_return_recover_name: "$user1.user_name",
-                    return_asset_image_1: {
-                        $concat: [imageUrl, "$return_asset_image_1"],
-                    },
-                    return_asset_image_2: {
-                        $concat: [imageUrl, "$return_asset_image_2"],
-                    },
+                    // return_asset_image_1: {
+                    //     $concat: [imageUrl, "$return_asset_image_1"],
+                    // },
+                    // return_asset_image_2: {
+                    //     $concat: [imageUrl, "$return_asset_image_2"],
+                    // },
                     recover_asset_image_1: {
                         $concat: [imageUrl, "$recover_asset_image_1"],
                     },

@@ -6,24 +6,17 @@ const pmsVendorPagePriceModel = require('../../models/PMS/pmsVendorPagePriceMode
 //POST- PMS_Vendor_Page_Price
 exports.createVendorPagePrice = async (req, res) => {
     try {
-        // const checkDuplicacy = await pmsVendorPagePriceModel.findOne({ price_type: req.body.price_type });
-        // if (checkDuplicacy) {
-        //     return res.status(403).json({
-        //         status: 403,
-        //         message: "PMS vendor page price alredy exist!",
-        //     });
-        // }
-        const { platform_price_id, pageMast_id, vendorMast_Id, price_type_id, price_cal_type, variable_type, price_fixed,
-            price_variable, description, created_by, last_updated_by } = req.body;
+        const { platform_price_id, pageMast_id, vendorMast_id, price_type_id, price_cal_type, variable_type, Sale_price,
+            variable_type_rate, description, created_by, last_updated_by } = req.body;
         const addVendorPagePriceData = new pmsVendorPagePriceModel({
             platform_price_id: platform_price_id,
             pageMast_id: pageMast_id,
-            vendorMast_Id: vendorMast_Id,
+            vendorMast_id: vendorMast_id,
             price_type_id: price_type_id,
             price_cal_type: price_cal_type,
             variable_type: variable_type,
-            price_fixed: price_fixed,
-            price_variable: price_variable,
+            Sale_price: Sale_price,
+            variable_type_rate: variable_type_rate,
             description: description,
             created_by: created_by,
             last_updated_by: last_updated_by
@@ -37,7 +30,7 @@ exports.createVendorPagePrice = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -67,12 +60,12 @@ exports.getVendorPagePriceDetail = async (req, res) => {
                 $project: {
                     platform_price_id: 1,
                     pageMast_id: 1,
-                    vendorMast_Id: 1,
+                    vendorMast_id: 1,
                     price_type_id: 1,
                     price_cal_type: 1,
                     variable_type: 1,
-                    price_fixed: 1,
-                    price_variable: 1,
+                    Sale_price: 1,
+                    variable_type_rate: 1,
                     description: 1,
                     created_by_name: "$user.user_name",
                     last_updated_date: 1,
@@ -94,16 +87,17 @@ exports.getVendorPagePriceDetail = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
 
+//PUT- VendorPAgePrice
 exports.updateVendorPagePrice = async (req, res) => {
     try {
         const { id } = req.params;
-        const { platform_price_id, pageMast_id, vendorMast_Id, price_type_id, price_cal_type, variable_type, price_fixed,
-            price_variable, description, created_by, last_updated_by } = req.body;
+        const { platform_price_id, pageMast_id, vendorMast_id, price_type_id, price_cal_type, variable_type, Sale_price,
+            variable_type_rate, description, created_by, last_updated_by } = req.body;
         const vendorPagePriceData = await pmsVendorPagePriceModel.findOne({ _id: id });
         if (!vendorPagePriceData) {
             return res.send("Invalid vendor page price Id...");
@@ -113,12 +107,12 @@ exports.updateVendorPagePrice = async (req, res) => {
             $set: {
                 platform_price_id,
                 pageMast_id,
-                vendorMast_Id,
+                vendorMast_id,
                 price_type_id,
                 price_cal_type,
                 variable_type,
-                price_fixed,
-                price_variable,
+                Sale_price,
+                variable_type_rate,
                 description,
                 created_by,
                 last_updated_by
@@ -132,7 +126,7 @@ exports.updateVendorPagePrice = async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -140,6 +134,7 @@ exports.updateVendorPagePrice = async (req, res) => {
 //GET - PMS_VendorPagePrice_List
 exports.getVendorPagePriceList = async (req, res) => {
     try {
+
         const vendorPagePriceData = await pmsVendorPagePriceModel.aggregate([
             {
                 $lookup: {
@@ -229,21 +224,23 @@ exports.getVendorPagePriceList = async (req, res) => {
                 $project: {
                     platform_price_id: 1,
                     pageMast_id: 1,
-                    vendorMast_Id: 1,
+                    vendorMast_id: 1,
                     price_type_id: 1,
                     price_cal_type: 1,
                     variable_type: 1,
-                    price_fixed: 1,
-                    price_variable: 1,
+                    Sale_price: 1,
+                    variable_type_rate: 1,
                     description: 1,
                     created_by_name: "$user.user_name",
                     last_updated_date: 1,
                     last_updated_by: 1,
                     pmsplatformprice_data: {
+                        platform_price_id: "$pmsplatformprice._id",
                         description: "$pmsplatformprice.description",
                         created_by: "$pmsplatformprice.created_by"
                     },
                     PMS_PageMast_data: {
+                        pmspageMast_id: "$pmspagemast._id",
                         page_user_name: "$pmspagemast.page_user_name",
                         link: "$pmspagemast.link",
                         platform_id: "$pmspagemast.platform_id",
@@ -266,6 +263,7 @@ exports.getVendorPagePriceList = async (req, res) => {
                         last_updated_by: "$pmspagemast.last_updated_by",
                     },
                     PMS_VendorMasts_data: {
+                        vendorMast_id: "$pmsvendormast._id",
                         vendorMast_name: "$pmsvendormast.vendorMast_name",
                         country_code: "$pmsvendormast.country_code",
                         mobile: "$pmsvendormast.mobile",
@@ -286,14 +284,25 @@ exports.getVendorPagePriceList = async (req, res) => {
                         created_by: "$pmsvendormast.created_by",
                         last_updated_by: "$pmsvendormast.last_updated_by",
                     },
-                    PMS_Price_data:{
-                        price_type:"$pmspricetype.price_type",
-                        description:"$pmspricetype.description",
-                        created_by:"$pmspricetype.created_by"
+                    PMS_Price_data: {
+                        price_type_id: "$pmspricetype._id",
+                        price_type: "$pmspricetype.price_type",
+                        description: "$pmspricetype.description",
+                        created_by: "$pmspricetype.created_by"
                     }
                 }
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    data: { $first: "$$ROOT" }
+                }
+            },
+            {
+                $replaceRoot: { newRoot: "$data" }
             }
         ])
+        console.log("vendorPagePriceData--------------------------",vendorPagePriceData)
         if (!vendorPagePriceData) {
             return res.status(500).send({
                 succes: true,
@@ -305,9 +314,9 @@ exports.getVendorPagePriceList = async (req, res) => {
             message: "PMS vendor page price data list successfully!",
             data: vendorPagePriceData
         });
-    } catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -332,7 +341,7 @@ exports.deleteVendorPagePriceData = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };

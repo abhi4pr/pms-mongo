@@ -16,14 +16,13 @@ exports.createPlatformPrice = async (req, res) => {
                 message: "PMS platform-price alredy exist!",
             });
         }
-        const { platform_id, description, price_type_id, created_date_time, created_by, last_updated_date, last_updated_by } = req.body;
+        const { platform_id, platform_price_name, description, price_type_id, created_by, last_updated_by } = req.body;
         const addPlatformPriceData = new pmsPlatformPriceModel({
             platform_id: platform_id,
+            platform_price_name: platform_price_name,
             price_type_id: price_type_id,
             description: description,
-            created_date_time: created_date_time,
             created_by: created_by,
-            last_updated_date: last_updated_date,
             last_updated_by: last_updated_by
         });
         await addPlatformPriceData.save();
@@ -35,7 +34,7 @@ exports.createPlatformPrice = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -66,6 +65,7 @@ exports.getPlatformPriceDetail = async (req, res) => {
                     platform_id: 1,
                     price_type_id: 1,
                     type_name: 1,
+                    platform_price_name: 1,
                     description: 1,
                     created_date_time: 1,
                     created_by: 1,
@@ -89,7 +89,7 @@ exports.getPlatformPriceDetail = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -98,7 +98,7 @@ exports.getPlatformPriceDetail = async (req, res) => {
 exports.updatePlatformPriceData = async (req, res) => {
     try {
         const { id } = req.params;
-        const { platform_id, description, price_type_id, created_date_time, created_by, last_updated_date, last_updated_by } = req.body;
+        const { platform_id, platform_price_name, description, price_type_id, created_by, last_updated_by } = req.body;
         const PlatformPrice = await pmsPlatformPriceModel.findOne({ _id: id });
         if (!PlatformPrice) {
             return res.send("Invalid Platform-price Id...");
@@ -108,10 +108,9 @@ exports.updatePlatformPriceData = async (req, res) => {
             $set: {
                 platform_id,
                 price_type_id,
+                platform_price_name,
                 description,
-                created_date_time,
                 created_by,
-                last_updated_date,
                 last_updated_by
             },
         },
@@ -123,7 +122,7 @@ exports.updatePlatformPriceData = async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -190,6 +189,7 @@ exports.getPlatformPriceList = async (req, res) => {
             },
             {
                 $project: {
+                    platform_price_name: 1,
                     description: 1,
                     created_date_time: 1,
                     created_by: 1,
@@ -198,14 +198,15 @@ exports.getPlatformPriceList = async (req, res) => {
                     last_updated_date: 1,
                     last_updated_by: 1,
                     PMS_Platform_data: {
+                        pmsPlatform_id: "$pmsPlatform._id",
                         platform_name: "$pmsPlatform.platform_name",
                         description: "$pmsPlatform.description"
                     },
                     PMS_Pricetypes_data: {
-                        price_type:"$pmsPriceType.price_type",
-                        description_price_type:"$pmsPriceType.description"
+                        pmsPriceType_id: "$pmsPriceType._id",
+                        price_type: "$pmsPriceType.price_type",
+                        description_price_type: "$pmsPriceType.description"
                     }
-
                 }
             }
         ])
@@ -220,9 +221,9 @@ exports.getPlatformPriceList = async (req, res) => {
             message: "PMS platform-price type data list successfully!",
             data: pmsPlatformPriceData
         });
-    } catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -247,7 +248,7 @@ exports.deletePlatformPriceData = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };

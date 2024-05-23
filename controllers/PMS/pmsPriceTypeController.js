@@ -6,20 +6,24 @@ const pmsPriceTypeModel = require('../../models/PMS/pmsPriceTypeModel');
 //POST- PMS_Price-type
 exports.createPriceType = async (req, res) => {
     try {
-        const checkDuplicacy = await pmsPriceTypeModel.findOne({ price_type: req.body.price_type });
+        const checkDuplicacy = await pmsPriceTypeModel.findOne({
+            platform_id: req.body.platform_id,
+            // price_type: req.body.price_type
+            price_type: { $regex: new RegExp(req.body.price_type, 'i') },
+        });
+        
         if (checkDuplicacy) {
             return res.status(403).json({
                 status: 403,
-                message: "PMS price type alredy exist!",
+                message: "Price type alredy exist for this platform!",
             });
         }
-        const { price_type, description, created_date_time, created_by, last_updated_date, last_updated_by } = req.body;
+        const { price_type, description, platform_id, created_by, last_updated_by } = req.body;
         const addPriceData = new pmsPriceTypeModel({
             price_type: price_type,
             description: description,
-            created_date_time: created_date_time,
+            platform_id: platform_id,
             created_by: created_by,
-            last_updated_date: last_updated_date,
             last_updated_by: last_updated_by
         });
         await addPriceData.save();
@@ -31,7 +35,7 @@ exports.createPriceType = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -60,6 +64,7 @@ exports.getPriceDetail = async (req, res) => {
             {
                 $project: {
                     price_id: 1,
+                    platform_id: 1,
                     price_type: 1,
                     description: 1,
                     created_date_time: 1,
@@ -84,7 +89,7 @@ exports.getPriceDetail = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -93,7 +98,7 @@ exports.getPriceDetail = async (req, res) => {
 exports.updatePriceType = async (req, res) => {
     try {
         const { id } = req.params;
-        const { price_type, description, created_date_time, created_by, last_updated_date, last_updated_by } = req.body;
+        const { price_type, description, platform_id, created_by, last_updated_by } = req.body;
         const priceTypeData = await pmsPriceTypeModel.findOne({ _id: id });
         if (!priceTypeData) {
             return res.send("Invalid price Id...");
@@ -103,9 +108,7 @@ exports.updatePriceType = async (req, res) => {
             $set: {
                 price_type,
                 description,
-                created_date_time,
                 created_by,
-                last_updated_date,
                 last_updated_by
             },
         },
@@ -117,12 +120,12 @@ exports.updatePriceType = async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
 
-//GET - PMS_Vendo_List
+//GET - PMS_Price_List
 exports.getPriceList = async (req, res) => {
     try {
         const pmsPriceData = await pmsPriceTypeModel.aggregate([
@@ -158,6 +161,7 @@ exports.getPriceList = async (req, res) => {
                 $project: {
                     price_type_id: 1,
                     price_type: 1,
+                    platform_id: 1,
                     description: 1,
                     created_date_time: 1,
                     created_by: 1,
@@ -179,9 +183,9 @@ exports.getPriceList = async (req, res) => {
             message: "PMS price data list successfully!",
             data: pmsPriceData
         });
-    } catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -206,7 +210,8 @@ exports.deletePriceType = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
+

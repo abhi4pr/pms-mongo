@@ -3,26 +3,17 @@ const { message } = require("../../common/message");
 const mongoose = require("mongoose");
 const pmsVendorGroupLinkModel = require('../../models/PMS/pmsVendorGroupLinkModel');
 
-//POST- PMS_Vendor_Group
+//POST- PMS_Vendor_Group_Link
 exports.createVendorGroup = async (req, res) => {
     try {
-        const checkDuplicacy = await pmsVendorGroupLinkModel.findOne({ link_type: req.body.link_type });
-        if (checkDuplicacy) {
-            return res.status(403).json({
-                status: 403,
-                message: "PMS vendor group link data alredy exist!",
-            });
-        }
-        const { vendorMast_id, group_link_type_id, group_link, description, created_date_time, created_by, last_updated_date,
+        const { vendorMast_id, group_link_type_id, group_link, description, created_by,
             last_updated_by } = req.body;
         const addVendorGroupData = new pmsVendorGroupLinkModel({
             vendorMast_id: vendorMast_id,
             group_link_type_id: group_link_type_id,
             group_link: group_link,
             description: description,
-            created_date_time: created_date_time,
             created_by: created_by,
-            last_updated_date: last_updated_date,
             last_updated_by: last_updated_by
         });
         await addVendorGroupData.save();
@@ -34,7 +25,7 @@ exports.createVendorGroup = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -87,7 +78,7 @@ exports.getVendorGroupDetail = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -96,7 +87,7 @@ exports.getVendorGroupDetail = async (req, res) => {
 exports.updateVendorGroup = async (req, res) => {
     try {
         const { id } = req.params;
-        const { vendorMast_id, group_link_type_id, group_link, description, created_date_time, created_by, last_updated_date,
+        const { vendorMast_id, group_link_type_id, group_link, description, created_by,
             last_updated_by } = req.body;
         const VendorgroupLinkData = await pmsVendorGroupLinkModel.findOne({ _id: id });
         if (!VendorgroupLinkData) {
@@ -109,9 +100,7 @@ exports.updateVendorGroup = async (req, res) => {
                 group_link_type_id,
                 group_link,
                 description,
-                created_date_time,
                 created_by,
-                last_updated_date,
                 last_updated_by
             },
         },
@@ -123,7 +112,7 @@ exports.updateVendorGroup = async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -164,13 +153,13 @@ exports.getAllVendorGroupList = async (req, res) => {
                 $lookup: {
                     from: "pmsvendormasts",
                     localField: "vendorMast_id",
-                    foreignField: "_id",
-                    as: "pmsVendorMast",
+                    foreignField: "vendorMast_id",
+                    as: "pmsvendormast",
                 },
             },
             {
                 $unwind: {
-                    path: "$pmsVendorMast",
+                    path: "$pmsvendormast",
                     preserveNullAndEmptyArrays: true,
                 },
             },
@@ -192,39 +181,51 @@ exports.getAllVendorGroupList = async (req, res) => {
                 $project: {
                     group_link: 1,
                     description: 1,
+                    vendorMast_id: 1,
                     created_date_time: 1,
                     created_by: 1,
                     last_updated_by_name: "$user_data.user_name",
                     created_by_name: "$user.user_name",
                     last_updated_date: 1,
                     last_updated_by: 1,
-                    PMSVendorMasts_data: {
-                        type_id: "$pmsVendorMast.type_id",
-                        platform_id: "$pmsVendorMast.platform_id",
-                        payMethod_id: "$pmsVendorMast.payMethod_id",
-                        cycle_id: "$pmsVendorMast.cycle_id",
-                        vendorMast_name: "$pmsVendorMast.vendorMast_name",
-                        country_code: "$pmsVendorMast.country_code",
-                        mobile: "$pmsVendorMast.mobile",
-                        alternate_mobile: "$pmsVendorMast.alternate_mobile",
-                        email: "$pmsVendorMast.email",
-                        personal_address: "$pmsVendorMast.personal_address",
-                        comapny_name: "$pmsVendorMast.comapny_name",
-                        company_address: "$pmsVendorMast.company_address",
-                        company_city: "$pmsVendorMast.company_city", 
-                        company_pincode: "$pmsVendorMast.company_pincode",
-                        company_state: "$pmsVendorMast.company_state",
-                        threshold_limit: "$pmsVendorMast.threshold_limit",
-                        home_address: "$pmsVendorMast.home_address",
-                        home_city: "$pmsVendorMast.home_city",
-                        home_state: "$pmsVendorMast.home_state",
-                        PMSGroupLinks_data:{
-                            link_type:"$pmsgrouplink.link_type",
-                            description_group_link_type:"$pmsgrouplink.description",
-                            created_by_group_link_type:"$pmsgrouplink.created_by"
+                    PMS_VendorMasts_data: {
+                        pmsvendorMast_id: "$pmsvendormast._id",
+                        vendorMast_name: "$pmsvendormast.vendorMast_name",
+                        country_code: "$pmsvendormast.country_code",
+                        mobile: "$pmsvendormast.mobile",
+                        alternate_mobile: "$pmsvendormast.alternate_mobile",
+                        email: "$pmsvendormast.email",
+                        personal_address: "$pmsvendormast.personal_address",
+                        pan_no: "$pmsvendormast.pan_no",
+                        gst_no: "$pmsvendormast.gst_no",
+                        comapny_name: "$pmsvendormast.comapny_name",
+                        company_address: "$pmsvendormast.company_address",
+                        company_city: "$pmsvendormast.company_city",
+                        company_pincode: "$pmsvendormast.company_pincode",
+                        company_state: "$pmsvendormast.company_state",
+                        threshold_limit: "$pmsvendormast.threshold_limit",
+                        home_address: "$pmsvendormast.home_address",
+                        home_city: "$pmsvendormast.home_city",
+                        home_state: "$pmsvendormast.home_state",
+                        created_by: "$pmsvendormast.created_by",
+                        last_updated_by: "$pmsvendormast.last_updated_by",
+                        PMSGroupLinks_data: {
+                            group_link_type_id: "$pmsgrouplink._id",
+                            link_type: "$pmsgrouplink.link_type",
+                            description_group_link_type: "$pmsgrouplink.description",
+                            created_by_group_link_type: "$pmsgrouplink.created_by"
                         }
                     }
                 }
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    data: { $first: "$$ROOT" }
+                }
+            },
+            {
+                $replaceRoot: { newRoot: "$data" }
             }
         ])
         if (!pmsVendorGroupLinkData) {
@@ -238,9 +239,9 @@ exports.getAllVendorGroupList = async (req, res) => {
             message: "PMS vendor group link data list successfully!",
             data: pmsVendorGroupLinkData
         });
-    } catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -265,7 +266,7 @@ exports.deleteVendorGroupData = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };

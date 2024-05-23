@@ -2,13 +2,18 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const pmsPageMastSchema = new Schema({
+    pageMast_id: {
+        type: Number,
+        required: false,
+    },
+    page_user_id: {
+        type: Number,
+        required: false,
+        default: 0
+    },
     page_user_name: {
         type: String,
         required: true
-    },
-    pageMast_id: {
-        type: String,
-        required: false,
     },
     link: {
         type: String,
@@ -24,10 +29,10 @@ const pmsPageMastSchema = new Schema({
         required: true,
         ref: "pmsPageCategory"
     },
-    tag_category: {
-        type: Array,
-        required: false,
-    },
+    tag_category: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "pmsPageCategory"
+    }],
     page_level: {
         type: String,
         required: true,
@@ -52,10 +57,9 @@ const pmsPageMastSchema = new Schema({
         type: String,
         required: true,
     },
-    vendorMast_Id: {
+    vendorMast_id: {
         type: Number,
         required: true,
-        // ref: "pmsVendorMast"
     },
     followers_count: {
         type: Number,
@@ -63,13 +67,13 @@ const pmsPageMastSchema = new Schema({
     },
     profile_type_id: {
         type: Schema.Types.ObjectId,
-        required: true,
+        required: false,
         ref: "pmsProfileType"
     },
-    platform_active_on: {
-        type: String,
-        required: true,
-    },
+    platform_active_on: [{
+        type: Schema.Types.ObjectId,
+        ref: "pmsPlatform",
+    }],
     engagment_rate: {
         type: Number,
         required: true,
@@ -78,6 +82,24 @@ const pmsPageMastSchema = new Schema({
         type: String,
         required: false
     },
+    price_cal_type: {
+        type: String,
+        required: true,
+    },
+    variable_type: {
+        type: String,
+        required: false,
+    },
+    purchase_price: [{
+        price_type_id: {
+            type: Schema.Types.ObjectId,
+            required: true,
+        },
+        price: {
+            type: Number,
+            required: true
+        }
+    }],
     created_date_time: {
         type: Date,
         default: Date.now,

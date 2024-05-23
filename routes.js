@@ -124,6 +124,14 @@ const userUpdateHistory = require("./controllers/userUpdateHistory.js");
 const userTraining = require("./controllers/userTraining.js");
 const nodePhpVendorPaymentMode = require("./controllers/nodePhpVendorPaymentMode.js");
 const razorPay = require("./controllers/razorpay.js");
+const phpVendorPurchasePaymentRequest = require("./controllers/phpVendorPurchasePayment.js");
+
+//Routes for Asset Repair and Return Summary Data
+const repairandreturnsumdata = require("./controllers/repairAndReturnSum.js");
+const assetVendorSum = require("./controllers/assetVendorSum.js");
+const pmsPageAssignment = require("./controllers/PMS/pmsPageAssignment.js");
+const dynamicTablesModel = require("./controllers/dynamicTables.js");
+const adminController = require('./controllers/adminController.js')
 
 /* Task Mangement Controller Import */
 //const deptWiseStatus = require('./controllers/TMS/deptWiseStatus.js');
@@ -138,16 +146,25 @@ const { createPlatform, getPlatformDetail, updatePlatformData, getAllPlatformLis
 const { createPayMethod, getPayDetail, updatePayData, getAllPayList, deletePayData } = require("./controllers/PMS/pmsPayMethodController.js");
 const { createPayCycle, getPayCycleDetail, updatePayCycle, getAllPayCycleList, deletePayCycleData } = require("./controllers/PMS/pmsPayCycleController.js");
 const { createGroupLink, getGroupLinkDetail, updateGroupLink, getAllGroupLinkList, deleteGroupLinkData } = require("./controllers/PMS/pmsGroupLinkTypeController.js");
-const { createPmsVendorMast, getVendorMastDetail, updateVendorMast, getAllVendorkMastList, getAllVendorMastList, vendorMastDelete } = require("./controllers/PMS/pmsVendorMastController.js");
+const { createPmsVendorMast, getVendorMastDetail, updateVendorMast, getAllVendorkMastList, getAllVendorMastList, vendorMastDelete, getPageByVenodrId, getNotAssignedToPageMastVenodrList } = require("./controllers/PMS/pmsVendorMastController.js");
 const { createVendorGroup, getVendorGroupDetail, updateVendorGroup, getAllVendorGroupList, deleteVendorGroupData } = require("./controllers/PMS/pmsVendorGroupLinkController.js");
-const { createPriceType, getPriceDetail, updatePriceType, getPriceList, deletePriceType } = require("./controllers/PMS/pmsPriceTypeController.js");
+const { createPriceType, getPriceDetail, updatePriceType, getPriceList, deletePriceType, getAllPriceTypeList } = require("./controllers/PMS/pmsPriceTypeController.js");
 const { createPlatformPrice, getPlatformPriceDetail, updatePlatformPriceData, getPlatformPriceList, deletePlatformPriceData } = require("./controllers/PMS/pmsPlatformPriceTypeController.js");
 const { createPageCatg, getPageCatgDetail, updatePageCatg, getPageCatgList, deletePageCatgData } = require("./controllers/PMS/pmsPageCategoryController.js");
 const { createPmsProfile, getProfileDetail, updateProfileType, getProfileList, deleteProfileType } = require("./controllers/PMS/pmsProfileTypeController.js");
-const { createPageMast, getPageMastDetail, updatePageMast, getPageMastList, deletePageMastData } = require("./controllers/PMS/pmsPageMastController.js");
+const { createPageMast, getPageMastDetail, updatePageMast, getPageMastList, deletePageMastData, getTopPageMastList } = require("./controllers/PMS/pmsPageMastController.js");
 const { createPageOwner, getPageOwnerDetail, updatePageOwner, getPageOwnerList, deletePageOwnerData } = require("./controllers/PMS/pmsPageOwnershipController.js");
 const { createVendorPagePrice, getVendorPagePriceDetail, updateVendorPagePrice, getVendorPagePriceList, deleteVendorPagePriceData } = require("./controllers/PMS/pmsVendorPagePriceController.js");
 const { createUserAnnouncement, getUserAnnouncementDetail, updateUserAnnouncement, getUserAnnoncementList, deleteUserAnnouncementData, announcementUpdateData, announcementWiseGetReactionDetails, announcementWisegetCommentsList, announcementWiseComment, getAllLoginUserAnnoncementListData } = require("./controllers/Announcement/userAnnouncementController.js");
+const { createCustomerType, getcustomerTypeDetail, updateCustomerType, getCustomerTypeList, deleteCustomerType } = require("./controllers/Customer&Campaign/opsCustomerTypeController.js");
+const { createAccountType, getAccountTypeDetail, updateAccountType, getAccountTypeList, deleteAccountType } = require("./controllers/Customer&Campaign/opsAccountTypeController.js");
+const { createOwnership, getOwnershipDetail, updateOwnershipType, getOwnershipList, deleteOwnership } = require("./controllers/Customer&Campaign/opsOwnershipController.js");
+const { createCustomerMast, getCustomerMastDetail, updateCustomerMast, getCustomerMastList, customerMastDelete, getCustomerMastNameListData } = require("./controllers/Customer&Campaign/opsCustomerMastController.js");
+const { createCustomerContact, getCustomerContactDetail, updateCustomerContact, getCustomerContactList, deleteCustomerContact, getListCustomerContactData } = require("./controllers/Customer&Campaign/opsCustomerContactController.js");
+const { createDocMast, getDocMastDetail, updateDocMast, getDocMastList, deleteDocMast } = require("./controllers/Customer&Campaign/opsDocMastController.js");
+const { createCustomerDocument, getcustomerDocumentDetail, updateCustomerDocument, getCustomerDocumentList, deleteCustomerDocument, getAllCustomerDocumentList } = require("./controllers/Customer&Campaign/opsCustomerDocumentController.js");
+const { createPagePurchasePrice, getPagePurchasePrice, updatePagePurchasePrice, getPagePurchasePriceList, deletePagePurchasePriceData, getAllPagePurchasePriceList, getAllDataList, getAllListData } = require("./controllers/PMS/pmsPagePurchasePriceController.js");
+const { addExeHistory, updateExeHistory, getExeHistoryList, getExeHistoryDetails, getAllExeData } = require("./controllers/PMS/exeHistoryController.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -174,6 +191,10 @@ router.put('/updatePhase', campaignPhaseController.updatePhase)
 router.put('/updateAssignment', assignmentController.updateAssignment)
 // router.get('/campaignplan/:id', campaignPlanController.getPlan)
 
+router.get("/operation_dashboard_api", campaignPlanController.getCampaignPlanDataList);
+
+
+
 router.post('/campaignphase', campaignPhaseController.createPhase)
 router.get('/campaignphase/:id', campaignPhaseController.getAllPhase)
 router.get('/campaignphase/singlephase/:id', campaignPhaseController.getSinglePhase)
@@ -193,10 +214,21 @@ router.get('/assignment', assignmentController.getAllGodamnAssignments)
 router.get('/assignment/:id', assignmentController.getSingleAssignment)
 
 router.get('/assignment/all/:id', assignmentController.getAllAssignmentToExpertee)
+router.get('/assignments', assignmentController.getAllAssignments)
 router.get('/assignment/phase/:id', assignmentController.getAllAssignmentInPhase)
 router.get('/assignment/campaign/:id', assignmentController.getAllAssignmentInCampaign)
 router.post('/assignment/status', assignmentController.updateAssignmentStatus)
+router.get('/assignment/campaign_wise_counts/:id', assignmentController.getcampaignWiseCountsData)
+router.put('/assignment/post/details/update', assignmentController.updatePostDetails)
 router.post('/assignment/campaign/dashboard', assignmentDashboardController.AssignmentDashCampaign)
+router.get('/assignment/get_all_phases/:phase_id', assignmentController.getAllAssignmentsFromPhaseId)
+router.get('/assignment/get_all_phases_by_campid/:_id', assignmentController.getAllPhasesByCampId)
+router.get('/assignment/get_all_exe_phases_by_campid/:_id', assignmentController.getAllExePhasesByCampId);
+router.get('/assignment/get_camp_commitments/:_id', assignmentController.getCampCommits)
+router.get('/assignment/get_phase_commitments/:phase_id', assignmentController.getPhaseCommits)
+router.post('/assignment/get_shift_phases', assignmentController.getShiftPhases)
+router.post('/assignment/replace_page_new', assignmentController.replacePage)
+router.post('/assignment/add_new_page', assignmentController.addNewPage)
 
 router.post('/assignment/commit', assignmentCommitController.createAssComm)
 router.post('/assignment/bulk', assignmentController.createAssignmentBulk)
@@ -212,6 +244,7 @@ router.post('/operation_phase_dashboard', operationDasboard.phaseDashboard)
 router.post('/operation_plan_dashboard', operationDasboard.planDashboard)
 
 router.post('/replacement/plan', pageReplacementController.createReplacementPlan)
+router.post('/replacement/campexe/new', pageReplacementController.createReplacementPlanNew)
 router.get('/replacement/plan', pageReplacementController.getAllRecord)
 router.get('/replacement/:id', pageReplacementController.getSingleRecord)
 router.post('/replacement/status', pageReplacementController.replacementStatus)
@@ -332,6 +365,8 @@ router.get("/get_stats_update_flag/:p_id", exe.getStatUpdateFlag);
 router.get("/get_distinct_count_history/:p_id?", exe.getDistinctExeCountHistory);
 router.post("/page_health_dashboard", exe.pageHealthDashboard);
 
+router.post("/token_get_data/:sale_booking_execution_id", exe.AddExeToken);
+router.put("/update_all_list_token/:execution_token", exe.updateAllListExeToken);
 
 
 /* logo brand */
@@ -398,6 +433,7 @@ router.get(
 );
 router.delete("/delete_designation/:desi_id", designation.deleteDesignation); //Done
 router.get("/get_all_designations", designation.getDesignations); //Done
+router.get("/get_all_designation/:sub_dept_id", designation.getAllDesignationBySubDeptID);
 
 //brand routes
 router.post("/add_brand", brand.addBrand);
@@ -837,6 +873,14 @@ router.put(
   user.getUserOtherFields
 );
 
+router.get("/get_user_time_line/:id", user.getUserTimeLine);
+router.post("/l1l2l3_users_by_dept", user.l1l2l3UsersByDept);
+
+router.get("/report_l1_users_data/:id", user.reportl1UsersData);
+
+router.get("/user_hiearchy/:id", user.userHierarchy);
+
+
 router.post("/login_user_data", user.loginUserData);
 router.post("/add_reason", user.addReason);
 router.get("/get_all_reasons", user.getAllReasons);
@@ -863,12 +907,19 @@ router.get("/get_all_percentage", user.getFilledPercentage);
 router.post("/get_user_graph_data", user.getUserGraphData)
 router.get("/get_users_with_status", user.getUsersWithStatus);
 router.get("/get_all_sales_users", user.getAllSalesUsers);
+router.get("/get_all_sales_users_list", user.getAllSalesUsersByDepartment);
 router.get("/all_objs_in_user_auth/:user_id", user.assignAllObjInUserAuth);
 router.post("/check_login_exist", user.checkLoginExist);
-router.get("/get_all_userS_with_invoiceno", user.getAllUsersWithInvoiceNo);
+router.get("/get_all_users_with_invoiceno", user.getAllUsersWithInvoiceNo);
 router.get("/users", user.getUsers);
 router.post("/get_all_users_counts_with_joining_date", user.getAllUsersCountsWithJoiningDate);
 router.get("/get_users_without_digital_signature_image", user.getAllWithDigitalSignatureImageUsers);
+router.put("/rejoin_user", user.rejoinUser);
+router.get("/get_all_users_with_roleId", user.getAllUsersWithRole);
+router.post("/image_to_base64", user.ImagetoBase64);
+router.get("/download_offerletter_in_bucket/:filename", user.downloadOfferLeterInBucket);
+router.post("/send_offer_letter", user.sendOfferLetter);
+router.post("/offer_letter_send_in_mail", upload.single("attachment"), user.sendOfferLetterMail);
 
 //---------------------------------------------------------------------------All Routes OF User Module Ends Here ---------------------------------------------------------------------------------------------------//
 
@@ -919,10 +970,13 @@ router.post(
   attendance.deptIdWithWfh
 );
 router.get("/get_total_salary", attendance.totalSalary);
+router.get("/current_month_all_dept_total_salary", attendance.currentMonthAllDeptTotalSalary);
+router.get("/single_dept_whole_year_total_salary/:id", attendance.singleDeptWholeYearTotalSalary);
 // router.get("/get_all_dept_with_wfh", attendance.allDeptWithWfh)
 router.put("/update_salary", attendance.updateSalary);
 router.put("/update_attendence_status", attendance.updateAttendenceStatus);
 router.get("/get_month_year_data", attendance.getMonthYearData);
+router.get("/get_month_year_merged_data", attendance.getMonthYearDataMerged);
 router.post("/get_distinct_depts", attendance.getDistinctDepts);
 router.post("/check_salary_status", attendance.checkSalaryStatus);
 router.get("/all_departments_of_wfh", attendance.allDeptsOfWfh);
@@ -930,10 +984,14 @@ router.get("/dept_with_wfh", attendance.deptWithWFH);
 router.post("/save_all_depts_attendance", attendance.addAttendanceAllDepartments);
 router.get("/get_all_attendance_data", attendance.getAllAttendanceData);
 router.get("/get_salary_calculation_data", attendance.getSalarycalculationData);
+router.get("/get_salary_calculation_with_filter_data", attendance.getSalaryCalculationWithFilterData);
 router.post("/get_users_count_by_dept", attendance.getUsersCountByDept);
 router.put("/update_attendance", attendance.updateAttendance);
 // router.get("/get_all_disputes", attendance.allAttendanceDisputeDatas);
 // router.get("/get_all_disputes/:user_id", attendance.getUserAttendanceDisputeDatas);
+
+router.delete("/delete_all_attendance", attendance.deleteAttecndenceData);
+
 
 /* commitement */
 router.post("/add_commitment", cmtController.addCmt);
@@ -1202,8 +1260,9 @@ router.get(
   "/get_sub_category_from_categroyid/:category_id",
   assetSubCategory.getAssetSubCategoryFromCategoryId
 );
-router.get("/get_total_asset_in_category/:sub_category_id", assetSubCategory.getTotalAssetInSubCategory);
-router.get("/get_total_asset_in_category_allocated/:sub_category_id", assetSubCategory.getTotalAssetInSubCategoryAllocated);
+router.get("/get_total_asset_in_sub_category/:sub_category_id", assetSubCategory.getTotalAssetInSubCategory);
+router.get("/get_total_asset_in_sub_category_allocated/:sub_category_id", assetSubCategory.getTotalAssetInSubCategoryAllocated);
+router.get("/get_asset_by_sub_cat/:sub_category_id", assetSubCategory.getAssetBySubCat)
 /* Vendor Routes */
 router.post("/add_vendor", vendor.addVendor);
 router.get("/get_all_vendor", vendor.getVendors);
@@ -1258,6 +1317,10 @@ router.get("/show_repair_request_asset_data_to_reportL1/:user_id", repairRequest
 router.get("/show_asset_repair_request_data_to_user/:user_id", repairRequest.showAssetRepairRequestDataToUser);
 router.get("/get_summary_for_asset_repair_request", repairRequest.getAllRepairRequestsForSummary);
 router.get("/get_single_repair_request_by_reqBy/:req_by", repairRequest.getSingleRepairRequestsByReqBy);
+
+// asset summary repair and return routes
+router.get("/get_all_repair_summary_data", repairandreturnsumdata.getAllRepairSummaryData);
+router.get("/get_all_return_summary_data", repairandreturnsumdata.getAllReturnSummaryData);
 
 /* Assets Images master */
 router.post("/add_assets_images", assetsImage.addAssetImage);
@@ -1320,6 +1383,7 @@ router.post(
   documentController.addHistoryDoc
 );
 router.put("/update_doc_history", documentController.editHistoryDoc);
+router.put("/edit_document_order", documentController.rearrangeDocumentOrder);
 
 
 /* crawler count api */
@@ -1367,13 +1431,16 @@ router.delete("/delete_city/:_id", city.deleteCity);
 /* php finance api */
 router.post("/add_php_finance_data_in_node", phpFinance.savePhpFinanceDataInNode);
 router.get("/get_all_php_finance_data", phpFinance.getAllphpFinanceData);
+router.delete("/delete_php_finance_data", phpFinance.deletePhpFinanceData);
 router.get("/get_all_php_finance_data_pending", phpFinance.getAllphpFinanceDataPending);
 router.post("/add_php_payment_acc_data_in_node", phpPayment.savePhpPaymentAccDataInNode);
 router.get("/get_all_php_payment_acc_data", phpPayment.getAllphpPaymentAccData);
 router.post("/add_payment_acc_data", phpPayment.addAccListData);
+router.put("/edit_payment_acc_data", phpPayment.updateAccListData);
+router.delete("/delete_payment_acc_data", phpPayment.deleteAccListData);
 router.get("/get_all_php_payment_acc_data_pending", phpPayment.getAllphpPaymentAccDataForStatus);
-router.put("/update_hide_status_php_payment_acc_data/:id", phpPayment.updateHideStatusForPhpPaymentAccData);
 router.put("/pending_approval_update", phpPayment.pendingApprovalUpdate);
+router.put("/update_hide_status_php_payment_acc_data/:id", phpPayment.updateHideStatusForPhpPaymentAccData);
 router.post("/add_php_payment_refund_data_in_node", phpRefund.savePhpPaymentRefundInNode);
 router.get("/get_all_php_payment_refund_data", phpRefund.getAllphpPaymentRefundData);
 router.get("/get_all_php_payment_refund_data_pending", phpRefund.getAllphpPaymentRefundDataStatus);
@@ -1396,12 +1463,12 @@ router.get("/get_all_php_payment_acc_data_customers/:cust_id", phpPayment.getAcc
 /* email content routes */
 router.post("/add_email_content", emailContent.addEmailContent);
 router.put("/update_email_content", emailContent.editEmailContent);
-router.get("/get_all_email_contents", emailContent.getAllEmailContents);
+router.get("/get_all_email_contents", verifyToken, emailContent.getAllEmailContents);
 router.get("/get_single_email_content/:_id", emailContent.getSingleEmailContent);
 router.delete("/delete_email_content/:_id", emailContent.deleteEmailContent);
 router.post("/add_email_event", emailContent.addEmailEvent);
 router.put("/update_email_event", emailContent.editEmailEvent);
-router.get("/get_all_email_events", emailContent.getAllEmailEvents);
+router.get("/get_all_email_events", verifyToken, emailContent.getAllEmailEvents);
 router.get("/get_single_email_event/:_id", emailContent.getSingleEmailEvent);
 
 // Hobbies  Routes 
@@ -1519,6 +1586,61 @@ router.get('/total_count_data', dataController.totalCountOfData);
 
 //---------------------------------------------------------------------------All Routes OF Data Module Ends Here ---------------------------------------------------------------------------------------------------//
 
+//deptDesiAuth routes
+router.post("/add_dept_desi_auth", deptDesiAuth.addDeptDesiAuth);
+router.get("/get_single_desi_dept_auth/:desi_id", deptDesiAuth.getSingleDeptDesiAuthDetail);
+router.put("/update_dept_desi_auth", deptDesiAuth.updateDeptDesiAuth);
+
+router.get("/get_single_desi_dept_auth_count", deptDesiAuth.getListDeptDesiAuthData);
+
+// --------------------------------------------------------------Customer_&_Campaign-----------------------------------------------//
+
+router.post("/add_customer_type", createCustomerType);
+router.get("/get_customer_type/:id", getcustomerTypeDetail);
+router.put("/update_customer_type/:id", updateCustomerType);
+router.get("/get_all_customer_type", getCustomerTypeList);
+router.delete("/delete_customer_type/:id", deleteCustomerType);
+
+router.post("/add_account_type", createAccountType);
+router.get("/get_account_type/:id", getAccountTypeDetail);
+router.put("/update_account_type/:id", updateAccountType);
+router.get("/get_all_account_type", getAccountTypeList);
+router.delete("/delete_account_type/:id", deleteAccountType);
+
+router.post("/add_ownership", createOwnership);
+router.get("/get_ownership/:id", getOwnershipDetail);
+router.put("/update_ownership/:id", updateOwnershipType);
+router.get("/get_all_ownership", getOwnershipList);
+router.delete("/delete_ownership/:id", deleteOwnership);
+
+router.post("/add_customer_mast", createCustomerMast);
+router.get("/get_customer_mast/:id", getCustomerMastDetail);
+router.put("/update_customer_mast/:id", updateCustomerMast);
+router.get("/get_all_customer_mast", getCustomerMastList);
+router.delete("/delete_customer_mast/:id", customerMastDelete);
+router.get("/get_all_customer_name_data", getCustomerMastNameListData);
+
+router.post("/add_customer_contact", createCustomerContact);
+router.get("/get_customer_contact/:id", getCustomerContactDetail);
+router.put("/update_customer_contact/:id", updateCustomerContact);
+router.get("/get_all_customer_contact", getCustomerContactList);
+router.get("/get_list_customer_contact/:id", getListCustomerContactData);
+
+router.delete("/delete_customer_contact/:id", deleteCustomerContact);
+
+router.post("/add_doc_mast", createDocMast);
+router.get("/get_doc_mast/:id", getDocMastDetail);
+router.put("/update_doc_mast/:id", updateDocMast);
+router.get("/get_all_doc_mast", getDocMastList);
+router.delete("/delete_doc_mast/:id", deleteDocMast);
+
+router.post("/add_customer_document", createCustomerDocument);
+router.get("/get_customer_document/:id", getcustomerDocumentDetail);
+router.put("/update_customer_document/:id", updateCustomerDocument);
+router.get("/get_all_customer_document", getCustomerDocumentList);
+router.get("/getlist_customer_document/:id", getAllCustomerDocumentList);
+
+router.delete("/delete_customer_document/:id", deleteCustomerDocument);
 
 // --------------------------------------------------------------User_Announcement------------------------------------------//
 
@@ -1534,48 +1656,49 @@ router.get("/get_announcement_reaction_details/:announcementId", announcementWis
 router.post("/announcement_post_comment", announcementWiseComment);
 router.get("/get_announcement_comments/:announcementId", announcementWisegetCommentsList);
 
-//deptDesiAuth routes
-router.post("/add_dept_desi_auth", deptDesiAuth.addDeptDesiAuth);
-router.get("/get_single_desi_dept_auth/:desi_id", deptDesiAuth.getSingleDeptDesiAuthDetail);
-router.put("/update_dept_desi_auth", deptDesiAuth.updateDeptDesiAuth);
-
 // --------------------------------------------------------------Page Mangements System all Routes------------------------------------------//
-
+//@2 This is vendor type master collection for dropdown
 router.post("/addVendor", createPmsVendor);
 router.get("/vendorDetail/:id", getVendorDetail);
 router.put("/updateVendor/:id", updateVendorType);
 router.get("/getAllVendor", getAllVendorData);
 router.delete("/deleteVendor/:id", deleteVendorType);
-
+//@2 End This is vendor type master collection for dropdown 
+//@2 Platform master collection for dropdown
 router.post("/addPlatform", createPlatform);
 router.get("/platformDetail/:id", getPlatformDetail);
 router.put("/updatePlatform/:id", updatePlatformData);
 router.get("/getAllPlatform", getAllPlatformList);
 router.delete("/deletePlatform/:id", deletePlatformData);
-
+//@2 Platform master collection for dropdown 
 router.post("/addpayMethod", createPayMethod);
 router.get("/getPay/:id", getPayDetail);
 router.put("/updatePay/:id", updatePayData);
 router.get("/getAllPay", getAllPayList);
 router.delete("/deletePay/:id", deletePayData);
 
+//@2 Vendor paycycle master collection for dropdown 
 router.post("/addPayCycle", createPayCycle);
 router.get("/getPayCycle/:id", getPayCycleDetail);
 router.put("/updatePayCycle/:id", updatePayCycle);
 router.get("/getAllPayCycle", getAllPayCycleList);
 router.delete("/deletePayCycle/:id", deletePayCycleData);
-
+//@2 End Vendor paycycle master collection for dropdown 
 router.post("/addGroupLink", createGroupLink);
 router.get("/getGroupLink/:id", getGroupLinkDetail);
 router.put("/updateGroupLink/:id", updateGroupLink);
 router.get("/getAllGroupLink", getAllGroupLinkList);
 router.delete("/deleteGroupLink/:id", deleteGroupLinkData);
 
+//@2 Vendor Master Collection api - 
 router.post("/addVendorMast", createPmsVendorMast);
 router.get("/getVendorMast/:id", getVendorMastDetail);
 router.put("/updateVendorMast/:id", updateVendorMast);
 router.get("/vendorAllData", getAllVendorMastList);
+router.get("/notAssignedToPageVendors", getNotAssignedToPageMastVenodrList);
+router.get("/pageByVenodrId/:vendorMast_id", getPageByVenodrId);
 router.delete("/deleteVendorMast/:id", vendorMastDelete);
+//@2 End Vendor Master Collection api - 
 
 router.post("/addVendorGroup", createVendorGroup);
 router.get("/getVendorGroup/:id", getVendorGroupDetail);
@@ -1611,8 +1734,8 @@ router.post("/addPageMast", createPageMast);
 router.get("/getPageDetail/:id", getPageMastDetail);
 router.put("/updatePage/:id", updatePageMast);
 router.get("/getPageMastList", getPageMastList);
+router.get("/getPageMastListQ", getTopPageMastList);
 router.delete("/deletePageMast/:id", deletePageMastData);
-
 
 router.post("/addPageOwner", createPageOwner);
 router.get("/getPageOwner/:id", getPageOwnerDetail);
@@ -1620,12 +1743,40 @@ router.put("/updatePageOwner/:id", updatePageOwner);
 router.get("/getPageOwnerList", getPageOwnerList);
 router.delete("/deletePageOwner/:id", deletePageOwnerData);
 
-
 router.post("/addVendorPagePrice", createVendorPagePrice);
 router.get("/getVendorPagePrice/:id", getVendorPagePriceDetail);
 router.put("/updateVendorPagePrice/:id", updateVendorPagePrice);
 router.get("/getVendorPagePriceList", getVendorPagePriceList);
 router.delete("/deleteVendorPagePrice/:id", deleteVendorPagePriceData);
+
+
+router.post("/add_page_purchase_price", createPagePurchasePrice);
+router.get("/get_page_purchase_price/:id", getPagePurchasePrice);
+router.put("/update_page_purchase_price/:id", updatePagePurchasePrice);
+router.get("/getlist_page_purchase_price", getPagePurchasePriceList);
+// router.get("/getAll_page_purchase_price/:id", getAllPagePurchasePriceList);
+router.delete("/delete_page_purchase_price/:id", deletePagePurchasePriceData);
+router.get("/data/:_id", getAllDataList);
+router.get("/get_all_data_list", getAllListData);
+
+// exe history Data
+router.post("/add_exe_history", addExeHistory);
+router.put("/update_exe_history/:id", updateExeHistory);
+router.get("/get_all_list_exe_history", getExeHistoryList);
+router.get("/get_exe_history/:pageMast_id", getExeHistoryDetails);
+
+router.get("/get_exe_historyData", getAllExeData);
+
+
+
+
+//pms page assignment APi's
+router.post("/add_page_assignment", pmsPageAssignment.createPageAssignment);
+router.put("/update_page_assignment/:id", pmsPageAssignment.updatePageAssignment);
+router.get("/get_page_assignment/:id", pmsPageAssignment.getPageAssignmentDetail);
+router.get("/get_list_page_assignment", pmsPageAssignment.getPageAssignmentList);
+router.delete("/delete_page_assignment/:id", pmsPageAssignment.deletePageAssignmentData);
+router.get("/get_list_page_assignment_history", pmsPageAssignment.getPageAssignmentHistoryList);
 
 // --------------------------------------------------------------Task Mangements all Routes------------------------------------------//
 router.post("/addSubStatus", createTmsSubStatusMast);
@@ -1676,6 +1827,16 @@ router.get("/phpvendorpaymentrequest", phpVendorPaymentRequest.getPhpVendorPayme
 router.get("/phpvendorpaymentrequest/:request_id", phpVendorPaymentRequest.getSinglePhpVendorPaymentRequest)
 router.put("/phpvendorpaymentrequest", upload1.single('evidence'), phpVendorPaymentRequest.updatePhpVendorPaymentRequest);
 router.delete("/deletephpvendorpaymentrequest/:request_id", phpVendorPaymentRequest.deletePhpVendorPaymentRequest);
+router.put("/updatePhpVendorPaymentRequestImage", upload1.single('evidence'), phpVendorPaymentRequest.updatePhpVendorPaymentRequestImage);
+
+// router.get("/phpvendorpaymentList/:status", phpVendorPaymentRequest.getVendorPaymentRequestList);
+// router.get("/phpvendorpaymentmatchlist", phpVendorPaymentRequest.getVendorPaymentRequestMatchList);
+//  router.get("/phpvendorpaymentWeeklyList", phpVendorPaymentRequest.getVendorPaymentRequestWeeklyList);
+// router.get("/phpvendorpaymentmatchlist", phpVendorPaymentRequest.getVendorPaymentRequestDayWiseListData);
+
+// phpVendorPurchase Routes
+router.post("/phpvendorpurchasepaymentrequest", phpVendorPurchasePaymentRequest.addPhpVendorPurchasePaymentRequestSet);
+router.get("/phpvendorpurchasepaymentrequest", phpVendorPurchasePaymentRequest.getPhpVendorPurchasePaymentRequests)
 
 //Data Operation Routes
 router.post("/dataoperation", dataOperation.addOperationData);
@@ -1709,5 +1870,21 @@ router.delete("/delete_payment_mode/:_id", nodePhpVendorPaymentMode.deletePaymen
 // Payment Gateway Routes
 // router.post("/create_order", razorPay.createOrder);
 router.post("/process_payment", razorPay.processPayment);
+
+//Vendor Summary Data
+router.post("/vendorsum", assetVendorSum.addVendorSum);
+router.get("/vendorsum", assetVendorSum.getVendorSums);
+router.get("/get_all_hr", assetVendorSum.getAllHR);
+router.put("/vendorsum", assetVendorSum.editVendorSum);
+
+//Dynamic table routes
+router.post("/add_dynamic_table_data", dynamicTablesModel.addDynamicTablesData);
+router.get("/get_dynamic_table_data", dynamicTablesModel.getSingleDynamicTablesData);
+router.put("/edit_dynamic_table_data", dynamicTablesModel.editDynamicTablesData);
+
+// admin password and email routes
+router.post('/change_selected_user_password', adminController.changePassOfSelectedUsers);
+router.post('/change_all_user_password', adminController.changePassOfUsers);
+router.post('/send_email_to_all_users', adminController.sendPassEmailToUsers)
 
 module.exports = router;

@@ -161,6 +161,20 @@ exports.getSims = async (req, res) => {
             // preserveNullAndEmptyArrays: true,
           },
         },
+        {
+          $lookup: {
+            from: "assetvendorsummodels",
+            localField: "sim_id",
+            foreignField: "sim_id",
+            as: "vendorSumData",
+          },
+        },
+        {
+          $unwind: {
+            path: "$vendorSumData",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
         // {
         //   $lookup: {
         //     from: "usermodels",
@@ -260,6 +274,7 @@ exports.getSims = async (req, res) => {
             category_name: "$category.category_name",
             sub_category_name: "$subcategory.sub_category_name",
             vendor_name: "$vendor.vendor_name",
+            vendor_status: "$vendorSumData.vendor_status",
             // created_by_name: "$user.user_name",
             // allocated_username: "$allocated_username.user_name",
             // allocated_username: {
@@ -481,6 +496,8 @@ exports.editSim = async (req, res) => {
         depreciation_percentage: req.body.depreciation_percentage,
         asset_brand_id: req.body.asset_brand_id,
         asset_modal_id: req.body.asset_modal_id,
+        all_status_remark: req.body.all_status_remark,
+        all_status_date: req.body.all_status_date
       },
       { new: true }
     );
@@ -1177,6 +1194,15 @@ exports.alldataofsimallocment = async (req, res) => {
           deleted_status: "$deleted_status",
         },
       },
+      {
+        $group: {
+          _id: "$sim_id",
+          data: { $first: "$$ROOT" },
+        },
+      },
+      {
+        $replaceRoot: { newRoot: "$data" },
+      },
     ]);
 
     if (!simc || simc.length === 0) {
@@ -1456,7 +1482,7 @@ exports.getAssetUsersDepartment = async (req, res) => {
       {
         $lookup: {
           from: 'simmodels',
-          localField: 'sim_id', // Adjust this field if necessary
+          localField: 'sim_id',
           foreignField: 'sim_id',
           as: 'simDetails',
         },
@@ -2063,6 +2089,20 @@ exports.showAssetDataToHR = async (req, res) => {
           },
         },
         {
+          $lookup: {
+            from: "assetvendorsummodels",
+            localField: "sim_id",
+            foreignField: "sim_id",
+            as: "vendorSimData",
+          },
+        },
+        {
+          $unwind: {
+            path: "$vendorSimData",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
           $project: {
             _id: "$_id",
             sim_id: "$sim_id",
@@ -2105,7 +2145,8 @@ exports.showAssetDataToHR = async (req, res) => {
             img4: {
               $concat: [imageUrl, "$repair.img4"]
             },
-            req_date: "$repair.repair_request_date_time"
+            req_date: "$repair.repair_request_date_time",
+            vendor_status: "$vendorSimData.vendor_status"
           },
         },
       ])
@@ -2301,10 +2342,151 @@ exports.showAssetDataToUser = async (req, res) => {
   }
 };
 
+// exports.showNewAssetDataToUser = async (req, res) => {
+//   try {
+//     const user_id = parseInt(req.params.user_id);
+//     const userData = await assetRequestModel.aggregate([
+//       {
+//         $lookup: {
+//           from: "simmodels",
+//           localField: "sub_category_id",
+//           foreignField: "sub_category_id",
+//           as: "sim",
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: "$sim",
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "usermodels",
+//           localField: "multi_tag",
+//           foreignField: "user_id",
+//           as: "userdata1",
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: "$userdata1",
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "usermodels",
+//           localField: "request_by",
+//           foreignField: "user_id",
+//           as: "userdataRequest",
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: "$userdataRequest",
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "assetscategorymodels",
+//           localField: "category_id",
+//           foreignField: "sim.category_id",
+//           as: "category",
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: "$category",
+//           preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "assetssubcategorymodels",
+//           localField: "sub_category_id",
+//           foreignField: "sub_category_id",
+//           as: "subcategory",
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: "$subcategory",
+//           // preserveNullAndEmptyArrays: true,
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: "$_id",
+//           sim_id: { $first: "$sim.sim_id" },
+//           asset_id: { $first: "$sim.sim_no" },
+//           asset_name: { $first: "$sim.assetsName" },
+//           status: { $first: "$sim.status" },
+//           category_id: { $first: "$sim.category_id" },
+//           category_name: { $first: "$category.category_name" },
+//           sub_category_id: { $first: "$sub_category_id" },
+//           sub_category_name: { $first: "$subcategory.sub_category_name" },
+//           vendor_id: { $first: "$sim.vendor_id" },
+//           inWarranty: { $first: "$sim.inWarranty" },
+//           warrantyDate: { $first: "$sim.warrantyDate" },
+//           dateOfPurchase: { $first: "$sim.dateOfPurchase" },
+//           multi_tag: { $first: "$multi_tag" },
+//           priority: { $first: "$priority" },
+//           req_date: { $first: "$date_and_time_of_asset_request" },
+//           asset_request_multi_tag_name: { $first: "$userdata1.user_name" },
+//           asset_new_request_status: { $first: "$assetRequest.asset_request_status" },
+//           asset_request_by: { $first: "$request_by" },
+//           req_by_name: { $first: "$userdataRequest.user_name" }
+//         },
+//       },
+//       // {
+//       //   $project: {
+//       //     _id: "$_id",
+//       //     sim_id: "$sim.sim_id",
+//       //     asset_id: "$sim.sim_no",
+//       //     asset_name: "$sim.assetsName",
+//       //     status: "$sim.status",
+//       //     category_id: "$sim.category_id",
+//       //     sub_category_id: "$sim.sub_category_id",
+//       //     vendor_id: "$sim.vendor_id",
+//       //     inWarranty: "$sim.inWarranty",
+//       //     warrantyDate: "$sim.warrantyDate",
+//       //     dateOfPurchase: "$sim.dateOfPurchase",
+//       //     multi_tag: "$multi_tag",
+//       //     priority: "$priority",
+//       //     req_date: "$date_and_time_of_asset_request",
+//       //     asset_request_multi_tag_name: "$userdata1.user_name",
+//       //     asset_new_request_status: "$assetRequest.asset_request_status",
+//       //     asset_request_id: "$assetRequest._id"
+//       //   },
+//       // },
+//     ]);
+
+//     if (!userData) {
+//       return res.status(500).json({ success: false, message: "No data found" });
+//     }
+
+//     if (userData.length === 0) {
+//       return res.status(404).json({ success: false, message: "No data found for the user_id" });
+//     }
+
+//     const userReportL1 = await userModel.find({ user_id: userData[0].asset_request_by })
+//     const reportData = userReportL1[0].Report_L1;
+
+//     const assetReqBy = parseInt(userData[0].asset_request_by)
+//     if (assetReqBy === user_id || reportData === user_id || 633 === user_id) {
+//       return res.status(404).send("data not found")
+//     }
+//     res.status(200).json({ data: userData });
+//   } catch (err) {
+//     res.status(500).send({ error: err.message, sms: "Error getting user details" });
+//   }
+// }
+
 exports.showNewAssetDataToUser = async (req, res) => {
   try {
     const user_id = parseInt(req.params.user_id);
-
     const userData = await assetRequestModel.aggregate([
       {
         $lookup: {
@@ -2373,7 +2555,7 @@ exports.showNewAssetDataToUser = async (req, res) => {
       {
         $unwind: {
           path: "$subcategory",
-          // preserveNullAndEmptyArrays: true,
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -2399,29 +2581,8 @@ exports.showNewAssetDataToUser = async (req, res) => {
           asset_request_by: { $first: "$request_by" },
           req_by_name: { $first: "$userdataRequest.user_name" }
         },
-      },
-      // {
-      //   $project: {
-      //     _id: "$_id",
-      //     sim_id: "$sim.sim_id",
-      //     asset_id: "$sim.sim_no",
-      //     asset_name: "$sim.assetsName",
-      //     status: "$sim.status",
-      //     category_id: "$sim.category_id",
-      //     sub_category_id: "$sim.sub_category_id",
-      //     vendor_id: "$sim.vendor_id",
-      //     inWarranty: "$sim.inWarranty",
-      //     warrantyDate: "$sim.warrantyDate",
-      //     dateOfPurchase: "$sim.dateOfPurchase",
-      //     multi_tag: "$multi_tag",
-      //     priority: "$priority",
-      //     req_date: "$date_and_time_of_asset_request",
-      //     asset_request_multi_tag_name: "$userdata1.user_name",
-      //     asset_new_request_status: "$assetRequest.asset_request_status",
-      //     asset_request_id: "$assetRequest._id"
-      //   },
-      // },
-    ]).exec();
+      }
+    ]);
 
     if (!userData) {
       return res.status(500).json({ success: false, message: "No data found" });
@@ -2431,15 +2592,16 @@ exports.showNewAssetDataToUser = async (req, res) => {
       return res.status(404).json({ success: false, message: "No data found for the user_id" });
     }
 
-    const assetReqBy = parseInt(userData[0].asset_request_by)
-    if (assetReqBy === user_id) {
-      return res.status(404).send("data not found")
-    }
-    res.status(200).json({ data: userData });
+    const filteredUserData = userData.filter(item => {
+      return item.multi_tag.includes(user_id);
+    });
+
+    res.status(200).json({ data: filteredUserData });
   } catch (err) {
     res.status(500).send({ error: err.message, sms: "Error getting user details" });
   }
-}
+};
+
 
 // Asset Request to Report L1
 exports.showAssetDataToUserReport = async (req, res) => {

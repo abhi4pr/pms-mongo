@@ -11,16 +11,21 @@ const { swaggerConfig } = require("./doc/swaggerConfig.js");
 const errorController = require('./controllers/errorController.js')
 const swaggerAccessManagement = require('./doc/customization_src/controller/swaggerAccessManagement.js');
 const { checkDevAuthentication } = require("./doc/customization_src/middleware/swaggerMiddleware.js");
+const cron = require("./common/cronjob.js");
 const path = require("path");
+const requireDirectory = require('require-directory');
+const { registerRoutes } = require("./helper/helper.js");
+const { routeModulesV1, routeModules } = require("./routes/routeModule.js");
 // const axios = require("axios");
 require("./controllers/autoMail.js");
 require("./controllers/assetAutoMail.js");
 
 const app = express();
+cron.cronImplement();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'doc/customization_src/doc_templates/pages'));
-app.use(express.static(path.join(__dirname, './build')))
+// app.use(express.static(path.join(__dirname,'./build')))
 app.use(bodyParser.json({ limit: '500mb' }));
 
 app.use(
@@ -49,13 +54,26 @@ app.use(cors());
 app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use("/api", routes);
 
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'))
-})
+// //all seprate route files require
+// var routesFile = requireDirectory(module, './routes');
+
+// for (i in routesFile) {
+//   app.use("/api/" + i, require("./routes/" + i));
+// }
+
+// New Version Route Configuration
+registerRoutes(app, "/api/", routeModules);
+registerRoutes(app, "/api/v1", routeModulesV1);
+// End
+
+// app.get('/*', function (req, res) {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'))
+// })
 
 const docBackendRouter = require("./doc/customization_src/routes/backend_routes.js");
 const docFrontendRouter = require("./doc/customization_src/routes/frontend_routes.js");
 app.use("/", docBackendRouter);
+// app.use("/", cronImplement);
 app.use("/", docFrontendRouter);
 app.use(
   "/api-docs/:token",

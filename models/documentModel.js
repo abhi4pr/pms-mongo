@@ -2,9 +2,13 @@ const { default: mongoose } = require("mongoose");
 const userDocManagementModel = require("./userDocManagementModel");
 
 const documentSchema = new mongoose.Schema({
-  doc_type: {
+  doc_name: {
     type: String,
     unique: true,
+    default: "",
+  },
+  doc_type: {
+    type: String,
     default: "",
   },
   description: {
@@ -28,11 +32,29 @@ const documentSchema = new mongoose.Schema({
     required: false,
     default: false
   },
+  is_doc_number: {
+    type: String,
+    default: "",
+    required: false
+  },
   doc_number: {
     type: String,
     default: "",
     required: false
+  },
+  is_document_expired: {
+    type: String,
+    default: "",
+    required: false
+  },
+  expired_date: {
+    type: String,
+    default: "",
+  },
+  order_number: {
+    type: Number
   }
+
 });
 // Post-save hook on the Document model
 documentSchema.post('save', async function (doc) {
