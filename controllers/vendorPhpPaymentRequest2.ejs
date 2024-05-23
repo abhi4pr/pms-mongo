@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link>
+    <style>
+        /* @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap'); */
+        body {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            height: 100%;
+            width: 100%;
+            background-color: #FEFCFA;
+            padding: 0;
+            margin: 0;
+            font-family: Lato !important;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .email-body,
+        .component {
+            position: relative;
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+
+            margin: 0;
+            padding: 0;
+
+            .tl,
+            .tr {
+                position: absolute;
+                top: 0;
+                width: 100px;
+            }
+
+            .tl {
+                left: 0;
+            }
+
+            .tr {
+                right: 0;
+            }
+
+            .table-boby {
+                position: relative;
+
+                .br {
+                    position: absolute;
+                    bottom: -80px;
+                    right: 0;
+                    height: 200px;
+                    ;
+                }
+
+                width: 100%;
+                height: var(100% - 306px);
+                /* width:70%; */
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+
+                .table-container {
+                    display: inline-flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    width: 70%;
+                    gap: 10px;
+
+                    .main-table {
+                        width: 100%;
+
+                        span {
+                            display: flex;
+                            width: 100%;
+                            height: 5px;
+                            background-color: #84A492;
+                        }
+
+                        .head {
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 38px;
+                            padding: 10px;
+                            background-color: #84A492;
+                            color: #FAFAFA;
+                            font-weight: 700px;
+                            font-size: 18px;
+                            font-family: Arial;
+                        }
+                    }
+
+                    table,
+                    td,
+                    th {
+                        border: 1px solid var(--Gray-Color-600, #D0D5DD);
+
+                    }
+
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                    }
+
+                    th {
+                        color: var(--Gray-Color-400, #475467);
+                        font-weight: 700;
+                    }
+
+                    td {
+                        font-weight: 400;
+                    }
+
+                    th,
+                    td {
+                        text-align: start;
+                        font-size: 16px;
+                        padding: 10px;
+                        width: 311px;
+                    }
+                }
+            }
+        }
+
+        header {
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100px;
+
+
+            h1 {
+                color: #202020;
+
+                font-family: Lato;
+                font-size: 30px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: normal;
+            }
+
+
+        }
+
+        footer {
+            position: relative;
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.25);
+
+            backdrop-filter: blur(2.5px);
+
+            img {
+                width: 100%;
+                position: absolute;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="./public/emailcs.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap>
+    <!-- Latest compiled and minified CSS -->
+    <link rel=" stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="email-body">
+        <div class="component">
+            <img class="tl" src="./images/topleft.png" alt="">
+            <img class="tr" src="./images/topright.png" alt="">
+            <header>
+                <h1>Vendor Payment</h1>
+            </header>
+            <div class="table-boby">
+                <img class="br" src="./images/botomrigth.png" alt="">
+                <div class="table-container">
+                    <p>Hello,</p>
+                    <p>Request has been successfully.</p>
+                    <div class="main-table">
+                        <table>
+                            <div class="head">Payment Details</div>
+                            <tr>
+                                <th>Requested Date</th>
+                                <td>  <%= request_date %>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <th>Requested By</th>
+                                <td>  <%= request_by %></td>
+
+
+                            </tr>
+                            <tr>
+                                <th>Vendor Name</th>
+                                <td><%= vendor_name %> </td>
+                            </tr>
+                            <tr>
+                                <th>Requested Amount</th>
+                                <td><%= request_amount %></td>
+                            </tr>
+                            <tr>
+                                <th>Payment Amount</th>
+                                <td><%= payment_amount %></td>
+                            </tr>
+                            <tr>
+                                <th>Payment Date</th>
+                                <td><%= payment_date %></td>
+                            </tr>
+                            <tr>
+                                <th>Payment By</th>
+                                <td><%= payment_by %></td>
+                            </tr>
+                            <tr>
+                                <th>Payment Status</th>
+                                <td><%= status %></td>
+                            </tr>
+                        </table>
+
+                    </div>
+                    <p>Best Regards,</p>
+                    <p>Ankita</p>
+
+                </div>
+
+            </div>
+            <footer>
+                <img src="./images/foot.png" alt="">
+            </footer>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

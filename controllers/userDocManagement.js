@@ -4,8 +4,8 @@ const constant = require("../common/constant.js");
 const { default: mongoose } = require("mongoose");
 const helper = require("../helper/helper.js");
 const vari = require("../variables.js");
-const { storage } = require('../common/uploadFile.js')
-const documentModel = require("../models/documentModel.js");
+const { storage } = require('../common/uploadFile.js');
+const userLoginHisModel = require("../models/userLoginHisModel.js");
 
 exports.addUserDoc = async (req, res) => {
   try {
@@ -46,11 +46,94 @@ exports.addUserDoc = async (req, res) => {
   }
 };
 
+// exports.getUserDoc = async (req, res) => {
+//   try {
+//     let userDocId = req.body?._id;
+//     let user_id = req.body?.user_id;
+//     let matchCondition = {};
+
+//     if (user_id) {
+//       matchCondition.user_id = parseInt(user_id);
+//     }
+//     if (userDocId) {
+//       matchCondition._id = mongoose.Types.ObjectId(userDocId);
+//     }
+//     let docs = await userDocManagmentModel.aggregate([
+//       {
+//         $match: matchCondition,
+//       },
+//       {
+//         $lookup: {
+//           from: "documentmodels",
+//           localField: "doc_id",
+//           foreignField: "_id",
+//           as: "document",
+//         },
+//       },
+//       {
+//         $unwind: "$document",
+//       },
+//       {
+//         $addFields: {
+//           doc_image_url: {
+//             $cond: {
+//               if: "$doc_image",
+//               then: {
+//                 $concat: [
+//                   `${constant.base_url}`,
+//                   "$doc_image",
+//                 ],
+//               },
+//               else: "",
+//             },
+//           },
+//         },
+//       },
+//       // {
+//       //   $group: {
+//       //     _id: "$doc_id",
+//       //     document: { $first: "$document" },
+//       //   }
+//       // }
+//       {
+//         $group: {
+//           _id: "$doc_id",
+//           userDoc: { $first: "$$ROOT" },
+//           document: { $first: "$document" },
+//         }
+//       },
+//       {
+//         $replaceRoot: {
+//           newRoot: {
+//             $mergeObjects: ["$userDoc", "$document"]
+//           }
+//         }
+//       }
+//     ]);
+
+//     if (docs?.length === 0) {
+//       return response.returnFalse(200, req, res, "No record found", []);
+//     } else {
+//       return response.returnTrue(
+//         200,
+//         req,
+//         res,
+//         "Data Fetch Successfully",
+//         docs
+//       );
+//     }
+//   } catch (err) {
+//     return response.returnFalse(500, req, res, err.message, {});
+//   }
+// };
+
+
 exports.getUserDoc = async (req, res) => {
+  const financeImagesBaseUrl = vari.IMAGE_URL;
   try {
-    let userDocId = req.body?._id;
-    let user_id = req.body?.user_id;
-    let matchCondition = {};
+    const userDocId = req.body?._id;
+    const user_id = req.body?.user_id;
+    const matchCondition = {};
 
     if (user_id) {
       matchCondition.user_id = parseInt(user_id);
@@ -58,7 +141,7 @@ exports.getUserDoc = async (req, res) => {
     if (userDocId) {
       matchCondition._id = mongoose.Types.ObjectId(userDocId);
     }
-    let docs = await userDocManagmentModel.aggregate([
+    const docs = await userDocManagmentModel.aggregate([
       {
         $match: matchCondition,
       },
@@ -74,21 +157,33 @@ exports.getUserDoc = async (req, res) => {
         $unwind: "$document",
       },
       {
-        $addFields: {
-          doc_image_url: {
-            $cond: {
-              if: "$doc_image",
-              then: {
-                $concat: [
-                  `${constant.base_url}`,
-                  "$doc_image",
-                ],
-              },
-              else: "",
-            },
-          },
-        },
-      },
+        $project: {
+          _id: 1,
+          reject_reason: 1,
+          status: 1,
+          timer: 1,
+          doc_id: 1,
+          user_id: 1,
+          upload_date: 1,
+          approval_date: 1,
+          approval_by: 1,
+          doc_image: 1,
+          doc_image_url: { $concat: [financeImagesBaseUrl, "$doc_image"] },
+          document: {
+            doc_name: "$document.doc_name",
+            doc_type: "$document.doc_type",
+            description: "$document.description",
+            priority: "$document.priority",
+            period: "$document.period",
+            isRequired: "$document.isRequired",
+            is_doc_number: "$document.is_doc_number",
+            doc_number: "$document.doc_number",
+            is_document_expired: "$document.is_document_expired",
+            expired_date: "$document.expired_date",
+            job_type: "$document.job_type",
+          }
+        }
+      }
     ]);
 
     if (docs?.length === 0) {
@@ -106,6 +201,7 @@ exports.getUserDoc = async (req, res) => {
     return response.returnFalse(500, req, res, err.message, {});
   }
 };
+
 
 exports.editDoc = async (req, res) => {
   try {
@@ -160,11 +256,78 @@ exports.editDoc = async (req, res) => {
     if (!editDocObj) {
       return response.returnFalse(200, req, res, "No record found", {});
     }
-    return response.returnTrue(200, req, res, "Data Update Successfully", {});
+    return response.returnTrue(200, req, res, "Data Update Successfully", editDocObj);
   } catch (err) {
     return response.returnFalse(500, req, res, err.message, {});
   }
 };
+
+
+// exports.editDoc = async (req, res) => {
+//   try {
+//     const {
+//       _id,
+//       reject_reason,
+//       status,
+//       timer,
+//       doc_id,
+//       user_id,
+//       upload_date,
+//       approval_date,
+//       approval_by,
+//     } = req.body;
+
+//     let doc_image = req.file ? req.file.originalname : null;
+
+//     // Retrieve the document object from the database
+//     const editDocObj = await userDocManagmentModel.findById(_id);
+
+//     if (!editDocObj) {
+//       return response.returnFalse(200, req, res, "No record found", {});
+//     }
+
+//     // Update the document object with the new values
+//     editDocObj.reject_reason = reject_reason;
+//     editDocObj.status = status;
+//     editDocObj.timer = timer;
+//     editDocObj.doc_id = doc_id;
+//     editDocObj.user_id = user_id;
+//     editDocObj.upload_date = upload_date;
+//     editDocObj.approval_date = approval_date;
+//     editDocObj.approval_by = approval_by;
+//     editDocObj.doc_image = doc_image;
+
+//     // Save the updated document object
+//     await editDocObj.save();
+
+//     if (req.file) {
+//       const bucketName = vari.BUCKET_NAME;
+//       const bucket = storage.bucket(bucketName);
+//       const blob = bucket.file(req.file.originalname);
+//       editDocObj.doc_image = blob.name;
+//       const blobStream = blob.createWriteStream();
+//       blobStream.on("finish", () => {
+//         editDocObj.save();
+//         // res.status(200).send("Success") 
+//       });
+//       blobStream.end(req.file.buffer);
+//     }
+
+//     if (doc_image) {
+//       const result = helper.fileRemove(
+//         editDocObj?.doc_image,
+//         "../uploads/userDocuments"
+//       );
+//       if (result?.status == false) {
+//         console.log(result.msg);
+//       }
+//     }
+
+//     return response.returnTrue(200, req, res, "Data Update Successfully", {});
+//   } catch (err) {
+//     return response.returnFalse(500, req, res, err.message, {});
+//   }
+// };
 
 exports.deleteDoc = async (req, res) => {
   try {
@@ -197,6 +360,7 @@ exports.deleteDoc = async (req, res) => {
   }
 };
 
+
 exports.getDocsByUserID = async (req, res) => {
   try {
     const user_id = parseInt(req.params.user_id);
@@ -225,7 +389,6 @@ exports.getDocsByUserID = async (req, res) => {
     res.status(500).json({ error: err.message, sms: "Error getting all documents" });
   }
 };
-
 
 exports.updateUserDoc = async (req, res) => {
   try {

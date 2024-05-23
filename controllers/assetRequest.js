@@ -13,7 +13,8 @@ exports.addAssetRequest = async (req, res) => {
             detail: req.body.detail,
             priority: req.body.priority,
             request_by: req.body.request_by,
-            multi_tag: req.body.multi_tag
+            multi_tag: req.body.multi_tag,
+            reject_reason: req.body.reject_reason
         });
         const savedassetrequestdata = await assetRequestData.save();
 
@@ -103,6 +104,7 @@ exports.getAssetRequests = async (req, res) => {
                 },
                 {
                     $project: {
+                        asset_request_id: "$asset_request_id",
                         sim_id: "$sim_id",
                         asset_name: "$Sim.assetsName",
                         sub_category_id: "$sub_category_id",
@@ -115,19 +117,19 @@ exports.getAssetRequests = async (req, res) => {
                         multi_tag: "$multi_tag",
                         asset_request_status: "$asset_request_status",
                         multi_tag_name: "$userMulti.user_name",
+                        reject_reason: "$reject_reason"
                     },
                 },
-                // {
-                //     $group: {
-                //         _id: "$sub_category_id",
-                //         data: { $first: "$$ROOT" }
-                //     }
-                // },
-                // {
-                //     $replaceRoot: { newRoot: "$data" }
-                // }
-            ])
-            .exec();
+                {
+                    $group: {
+                        _id: "$asset_request_id",
+                        data: { $first: "$$ROOT" }
+                    }
+                },
+                {
+                    $replaceRoot: { newRoot: "$data" }
+                }
+            ]);
 
         if (assetRequestData.length === 0) {
             res
@@ -142,7 +144,6 @@ exports.getAssetRequests = async (req, res) => {
             .send({ error: err.message, message: "Error getting all assetRequestData" });
     }
 };
-
 
 // exports.getAssetRequestById = async (req, res) => {
 //     try {
@@ -366,7 +367,8 @@ exports.getAssetRequestById = async (req, res) => {
                     multi_tag_names: { $first: "$multi_tag_names" },
                     sub_category_name: { $first: "$SubCategory.sub_category_name" },
                     request_by_name: { $first: "$user.user_name" },
-                    asset_request_status: { $first: "$asset_request_status" }
+                    asset_request_status: { $first: "$asset_request_status" },
+                    reject_reason: { $first: "$reject_reason" }
                 }
             },
         ]);
@@ -397,7 +399,8 @@ exports.editAssetRequest = async (req, res) => {
             multi_tag: req.body.multi_tag,
             date_and_time_of_asset_request: req.body.date_and_time_of_asset_request,
             asset_request_status: req.body.asset_request_status,
-            updated_at: req.body.updated_at
+            updated_at: req.body.updated_at,
+            reject_reason: req.body.reject_reason
 
         }, { new: true })
 
@@ -496,7 +499,8 @@ exports.showAssetRequestData = async (req, res) => {
                     req_date: "$repair.repair_request_date_time",
                     detail: "$assetrequest.detail",
                     priority: "$assetrequest.priority",
-                    asset_request_status: "$assetrequest.asset_request_status"
+                    asset_request_status: "$assetrequest.asset_request_status",
+                    asset_reject_reason: "$assetrequest.reject_reason"
                 },
             },
         ]).exec();

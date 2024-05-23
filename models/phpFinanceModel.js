@@ -35,10 +35,6 @@ const phpFinanceModel = new mongoose.Schema({
         type: String,
         required: false
     },
-    gst_status: {
-        type: String,
-        required: false
-    },
     creation_date: {
         type: String,
         required: false
@@ -48,6 +44,10 @@ const phpFinanceModel = new mongoose.Schema({
         required: false
     },
     campaign_amount: {
+        type: String,
+        required: false
+    },
+    gst_status: {
         type: String,
         required: false
     },

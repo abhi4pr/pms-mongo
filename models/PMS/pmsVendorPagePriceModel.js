@@ -11,7 +11,7 @@ const pmsVendorPagePriceSchema = new Schema({
         type: Number,
         required: true,
     },
-    vendorMast_Id: {
+    vendorMast_id: {
         type: Number,
         required: true,
     },
@@ -28,12 +28,12 @@ const pmsVendorPagePriceSchema = new Schema({
         type: String,
         required: false,
     },
-    price_fixed: {
-        type: String,
-        required: true,
+    Sale_price: {                           // price_fixed(Sale_price)
+        type: Number,
+        required: false,
     },
-    price_variable: {
-        type: String,
+    variable_type_rate: {                   //price_variable(variable_type_rate)
+        type: Number,
         required: true,
     },
     description: {

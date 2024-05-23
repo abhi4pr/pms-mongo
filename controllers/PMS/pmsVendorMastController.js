@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 const pmsVendorMastModel = require('../../models/PMS/pmsVendorMastModel');
 const multer = require("multer");
 const vari = require("../../variables.js");
-const { storage } = require('../../common/uploadFile.js')
+const { storage } = require('../../common/uploadFile.js');
+const pmsPageMastModel = require('../../models/PMS/pmsPageMastModel.js');
 
 const upload = multer({
     storage: multer.memoryStorage()
@@ -14,13 +15,10 @@ const upload = multer({
     { name: "upload_pan_image", maxCount: 1 },
     { name: "upload_gst_image", maxCount: 1 }
 ]);
-//POST- TmsCatMast
+//POST- PMS_VendorMast
 exports.createPmsVendorMast = [
     upload, async (req, res) => {
         try {
-            const panPattern = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
-            const gstPattern = /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d[Z]{1}[A-Z\d]{1}?$/;
-
             const checkDuplicacy = await pmsVendorMastModel.findOne({ vendorMast_name: req.body.vendorMast_name });
             if (checkDuplicacy) {
                 return res.status(403).json({
@@ -28,27 +26,13 @@ exports.createPmsVendorMast = [
                     message: "PMS vendore-mast alredy exist!",
                 });
             }
-            // Validate PAN format
-            if (!panPattern.test(req.body.pan_no)) {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Invalid PAN format! PAN should be in the format: ABCDE1234F",
-                });
-            }
-            // Validate GST format
-            if (!gstPattern.test(req.body.gst_no)) {
-                return res.status(400).json({
-                    status: 400,
-                    message: "Invalid GST format! GST should be in the format: 12ABCDE1234F1Z1",
-                });
-            }
-
-            const { type_id,vendorMast_Id, platform_id, payMethod_id, cycle_id, vendorMast_name, country_code, mobile, alternate_mobile, email,
-                personal_address, pan_no, gst_no, comapny_name, company_address, company_city, created_date_time, company_pincode, company_state,
-                threshold_limit, home_address, home_city, home_state, created_by, last_updated_date, last_updated_by } = req.body;
+            const { type_id, platform_id, payMethod_id, cycle_id, vendorMast_name, country_code, mobile, alternate_mobile, email,
+                personal_address, pan_no, gst_no, company_name, company_address, company_city, company_pincode, company_state,
+                threshold_limit, home_address, home_city, home_state, created_by, last_updated_by, vendor_category, bank_name, account_no,
+                ifsc_code,
+                account_type, upi_id, whatsapp_link } = req.body;
             const addVendorMastData = new pmsVendorMastModel({
                 type_id: type_id,
-                vendorMast_Id:vendorMast_Id,
                 platform_id: platform_id,
                 payMethod_id: payMethod_id,
                 cycle_id: cycle_id,
@@ -60,7 +44,7 @@ exports.createPmsVendorMast = [
                 personal_address: personal_address,
                 pan_no: pan_no,
                 gst_no: gst_no,
-                comapny_name: comapny_name,
+                company_name: company_name,
                 company_address: company_address,
                 company_city: company_city,
                 company_pincode: company_pincode,
@@ -69,10 +53,15 @@ exports.createPmsVendorMast = [
                 home_address: home_address,
                 home_city: home_city,
                 home_state: home_state,
-                created_date_time: created_date_time,
                 created_by: created_by,
-                last_updated_date: last_updated_date,
-                last_updated_by: last_updated_by
+                last_updated_by,
+                vendor_category,
+                bank_name,
+                account_no,
+                ifsc_code,
+                account_type,
+                upi_id,
+                whatsapp_link: JSON.parse(whatsapp_link)
             });
             const bucketName = vari.BUCKET_NAME;
             const bucket = storage.bucket(bucketName);
@@ -93,7 +82,6 @@ exports.createPmsVendorMast = [
                 });
                 blobStream2.end(req.files.upload_gst_image[0].buffer);
             }
-
             await addVendorMastData.save();
             return res.status(200).json({
                 status: 200,
@@ -103,7 +91,7 @@ exports.createPmsVendorMast = [
         } catch (error) {
             return res.status(500).json({
                 status: 500,
-                message: message.ERROR_MESSAGE,
+                message: error.message ? error.message : message.ERROR_MESSAGE,
             });
         }
     }];
@@ -130,6 +118,7 @@ exports.getVendorMastDetail = async (req, res) => {
                     preserveNullAndEmptyArrays: true,
                 },
             },
+            //~ This lookup not required 
             {
                 $lookup: {
                     from: "usermodels",
@@ -147,10 +136,12 @@ exports.getVendorMastDetail = async (req, res) => {
 
             {
                 $project: {
+                    vendor_category: 1,
                     type_id: 1,
                     platform_id: 1,
                     payMethod_id: 1,
                     cycle_id: 1,
+                    vendorMast_id: 1,
                     vendorMast_name: 1,
                     country_code: 1,
                     mobile: 1,
@@ -159,7 +150,7 @@ exports.getVendorMastDetail = async (req, res) => {
                     personal_address: 1,
                     pan_no: 1,
                     gst_no: 1,
-                    comapny_name: 1,
+                    company_name: 1,
                     company_address: 1,
                     company_city: 1,
                     company_pincode: 1,
@@ -196,7 +187,7 @@ exports.getVendorMastDetail = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
@@ -208,15 +199,17 @@ exports.updateVendorMast = [
         try {
             const { id } = req.params;
             const { type_id, platform_id, payMethod_id, cycle_id, vendorMast_name, country_code, mobile, alternate_mobile, email,
-                personal_address, pan_no, gst_no, comapny_name, company_address, company_city, created_date_time, company_pincode, company_state,
-                threshold_limit, home_address, home_city, home_state, created_by, last_updated_date, last_updated_by } = req.body;
+                personal_address, pan_no, gst_no, company_name, company_address, company_city, company_pincode, company_state,
+                threshold_limit, home_address, home_city, home_state, created_by, last_updated_by, vendor_category, bank_name, account_no,
+                ifsc_code,
+                account_type, upi_id, whatsapp_link } = req.body;
             const VendorMastData = await pmsVendorMastModel.findOne({ _id: id });
             if (!VendorMastData) {
                 return res.send("Invalid Vendore-Mast Id...");
             }
             if (req.files) {
-                VendorMastData.upload_pan_image = req.files["upload_pan_image"] ? req.files["upload_pan_image"][0].filename : assetReturnRequest.upload_pan_image;
-                VendorMastData.upload_gst_image = req.files["upload_gst_image"] ? req.files["upload_gst_image"][0].filename : assetReturnRequest.upload_gst_image;
+                VendorMastData.upload_pan_image = req.files["upload_pan_image"] ? req.files["upload_pan_image"][0].filename : VendorMastData.upload_pan_image;
+                VendorMastData.upload_gst_image = req.files["upload_gst_image"] ? req.files["upload_gst_image"][0].filename : VendorMastData.upload_gst_image;
             }
             const bucketName = vari.BUCKET_NAME;
             const bucket = storage.bucket(bucketName);
@@ -252,10 +245,9 @@ exports.updateVendorMast = [
                     personal_address,
                     pan_no,
                     gst_no,
-                    comapny_name,
+                    company_name,
                     company_address,
                     company_city,
-                    created_date_time,
                     company_pincode,
                     company_state,
                     threshold_limit,
@@ -263,8 +255,14 @@ exports.updateVendorMast = [
                     home_city,
                     home_state,
                     created_by,
-                    last_updated_date,
-                    last_updated_by
+                    last_updated_by,
+                    vendor_category: vendor_category,
+                    bank_name,
+                    account_no,
+                    ifsc_code,
+                    account_type,
+                    upi_id,
+                    whatsapp_link: JSON.parse(whatsapp_link)
                 },
             },
                 { new: true }
@@ -275,12 +273,12 @@ exports.updateVendorMast = [
             });
         } catch (error) {
             return res.status(500).json({
-                message: message.ERROR_MESSAGE,
+                message: error.message ? error.message : message.ERROR_MESSAGE,
             });
         }
     }];
 
-//GET - TMS_Task-List
+//GET - PMS- Vendor_Mast_List
 exports.getAllVendorMastList = async (req, res) => {
     try {
         const imageUrl = vari.IMAGE_URL;
@@ -357,10 +355,12 @@ exports.getAllVendorMastList = async (req, res) => {
             },
             {
                 $project: {
+                    vendor_category: 1,
                     type_id: "$type_id",
                     platform_id: "$platform_id",
                     payMethod_id: "$payMethod_id",
                     cycle_id: "$cycle_id",
+                    vendorMast_id: 1,
                     vendorMast_name: 1,
                     country_code: 1,
                     mobile: 1,
@@ -369,7 +369,7 @@ exports.getAllVendorMastList = async (req, res) => {
                     personal_address: 1,
                     pan_no: 1,
                     gst_no: 1,
-                    comapny_name: 1,
+                    company_name: 1,
                     company_address: 1,
                     company_city: 1,
                     created_date_time: 1,
@@ -381,6 +381,15 @@ exports.getAllVendorMastList = async (req, res) => {
                     home_state: 1,
                     created_by: 1,
                     last_updated_by: 1,
+                    //~  This fields not required 
+                    account_no: 1,
+                    ifsc_code: 1,
+                    account_type: 1,
+                    account_no: 1,
+                    upi_id: 1,
+                    bank_name: 1,
+                    whatsapp_link: 1,
+                    //~  End This fields not required    
                     upload_pan_image: {
                         $concat: [imageUrl, "$upload_pan_image"],
                     },
@@ -434,13 +443,59 @@ exports.getAllVendorMastList = async (req, res) => {
             message: "Vendor-mast list created successfully!",
             task_data: totalVendorList, tmsVendorkMastList
         });
-    } catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };
 
+exports.getNotAssignedToPageMastVenodrList = async (req, res) => {
+    try {
+        const vendorMastData = await pmsPageMastModel.find();
+        const vendorMastData1 = vendorMastData.map((data) => {
+            return data.vendorMast_id;
+        });
+
+        const venodrData = await pmsVendorMastModel.find({})
+
+        let filterData = venodrData.filter((dataa) => {
+            return !vendorMastData1.includes(dataa.vendorMast_id);
+        });
+        return res.status(200).json({
+            status: 200,
+            message: "PMS vendor-mast data found successfully!",
+            data: filterData,
+            length: filterData.length
+        });
+    } catch (error) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+exports.getPageByVenodrId = async (req, res) => {
+    try {
+        const { params } = req;
+        const { vendorMast_id } = params;
+        const vendorMastData = await pmsPageMastModel.find({ vendorMast_id });
+        if (!vendorMastData) {
+            return res.status(404).json({
+                status: 404,
+                message: message.DATA_NOT_FOUND,
+            });
+        }
+        return res.status(200).json({
+            status: 200,
+            message: "PMS vendor-mast data found successfully!",
+            data: vendorMastData,
+        });
+    } catch (error) {
+        res.status(404).json({
+            message: error
+        })
+    }
+}
 //DELETE - PMS_vendor_Mast_ By-ID
 exports.vendorMastDelete = async (req, res) => {
     try {
@@ -461,7 +516,7 @@ exports.vendorMastDelete = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: message.ERROR_MESSAGE,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
         });
     }
 };

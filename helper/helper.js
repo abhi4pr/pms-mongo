@@ -105,11 +105,11 @@ module.exports = {
       const remoteFilePath = `offerLetterPdf/${pdfFileName} Offer Letter.pdf`;
 
       // Generate PDF with Puppeteer
-      const browser = await puppeteer.launch({ headless: "true" });  // For Localhsot
-      // const browser = await puppeteer.launch({
-      //   headless: "true",
-      //   executablePath: "/usr/bin/chromium",
-      // });
+      // const browser = await puppeteer.launch({ headless: "true" });  // For Localhsot
+      const browser = await puppeteer.launch({
+        headless: "true",
+        executablePath: "/usr/lib/chromium",
+      });
       const page = await browser.newPage();
       await page.setContent(html);
       // await page.pdf({ path: outputPath, format: "A4" });
@@ -128,7 +128,7 @@ module.exports = {
         { user_id: empData?.user_id },
         {
           $set: {
-            offer_later_pdf_url: `${vari.IMAGE_URL}/${pdfFileName} Offer Letter.pdf`,
+            offer_later_pdf_url: `${vari.IMAGE_URL}${remoteFilePath}`,
           },
         }
       );
@@ -224,7 +224,6 @@ module.exports = {
       .sort({ _id: -1 })
       .exec();
 
-    // console.log("dddddddddd", latestEntry)
     let nextIncrement = 1;
     if (latestEntry && latestEntry.invoiceNo) {
       const parts = latestEntry.invoiceNo.split("/");
@@ -274,5 +273,14 @@ module.exports = {
     // Calculate the expiry time (10 minutes = 600,000 milliseconds)
     var expiryTime = currentTime + 600000;
     return expiryTime;
+  },
+
+  /**
+   * @param {*} app - express module require.
+   * @param {*} baseUrl - end points for the url
+   * @param {*} modules - router files requires
+   */
+  registerRoutes: (app, baseUrl, modules) => {
+    modules.forEach((module) => app.use(baseUrl, module));
   },
 };
