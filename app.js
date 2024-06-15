@@ -19,6 +19,8 @@ const { routeModulesV1, routeModules } = require("./routes/routeModule.js");
 // const axios = require("axios");
 require("./controllers/autoMail.js");
 require("./controllers/assetAutoMail.js");
+const https = require("https");
+const fs = require("fs");
 
 const app = express();
 cron.cronImplement();
@@ -37,29 +39,7 @@ app.use(
 );
 
 app.use(cors());
-
-// app.use(cors({
-//   origin: [vari.ALLOWED_URL, vari.ALLOWED_URL],
-//   methods: 'GET,HEAD,PUT,POST,DELETE',
-//   credentials: true,
-// }));
-// app.use(function (req, res, next) {
-//   res.setHeader("Access-Control-Allow-Origin", vari.ALLOWED_URL);
-//   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,PATCH,DELETE");
-//   res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type");
-//   res.setHeader("Access-Control-Allow-Credentials", true);
-//   next();
-// });
-
-app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use("/api", routes);
-
-// //all seprate route files require
-// var routesFile = requireDirectory(module, './routes');
-
-// for (i in routesFile) {
-//   app.use("/api/" + i, require("./routes/" + i));
-// }
 
 // New Version Route Configuration
 registerRoutes(app, "/api/", routeModules);
@@ -112,7 +92,24 @@ mongoose
     console.log(err);
   });
 
-app.listen(vari.PORT, () => {
-  console.log("server is running at " + vari.API_URL);
+// ssl code start
+const httpsOptions = {
+  cert: fs.readFileSync('./jarvis_work.crt'),
+  ca: fs.readFileSync('./jarvis_work.ca-bundle'),
+  key: fs.readFileSync('./jarvis.work.key'),
+};
 
+const httpsServer = https.createServer(httpsOptions,app);
+const httpApp = express();
+httpApp.get('*', (req, res) => {
+  res.redirect(`https://${req.headers.host}${req.url}`);
 });
+
+httpsServer.listen(vari.PORT, () => {
+  console.log('HTTP server is running on port'+vari.API_URL);
+});
+// ssl code end
+
+// app.listen(vari.PORT, () => {
+//   console.log("server is running at " + vari.API_URL);
+// });
