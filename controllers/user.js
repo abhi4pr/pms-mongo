@@ -432,14 +432,19 @@ exports.addUser = async (req, res) => {
         }
 
         const objectData = await objModel.find();
+        const lastAuth = await userAuthModel.findOne({}, {}, { sort: { 'auth_id': -1 } });
+        let currentAuthId = lastAuth ? lastAuth.auth_id : 0;
+
         const bulkOps = objectData.map(object => {
             let insert = 0, view = 0, update = 0, delete_flag = 0;
             if (simv.role_id === 1) {
                 insert = view = update = delete_flag = 1;
             }
+            currentAuthId++;
             return {
                 insertOne: {
                     document: {
+                        auth_id: currentAuthId,
                         Juser_id: simv.user_id,
                         obj_id: object.obj_id,
                         insert, view, update, delete_flag,
@@ -451,6 +456,7 @@ exports.addUser = async (req, res) => {
                 }
             };
         });
+
         await userAuthModel.bulkWrite(bulkOps);
 
     } catch (err) {
@@ -690,14 +696,19 @@ exports.addUserForGeneralInformation = [upload, async (req, res) => {
 
         if (simv) {
             const objectData = await objModel.find();
+            const lastAuth = await userAuthModel.findOne({}, {}, { sort: { 'auth_id': -1 } });
+            let currentAuthId = lastAuth ? lastAuth.auth_id : 0;
+
             const bulkOps = objectData.map(object => {
                 let insert = 0, view = 0, update = 0, delete_flag = 0;
                 if (simv.role_id === 1) {
                     insert = view = update = delete_flag = 1;
                 }
+                currentAuthId++;
                 return {
                     insertOne: {
                         document: {
+                            auth_id: currentAuthId,
                             Juser_id: simv.user_id,
                             obj_id: object.obj_id,
                             insert, view, update, delete_flag,
@@ -709,6 +720,7 @@ exports.addUserForGeneralInformation = [upload, async (req, res) => {
                     }
                 };
             });
+
             await userAuthModel.bulkWrite(bulkOps);
         }
 
