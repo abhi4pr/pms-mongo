@@ -16,7 +16,7 @@ const path = require("path");
 const requireDirectory = require('require-directory');
 const { registerRoutes } = require("./helper/helper.js");
 const { routeModulesV1, routeModules } = require("./routes/routeModule.js");
-// const axios = require("axios");
+const { restrictIPMiddleware } = require("./middleware/ipAuthMiddleware.js");
 require("./controllers/autoMail.js");
 require("./controllers/assetAutoMail.js");
 const https = require("https");
@@ -39,6 +39,7 @@ app.use(
 );
 
 app.use(cors());
+app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use("/api", routes);
 
 // New Version Route Configuration
@@ -53,7 +54,6 @@ registerRoutes(app, "/api/v1", routeModulesV1);
 const docBackendRouter = require("./doc/customization_src/routes/backend_routes.js");
 const docFrontendRouter = require("./doc/customization_src/routes/frontend_routes.js");
 app.use("/", docBackendRouter);
-// app.use("/", cronImplement);
 app.use("/", docFrontendRouter);
 app.use(
   "/api-docs/:token",
@@ -68,7 +68,6 @@ const openai = new OpenAI({
 
 app.post("/chat", async (req, res) => {
   const { prompt } = req.body;
-
   const completion = await openai.completions.create({
     model: "text-davinci-003",
     prompt: prompt,

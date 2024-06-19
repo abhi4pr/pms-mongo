@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const deletedSalesBookingHistoryData = new mongoose.Schema({
     sale_booking_id: {
@@ -18,6 +19,14 @@ const deletedSalesBookingHistoryData = new mongoose.Schema({
         required: false,
         default: 0
     },
+    campaign_name: {
+        type: String,
+        required: false,
+    },
+    brand_id: {
+        type: Schema.Types.ObjectId,
+        required: false,
+    },
     base_amount: {
         type: Number,
         required: false,
@@ -34,8 +43,7 @@ const deletedSalesBookingHistoryData = new mongoose.Schema({
     },
     credit_approval_status: {
         type: String,
-        enum: ['manager_pending', 'manager_approved', 'manager_rejected', 'admin_pending',
-            'admin_approved', 'admin_rejected', 'self_credit_used'],//0-6
+        enum: ['pending', 'approved', 'rejected', 'self_credit_used'],
     },
     reason_credit_approval: {
         type: mongoose.Schema.Types.ObjectId,
@@ -70,7 +78,7 @@ const deletedSalesBookingHistoryData = new mongoose.Schema({
         type: String,
         required: false,
     },
-    plan_file: {
+    record_service_file: {
         type: String,
         required: false,
     },

@@ -16,10 +16,8 @@ router.get("/accounts", (req, res) => {
 /**
  * account master routes
  */
-router.post("/accounts/add_account", verifyToken, validation.accountMasterValidation,
-    accountMaster.addAccountDetails);
-router.put("/accounts/edit_account/:id", verifyToken, validation.accountMasterValidation,
-    accountMaster.editAccountDetails);
+router.post("/accounts/add_account", verifyToken, accountMaster.addAccountDetails);
+router.put("/accounts/edit_account/:id", verifyToken, accountMaster.editAccountDetails);
 router.get("/accounts/get_all_account", verifyToken, accountMaster.getAllAccountDetails);
 router.get("/accounts/get_single_account/:id", verifyToken, accountMaster.getSingleAccountDetails);
 router.delete("/accounts/delete_account/:id", verifyToken, accountMaster.deleteAccountDetails);
@@ -46,9 +44,10 @@ router.put("/accounts/update_account_poc/:id", verifyToken, validation.accountPo
 router.get("/accounts/get_account_poc/:id", verifyToken, accountPoc.getAccountPocDetails);
 router.get("/accounts/get_account_poc_list", verifyToken, accountPoc.getAccountPocList);
 router.delete("/accounts/delete_account_poc/:id", verifyToken, accountPoc.deleteAccountPoc);
+router.put("/accounts/update_multiple_account_poc/:id", verifyToken, accountPoc.updateMultipleAccountPoc);
 
 /**
- * account company type routes
+ * account company type routes update_multiple_account_poc
  */
 router.post("/accounts/add_account_company_type", verifyToken, validation.accountCompanyTypeValidation,
     accountCompanyTypeController.addAccountCompanyType);
@@ -74,7 +73,7 @@ router.delete("/accounts/delete_document_master/:id", verifyToken, accountDocume
  */
 router.post("/accounts/add_document_overview", verifyToken, validation.accountDocumentOverviewValidation,
     accountDocumentOverview.addDocumentOverview);
-router.put("/accounts/update_document_overview/:id", verifyToken, validation.accountDocumentOverviewValidation,
+router.put("/accounts/update_document_overview", verifyToken, validation.accountDocumentOverviewValidation,
     accountDocumentOverview.updateDocumentOverview);
 router.get("/accounts/get_document_overview/:id", verifyToken, accountDocumentOverview.getDocumentOverviewDetails);
 router.get("/accounts/get_document_overview_list", verifyToken, accountDocumentOverview.getDocumentOverviewList);

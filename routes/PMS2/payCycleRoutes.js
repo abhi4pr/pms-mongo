@@ -5,19 +5,17 @@ const {
     getAllPayCycleDetails,
     getSinglePayCycleDetails,
     updateSinglePayCycleDetails,
-    getPayCycleData,
+    getPayCycleDataDeleted,
 } = require("../../controllers/PMS2/payCycleController");
-const {
-    addPayCycleValidation,
-    updatePayCycleValidation,
-} = require("../../helper/validation");
+const { addPayCycleValidation, updatePayCycleValidation } = require("../../helper/validation");
+const { verifyToken } = require("../../middleware/auth");
 const router = express.Router();
 
-router.post("/paycycle", addPayCycleValidation, addPayCycle);
-router.get("/paycycle", getAllPayCycleDetails);
-router.get("/paycycle/:id", getSinglePayCycleDetails);
-router.put("/paycycle", updatePayCycleValidation, updateSinglePayCycleDetails);
-router.delete("/paycycle/:id", deletePayCycleDetails);
-router.get("/paycycle", getPayCycleData);
+router.post("/paycycle", verifyToken, addPayCycleValidation, addPayCycle);
+router.get("/paycycle", verifyToken, getAllPayCycleDetails);
+router.get("/paycycle/:id", verifyToken, getSinglePayCycleDetails);
+router.put("/paycycle", verifyToken, updatePayCycleValidation, updateSinglePayCycleDetails);
+router.delete("/paycycle/:id", verifyToken, deletePayCycleDetails);
+router.get("/paycycle_deleted", verifyToken, getPayCycleDataDeleted);
 
 module.exports = router;

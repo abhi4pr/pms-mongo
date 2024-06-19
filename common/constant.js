@@ -12,6 +12,17 @@ module.exports = Object.freeze({
   SWAGGER_ADMIN: 1,
   SWAGGER_DEVELOPER: 2,
 
+  // GCP Image URL
+  GCP_VENDOR_FOLDER_URL: "https://storage.googleapis.com/jarvis-dev-bucket/InVendorDocs",
+  GCP_PAGE_STATES_FOLDER_URL: "https://storage.googleapis.com/jarvis-dev-bucket/PMS2Docs",
+  GCP_SALES_BOOKING_FOLDER_URL: "https://storage.googleapis.com/jarvis-dev-bucket/SalesBookingFiles",
+  GCP_SALES_RECORD_SERVICE_FOLDER_URL: "https://storage.googleapis.com/jarvis-dev-bucket/SalesRecordServiceFiles",
+  GCP_SALES_PAYMENT_UPDATE_FOLDER_URL: "https://storage.googleapis.com/jarvis-dev-bucket/SalesRecordServiceFiles",
+  GCP_SALES_BADGES_FOLDER_URL: "https://storage.googleapis.com/jarvis-dev-bucket/SalesBadgeImages",
+  GCP_ACCOUNT_FOLDER_URL: "https://storage.googleapis.com/jarvis-dev-bucket/AccountDocument",
+  GCP_INVOICE_REQUEST_URL: "https://storage.googleapis.com/jarvis-dev-bucket/InvoiceRequestFiles",
+
+
   /* JWT  */
   SECRET_KEY_LOGIN: "thisissecret12",
   SECRET_KEY_DOC_LOGIN: "docloginsect1234d",
@@ -33,5 +44,10 @@ module.exports = Object.freeze({
   DELETED: 2,
   ACTIVE: 0,
   INACTIVE: 1,
+
+  //@2 Email Configuration 
+  CONST_MAIL_USER_FOR_ALERT: "naveen@creativefuel.io",
+  CONST_SUMIT_MAIL: "sumit@creativefuel.io",
+  CONST_MAIL_PASS_FOR_ALERT: "absolwvkdihbvahf",
 
 });

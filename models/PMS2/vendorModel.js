@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 const constant = require("../../common/constant");
+const { required } = require("joi");
 const Schema = mongoose.Schema;
 
 const vendorSchema = new Schema({
-
-    type: {
+    vendor_type: {
         type: Schema.Types.ObjectId,
         required: false,
-        ref: "pms2grouplinktypemodels"
+        ref: "pms2vendortypemodels"
     },
     vendor_platform: {
         type: Schema.Types.ObjectId,
@@ -19,10 +19,34 @@ const vendorSchema = new Schema({
         required: true,
         ref: "pms2paycyclemodels"
     },
-    payment_method: {
+    // payment_method: {
+    //     type: Schema.Types.ObjectId,
+    //     required: true,
+    //     ref: "pms2paymentmethodmodels"
+    // },
+    primary_page: {
         type: Schema.Types.ObjectId,
-        required: true,
-        ref: "pms2paymentmethodmodels"
+        required: false,
+        ref: "pms2pagemastermodels"
+    },
+    bank_name: {
+        type: Schema.Types.ObjectId,
+        required: false,
+        ref: "pms2BankNameModel"
+    },
+    company_details: {
+        type: Schema.Types.ObjectId,
+        required: false,
+        ref: "Pms2CompanyDetailsModel"
+    },
+    page_count: {
+        type: Number,
+        required: false,
+        default: 0
+    },
+    primary_field: {
+        type: String,
+        required: false,
     },
     vendor_name: {
         type: String,
@@ -49,47 +73,9 @@ const vendorSchema = new Schema({
         type: String,
         required: false
     },
-    pan_no: {
-        type: String,
-        required: false
-    },
-    pan_image: {
-        type: String,
-        required: false
-    },
-    gst_no: {
-        type: String,
-        required: false
-    },
-    gst_image: {
-        type: String,
-        required: false
-    },
-    company_name: {
-        type: String,
-        required: false
-    },
-    company_address: {
-        type: String,
-        required: false
-    },
-    company_city: {
-        type: String,
-        required: false
-    },
-    company_pincode: {
+    home_pincode: {
         type: Number,
-        required: false,
-        default: 0
-    },
-    company_state: {
-        type: String,
         required: false
-    },
-    threshold_limit: {
-        type: String,
-        required: false,
-        default: ""
     },
     home_address: {
         type: String,
@@ -113,7 +99,7 @@ const vendorSchema = new Schema({
         required: true,
         default: 0,
     },
-    last_updated_by: {
+    updated_by: {
         type: Number,
         reqxuired: false,
         default: 0,

@@ -3,6 +3,8 @@ const { message } = require("../../common/message");
 const mongoose = require("mongoose");
 const accountMaster = require('../../models/accounts/accountMasterModel');
 const accountBilling = require('../../models/accounts/accountBillingModel');
+const accountPocModel = require('../../models/accounts/accountPocModel');
+const accountDocumentOverviewModel = require('../../models/accounts/accountDocumentOverviewModel');
 
 /**
  * POST- Api is to used for the account master data add in the DB collection.
@@ -14,8 +16,24 @@ exports.addAccountDetails = async (req, res) => {
             account_owner_id, website, turn_over, created_by,
             how_many_offices, connected_office, connect_billing_street, connect_billing_city,
             connect_billing_state, connect_billing_country, head_office, head_billing_street,
-            head_billing_city, head_billing_state, head_billing_country, pin_code, company_email
+            head_billing_city, head_billing_state, head_billing_country, pin_code, company_email,
+            account_poc, account_documents
         } = req.body;
+
+        // Check for duplicate contact_no in accountPoc
+        if (account_poc && Array.isArray(account_poc)) {
+            for (let i = 0; i < account_poc.length; i++) {
+                const existingPoc = await accountPocModel.findOne({
+                    contact_no: account_poc[i].contact_no
+                });
+                if (existingPoc) {
+                    return res.status(400).json({
+                        status: 400,
+                        message: `Contact number ${account_poc[i].contact_no} already exists.`
+                    });
+                }
+            }
+        }
 
         //account master data stored in DB collection
         const addAccountMasterData = await accountMaster.create({
@@ -48,13 +66,46 @@ exports.addAccountDetails = async (req, res) => {
             company_email: company_email,
             created_by: created_by
         })
+
+        let accountPocDataUpdatedArray = [];
+        let accountPocDetails = account_poc || [];
+
+        //account Poc details obj add in array
+        if (accountPocDetails.length && Array.isArray(accountPocDetails)) {
+            for (let element of accountPocDetails) {
+                element.account_id = addAccountMasterData.account_id;
+                element.created_by = created_by;
+                accountPocDataUpdatedArray.push(element);
+            }
+        }
+        //add data in db collection
+        const addAccountPocData = await accountPocModel.insertMany(accountPocDataUpdatedArray);
+
+
+        let accountDocumentsUpdatedArray = [];
+        let accountDocumentsDetails = account_documents || [];
+
+        //account Documents details obj add in array
+        if (accountDocumentsDetails.length && Array.isArray(accountDocumentsDetails)) {
+            for (let element of accountDocumentsDetails) {
+                element.account_id = addAccountMasterData.account_id;
+                element.created_by = created_by;
+                accountDocumentsUpdatedArray.push(element);
+            }
+        }
+
+        //add data in db collection
+        const addAccountDocumentsData = await accountDocumentOverviewModel.insertMany(accountDocumentsUpdatedArray);
+
         //send success response
         return res.status(200).json({
             status: 200,
             message: "Account master data added successfully!",
             data: {
                 accountMaster: addAccountMasterData,
-                accountBilling: addAccountBillingData
+                accountBilling: addAccountBillingData,
+                accountPoc: addAccountPocData,
+                accountDocuments: addAccountDocumentsData
             }
         });
     } catch (error) {
@@ -317,11 +368,25 @@ exports.getAllAccountBillingDetails = async (req, res) => {
  */
 exports.getSingleAccountBillingDetails = async (req, res) => {
     try {
+        let matchQuery = {};
+        if (req.query?._id == (true || 'true')) {
+            matchQuery = {
+                _id: mongoose.Types.ObjectId(req.params.id),
+                deleted: false
+            }
+        } else if (req.query?._id == (false || 'false')) {
+            matchQuery = {
+                account_id: Number(req.params.id),
+                deleted: false
+            }
+        } else {
+            matchQuery = {
+                _id: mongoose.Types.ObjectId(req.params.id),
+                deleted: false
+            }
+        }
         //data get from the db collection
-        const accountBillingData = await accountBilling.findOne({
-            _id: mongoose.Types.ObjectId(req.params.id),
-            deleted: false
-        });
+        const accountBillingData = await accountBilling.findOne(matchQuery);
 
         //send success response
         return res.status(200).send({

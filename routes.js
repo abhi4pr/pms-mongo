@@ -126,6 +126,7 @@ const nodePhpVendorPaymentMode = require("./controllers/nodePhpVendorPaymentMode
 const razorPay = require("./controllers/razorpay.js");
 const phpVendorPurchasePaymentRequest = require("./controllers/phpVendorPurchasePayment.js");
 
+
 //Routes for Asset Repair and Return Summary Data
 const repairandreturnsumdata = require("./controllers/repairAndReturnSum.js");
 const assetVendorSum = require("./controllers/assetVendorSum.js");
@@ -165,6 +166,13 @@ const { createDocMast, getDocMastDetail, updateDocMast, getDocMastList, deleteDo
 const { createCustomerDocument, getcustomerDocumentDetail, updateCustomerDocument, getCustomerDocumentList, deleteCustomerDocument, getAllCustomerDocumentList } = require("./controllers/Customer&Campaign/opsCustomerDocumentController.js");
 const { createPagePurchasePrice, getPagePurchasePrice, updatePagePurchasePrice, getPagePurchasePriceList, deletePagePurchasePriceData, getAllPagePurchasePriceList, getAllDataList, getAllListData } = require("./controllers/PMS/pmsPagePurchasePriceController.js");
 const { addExeHistory, updateExeHistory, getExeHistoryList, getExeHistoryDetails, getAllExeData } = require("./controllers/PMS/exeHistoryController.js");
+
+
+//Opcampaign
+const opCampaign = require("./controllers/opCampaign.js");
+const opCampaignPlan = require("./controllers/opCampaignPlan.js");
+const opCampaignPhase = require("./controllers/opCampaignPhase.js");
+const opExecution = require("./controllers/opExecution.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -222,13 +230,13 @@ router.get('/assignment/campaign_wise_counts/:id', assignmentController.getcampa
 router.put('/assignment/post/details/update', assignmentController.updatePostDetails)
 router.post('/assignment/campaign/dashboard', assignmentDashboardController.AssignmentDashCampaign)
 router.get('/assignment/get_all_phases/:phase_id', assignmentController.getAllAssignmentsFromPhaseId)
-router.get('/assignment/get_all_phases_by_campid/:_id', assignmentController.getAllPhasesByCampId)
-router.get('/assignment/get_all_exe_phases_by_campid/:_id', assignmentController.getAllExePhasesByCampId);
-router.get('/assignment/get_camp_commitments/:_id', assignmentController.getCampCommits)
-router.get('/assignment/get_phase_commitments/:phase_id', assignmentController.getPhaseCommits)
+// router.get('/assignment/get_all_phases_by_campid/:_id', assignmentController.getAllPhasesByCampId)
+// router.get('/assignment/get_all_exe_phases_by_campid/:_id', assignmentController.getAllExePhasesByCampId);
+// router.get('/assignment/get_camp_commitments/:_id', assignmentController.getCampCommits)
+// router.get('/assignment/get_phase_commitments/:phase_id', assignmentController.getPhaseCommits)
 router.post('/assignment/get_shift_phases', assignmentController.getShiftPhases)
 router.post('/assignment/replace_page_new', assignmentController.replacePage)
-router.post('/assignment/add_new_page', assignmentController.addNewPage)
+// router.post('/assignment/add_new_page', assignmentController.addNewPage)
 
 router.post('/assignment/commit', assignmentCommitController.createAssComm)
 router.post('/assignment/bulk', assignmentController.createAssignmentBulk)
@@ -451,11 +459,14 @@ router.put("/campaign", campagin.editCampaign);
 router.delete("/campaign/:id", campagin.deleteCampaign);
 
 //Execution Campaign routes
-router.post("/exe_campaign", exeCampaign.addExeCampaign);
-router.get("/exe_campaign", exeCampaign.getExeCampaigns);
-router.get("/exe_campaign/:id", exeCampaign.getExeCampaignById);
-router.put("/exe_campaign", exeCampaign.editExeCampaign);
-router.delete("/exe_campaign/:id", exeCampaign.deleteExeCampaign);
+router.post("/exe_campaign", verifyToken, exeCampaign.addExeCampaign);
+router.get("/exe_campaign", verifyToken, exeCampaign.getExeCampaigns);
+router.get("/exe_campaign/:id", verifyToken, exeCampaign.getExeCampaignById);
+router.put("/exe_campaign/:id", verifyToken, exeCampaign.editExeCampaign);
+router.delete("/exe_campaign/:id", verifyToken, exeCampaign.deleteExeCampaign);
+router.get("/exe_campaign_name_wise", verifyToken, exeCampaign.getExeCampaignsNameWiseData);
+router.get("/exe_campaign_wise_list/:id", verifyToken, exeCampaign.getAllExeCampaignList);
+
 
 //ProjectxPageCategory
 router.post(
@@ -925,7 +936,7 @@ router.post("/offer_letter_send_in_mail", upload.single("attachment"), user.send
 
 //---------------------------------------------------------------------------All Routes OF Attendance Module Starts Here ---------------------------------------------------------------------------------------------------//
 
-router.post("/add_attendance", attendance.addAttendance);
+// router.post("/add_attendance", attendance.addAttendance);
 router.post(
   "/get_salary_by_id_month_year",
 
@@ -1885,6 +1896,48 @@ router.put("/edit_dynamic_table_data", dynamicTablesModel.editDynamicTablesData)
 // admin password and email routes
 router.post('/change_selected_user_password', adminController.changePassOfSelectedUsers);
 router.post('/change_all_user_password', adminController.changePassOfUsers);
-router.post('/send_email_to_all_users', adminController.sendPassEmailToUsers)
+router.post('/send_email_to_all_users', adminController.sendPassEmailToUsers);
+
+//------------------------------------------------- New Operations Routes Starts Here----------------------------
+
+//OpCampaign Routes Start Here
+router.post('/opcampaign', opCampaign.addOpCampaign);
+router.get('/opcampaign', opCampaign.getOpCampaigns);
+router.get('/opcampaign/:id', opCampaign.getSingleOpCampaign);
+router.delete('/opcampaign/:_id', opCampaign.deleteCampaign);
+router.post('/get_filter_campaigns', opCampaign.filterCampagin);
+router.get('/get_data', opCampaign.getCampaignWithFilterData);
+router.get('/get_single_sale_booking_data_new_table/:sale_booking_id', opCampaign.getSingleSaleBookingData);
+// router.get('/get_single_sale_booking_data_old_table/:sale_booking_id', opCampaign.getSingleSaleBookingData);
+
+//OpCampaign Plan Routes
+router.post('/opcampaignplan', opCampaignPlan.addCampaignPlan);
+router.get('/opcampaignplan/:id', opCampaignPlan.getCampaignPlan);
+router.get('/opcampaignplan/:_id', opCampaignPlan.getSingleCampaignPlan);
+router.put('/opcampaignplan/:id', opCampaignPlan.updateSingleCampaignPlan);
+router.delete('/opcampaignplan/:id', opCampaignPlan.deleteCampaignPlanDataByCampaignId);
+router.delete('/opcampaignplansingle/:_id', opCampaignPlan.deleteCampaignPlan);
+router.post('/get_excel_data_in_json_from_url', opCampaignPlan.getNsendExcelDataInJson);
+router.post('/replace_plan_pages', opCampaignPlan.replacePlanPage);
+
+//OpCampaign Phase
+router.post('/opCampaignPhase', opCampaignPhase.addCampaignPhase);
+router.get('/opCampaignPhase/:id', opCampaignPhase.getOpCampaignPhases);
+router.post('/replace_phase_pages', opCampaignPhase.replacePhasePage);
+router.delete('/opCampaignPhase', opCampaignPhase.deleteCampaignPhaseDataByCampaignId);
+router.delete('/opCampaignPhaseSingle/:_id', opCampaignPhase.deleteCampaignPhase);
+
+//OpExecution Routes
+router.post('/opexecution', opExecution.addOPExecution);
+router.get('/get_all_exe_phases_by_campid/:_id', opExecution.getOPExecutions);
+router.get('/get_all_phases_by_campid/:_id', opExecution.getAllPhasesByCampId);
+router.get('/get_all_phases_by_phaseName/:phaseName', opExecution.getAllPhasesByPhaseName);
+router.get('/get_camp_commitments/:_id', opExecution.getCampCommits);
+router.put('/opexecution', opExecution.updateOPExecution);
+router.post('/add_new_page', opExecution.addNewPage)
+router.get('/get_phase_commitments/:phaseName', opExecution.getPhaseCommits);
+router.get('/phase_created_campaign', opExecution.phaseCreatedCampaign);
+
+//------------------------------------------------- New Operations Routes End Here----------------------------
 
 module.exports = router;

@@ -47,8 +47,8 @@ exports.addAccountPoc = async (req, res) => {
  */
 exports.getAccountPocDetails = async (req, res) => {
     try {
-        const accountPocData = await accountPocModel.findOne({
-            _id: mongoose.Types.ObjectId(req.params.id)
+        const accountPocData = await accountPocModel.find({
+            account_id: Number(req.params.id)
         });
 
         //data not get check
@@ -77,39 +77,56 @@ exports.getAccountPocDetails = async (req, res) => {
  */
 exports.updateAccountPoc = async (req, res) => {
     try {
-        const { id } = req.params
-        const { account_id, contact_name, contact_no, alternative_contact_no, email, department, designation, description, updated_by } = req.body;
-        const editAccountPocData = await accountPocModel.findOne({ _id: id })
-        // if check by account_poc_id 
-        if (!editAccountPocData) {
+        const { id } = req.params;
+        const {
+            account_id,
+            contact_name,
+            contact_no,
+            alternative_contact_no,
+            email,
+            department,
+            designation,
+            description,
+            updated_by
+        } = req.body;
+
+        // update account poc data
+        const updatedAccountPocData = await accountPocModel.findByIdAndUpdate(
+            { _id: id },
+            {
+                $set: {
+                    account_id,
+                    contact_name,
+                    contact_no,
+                    alternative_contact_no,
+                    email,
+                    department,
+                    designation,
+                    description,
+                    updated_by
+                }
+            },
+            { new: true }
+        );
+
+        // if account poc not found
+        if (!updatedAccountPocData) {
             return res.status(400).json({ message: "Account poc id invalid, please check!" });
         }
-        //update account poc data
-        await accountPocModel.updateOne({ _id: editAccountPocData.id }, {
-            $set: {
-                account_id,
-                contact_name,
-                description,
-                contact_no,
-                alternative_contact_no,
-                email,
-                department,
-                designation,
-                updated_by
-            }
-        })
-        //send success response
+
+        // send success response
         return res.status(200).json({
             status: 200,
             message: "Account poc data updated successfully!",
-        })
+            data: updatedAccountPocData
+        });
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: error.message ? error.message : message.ERROR_MESSAGE,
+            message: error.message ? error.message : "An error occurred while updating account poc data.",
         });
     }
-}
+};
 
 /**
  * Api is to used for the update_account_poc data in the DB collection.
@@ -215,3 +232,76 @@ exports.deleteAccountPoc = async (req, res) => {
         });
     }
 };
+
+
+/**
+ * Api is to used for multiple update_account_poc data in the DB collection.
+ */
+exports.updateMultipleAccountPoc = async (req, res) => {
+    try {
+        // get poc data from body
+        let accountPocDetails = (req.body?.account_poc) || [];
+        const { updated_by } = req.body;
+        const accountId = Number(req.params.id);
+
+        // // Check for duplicate contact_no in accountPoc
+        // if (accountPocDetails && Array.isArray(accountPocDetails)) {
+        //     for (let i = 0; i < accountPocDetails.length; i++) {
+        //         const existingPoc = await accountPocModel.findOne({
+        //             contact_no: accountPocDetails[i].contact_no
+        //         });
+        //         if (existingPoc) {
+        //             return res.status(400).json({
+        //                 status: 400,
+        //                 message: `Contact number ${accountPocDetails[i].contact_no} already exists.`
+        //             });
+        //         }
+        //     }
+        // }
+
+        // Get distinct IDs from the database
+        const distinctIds = await accountPocModel.distinct('_id', {
+            account_id: accountId
+        });
+
+        // Create a set of IDs from accountPocDetails
+        const documentIds = new Set(accountPocDetails.map(doc => doc?._id));
+
+        // Delete documents that are not included in accountPocDetails
+        for (let id of distinctIds) {
+            if (!documentIds.has(id.toString())) {
+                await accountPocModel.deleteOne({ _id: id });
+            }
+        }
+
+        //account Poc details obj add in array
+        if (accountPocDetails.length && Array.isArray(accountPocDetails)) {
+            for (let element of accountPocDetails) {
+                if (element?._id) {
+                    // Existing document: update it
+                    element.updated_by = updated_by;
+                    await accountPocModel.updateOne({
+                        _id: element._id
+                    }, {
+                        $set: element
+                    });
+                } else {
+                    // New document: insert it
+                    element.created_by = updated_by;
+                    element.account_id = accountId;
+                    await accountPocModel.create(element);
+                }
+            }
+        }
+        //send success response
+        return res.status(200).json({
+            status: 200,
+            message: "Account poc multiple data updated successfully!",
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message ? error.message : message.ERROR_MESSAGE,
+        });
+    }
+}
