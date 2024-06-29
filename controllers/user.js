@@ -121,6 +121,7 @@ exports.addUser = async (req, res) => {
             tds_applicable: req.body?.tds_applicable,
             tds_per: req.body?.tds_per,
             permanent_city: req.body?.permanent_city,
+            user_status: req.body?.user_status,
             emergency_contact_person_name2: req.body.emergency_contact_person_name2
         })
 
