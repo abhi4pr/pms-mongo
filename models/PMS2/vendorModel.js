@@ -4,6 +4,11 @@ const { required } = require("joi");
 const Schema = mongoose.Schema;
 
 const vendorSchema = new Schema({
+    vendor_id: {
+        type: Number,
+        required: false,
+        unique: true
+    },
     vendor_type: {
         type: Schema.Types.ObjectId,
         required: false,
@@ -34,12 +39,17 @@ const vendorSchema = new Schema({
         required: false,
         ref: "pms2BankNameModel"
     },
-    company_details: {
-        type: Schema.Types.ObjectId,
-        required: false,
-        ref: "Pms2CompanyDetailsModel"
-    },
+    // company_details: {
+    //     type: Schema.Types.ObjectId,
+    //     required: false,
+    //     ref: "Pms2CompanyDetailsModel"
+    // },
     page_count: {
+        type: Number,
+        required: false,
+        default: 0
+    },
+    closed_by: {
         type: Number,
         required: false,
         default: 0
@@ -114,4 +124,18 @@ const vendorSchema = new Schema({
         timestamps: true,
     }
 );
+
+vendorSchema.pre('save', async function (next) {
+    if (!this.vendor_id) {
+        const lastAgency = await this.constructor.findOne({}, {}, { sort: { 'vendor_id': -1 } });
+
+        if (lastAgency && lastAgency.vendor_id) {
+            this.vendor_id = lastAgency.vendor_id + 1;
+        } else {
+            this.vendor_id = 1;
+        }
+    }
+    next();
+});
+
 module.exports = mongoose.model("Pms2VendorModel", vendorSchema);

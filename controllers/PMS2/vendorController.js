@@ -4,18 +4,19 @@ const bankDetailsModel = require("../../models/PMS2/bankDetailsModel");
 const paymentMethodModel = require("../../models/PMS2/paymentMethodModel");
 const vendorGroupLinkModel = require("../../models/PMS2/vendorGroupLinkModel");
 const vendorModel = require("../../models/PMS2/vendorModel");
+const companyDetailsModel = require("../../models/PMS2/companyDetailsModel");
+
 
 exports.createVendorData = async (req, res) => {
     try {
-        const { vendor_type, vendor_platform, pay_cycle, bank_name, page_count, company_details, primary_field,
+        const { vendor_type, vendor_platform, pay_cycle, bank_name, page_count, primary_field,
             vendor_name, home_pincode, country_code, mobile, alternate_mobile, email, personal_address,
-            home_address, home_city, home_state, created_by, vendor_category, } = req.body;
+            home_address, home_city, home_state, created_by, vendor_category, closed_by } = req.body;
         const addVendorData = new vendorModel({
             vendor_type,
             vendor_platform,
             pay_cycle,
             bank_name,
-            company_details,
             primary_field,
             vendor_name,
             home_pincode,
@@ -29,7 +30,8 @@ exports.createVendorData = async (req, res) => {
             home_city,
             vendor_category,
             home_state,
-            created_by
+            created_by,
+            closed_by
         });
 
         const vendorDataSaved = await addVendorData.save();
@@ -46,11 +48,12 @@ exports.createVendorData = async (req, res) => {
         let bankDataUpdatedArray = [];
         let vendorlinksUpdatedArray = [];
         let paymentMethodUpdatedArray = [];
+        let companyDetailsUpdatedArray = [];
 
         let bankDetails = (req.body?.bank_details) || [];
         let vendorLinkDetails = (req.body?.vendorLinks) || [];
         let paymentMethodDetails = (req.body?.paymentMethod) || [];
-
+        let companyDetails = (req.body?.company_details) || [];
 
         //bank details obj in add vender id
         if (bankDetails.length) {
@@ -69,7 +72,7 @@ exports.createVendorData = async (req, res) => {
                 vendorlinksUpdatedArray.push(element);
             });
         }
-        
+
         //payment method details obj in add vender id
         if (paymentMethodDetails.length) {
             await paymentMethodDetails.forEach(element => {
@@ -79,10 +82,20 @@ exports.createVendorData = async (req, res) => {
             });
         }
 
+        //company details obj in add vender id
+        if (companyDetails.length) {
+            await companyDetails.forEach(element => {
+                element.vendor_id = vendorDataSaved._id;
+                element.created_by = created_by;
+                companyDetailsUpdatedArray.push(element);
+            });
+        }
+
         //add data in db collection
         await bankDetailsModel.insertMany(bankDataUpdatedArray);
         await vendorGroupLinkModel.insertMany(vendorlinksUpdatedArray);
         await paymentMethodModel.insertMany(paymentMethodUpdatedArray);
+        await companyDetailsModel.insertMany(companyDetailsUpdatedArray);
 
         //send success response
         return response.returnTrue(
@@ -176,7 +189,7 @@ exports.updateVendorData = async (req, res) => {
         // Assuming vendor_id is passed as a URL parameter
         const { vendor_type, vendor_platform, pay_cycle, bank_name, page_count, company_details, primary_field, vendor_name,
             home_pincode, country_code, mobile, alternate_mobile, email, personal_address, home_address, home_city, home_state,
-            vendor_category, updated_by } = req.body;
+            vendor_category, updated_by, closed_by } = req.body;
 
         // Find the vendor by ID
         const existingVendor = await vendorModel.findById(vendor_id);
@@ -186,6 +199,7 @@ exports.updateVendorData = async (req, res) => {
 
         // Update vendor fields
         existingVendor.vendor_type = vendor_type;
+        existingVendor.closed_by = closed_by;
         existingVendor.vendor_platform = vendor_platform;
         existingVendor.pay_cycle = pay_cycle;
         existingVendor.bank_name = bank_name;
@@ -368,6 +382,31 @@ exports.getAllVendorDeleted = async (req, res) => {
         }
 
         return response.returnTrue(200, req, res, 'Vendor retrieved successfully!', vendorData);
+    } catch (error) {
+        return response.returnFalse(500, req, res, `${error.message}`, {});
+    }
+};
+
+/**
+ * Api is get the vendor model data BY Vendor-Id
+ */
+exports.getVendorDetailsBYVendorId = async (req, res) => {
+    try {
+        const vendorId = parseInt(req.params.vendor_id);
+
+        const getVenorData = await vendorModel.findOne({
+            vendor_id: vendorId,
+        });
+        if (!getVenorData) {
+            return response.returnFalse(200, req, res, `No Record Found`, {});
+        }
+        return response.returnTrue(
+            200,
+            req,
+            res,
+            "Vendor details retrieve successfully!",
+            getVenorData
+        );
     } catch (error) {
         return response.returnFalse(500, req, res, `${error.message}`, {});
     }

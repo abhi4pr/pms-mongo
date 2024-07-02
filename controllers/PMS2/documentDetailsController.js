@@ -225,3 +225,47 @@ exports.deleteDocumentDetails = async (req, res) => {
         return response.returnFalse(500, req, res, `${error.message}`, {});
     }
 };
+
+exports.getDocumentVendorWiseDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        let matchQuery = {
+            vendor_id: mongoose.Types.ObjectId(id),
+            status: { $ne: constant.DELETED }
+        };
+
+        let addFieldsObj = {
+            $addFields: {
+                document_image_upload_url: {
+                    $cond: {
+                        if: { $ne: ["$document_image_upload", ""] },
+                        then: {
+                            $concat: [
+                                constant.GCP_PMS2_Document_FOLDER_URL,
+                                "/",
+                                "$document_image_upload",
+                            ],
+                        },
+                        else: "$document_image_upload",
+                    },
+                },
+            },
+        };
+        const pipeline = [{ $match: matchQuery }, addFieldsObj];
+ 
+        const vendorWisedocumentDetails = await documentDetailsModel.aggregate(pipeline);
+
+        if (vendorWisedocumentDetails?.length === 0) {
+            return response.returnFalse(200, req, res, `No Record Found`, {});
+        }
+        return response.returnTrue(
+            200,
+            req,
+            res,
+            "Vendor id wise document details data retrieve successfully!",
+            vendorWisedocumentDetails
+        );
+    } catch (error) {
+        return response.returnFalse(500, req, res, `${error.message}`, {});
+    }
+}

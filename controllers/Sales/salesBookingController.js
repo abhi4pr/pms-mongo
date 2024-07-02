@@ -26,7 +26,7 @@ const upload = multer({
 
 /**
  * Api is to used for the sales booking data add in the DB collection.
- */
+*/
 
 exports.addSalesBooking = [
     upload, async (req, res) => {
@@ -105,6 +105,8 @@ exports.addSalesBooking = [
                 for (let element of recordServicesDetails) {
                     element.sale_booking_id = saleBookingAdded.sale_booking_id;
                     element.created_by = req.body.created_by;
+                    element.sale_executive_id = req.body.created_by;
+                    element.sale_booking_date = req.body.sale_booking_date;
                     recordServicesDataUpdatedArray.push(element);
                 }
             }
@@ -114,6 +116,7 @@ exports.addSalesBooking = [
 
             let totalIncentiveAmount = 0;
             let totalRecordServiceAmount = 0;
+            const recordServiceCounts = (recordServicesData && recordServicesData.length) ? recordServicesData.length : 0;
             for (let index = 0; index < recordServicesData.length; index++) {
                 const element = recordServicesData[index];
                 totalRecordServiceAmount += element?.amount;
@@ -128,14 +131,15 @@ exports.addSalesBooking = [
             }, {
                 $set: {
                     incentive_amount: totalIncentiveAmount,
-                    record_service_amount: totalRecordServiceAmount
+                    record_service_amount: totalRecordServiceAmount,
+                    record_service_counts: recordServiceCounts
                 }
             })
 
             //success response send
             return response.returnTrue(200, req, res,
                 "Sales Booking Created Successfully",
-                { saleBookingAdded, recordServicesData });
+                saleBookingAdded);
         } catch (err) {
             return response.returnFalse(500, req, res, err.message, {});
         }
@@ -190,7 +194,7 @@ exports.editSalesBooking = [
             };
 
             //draft status check
-            if (req.body?.is_draft_save) {
+            if (req.body?.is_draft_save == true || req.body?.is_draft_save == "true") {
                 updateData["booking_status"] = saleBookingStatus['04'].status;
             } else {
                 if (req.body.payment_credit_status == "sent_for_payment_approval") {
@@ -264,13 +268,12 @@ exports.getAllSalesBooking = async (req, res) => {
             },
         };
 
-        const pipeline = [addFieldsObj];
+        const pipeline = [addFieldsObj, { $sort: sort }];
 
         if (page && limit) {
             pipeline.push(
                 { $skip: skip },
                 { $limit: limit },
-                { $sort: sort }
             );
         }
 
@@ -308,12 +311,21 @@ exports.getSingleSalesBooking = async (req, res) => {
         if (!salesBookingDetail) {
             return response.returnFalse(200, req, res, `No Record Found`, {});
         }
+
+        const result = { ...salesBookingDetail._doc }; // create a new object with all fields from salesBookingDetail._doc
+
+        if (salesBookingDetail.record_service_file && salesBookingDetail.record_service_file != '') {
+            const recordServiceURl = `${constant.GCP_SALES_BOOKING_FOLDER_URL}/${salesBookingDetail.record_service_file}`;
+            result.recordServiceFileURL = recordServiceURl; // add the new field to the result object
+        }
+
+        //return success response
         return response.returnTrue(
             200,
             req,
             res,
             "Sales booking details retrive successfully!",
-            salesBookingDetail
+            result
         );
     } catch (error) {
         return response.returnFalse(500, req, res, `${error.message}`, {});
@@ -754,81 +766,3 @@ exports.salesDataOfUserOutstanding = async (req, res) => {
         return response.returnFalse(500, req, res, err.message, {});
     }
 }
-
-
-exports.salesBookingIncentiveData = async (req, res) => {
-    try {
-        const { month, year, user_id } = req.query;
-
-        // Create match conditions based on the provided query parameters
-        const matchConditions = {};
-        if (month && year) {
-            const startDate = moment(`${year}-${month}-01`).startOf('month').toDate();
-
-            const endDate = moment(startDate).endOf('month').toDate();
-            matchConditions.createdAt = {
-                $gte: startDate,
-                $lt: endDate,
-            };
-        }
-        if (user_id) {
-            matchConditions.created_by = Number(user_id); // convert user_id to Number
-        }
-
-        const salesBookingIncentiveData = await salesBookingModel.aggregate([{
-            $match: matchConditions,
-        }, {
-            $lookup: {
-                from: "usermodels",
-                localField: "created_by",
-                foreignField: "user_id",
-                as: "user",
-            },
-        }, {
-            $unwind: {
-                path: "$user",
-                preserveNullAndEmptyArrays: true,
-            },
-        }, {
-            $project: {
-                _id: 1,
-                created_by_name: "$user.user_name",
-                sale_booking_date: 1,
-                campaign_name: 1,
-                campaign_amount: 1,
-                description: 1,
-                credit_approval_status: 1,
-                reason_credit_approval: 1,
-                gst_status: 1,
-                balance_payment_ondate: 1,
-                payment_credit_status: 1,
-                booking_status: 1,
-                sale_booking_id: 1,
-                account_id: 1,
-                account_name: 1,
-                requested_amount: 1,
-                registered_by_name: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                created_by: 1,
-                total_sale_booking_amount: { $sum: "$campaign_amount" },
-                total_incentive_amount: { $sum: "$incentive_amount" },
-            },
-        },
-        ]);
-
-        if (!salesBookingIncentiveData) {
-            return response.returnFalse(200, req, res, "No Record Found...", []);
-        }
-
-        return response.returnTrue(200, req, res,
-            "Sales Booking Status data retrieved",
-            salesBookingIncentiveData
-        );
-    } catch (err) {
-        return response.returnFalse(500, req, res, err.message, {});
-    }
-};
-
-
-
