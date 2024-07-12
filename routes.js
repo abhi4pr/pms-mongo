@@ -54,6 +54,9 @@ const leadtype = require("./controllers/lead.js");
 const leadmast = require("./controllers/lead.js");
 const { verifyToken } = require("./middleware/auth.js");
 const demoApi = require("./controllers/demoApi.js");
+const expenseApi = require("./controllers/expenseController.js");
+const expenseAccountApi = require("./controllers/expenseAccountController.js");
+const expenseCategoryApi = require("./controllers/expenseCategory.js");
 
 const assetCategory = require("./controllers/assestsCategory.js");
 const assetSubCategory = require("./controllers/assetsSubCategory.js");
@@ -931,12 +934,13 @@ router.post("/image_to_base64", user.ImagetoBase64);
 router.get("/download_offerletter_in_bucket/:filename", user.downloadOfferLeterInBucket);
 router.post("/send_offer_letter", user.sendOfferLetter);
 router.post("/offer_letter_send_in_mail", upload.single("attachment"), user.sendOfferLetterMail);
+router.put('/change_all_reportL1_by_sub_dept', user.changeAllReportL1BySubDept);
 
 //---------------------------------------------------------------------------All Routes OF User Module Ends Here ---------------------------------------------------------------------------------------------------//
 
 //---------------------------------------------------------------------------All Routes OF Attendance Module Starts Here ---------------------------------------------------------------------------------------------------//
 
-// router.post("/add_attendance", attendance.addAttendance);
+router.post("/add_attendance", attendance.addAttendance);
 router.post(
   "/get_salary_by_id_month_year",
 
@@ -1942,5 +1946,29 @@ router.get('/phase_created_campaign', opExecution.phaseCreatedCampaign);
 router.get('/change_vendor_id_to_id', adminController.changeVendorIdToId)
 router.get('/change_primarypage_id_to_id', adminController.changePrimaryPageToId)
 router.get('/shift_bank_details', adminController.shiftBankDetails)
+router.get('/get_vendor_details_with_ids', adminController.getVendorDetailsWithIds)
+router.get('/get_vendor_details_with_ids_by_id/:vendor_id', adminController.getVendorDetailsWithIdsById)
+
+/* expense api */
+router.post("/add_expense", expenseApi.addExpense);
+router.post("/add_multiple_expense", expenseApi.addMultipleExpense);
+router.get("/get_all_expense", expenseApi.getAllExpenses);
+router.get("/get_single_expense/:_id", expenseApi.getSingleExpense);
+router.put("/update_expense", expenseApi.editExpense);
+router.delete("/delete_expense/:_id", expenseApi.deleteExpense);
+
+/* expense account api */
+router.post("/add_expense_account", expenseAccountApi.addExpenseAccount);
+router.get("/get_all_expense_accounts", expenseAccountApi.getExpenseAccounts);
+router.get("/get_single_expense_account/:_id", expenseAccountApi.getSingleExpenseAccount);
+router.put("/update_expense_account", expenseAccountApi.editExpenseData);
+router.delete("/delete_expense_account/:_id", expenseAccountApi.deleteExpenseData);
+
+/* expense Category api */
+router.post("/add_expense_category", expenseCategoryApi.addExpenseCategory);
+router.get("/get_all_expense_categories", expenseCategoryApi.getExpenseCategories);
+router.get("/get_single_expense_category/:_id", expenseCategoryApi.getSingleExpenseCategory);
+router.put("/update_expense_category", expenseCategoryApi.editExpenseCategory);
+router.delete("/delete_expense_category/:_id", expenseCategoryApi.deleteExpenseData);
 
 module.exports = router;
