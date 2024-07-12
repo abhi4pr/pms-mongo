@@ -48,6 +48,11 @@ const salesBooking = new mongoose.Schema({
         required: false,
         default: 0
     },
+    record_service_counts: {
+        type: Number,
+        required: false,
+        default: 0
+    },
     brand_id: {
         type: Schema.Types.ObjectId,
         required: false,
@@ -120,6 +125,19 @@ const salesBooking = new mongoose.Schema({
     // },
     booking_remarks: {
         type: String,
+        required: false,
+    },
+    incentive_request_id: {
+        type: Schema.Types.ObjectId,
+        required: false,
+    },
+    incentive_request_status: { //on incentive release request time add
+        type: String,
+        enum: ['pending', 'requested', 'released'],
+        required: false,
+    },
+    settlement_sale_booking_id: { //only add in Non GST booking
+        type: Number,
         required: false,
     },
     incentive_status: {

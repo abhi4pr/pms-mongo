@@ -32,6 +32,9 @@ const companyDetailsRoutes = require("./PMS2/companyDetailsRoutes");
 const documentDetailsRoutes = require("./PMS2/documentDetailsRoutes");
 const autoIncentiveCalculationRoutes = require("./Sales/autoIncentiveCalculationRoutes");
 const invoiceParticularRoutes = require("./Sales/invoiceParticularRoutes");
+const invoiceRequestRoutes = require("./Sales/invoiceRequestRoutes");
+const incentiveRequestRoutes = require("./Sales/incentiveRequestRoutes");
+const financeSalesRoutes = require("./Sales/financeSalesRoutes");
 
 //used for the http://localhost:8080/api/v1/end-points
 exports.routeModulesV1 = [
@@ -53,7 +56,7 @@ exports.routeModulesV1 = [
     pageStatesRoutes,
     bankNameRoutes,
     companyDetailsRoutes,
-    documentDetailsRoutes
+    documentDetailsRoutes,
 ];
 
 //used for the http://localhost:8080/api/end-points
@@ -72,6 +75,9 @@ exports.routeModules = [
     incentivePlanRoutes,
     badgesMasterRoutes,
     autoIncentiveCalculationRoutes,
-    invoiceParticularRoutes
+    invoiceParticularRoutes,
+    invoiceRequestRoutes,
+    incentiveRequestRoutes,
+    financeSalesRoutes
 ];
 

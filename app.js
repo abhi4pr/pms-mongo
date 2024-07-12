@@ -98,14 +98,14 @@ const httpsOptions = {
   key: fs.readFileSync('./jarvis.work.key'),
 };
 
-const httpsServer = https.createServer(httpsOptions,app);
+const httpsServer = https.createServer(httpsOptions, app);
 const httpApp = express();
 httpApp.get('*', (req, res) => {
   res.redirect(`https://${req.headers.host}${req.url}`);
 });
 
 httpsServer.listen(vari.PORT, () => {
-  console.log('HTTP server is running on port'+vari.API_URL);
+  console.log('HTTP server is running on port' + vari.API_URL);
 });
 // ssl code end
 

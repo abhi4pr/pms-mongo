@@ -20,6 +20,11 @@ const vendorGroupLinkSchema = new Schema(
             trim: true,
             default: "",
         },
+        remark: {
+            type: String,
+            trim: true,
+            default: "",
+        },
         created_by: {
             type: Number,
             required: true,
