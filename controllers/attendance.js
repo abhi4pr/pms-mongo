@@ -412,6 +412,8 @@ exports.addAttendance = async (req, res) => {
             user_id: parseInt(req.body.user_id),
           });
 
+          // console.log("results4", results4)
+
           const findSeparationData = await separationModel.findOne({ user_id: req.body.user_id })
           const resignDate = findSeparationData?.resignation_date;
           const resignConvertDate = new Date(resignDate);
@@ -444,7 +446,7 @@ exports.addAttendance = async (req, res) => {
             if (extractDate <= 15) {
               work_days = 15 - (extractDate - 1) - absent;
             }
-          } else if (user.user_status == "Resigned") {
+          } else if (results4.user_status == "Resigned") {
             work_days = (30 - resignExtractDate) - absent;
           } else if (previous <= mergeJoining1) {
             if (extractDate <= 15) {
