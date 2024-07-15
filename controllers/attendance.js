@@ -247,8 +247,11 @@ exports.addAttendance = async (req, res) => {
             } else if (previous <= mergeJoining1) {
               if (extractDate <= 15) {
                 work_days = lastDateOfMonth - absent;
-              } else {
+              } else if (previousMonthNumber == joiningMonth) {
                 work_days = (lastDateOfMonth - extractDate) + 15 - absent
+              }
+              else {
+                work_days = lastDateOfMonth - absent;
               }
             }
             else {
@@ -451,8 +454,11 @@ exports.addAttendance = async (req, res) => {
           } else if (previous <= mergeJoining1) {
             if (extractDate <= 15) {
               work_days = lastDateOfMonth - absent;
-            } else {
+            } else if (previousMonthNumber == joiningMonth) {
               work_days = (lastDateOfMonth - extractDate) + 15 - absent
+            }
+            else {
+              work_days = lastDateOfMonth - absent;
             }
           }
           else {
