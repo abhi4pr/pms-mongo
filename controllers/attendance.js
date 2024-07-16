@@ -123,6 +123,14 @@ function getLastDateOfMonth(month, year) {
   return lastDateOfMonth.getDate();
 }
 
+function getLastDate(month, year) {
+  // JavaScript months are 0-based (0 = January, 11 = December), so we subtract 1 from the month
+  const date = new Date(year, month, 0);
+  // Get the last day of the month
+  const lastDate = date.getDate();
+  return lastDate;
+}
+
 exports.addAttendance = async (req, res) => {
   try {
     const {
@@ -224,31 +232,33 @@ exports.addAttendance = async (req, res) => {
 
             var work_days;
             const absent = noOfabsent == undefined ? 0 : req.body.noOfabsent;
-            const joining = user.joining_date;
-            const convertDate = new Date(joining);
-            // const extractJodDate = convertDate.getDate() - 1;
-            const extractDate = convertDate.getDate();
-            const joiningMonth = String(convertDate.getUTCMonth() + 1);
-            const joiningYear = String(convertDate.getUTCFullYear());
+            const joining = user?.joining_date;
+            const convertDate = new Date(joining).toISOString().slice(0, 10);
+            const convertDate1 = new Date(convertDate);
+            const extractDate = convertDate1.getDate();
+            const extractDate1 = extractDate === 0 ? 1 : extractDate;
+            const joiningMonth = convertDate1.getUTCMonth() + 1;
+            const joiningYear = convertDate1.getUTCFullYear();
             const mergeJoining = parseInt(joiningMonth + joiningYear);
             const monthNumber = monthNameToNumber(month);
             const previousMonthNumber = monthNumber - 1;
             const mergeJoining1 = `${monthNumber}` + `${year}`;
             const lastDateOfMonth = getLastDateOfMonth(month, year);
-            const remainingDays = lastDateOfMonth - extractDate;
+            const remainingDays = lastDateOfMonth - extractDate1;
             const previous = `${previousMonthNumber}` + `${year}`;
 
             if (mergeJoining == mergeJoining1) {
-              if (extractDate <= 15) {
+              if (extractDate1 <= 15) {
                 work_days = 15 - (extractDate - 1) - absent;
               }
             } else if (user.user_status == "Resigned") {
               work_days = (30 - resignExtractDate) - absent;
             } else if (previous <= mergeJoining1) {
-              if (extractDate <= 15) {
+              if (extractDate1 <= 15) {
                 work_days = lastDateOfMonth - absent;
               } else if (previousMonthNumber == joiningMonth) {
-                work_days = (lastDateOfMonth - extractDate) + 15 - absent
+                const lastDateOfMonth1 = getLastDate(previousMonthNumber, year);
+                work_days = (lastDateOfMonth1 - extractDate1) + 15 - absent
               }
               else {
                 work_days = lastDateOfMonth - absent;
@@ -260,8 +270,8 @@ exports.addAttendance = async (req, res) => {
 
             const bodymonth = `${year}` + `${monthNumber}`;
 
-            const joiningMonthNumber = convertDate.getUTCMonth() + 1;
-            const joiningYearNumber = convertDate.getUTCFullYear();
+            const joiningMonthNumber = convertDate1.getUTCMonth() + 1;
+            const joiningYearNumber = convertDate1.getUTCFullYear();
             const mergeMonthYear = `${joiningYearNumber}` + `${joiningMonthNumber}`;
 
             if (mergeMonthYear <= bodymonth) {
@@ -428,6 +438,7 @@ exports.addAttendance = async (req, res) => {
           const salaryDeduction = salary_deduction == undefined ? 0 : req.body.salary_deduction;
           // console.log("salaryDeduction", salaryDeduction);
           const joining = results4[0].joining_date;
+          // console.log("fffffffffff", joining)
           // console.log("joining", joining);
           const convertDate = new Date(joining);
           const extractDate = convertDate.getDate();
@@ -455,7 +466,8 @@ exports.addAttendance = async (req, res) => {
             if (extractDate <= 15) {
               work_days = lastDateOfMonth - absent;
             } else if (previousMonthNumber == joiningMonth) {
-              work_days = (lastDateOfMonth - extractDate) + 15 - absent
+              const lastDateOfMonth1 = getLastDate(previousMonthNumber, year);
+              work_days = (lastDateOfMonth1 - extractDate) + 15 - absent
             }
             else {
               work_days = lastDateOfMonth - absent;
