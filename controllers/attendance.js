@@ -236,7 +236,7 @@ exports.addAttendance = async (req, res) => {
             const convertDate = new Date(joining).toISOString().slice(0, 10);
             const convertDate1 = new Date(convertDate);
             const extractDate = convertDate1.getDate();
-            const extractDate1 = extractDate === 0 ? 1 : extractDate;
+            const extractDate1 = extractDate === 0 ? 1 : (extractDate - 1);
             const joiningMonth = convertDate1.getUTCMonth() + 1;
             const joiningYear = convertDate1.getUTCFullYear();
             const mergeJoining = parseInt(joiningMonth + joiningYear);

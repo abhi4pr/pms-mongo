@@ -2492,7 +2492,7 @@ exports.getAllWfhUsers = async (req, res) => {
         // const simc = await userModel.find({ job_type: 'WFHD' }).lean();
         const simc = await userModel.aggregate([
             {
-                $match: { job_type: 'WFHD' }
+                $match: { job_type: 'WFHD', user_status: "Active", att_status: "onboarded" }
             },
             {
                 $lookup: {
