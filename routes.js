@@ -935,6 +935,7 @@ router.get("/download_offerletter_in_bucket/:filename", user.downloadOfferLeterI
 router.post("/send_offer_letter", user.sendOfferLetter);
 router.post("/offer_letter_send_in_mail", upload.single("attachment"), user.sendOfferLetterMail);
 router.put('/change_all_reportL1_by_sub_dept', user.changeAllReportL1BySubDept);
+router.get("/get_wfh_users_with_dept", user.getAllWfhUsersWithDept);
 
 //---------------------------------------------------------------------------All Routes OF User Module Ends Here ---------------------------------------------------------------------------------------------------//
 

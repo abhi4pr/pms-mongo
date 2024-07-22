@@ -2492,7 +2492,7 @@ exports.getAllWfhUsers = async (req, res) => {
         // const simc = await userModel.find({ job_type: 'WFHD' }).lean();
         const simc = await userModel.aggregate([
             {
-                $match: { job_type: 'WFHD', user_status: "Active", att_status: "onboarded" }
+                $match: { job_type: 'WFHD' }
             },
             {
                 $lookup: {
@@ -4289,3 +4289,51 @@ exports.changeAllReportL1BySubDept = async (req, res) => {
         })
     }
 }
+
+exports.getAllWfhUsersWithDept = async (req, res) => {
+    try {
+        const simc = await userModel.aggregate([
+            {
+                $match: { job_type: 'WFHD', user_status: "Active", att_status: "onboarded" }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        dept_id: "$dept_id",
+                        dept_name: "$department.dept_name"
+                    },
+                    user_count: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    dept_id: "$_id.dept_id",
+                    dept_name: "$_id.dept_name",
+                    user_count: 1,
+                    _id: 0
+                }
+            }
+        ]).exec();
+
+        if (simc.length === 0) {
+            return res.status(500).send({ success: false, message: "No record found" });
+        }
+        res.status(200).send({ data: simc });
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: 'Error getting all WFH users' });
+    }
+};
