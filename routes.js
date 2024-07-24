@@ -918,7 +918,8 @@ router.get("/get_all_filled_users", user.getAllFilledUsers);
 router.get("/get_all_percentage", user.getFilledPercentage);
 // router.post("/get_users_by_departments",user.getUsersByDepartment);
 // router.get("/get_first_time_login_users", user.getAllFirstLoginUsers)
-router.post("/get_user_graph_data", user.getUserGraphData)
+router.post("/get_user_graph_data", user.getUserGraphData);
+router.post("/get_user_graph_data_of_wfhd", user.getUserGraphDataOfWFHD);
 router.get("/get_users_with_status", user.getUsersWithStatus);
 router.get("/get_all_sales_users", user.getAllSalesUsers);
 router.get("/get_all_sales_users_list", user.getAllSalesUsersByDepartment);
@@ -936,6 +937,8 @@ router.post("/send_offer_letter", user.sendOfferLetter);
 router.post("/offer_letter_send_in_mail", upload.single("attachment"), user.sendOfferLetterMail);
 router.put('/change_all_reportL1_by_sub_dept', user.changeAllReportL1BySubDept);
 router.get("/get_wfh_users_with_dept", user.getAllWfhUsersWithDept);
+router.get("/get_work_anniversary", user.getWorkAnniversarys);
+router.get("/get_birth_days", user.getBirthDays);
 
 //---------------------------------------------------------------------------All Routes OF User Module Ends Here ---------------------------------------------------------------------------------------------------//
 
@@ -1007,6 +1010,7 @@ router.put("/update_attendance", attendance.updateAttendance);
 // router.get("/get_all_disputes/:user_id", attendance.getUserAttendanceDisputeDatas);
 
 router.delete("/delete_all_attendance", attendance.deleteAttecndenceData);
+router.get("/get_salary_by_month_wise", attendance.getSalaryByMonthWise);
 
 
 /* commitement */
@@ -1902,6 +1906,7 @@ router.put("/edit_dynamic_table_data", dynamicTablesModel.editDynamicTablesData)
 router.post('/change_selected_user_password', adminController.changePassOfSelectedUsers);
 router.post('/change_all_user_password', adminController.changePassOfUsers);
 router.post('/send_email_to_all_users', adminController.sendPassEmailToUsers);
+router.post('/get_story_data', adminController.trackCreatorGet);
 
 //------------------------------------------------- New Operations Routes Starts Here----------------------------
 

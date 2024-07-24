@@ -3322,6 +3322,147 @@ exports.getUserGraphData = async (req, res) => {
     }
 };
 
+exports.getUserGraphDataOfWFHD = async (req, res) => {
+    try {
+        let result;
+
+        if (req.body.caseType == 'department_wise') {
+            result = await userModel.aggregate([
+                {
+                    $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
+                },
+                {
+                    $group: {
+                        _id: {
+                            dept_id: "$dept_id",
+                            gender: "$Gender",
+                        },
+                        count: { $sum: 1 },
+                    },
+                },
+                {
+                    $group: {
+                        _id: "$_id.dept_id",
+                        maleCount: {
+                            $sum: {
+                                $cond: [{ $eq: ["$_id.gender", "Male"] }, "$count", 0],
+                            },
+                        },
+                        femaleCount: {
+                            $sum: {
+                                $cond: [{ $eq: ["$_id.gender", "Female"] }, "$count", 0],
+                            },
+                        },
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "departmentmodels",
+                        localField: "_id",
+                        foreignField: "dept_id",
+                        as: "department",
+                    },
+                },
+                {
+                    $unwind: {
+                        path: "$department",
+                        preserveNullAndEmptyArrays: true
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        dept_id: "$_id",
+                        maleCount: 1,
+                        dept_name: "$department.dept_name",
+                        femaleCount: 1,
+                    },
+                },
+            ]).sort({ dept_id: 1 });
+        }
+        else if (req.body.caseType == 'year') {
+            result = await userModel.aggregate([
+                {
+                    $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
+                },
+                {
+                    $addFields: {
+                        convertedDate: { $toDate: "$joining_date" },
+                    },
+                },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$convertedDate" },
+                        },
+                        userjoined: { $sum: 1 },
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        year: "$_id.year",
+                        userjoined: 1,
+                    },
+                },
+            ]).sort({ year: 1 });
+        }
+        else if (req.body.caseType == 'age') {
+            result = await userModel.aggregate([
+                {
+                    $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
+                },
+                {
+                    $addFields: {
+                        birthYear: { $year: { $toDate: "$DOB" } },
+                        age: {
+                            $subtract: [
+                                { $year: new Date() },
+                                { $year: { $toDate: "$DOB" } }
+                            ]
+                        }
+                    },
+                },
+                {
+                    $group: {
+                        _id: {
+                            ageGroup: {
+                                $switch: {
+                                    branches: [
+                                        { case: { $and: [{ $gte: ["$age", 10] }, { $lte: ["$age", 17] }] }, then: "10-17" },
+                                        { case: { $and: [{ $gte: ["$age", 18] }, { $lte: ["$age", 24] }] }, then: "18-24" },
+                                        { case: { $and: [{ $gte: ["$age", 25] }, { $lte: ["$age", 30] }] }, then: "25-30" },
+                                        { case: { $and: [{ $gte: ["$age", 31] }, { $lte: ["$age", 35] }] }, then: "31-35" },
+                                        { case: { $and: [{ $gte: ["$age", 36] }, { $lte: ["$age", 40] }] }, then: "36-40" },
+                                        { case: { $gte: ["$age", 41] }, then: "41+" }
+                                    ],
+                                    default: "Unknown"
+                                }
+                            }
+                        },
+                        userCount: { $sum: 1 },
+                    },
+                },
+                {
+                    $match: {
+                        "_id.ageGroup": { $ne: "Unknown" }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        age: "$_id.ageGroup",
+                        userCount: 1,
+                    },
+                }
+            ]).sort({ age: 1 });
+        }
+        res.status(200).send(result);
+    } catch (err) {
+        res.status(500).send({ error: err.message, sms: "Error creating user graph" });
+    }
+};
+
 exports.getUsersWithStatus = async (req, res) => {
     try {
         const WFOUsers = await userModel.find({ job_type: "WFO" });
@@ -4290,6 +4431,17 @@ exports.changeAllReportL1BySubDept = async (req, res) => {
     }
 }
 
+function formatDate(dateString) {
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const date = new Date(dateString);
+
+    const day = date.getDate();
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    return `${day} ${month} ${year}`;
+}
+
 exports.getAllWfhUsersWithDept = async (req, res) => {
     try {
         const simc = await userModel.aggregate([
@@ -4337,3 +4489,117 @@ exports.getAllWfhUsersWithDept = async (req, res) => {
         res.status(500).send({ error: err.message, sms: 'Error getting all WFH users' });
     }
 };
+
+exports.getWorkAnniversarys = async (req, res) => {
+    try {
+        const currentMonth = new Date().getMonth() + 1;
+        const users = await userModel.aggregate([
+            {
+                $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    joiningMonth: { $month: "$joining_date" }
+                }
+            },
+            {
+                $match: {
+                    joiningMonth: currentMonth
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    user_name: 1,
+                    joining_date: 1,
+                    dept_name: "$department.dept_name"
+                }
+            }
+        ]);
+
+        // Send the response
+        res.status(200).json({
+            success: true,
+            data: users
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error'
+        });
+    }
+}
+
+exports.getBirthDays = async (req, res) => {
+    try {
+        const currentMonth = new Date().getMonth() + 1;
+        const users = await userModel.aggregate([
+            {
+                $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    joiningMonth: { $month: "$DOB" }
+                }
+            },
+            {
+                $match: {
+                    joiningMonth: currentMonth
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    user_name: 1,
+                    DOB: 1,
+                    dept_name: "$department.dept_name"
+                }
+            }
+        ]);
+
+        users.forEach(user => {
+            user.DOB = formatDate(user.DOB);
+        });
+
+        // Send the response
+        res.status(200).json({
+            success: true,
+            data: users
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error'
+        });
+    }
+}
