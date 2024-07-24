@@ -4531,6 +4531,10 @@ exports.getWorkAnniversarys = async (req, res) => {
             }
         ]);
 
+        users.forEach(user => {
+            user.joining_date = formatDate(user.joining_date);
+        });
+
         // Send the response
         res.status(200).json({
             success: true,

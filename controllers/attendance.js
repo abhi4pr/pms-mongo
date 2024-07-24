@@ -1833,82 +1833,82 @@ exports.getMonthYearData = async (req, res) => {
   }
 };
 
-const getMonthYearDataFunc = async function () {
-  try {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonthIndex = currentDate.getMonth() + 1;
-    const numberOfMonths = 12; // we need 12 months
+// const getMonthYearDataFunc = async function () {
+//   try {
+//     const currentDate = new Date();
+//     const currentYear = currentDate.getFullYear();
+//     const currentMonthIndex = currentDate.getMonth() + 1;
+//     const numberOfMonths = 12; // we need 12 months
 
-    const months = [
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-      "January",
-      "February",
-      "March",
-    ];
+//     const months = [
+//       "April",
+//       "May",
+//       "June",
+//       "July",
+//       "August",
+//       "September",
+//       "October",
+//       "November",
+//       "December",
+//       "January",
+//       "February",
+//       "March",
+//     ];
 
-    const startYear = currentMonthIndex <= months.indexOf("March") ? currentYear - 1 : currentYear;
-    let startMonthIndex = months.indexOf("April");
+//     const startYear = currentMonthIndex <= months.indexOf("March") ? currentYear - 1 : currentYear;
+//     let startMonthIndex = months.indexOf("April");
 
-    const monthYearArray = Array.from({ length: numberOfMonths }, (_, index) => {
-      const month = months[(startMonthIndex + index) % 12];
-      const year = (startMonthIndex + index) >= 9 ? startYear + 1 : startYear;
-      return { month, year };
-    });
+//     const monthYearArray = Array.from({ length: numberOfMonths }, (_, index) => {
+//       const month = months[(startMonthIndex + index) % 12];
+//       const year = (startMonthIndex + index) >= 9 ? startYear + 1 : startYear;
+//       return { month, year };
+//     });
 
-    const aggregationPipeline = [
-      {
-        $group: {
-          _id: {
-            month: "$month",
-            year: "$year",
-            dept: "$dept"
-          },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            month: "$_id.month",
-            year: "$_id.year"
-          },
-          deptCount: { $sum: 1 }
-        }
-      }
-    ];
+//     const aggregationPipeline = [
+//       {
+//         $group: {
+//           _id: {
+//             month: "$month",
+//             year: "$year",
+//             dept: "$dept"
+//           },
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: {
+//             month: "$_id.month",
+//             year: "$_id.year"
+//           },
+//           deptCount: { $sum: 1 }
+//         }
+//       }
+//     ];
 
-    const dbResult = await attendanceModel.aggregate(aggregationPipeline);
+//     const dbResult = await attendanceModel.aggregate(aggregationPipeline);
 
-    const dbSet = new Set(
-      dbResult.map((item) => `${item._id.month}-${item._id.year}`)
-    );
+//     const dbSet = new Set(
+//       dbResult.map((item) => `${item._id.month}-${item._id.year}`)
+//     );
 
-    const actualExistingResult = monthYearArray.map((item) => {
-      const dateStr = `${item.month}-${item.year}`;
-      const existingData = dbSet.has(dateStr) ? 1 : 0;
+//     const actualExistingResult = monthYearArray.map((item) => {
+//       const dateStr = `${item.month}-${item.year}`;
+//       const existingData = dbSet.has(dateStr) ? 1 : 0;
 
-      const deptCount = dbResult.find(entry => entry._id.month === item.month && entry._id.year === item.year)?.deptCount || 0;
+//       const deptCount = dbResult.find(entry => entry._id.month === item.month && entry._id.year === item.year)?.deptCount || 0;
 
-      item.deptCount = deptCount;
-      item.atdGenerated = existingData;
+//       item.deptCount = deptCount;
+//       item.atdGenerated = existingData;
 
-      return item;
-    });
+//       return item;
+//     });
 
-    const response = { data: [...actualExistingResult] };
-    return response;
-  } catch (error) {
-    console.log(error);
-  }
-}
+//     const response = { data: [...actualExistingResult] };
+//     return response;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
 const getMonthYearDataCurrentFy = async function () {
   try {
@@ -1993,7 +1993,7 @@ exports.getMonthYearDataMerged = async (req, res) => {
     let data1 = await getMonthYearDataFunc();
     //get data from current fy 
     let data2 = await getMonthYearDataCurrentFy();
-    const response = { data: [...data1.data, ...data2.data] };
+    const response = { data: [...data2.data] };
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ error: error.message, sms: "error getting data" });
