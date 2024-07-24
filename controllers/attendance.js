@@ -1951,8 +1951,11 @@ const getMonthYearDataCurrentFy = async function () {
           _id: {
             month: "$month",
             year: "$year",
-            dept: "$dept"
+            dept: "$dept",
           },
+          totalAmount: { $sum: "$salary" },
+          totalSalary: { $sum: "$toPay" },
+          totalBonus: { $sum: "$bonus" }
         },
       },
       {
@@ -1961,27 +1964,51 @@ const getMonthYearDataCurrentFy = async function () {
             month: "$_id.month",
             year: "$_id.year"
           },
-          deptCount: { $sum: 1 }
+          totalAmount: { $sum: "$totalAmount" },
+          totalSalary: { $sum: "$totalSalary" },
+          totalBonus: { $sum: "$totalBonus" },
+          deptCount: { $sum: 1 },
         }
       }
     ];
 
     const dbResult = await attendanceModel.aggregate(aggregationPipeline);
+    console.log("dbResult", dbResult);
     const dbSet = new Set(
       dbResult.map((item) => `${item._id.month}-${item._id.year}`)
     );
 
     const actualExistingResult = monthYearArray.map((item) => {
       const dateStr = `${item.month}-${item.year}`;
-      const existingData = dbSet.has(dateStr) ? 1 : 0;
-      const deptCount = dbResult.find(entry => entry._id.month === item.month && entry._id.year === item.year)?.deptCount || 0;
+      const existingData = dbSet.has(dateStr);
+      const dbEntry = dbResult.find(entry => entry._id.month === item.month && entry._id.year === item.year);
+      const deptCount = dbEntry ? dbEntry.deptCount : 0;
+      const totalAmount = dbEntry ? dbEntry.totalAmount : 0;
+      const totalSalary = dbEntry ? dbEntry.totalSalary : 0;
+      const totalBonus = dbEntry ? dbEntry.totalBonus : 0;
       item.deptCount = deptCount;
-      item.atdGenerated = existingData;
+      item.atdGenerated = existingData ? 1 : 0;
+      item.totalAmount = totalAmount;
+      item.totalSalary = totalSalary;
+      item.totalBonus = totalBonus;
       return item;
     });
+    // const shiftedResult = actualExistingResult.map((item, index, array) => {
+    //   const nextIndex = (index + 1) % array.length;
+    //   const nextItem = array[nextIndex];
+    //   return {
+    //     month: item.month,
+    //     year: item.year,
+    //     deptCount: nextItem.deptCount,
+    //     atdGenerated: nextItem.atdGenerated,
+    //     totalAmount: nextItem.totalAmount,
+    //     totalSalary: nextItem.totalSalary,
+    //     totalBonus: nextItem.totalBonus
+    //   };
+    // });
 
-    const response = { data: [...actualExistingResult] };
-    return response;
+    // const response = { data: shiftedResult };
+    return actualExistingResult;
   } catch (error) {
     console.log(error);
   }
@@ -1990,10 +2017,10 @@ const getMonthYearDataCurrentFy = async function () {
 exports.getMonthYearDataMerged = async (req, res) => {
   try {
     //get data from 2023 fy 
-    let data1 = await getMonthYearDataFunc();
+    // let data1 = await getMonthYearDataFunc();
     //get data from current fy 
     let data2 = await getMonthYearDataCurrentFy();
-    const response = { data: [...data2.data] };
+    const response = { data: data2 };
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({ error: error.message, sms: "error getting data" });
