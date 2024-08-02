@@ -41,6 +41,7 @@ const guardianModel = require('../models/guardianModel.js');
 const orderReqModel = require('../models/orderReqModel.js');
 const simAlloModel = require('../models/simAlloModel.js');
 const objectModel = require("../models/objModel.js");
+const userHistoryModel = require("../models/userHistoryModel.js");
 
 
 const upload = multer({
@@ -764,6 +765,52 @@ exports.updateUser = [upload, async (req, res) => {
         } else {
             editsim.joining_extend_document = '';
         }
+
+        const historyData = new userHistoryModel({
+            user_id: editsim.user_id,
+            user_name: editsim.user_name,
+            user_designation: editsim.user_designation,
+            user_email_id: editsim.user_email_id,
+            user_login_id: editsim.user_login_id,
+            user_login_password: editsim.user_login_password,
+            user_contact_no: editsim.user_contact_no,
+            dept_id: editsim.dept_id,
+            role_id: editsim.role_id,
+            job_type: editsim.job_type,
+            PersonalNumber: editsim.PersonalNumber,
+            Report_L1: editsim.Report_L1,
+            PersonalEmail: editsim.PersonalEmail,
+            joining_date: editsim.joining_date,
+            releaving_date: editsim.releaving_date,
+            salary: editsim.salary,
+            DOB: editsim.DOB,
+            Age: editsim.Age,
+            MartialStatus: editsim.MartialStatus,
+            tds_applicable: editsim.tds_applicable,
+            tds_per: editsim.tds_per,
+            user_status: editsim.user_status,
+            sub_dept_id: editsim.sub_dept_id,
+            pan_no: editsim.pan_no,
+            uid_no: editsim.uid_no,
+            current_address: editsim.current_address,
+            current_city: editsim.current_city,
+            current_state: editsim.current_state,
+            current_pin_code: editsim.current_pin_code,
+            permanent_address: editsim.permanent_address,
+            permanent_city: editsim.permanent_city,
+            permanent_state: editsim.permanent_state,
+            permanent_pin_code: editsim.permanent_pin_code,
+            invoice_template_no: editsim.invoice_template_no,
+            ctc: editsim.ctc,
+            nick_name: editsim.nick_name,
+            emp_id: editsim.user_id,
+            alternate_contact: editsim.alternate_contact,
+            emergency_contact_person_name2: editsim.emergency_contact_person_name2,
+            att_status: editsim.att_status,
+            year_salary: editsim.year_salary
+        })
+
+        await historyData.save();
 
         return res.status(200).send({ success: true, data: editsim })
     } catch (err) {
@@ -2532,58 +2579,58 @@ exports.getAllWfhUsers = async (req, res) => {
                     user_email_id: "$user_email_id",
                     user_login_id: "$user_login_id",
                     user_login_password: "$user_login_password",
-                    user_report_to_id: "$user_report_to_id",
-                    created_At: "$created_At",
-                    last_updated: "$lastupdated",
+                    // user_report_to_id: "$user_report_to_id",
+                    // created_At: "$created_At",
+                    // last_updated: "$lastupdated",
                     created_by: "$created_by",
                     user_contact_no: "$user_contact_no",
                     dept_id: "$dept_id",
                     dept_name: "$department.dept_name",
-                    location_id: "$location_id",
+                    // location_id: "$location_id",
                     role_id: "$role_id",
-                    sitting_id: "$sitting_id",
+                    // sitting_id: "$sitting_id",
                     image: "$image",
                     job_type: "$job_type",
                     att_status: "$att_status",
                     PersonalNumber: "$PersonalNumber",
                     Report_L1: "$Report_L1",
-                    Report_L2: "$Report_L2",
-                    Report_L3: "$Report_L3",
+                    // Report_L2: "$Report_L2",
+                    // Report_L3: "$Report_L3",
                     PersonalEmail: "$PersonalEmail",
                     level: "$level",
                     joining_date: "$joining_date",
-                    releaving_date: "$releaving_date",
-                    room_id: "$room_id",
-                    UID: "$UID",
-                    pan: "$pan",
-                    highest_upload: "$highest_upload",
-                    other_upload: "$other_upload",
+                    // releaving_date: "$releaving_date",
+                    // room_id: "$room_id",
+                    // UID: "$UID",
+                    // pan: "$pan",
+                    // highest_upload: "$highest_upload",
+                    // other_upload: "$other_upload",
                     salary: "$salary",
-                    SpokenLanguages: "$SpokenLanguages",
+                    // SpokenLanguages: "$SpokenLanguages",
                     Gender: "$Gender",
                     att_status: "$att_status",
                     Nationality: "$Nationality",
                     DOB: "$DOB",
                     Age: "$Age",
-                    fatherName: "$fatherName",
-                    motherName: "$motherName",
-                    Hobbies: "$Hobbies",
-                    BloodGroup: "$BloodGroup",
-                    MartialStatus: "$MartialStatus",
-                    DateOfMarriage: "$DateOfMarriage",
+                    // fatherName: "$fatherName",
+                    // motherName: "$motherName",
+                    // Hobbies: "$Hobbies",
+                    // BloodGroup: "$BloodGroup",
+                    // MartialStatus: "$MartialStatus",
+                    // DateOfMarriage: "$DateOfMarriage",
                     onboard_status: "$onboard_status",
                     tbs_applicable: "$tds_applicable",
                     tds_per: "$tds_per",
-                    image_remark: "$image_remark",
-                    image_validate: "$image_validate",
-                    uid_remark: "$uid_remark",
-                    uid_validate: "$uid_validate",
-                    pan_remark: "$pan_remark",
-                    pan_validate: "$pan_validate",
-                    highest_upload_remark: "$highest_upload_remark",
-                    highest_upload_validate: "$highest_upload_validate",
-                    other_upload_remark: "$other_upload_remark",
-                    other_upload_validate: "$other_upload_validate",
+                    // image_remark: "$image_remark",
+                    // image_validate: "$image_validate",
+                    // uid_remark: "$uid_remark",
+                    // uid_validate: "$uid_validate",
+                    // pan_remark: "$pan_remark",
+                    // pan_validate: "$pan_validate",
+                    // highest_upload_remark: "$highest_upload_remark",
+                    // highest_upload_validate: "$highest_upload_validate",
+                    // other_upload_remark: "$other_upload_remark",
+                    // other_upload_validate: "$other_upload_validate",
                     user_status: "$user_status",
                     sub_dept_id: "$sub_dept_id",
                     pan_no: "$pan_no",
@@ -2616,21 +2663,21 @@ exports.getAllWfhUsers = async (req, res) => {
                     bank_name: "$bank_name",
                     ifsc_code: "$ifsc_code",
                     account_no: "$account_no",
-                    guardian_name: "$guardian_name",
-                    guardian_address: "$guardian_address",
-                    relation_with_guardian: "$relation_with_guardian",
-                    gaurdian_number: "$gaurdian_number",
+                    // guardian_name: "$guardian_name",
+                    // guardian_address: "$guardian_address",
+                    // relation_with_guardian: "$relation_with_guardian",
+                    // gaurdian_number: "$gaurdian_number",
                     emergency_contact1: "$emergency_contact1",
                     emergency_contact2: "$emergency_contact2",
                     ctc: "$ctc",
-                    offer_letter_send: "$offer_letter_send",
-                    annexure_pdf: "$annexure_pdf",
+                    // offer_letter_send: "$offer_letter_send",
+                    // annexure_pdf: "$annexure_pdf",
                     profileflag: "$profileflag",
                     nick_name: "$nick_name",
                     showOnboardingModal: "$showOnboardingModal",
-                    coc_flag: "$coc_flag",
-                    latitude: "$latitude",
-                    longitude: "$longitude",
+                    // coc_flag: "$coc_flag",
+                    // latitude: "$latitude",
+                    // longitude: "$longitude",
                     beneficiary: "$beneficiary",
                     emp_id: "$emp_id",
                     alternate_contact: "$alternate_contact",
@@ -2638,9 +2685,9 @@ exports.getAllWfhUsers = async (req, res) => {
                     emergency_contact_person_name1: "$emergency_contact_person_name1",
                     emergency_contact_person_name2: "$emergency_contact_person_name2",
                     emergency_contact_relation1: "$emergency_contact_relation1",
-                    emergency_contact_relation2: "$emergency_contact_relation2",
-                    document_percentage_mandatory: "$document_percentage_mandatory",
-                    document_percentage_non_mandatory: "$document_percentage_non_mandatory",
+                    // emergency_contact_relation2: "$emergency_contact_relation2",
+                    // document_percentage_mandatory: "$document_percentage_mandatory",
+                    // document_percentage_non_mandatory: "$document_percentage_non_mandatory",
                     image: {
                         $concat: [imageUrl, "$image"],
                     }
@@ -2652,32 +2699,32 @@ exports.getAllWfhUsers = async (req, res) => {
             res.status(500).send({ success: false, message: "No record found" })
         }
 
-        const fieldsToCheck = [
-            'user_name', 'PersonalEmail', 'PersonalNumber', 'fatherName', 'Gender', 'motherName',
-            'Hobbies', 'BloodGroup', 'SpokenLanguage', 'DO', 'Nationality', 'guardian_name',
-            'guardian_contact', 'emergency_contact', 'guardian_address', 'relation_with_guardian',
-            'current_address', 'current_city', 'current_state', 'current_pin_code',
-            'permanent_address', 'permanent_city', 'permanent_state', 'permanent_pin_code',
-        ];
+        // const fieldsToCheck = [
+        //     'user_name', 'PersonalEmail', 'PersonalNumber', 'fatherName', 'Gender', 'motherName',
+        //     'Hobbies', 'BloodGroup', 'SpokenLanguage', 'DO', 'Nationality', 'guardian_name',
+        //     'guardian_contact', 'emergency_contact', 'guardian_address', 'relation_with_guardian',
+        //     'current_address', 'current_city', 'current_state', 'current_pin_code',
+        //     'permanent_address', 'permanent_city', 'permanent_state', 'permanent_pin_code',
+        // ];
 
-        const modifiedUsers = simc.map(user => {
-            const filledFields = fieldsToCheck.filter(field => user[field] !== null && user[field] !== undefined && user[field] !== '').length;
-            const percentageFilled = (filledFields / fieldsToCheck.length) * 100;
-            const percentage = percentageFilled.toFixed(2);
+        // const modifiedUsers = simc.map(user => {
+        //     const filledFields = fieldsToCheck.filter(field => user[field] !== null && user[field] !== undefined && user[field] !== '').length;
+        //     const percentageFilled = (filledFields / fieldsToCheck.length) * 100;
+        //     const percentage = percentageFilled.toFixed(2);
 
-            if (user.hasOwnProperty('lastupdated')) {
-                user.last_updated = user.lastupdated;
-                delete user.lastupdated;
-            }
-            if (user.hasOwnProperty('tds_applicable')) {
-                user.tbs_applicable = user.tds_applicable;
-                delete user.tds_applicable;
-            }
+        //     if (user.hasOwnProperty('lastupdated')) {
+        //         user.last_updated = user.lastupdated;
+        //         delete user.lastupdated;
+        //     }
+        //     if (user.hasOwnProperty('tds_applicable')) {
+        //         user.tbs_applicable = user.tds_applicable;
+        //         delete user.tds_applicable;
+        //     }
 
-            user.profile_status = percentage;
-            return user;
-        });
-        res.status(200).send({ data: modifiedUsers })
+        //     user.profile_status = percentage;
+        //     return user;
+        // });
+        res.status(200).send({ data: simc })
     } catch (err) {
         res.status(500).send({ error: err.message, sms: 'Error getting all wfh users' })
     }
@@ -3904,6 +3951,41 @@ exports.rejoinUser = async (req, res) => {
     }
 };
 
+// exports.getUserTimeLine = async (req, res) => {
+//     try {
+//         const userId = parseInt(req.params.id);
+//         const userData = await userModel.findOne({ user_id: userId });
+//         if (!userData) {
+//             return res.status(404).json({ error: "User not found!" });
+//         }
+//         const joiningDate = userData.joining_date;
+//         const joiningDate1 = userData.joining_date;
+//         const DOB = userData.DOB;
+//         if (!joiningDate) {
+//             return res.status(400).json({ error: "Joining date not found for the user" });
+//         }
+//         const probationEndDate = new Date(joiningDate);
+//         probationEndDate.setMonth(probationEndDate.getMonth() + 6);
+//         const today = new Date();
+//         const yearsOfWork = today.getFullYear() - joiningDate.getFullYear();
+//         return res.status(200).json({
+//             status: 200,
+//             message: "User timeline data fetched successfully!",
+//             joiningDate: joiningDate,
+//             DOB: DOB,
+//             probationEndDate: probationEndDate,
+//             probationMonthValue: "6 Months",
+//             workAnniversaryYears: {
+//                 Date: joiningDate,
+//                 Work_Anniversary_Years: yearsOfWork <= 1 ? "1 year" : `${yearsOfWork} years`
+//             }
+//         });
+//     } catch (err) {
+//         console.error("Error:", err.message);
+//         res.status(500).json({ error: "Internal Server Error" });
+//     }
+// };
+
 exports.getUserTimeLine = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
@@ -3911,15 +3993,24 @@ exports.getUserTimeLine = async (req, res) => {
         if (!userData) {
             return res.status(404).json({ error: "User not found!" });
         }
-        const joiningDate = userData.joining_date;
+
+        const joiningDate = new Date(userData.joining_date);
         const DOB = userData.DOB;
         if (!joiningDate) {
             return res.status(400).json({ error: "Joining date not found for the user" });
         }
+
         const probationEndDate = new Date(joiningDate);
         probationEndDate.setMonth(probationEndDate.getMonth() + 6);
+
         const today = new Date();
         const yearsOfWork = today.getFullYear() - joiningDate.getFullYear();
+
+        const Date1 = new Date(joiningDate.getFullYear() + 1, joiningDate.getMonth(), joiningDate.getDate());
+
+        // const isAnniversaryToday = (today.getDate() === joiningDate.getDate()) && (today.getMonth() === joiningDate.getMonth());
+        // const nextAnniversaryDate = new Date(today.getFullYear() + 1, joiningDate.getMonth(), joiningDate.getDate());
+
         return res.status(200).json({
             status: 200,
             message: "User timeline data fetched successfully!",
@@ -3928,7 +4019,7 @@ exports.getUserTimeLine = async (req, res) => {
             probationEndDate: probationEndDate,
             probationMonthValue: "6 Months",
             workAnniversaryYears: {
-                Date: joiningDate,
+                Date: Date1,
                 Work_Anniversary_Years: yearsOfWork <= 1 ? "1 year" : `${yearsOfWork} years`
             }
         });
@@ -4490,9 +4581,11 @@ exports.getAllWfhUsersWithDept = async (req, res) => {
     }
 };
 
-exports.getWorkAnniversarys = async (req, res) => {
+exports.getWorkAnniversarysForWFHDUsers = async (req, res) => {
     try {
         const currentMonth = new Date().getMonth() + 1;
+        const currentDate = new Date();
+
         const users = await userModel.aggregate([
             {
                 $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
@@ -4522,17 +4615,29 @@ exports.getWorkAnniversarys = async (req, res) => {
                 }
             },
             {
+                $addFields: {
+                    total_years: {
+                        $subtract: [
+                            { $year: currentDate },
+                            { $year: "$joining_date" }
+                        ]
+                    }
+                }
+            },
+            {
                 $project: {
                     _id: 0,
                     user_name: 1,
                     joining_date: 1,
-                    dept_name: "$department.dept_name"
+                    dept_name: "$department.dept_name",
+                    total_years: 1
                 }
             }
         ]);
 
         users.forEach(user => {
             user.joining_date = formatDate(user.joining_date);
+            user.total_years = user.total_years + " Years"
         });
 
         // Send the response
@@ -4549,9 +4654,11 @@ exports.getWorkAnniversarys = async (req, res) => {
     }
 }
 
-exports.getBirthDays = async (req, res) => {
+exports.getBirthDaysForWFHDUsers = async (req, res) => {
     try {
         const currentMonth = new Date().getMonth() + 1;
+        const currentDate = new Date();
+
         const users = await userModel.aggregate([
             {
                 $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
@@ -4581,11 +4688,22 @@ exports.getBirthDays = async (req, res) => {
                 }
             },
             {
+                $addFields: {
+                    age: {
+                        $subtract: [
+                            { $year: currentDate },
+                            { $year: "$DOB" }
+                        ]
+                    }
+                }
+            },
+            {
                 $project: {
                     _id: 0,
                     user_name: 1,
                     DOB: 1,
-                    dept_name: "$department.dept_name"
+                    dept_name: "$department.dept_name",
+                    age: 1
                 }
             }
         ]);
@@ -4601,6 +4719,141 @@ exports.getBirthDays = async (req, res) => {
         });
     } catch (err) {
         console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error'
+        });
+    }
+}
+
+exports.getNewJoineeOfWFHDUsers = async (req, res) => {
+    try {
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+
+        const users = await userModel.aggregate([
+            {
+                $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    joiningMonth: { $month: "$joining_date" },
+                    joiningYear: { $year: "$joining_date" }
+                }
+            },
+            {
+                $match: {
+                    joiningMonth: currentMonth,
+                    joiningYear: currentYear
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    user_name: 1,
+                    joining_date: 1,
+                    dept_name: "$department.dept_name"
+                }
+            }
+        ]);
+
+        users.forEach(user => {
+            user.joining_date = formatDate(user.joining_date);
+        });
+
+        res.status(200).json({
+            success: true,
+            data: users
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error'
+        });
+    }
+}
+
+exports.getAllExitUsersOfWFHD = async (req, res) => {
+    try {
+        const allUsers = await userModel.aggregate([
+            {
+                $match: {
+                    job_type: "WFHD",
+                    user_status: "Exit",
+                    att_status: "onboarded"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$department"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'designationmodels',
+                    localField: 'desi_id',
+                    foreignField: 'user_designation',
+                    as: 'designation'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$designation",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    user_id: 1,
+                    user_name: 1,
+                    Gender: 1,
+                    DOB: 1,
+                    dept_id: 1,
+                    user_designation: 1,
+                    dept_name: "$department.dept_name",
+                    desi_name: "$designation.desi_name"
+                }
+            },
+            {
+                $group: {
+                    _id: "$user_id",
+                    doc: { $first: "$$ROOT" }
+                }
+            },
+            {
+                $replaceRoot: { newRoot: "$doc" }
+            }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: allUsers
+        });
+    } catch (error) {
+        console.error(error);
         res.status(500).json({
             success: false,
             message: 'Server Error'
