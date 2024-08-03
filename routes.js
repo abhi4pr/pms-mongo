@@ -176,6 +176,7 @@ const opCampaign = require("./controllers/opCampaign.js");
 const opCampaignPlan = require("./controllers/opCampaignPlan.js");
 const opCampaignPhase = require("./controllers/opCampaignPhase.js");
 const opExecution = require("./controllers/opExecution.js");
+const userHistoryController = require("./controllers/userHistoryController.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -937,8 +938,10 @@ router.post("/send_offer_letter", user.sendOfferLetter);
 router.post("/offer_letter_send_in_mail", upload.single("attachment"), user.sendOfferLetterMail);
 router.put('/change_all_reportL1_by_sub_dept', user.changeAllReportL1BySubDept);
 router.get("/get_wfh_users_with_dept", user.getAllWfhUsersWithDept);
-router.get("/get_work_anniversary", user.getWorkAnniversarys);
-router.get("/get_birth_days", user.getBirthDays);
+router.get("/get_work_anniversary", user.getWorkAnniversarysForWFHDUsers);
+router.get("/get_birth_days", user.getBirthDaysForWFHDUsers);
+router.get("/get_newjoinee_of_wfhd_users", user.getNewJoineeOfWFHDUsers);
+router.get("/get_all_exit_users_of_wfhd", user.getAllExitUsersOfWFHD);
 
 //---------------------------------------------------------------------------All Routes OF User Module Ends Here ---------------------------------------------------------------------------------------------------//
 
@@ -1011,6 +1014,8 @@ router.put("/update_attendance", attendance.updateAttendance);
 
 router.delete("/delete_all_attendance", attendance.deleteAttecndenceData);
 router.get("/get_salary_by_month_wise", attendance.getSalaryByMonthWise);
+router.get("/get_salary_by_LPA", attendance.getSalaryWithLPAOfWFHD);
+router.get("/get_all_wfhd_users_with_bonus", attendance.getAllWFHDUsersWithBonus);
 
 
 /* commitement */
@@ -1434,6 +1439,7 @@ router.put(
 );
 // router.post("/get_user_doc/:id", userDocManagement.getUserDoc);
 router.post("/get_user_doc", userDocManagement.getUserDoc);
+router.post("/get_wfhd_user_doc", userDocManagement.getWFHDUserDoc);
 router.delete("/delete_user_doc/:id", userDocManagement.deleteDoc);
 router.get("/get_doc_by_userid/:user_id", userDocManagement.getDocsByUserID);
 router.put("/update_doc_user", userDocManagement.updateUserDoc);
@@ -1907,6 +1913,9 @@ router.post('/change_selected_user_password', adminController.changePassOfSelect
 router.post('/change_all_user_password', adminController.changePassOfUsers);
 router.post('/send_email_to_all_users', adminController.sendPassEmailToUsers);
 
+// router.post('/get_story_data', adminController.trackCreatorGet);
+// router.put('/update_vendorid_pagemaster', adminController.updatepagevendorids);
+
 //------------------------------------------------- New Operations Routes Starts Here----------------------------
 
 //OpCampaign Routes Start Here
@@ -1953,6 +1962,8 @@ router.get('/change_primarypage_id_to_id', adminController.changePrimaryPageToId
 router.get('/shift_bank_details', adminController.shiftBankDetails)
 router.get('/get_vendor_details_with_ids', adminController.getVendorDetailsWithIds)
 router.get('/get_vendor_details_with_ids_by_id/:vendor_id', adminController.getVendorDetailsWithIdsById)
+// router.get('/generate_plural_payment_jwt_token', adminController.createJWTForPluralPayment)
+// router.get('/update_vid_in_grouplink', adminController.updateVendoridinGroupLink)
 
 /* expense api */
 router.post("/add_expense", expenseApi.addExpense);
@@ -1975,5 +1986,8 @@ router.get("/get_all_expense_categories", expenseCategoryApi.getExpenseCategorie
 router.get("/get_single_expense_category/:_id", expenseCategoryApi.getSingleExpenseCategory);
 router.put("/update_expense_category", expenseCategoryApi.editExpenseCategory);
 router.delete("/delete_expense_category/:_id", expenseCategoryApi.deleteExpenseData);
+
+/* user history routes */
+router.get("/get_all_history_data", userHistoryController.getAllUserHistorys);
 
 module.exports = router;
