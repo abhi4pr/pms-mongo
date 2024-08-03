@@ -39,9 +39,42 @@ exports.addAccountPoc = async (req, res) => {
  */
 exports.getAccountPocDetails = async (req, res) => {
     try {
-        const accountPocData = await accountPocModel.find({
+        let matchQuery = {
             account_id: Number(req.params.id)
-        });
+        }
+        //account_poc_list get
+        const accountPocData = await accountPocModel.aggregate([{
+            $match: matchQuery
+        }, {
+            $lookup: {
+                from: "accountdepartmentmodels",
+                localField: "department",
+                foreignField: "_id",
+                as: "departmentData",
+            }
+        }, {
+            $unwind: {
+                path: "$departmentData",
+                preserveNullAndEmptyArrays: true,
+            }
+        }, {
+            $project: {
+                account_id: 1,
+                contact_name: 1,
+                contact_no: 1,
+                description: 1,
+                alternative_contact_no: 1,
+                email: 1,
+                department: 1,
+                department_name: "$departmentData.department_name",
+                designation: 1,
+                social_platforms: 1,
+                created_by: 1,
+                updated_by: 1,
+                createdAt: 1,
+                updatedAt: 1,
+            }
+        }]);
 
         //data not get check
         if (!accountPocData) {
@@ -79,6 +112,7 @@ exports.updateAccountPoc = async (req, res) => {
             department,
             designation,
             description,
+            social_platforms,
             updated_by
         } = req.body;
 
@@ -95,6 +129,7 @@ exports.updateAccountPoc = async (req, res) => {
                     department,
                     designation,
                     description,
+                    social_platforms,
                     updated_by
                 }
             },
@@ -158,6 +193,7 @@ exports.getAccountPocList = async (req, res) => {
                 email: 1,
                 department: 1,
                 designation: 1,
+                social_platforms: 1,
                 created_by: 1,
                 updated_by: 1,
                 createdAt: 1,

@@ -229,7 +229,6 @@ exports.getSinglePhpVendorPaymentRequest = async (req, res) => {
     }
 };
 
-
 exports.updatePhpVendorPaymentRequest = async (req, res) => {
     try {
         const updatedData = await phpVendorPaymentRequestModel.findOneAndUpdate(

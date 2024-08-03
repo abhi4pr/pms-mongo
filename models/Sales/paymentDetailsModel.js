@@ -22,6 +22,11 @@ const paymentDeatils = new Schema({
         required: false,
         ref: "salespaymentmodemodels"
     },
+    is_hide: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
     created_by: {
         type: Number,
         required: false,
@@ -40,4 +45,4 @@ const paymentDeatils = new Schema({
 }, {
     timestamps: true
 });
-module.exports = mongoose.model('salesPaymentDeatilsModel', paymentDeatils);
+module.exports = mongoose.model('salesPaymentDetailsModel', paymentDeatils);

@@ -3,7 +3,7 @@ const vari = require("../variables.js");
 const multer = require("multer");
 // const { storage } = require('../common/uploadFile.js');
 const { uploadImage, deleteImage } = require("../common/uploadImage.js");
-
+const mongoose = require("mongoose");
 const upload = multer({
     storage: multer.memoryStorage()
 }).fields([
@@ -37,7 +37,6 @@ exports.addExpense = [upload, async (req, res) => {
         }
 
         const simv = await simc.save();
-
         res.send({ simv, status: 200 });
     } catch (err) {
         res
@@ -62,7 +61,7 @@ exports.getAllExpenses = async (req, res) => {
             {
                 $unwind: {
                     path: "$accountData",
-                    // preserveNullAndEmptyArrays: true
+                    preserveNullAndEmptyArrays: true
                 }
             },
             {
@@ -76,7 +75,7 @@ exports.getAllExpenses = async (req, res) => {
             {
                 $unwind: {
                     path: "$expenseCategory",
-                    // preserveNullAndEmptyArrays: true
+                    preserveNullAndEmptyArrays: true
                 }
             },
             {
@@ -131,7 +130,7 @@ exports.getSingleExpense = async (req, res) => {
         const singleExpense = await expenseModel.aggregate([
             {
                 $match: {
-                    _id: req.params._id
+                    _id: mongoose.Types.ObjectId(req.params._id)
                 }
             },
             {
@@ -145,7 +144,7 @@ exports.getSingleExpense = async (req, res) => {
             {
                 $unwind: {
                     path: "$accountData",
-                    // preserveNullAndEmptyArrays: true
+                    preserveNullAndEmptyArrays: true
                 }
             },
             {
@@ -159,7 +158,7 @@ exports.getSingleExpense = async (req, res) => {
             {
                 $unwind: {
                     path: "$expenseCategory",
-                    // preserveNullAndEmptyArrays: true
+                    preserveNullAndEmptyArrays: true
                 }
             },
             {
@@ -173,7 +172,7 @@ exports.getSingleExpense = async (req, res) => {
             {
                 $unwind: {
                     path: "$userData",
-                    // preserveNullAndEmptyArrays: true
+                    preserveNullAndEmptyArrays: true
                 }
             },
             {

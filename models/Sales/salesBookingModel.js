@@ -106,6 +106,16 @@ const salesBooking = new mongoose.Schema({
         type: Date,
         required: false,
     },
+    tds_percentage: {
+        type: Number,
+        required: false,
+        default: 0
+    },
+    tds_amount: {
+        type: Number,
+        required: false,
+        default: 0
+    },
     tds_verified_amount: {
         type: Number,
         required: false,
@@ -189,11 +199,6 @@ const salesBooking = new mongoose.Schema({
         enum: ['normal_booking', 'renewed_booking'],   //0=normal booking, 1=renewed_booking
         default: 'normal_booking'
     },
-    service_taken_amount: {
-        type: Number,
-        required: false,
-        default: 0
-    },
     incentive_amount: {
         type: Number,
         required: false,
@@ -236,7 +241,7 @@ salesBooking.pre('save', async function (next) {
         if (salesBookingData && salesBookingData.sale_booking_id) {
             this.sale_booking_id = salesBookingData.sale_booking_id + 1;
         } else {
-            this.sale_booking_id = 1;
+            this.sale_booking_id = 2000;
         }
     }
     next();

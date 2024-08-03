@@ -1,17 +1,15 @@
-const mongoose = require("mongoose");
-const salesPaymentModeModel = require("../../models/Sales/paymentModeModels");
 const response = require("../../common/response");
-const paymentModeModels = require("../../models/Sales/paymentModeModels");
 const constant = require("../../common/constant");
+const brandCategoryModel = require("../../models/accounts/brandCategoryModel");
 
 /**
- * Api is to used for the sales_payment_mode data add in the DB collection.
+ * Api is to used for the Brand Category data add in the DB collection.
  */
-exports.createPaymentmode = async (req, res) => {
+exports.createBrandCategory = async (req, res) => {
     try {
-        const { payment_mode_name, created_by } = req.body;
-        const addPayementMode = await salesPaymentModeModel.create({
-            payment_mode_name: payment_mode_name,
+        const { brand_category_name, created_by } = req.body;
+        const addBrandCategory = await brandCategoryModel.create({
+            brand_category_name: brand_category_name,
             created_by: created_by,
         });
         // Return a success response with the updated record details
@@ -19,8 +17,8 @@ exports.createPaymentmode = async (req, res) => {
             200,
             req,
             res,
-            "Payment mode Created Successfully",
-            addPayementMode
+            "Brand Category Created Successfully",
+            addBrandCategory
         );
     } catch (error) {
         // Return an error response in case of any exceptions
@@ -29,16 +27,18 @@ exports.createPaymentmode = async (req, res) => {
 };
 
 /**
- * Api is to used for the sales_payment_mode data get_ByID in the DB collection.
+ * Api is to used for the Brand Category data get By ID in the DB collection.
  */
-exports.getPaymentModeDetails = async (req, res) => {
+exports.getBrandCategoryDetails = async (req, res) => {
     try {
         const { id } = req.params;
-        const paymentModeDetails = await salesPaymentModeModel.findOne({
+        const brandCategoryDetails = await brandCategoryModel.findOne({
             _id: id,
-            status: { $ne: constant.DELETED }
+            status: {
+                $ne: constant.DELETED
+            }
         });
-        if (!paymentModeDetails) {
+        if (!brandCategoryDetails) {
             return response.returnFalse(200, req, res, `No Record Found`, {});
         }
         // Return a success response with the updated record details
@@ -46,8 +46,8 @@ exports.getPaymentModeDetails = async (req, res) => {
             200,
             req,
             res,
-            "Payment mode details retrive successfully!",
-            paymentModeDetails
+            "Brand Category details retrive successfully!",
+            brandCategoryDetails
         );
     } catch (error) {
         // Return an error response in case of any exceptions
@@ -56,19 +56,21 @@ exports.getPaymentModeDetails = async (req, res) => {
 };
 
 /**
- * Api is to used for the sales_payment_mode data update in the DB collection.
+ * Api is to used for the Brand Category data update in the DB collection.
  */
-exports.updatePaymentMode = async (req, res) => {
+exports.updateBrandCategory = async (req, res) => {
     try {
         // Extract the id from request parameters
         const { id } = req.params;
-        const { payment_mode_name, updated_by } = req.body;
+        const { brand_category_name, updated_by } = req.body;
 
-        const paymentModeUpdated = await paymentModeModels.findByIdAndUpdate({ _id: id }, {
+        const brandCategoryUpdated = await brandCategoryModel.findByIdAndUpdate({
+            _id: id
+        }, {
             $set: {
-                payment_mode_name,
+                brand_category_name,
                 updated_by
-            },
+            }
         }, {
             new: true
         });
@@ -77,8 +79,8 @@ exports.updatePaymentMode = async (req, res) => {
             200,
             req,
             res,
-            "Payment mode update successfully!",
-            paymentModeUpdated
+            "Brand Category update successfully!",
+            brandCategoryUpdated
         );
     } catch (error) {
         // Return an error response in case of any exceptions
@@ -87,30 +89,30 @@ exports.updatePaymentMode = async (req, res) => {
 };
 
 /**
- * Api is to used for the sales_payment_mode data get_list in the DB collection.
+ * Api is to used for the Brand Category data get_list in the DB collection.
  */
-exports.getPaymentModeList = async (req, res) => {
+exports.getBrandCategoryList = async (req, res) => {
     try {
         // Extract page and limit from query parameters, default to null if not provided
-        const page = req.query?.page ? parseInt(req.query.page) : null;
-        const limit = req.query?.limit ? parseInt(req.query.limit) : null;
+        const page = req.query?.page ? parseInt(req.query.page) : 1;
+        const limit = req.query?.limit ? parseInt(req.query.limit) : Number.MAX_SAFE_INTEGER;
         const sort = { createdAt: -1 };
 
         // Calculate the number of records to skip based on the current page and limit
         const skip = (page && limit) ? (page - 1) * limit : 0;
 
         // Retrieve the list of records with pagination applied
-        const paymentModeList = await salesPaymentModeModel.find({
+        const brandCategoryList = await brandCategoryModel.find({
             status: {
                 $ne: constant.DELETED
             }
         }).skip(skip).limit(limit).sort(sort);
 
         // Get the total count of records in the collection
-        const paymentModeCount = await salesPaymentModeModel.countDocuments();
+        const brandCategoryCount = await brandCategoryModel.countDocuments();
 
         // If no records are found, return a response indicating no records found
-        if (paymentModeList.length === 0) {
+        if (brandCategoryList.length === 0) {
             return response.returnFalse(200, req, res, `No Record Found`, []);
         }
         // Return a success response with the list of records and pagination details
@@ -118,14 +120,14 @@ exports.getPaymentModeList = async (req, res) => {
             200,
             req,
             res,
-            "Payment mode list retrieved successfully!",
-            paymentModeList,
+            "Brand Category list retrieved successfully!",
+            brandCategoryList,
             {
                 start_record: page && limit ? skip + 1 : 1,
-                end_record: page && limit ? skip + paymentModeList.length : paymentModeList.length,
-                total_records: paymentModeCount,
+                end_record: page && limit ? skip + brandCategoryList.length : brandCategoryList.length,
+                total_records: brandCategoryCount,
                 current_page: page || 1,
-                total_page: page && limit ? Math.ceil(paymentModeCount / limit) : 1,
+                total_page: page && limit ? Math.ceil(brandCategoryCount / limit) : 1,
             }
         );
     } catch (error) {
@@ -135,15 +137,15 @@ exports.getPaymentModeList = async (req, res) => {
 };
 
 /**
- * Api is to used for the sales_payment_mode data delete in the DB collection.
+ * Api is to used for the Brand Category data delete in the DB collection.
  */
-exports.deletePaymentMode = async (req, res) => {
+exports.deleteBrandCategory = async (req, res) => {
     try {
         // Extract the id from request parameters
         const { id } = req.params;
 
         // Attempt to find and update the record with the given id and status not equal to DELETED
-        const paymentModeDeleted = await salesPaymentModeModel.findOneAndUpdate({
+        const brandCategoryDeleted = await brandCategoryModel.findOneAndUpdate({
             _id: id,
             status: {
                 $ne: constant.DELETED
@@ -157,7 +159,7 @@ exports.deletePaymentMode = async (req, res) => {
             new: true
         });
         // If no record is found or updated, return a response indicating no record found
-        if (!paymentModeDeleted) {
+        if (!brandCategoryDeleted) {
             return response.returnFalse(200, req, res, `No Record Found`, {});
         }
         // Return a success response with the updated record details
@@ -165,8 +167,8 @@ exports.deletePaymentMode = async (req, res) => {
             200,
             req,
             res,
-            `Payment mode deleted succesfully! for id ${id}`,
-            paymentModeDeleted
+            `Brand Category deleted succesfully! for id ${id}`,
+            brandCategoryDeleted
         );
     } catch (error) {
         // Return an error response in case of any exceptions
