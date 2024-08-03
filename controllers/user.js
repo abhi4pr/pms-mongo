@@ -4006,7 +4006,7 @@ exports.getUserTimeLine = async (req, res) => {
         const today = new Date();
         const yearsOfWork = today.getFullYear() - joiningDate.getFullYear();
 
-        const Date1 = new Date(joiningDate.getFullYear() + 1, joiningDate.getMonth(), joiningDate.getDate());
+        const Date1 = new Date(today.getFullYear(), joiningDate.getMonth(), joiningDate.getDate());
 
         // const isAnniversaryToday = (today.getDate() === joiningDate.getDate()) && (today.getMonth() === joiningDate.getMonth());
         // const nextAnniversaryDate = new Date(today.getFullYear() + 1, joiningDate.getMonth(), joiningDate.getDate());
