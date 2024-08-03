@@ -2,12 +2,11 @@ const mongoose = require("mongoose");
 const constant = require("../../common/constant");
 const Schema = mongoose.Schema;
 
-const salesPaymentMode = new Schema({
-    payment_mode_name: {
+const accountBrandCategorySchema = new mongoose.Schema({
+    brand_category_name: {
         type: String,
         required: true,
-        unique: true,
-        trim: true
+        unique: true
     },
     created_by: {
         type: Number,
@@ -21,8 +20,9 @@ const salesPaymentMode = new Schema({
         type: Number,
         required: false,
         default: constant?.ACTIVE,
-    }
+    },
 }, {
     timestamps: true
 });
-module.exports = mongoose.model('salesPaymentModeModel', salesPaymentMode);
+
+module.exports = mongoose.model("accountBrandCategoryModel", accountBrandCategorySchema);

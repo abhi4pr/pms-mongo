@@ -29,11 +29,12 @@ const accountMasterSchema = new mongoose.Schema({
     category_id: {
         type: Schema.Types.ObjectId, //update from industry id
         required: false,
-        // ref: ""
+        ref: "accountBrandCategoryModel"
     },
     brand_id: {
         type: Schema.Types.ObjectId, //update from industry id
         required: false,
+        ref: "accountBrandModel"
     },
     account_owner_id: {
         type: Number,   //login user_id
@@ -50,6 +51,14 @@ const accountMasterSchema = new mongoose.Schema({
     description: {
         type: String,
         required: false,
+    },
+    company_email: {
+        type: String,
+        required: false
+    },
+    account_image: {
+        type: String,
+        required: false
     },
     created_by: {
         type: Number,
@@ -73,7 +82,7 @@ accountMasterSchema.pre('save', async function (next) {
         if (lastAgency && lastAgency.account_id) {
             this.account_id = lastAgency.account_id + 1;
         } else {
-            this.account_id = 1;
+            this.account_id = 2000;
         }
     }
     next();

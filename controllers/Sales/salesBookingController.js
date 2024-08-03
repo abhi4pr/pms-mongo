@@ -49,24 +49,14 @@ exports.addSalesBooking = [
                 gst_status: req.body.gst_status,
                 tds_status: req.body.tds_status,
                 Booking_close_date: req.body.Booking_close_date,
-                tds_verified_amount: req.body.tds_verified_amount,
-                tds_verified_remark: req.body.tds_verified_remark,
                 booking_remarks: req.body.booking_remarks,
                 incentive_status: req.body.incentive_status,
                 payment_credit_status: req.body.payment_credit_status,
-                // booking_status: req.body.booking_status,
-                incentive_sharing_user_id: req.body.incentive_sharing_user_id,
-                incentive_sharing_percent: req.body.incentive_sharing_percent,
                 bad_debt: req.body.bad_debt,
                 bad_debt_reason: req.body.bad_debt_reason,
                 no_badge_achivement: req.body.no_badge_achivement,
-                old_sale_booking_id: req.body.old_sale_booking_id,
                 sale_booking_type: req.body.sale_booking_type,
-                service_taken_amount: req.body.service_taken_amount,
-                // incentive_amount: req.body.incentive_amount,
-                earned_incentive_amount: req.body.earned_incentive_amount,
-                unearned_incentive_amount: req.body.unearned_incentive_amount,
-                payment_type: req.body.payment_type,
+                // payment_type: req.body.payment_type,
                 final_invoice: req.body.final_invoice,
                 is_draft_save: req.body.is_draft_save,
                 created_by: req.body.created_by,
@@ -171,24 +161,14 @@ exports.editSalesBooking = [
                 gst_status: req.body.gst_status,
                 tds_status: req.body.tds_status,
                 Booking_close_date: req.body.Booking_close_date,
-                tds_verified_amount: req.body.tds_verified_amount,
-                tds_verified_remark: req.body.tds_verified_remark,
                 booking_remarks: req.body.booking_remarks,
                 incentive_status: req.body.incentive_status,
                 payment_credit_status: req.body.payment_credit_status,
-                // booking_status: req.body.booking_status,
-                incentive_sharing_user_id: req.body.incentive_sharing_user_id,
-                incentive_sharing_percent: req.body.incentive_sharing_percent,
                 bad_debt: req.body.bad_debt,
                 bad_debt_reason: req.body.bad_debt_reason,
                 no_badge_achivement: req.body.no_badge_achivement,
-                old_sale_booking_id: req.body.old_sale_booking_id,
                 sale_booking_type: req.body.sale_booking_type,
-                service_taken_amount: req.body.service_taken_amount,
-                // incentive_amount: req.body.incentive_amount,
-                earned_incentive_amount: req.body.earned_incentive_amount,
-                unearned_incentive_amount: req.body.unearned_incentive_amount,
-                payment_type: req.body.payment_type,
+                // payment_type: req.body.payment_type,
                 final_invoice: req.body.final_invoice,
                 is_draft_save: req.body.is_draft_save,
                 updated_by: req.body.updated_by,
@@ -250,8 +230,35 @@ exports.getAllSalesBooking = async (req, res) => {
         const limit = (req.query?.limit && parseInt(req.query.limit)) || null;
         const skip = (page && limit) ? (page - 1) * limit : 0;
         const sort = { createdAt: -1 };
+        //for match conditions
+        let matchQuery = {};
+        if (req.query?.userId) {
+            matchQuery["created_by"] = Number(req.query.userId);
+        }
 
-        let addFieldsObj = {
+        //condition creation for get data
+        const pipeline = [{
+            $match: matchQuery
+        }, {
+            $lookup: {
+                from: "accountmastermodels",
+                localField: "account_id",
+                foreignField: "account_id",
+                as: "accountData",
+            }
+        }, {
+            $unwind: {
+                path: "$accountData",
+                preserveNullAndEmptyArrays: true,
+            }
+        }, {
+            $lookup: {
+                from: "salesinvoicerequestmodels",
+                localField: "sale_booking_id",
+                foreignField: "sale_booking_id",
+                as: "salesInvoiceRequestData",
+            }
+        }, {
             $addFields: {
                 record_service_file_url: {
                     $cond: {
@@ -264,12 +271,55 @@ exports.getAllSalesBooking = async (req, res) => {
                             ],
                         },
                         else: "$record_service_file",
-                    },
+                    }
                 },
-            },
-        };
-
-        const pipeline = [addFieldsObj, { $sort: sort }];
+                url: constant.GCP_INVOICE_REQUEST_URL,
+            }
+        }, {
+            $project: {
+                account_id: 1,
+                account_name: "$accountData.account_name",
+                salesInvoiceRequestData: 1,
+                is_draft_save: 1,
+                sale_booking_date: 1,
+                campaign_amount: 1,
+                campaign_name: 1,
+                campaign_id: 1,
+                approved_amount: 1,
+                requested_amount: 1,
+                record_service_amount: 1,
+                record_service_counts: 1,
+                brand_id: 1,
+                base_amount: 1,
+                gst_amount: 1,
+                credit_approval_status: 1,
+                reason_credit_approval: 1,
+                reason_credit_approval_own_reason: 1,
+                balance_payment_ondate: 1,
+                gst_status: 1,
+                tds_status: 1,
+                tds_verified_amount: 1,
+                incentive_status: 1,
+                incentive_earning_status: 1,
+                payment_credit_status: 1,
+                incentive_sharing_percent: 1,
+                bad_debt: 1,
+                sale_booking_type: 1,
+                incentive_amount: 1,
+                earned_incentive_amount: 1,
+                unearned_incentive_amount: 1,
+                created_by: 1,
+                record_service_file: 1,
+                booking_status: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                sale_booking_id: 1,
+                record_service_file_url: 1,
+                url: 1
+            }
+        }, {
+            $sort: sort
+        }];
 
         if (page && limit) {
             pipeline.push(
@@ -279,7 +329,7 @@ exports.getAllSalesBooking = async (req, res) => {
         }
 
         const saleBookingList = await salesBookingModel.aggregate(pipeline);
-        const salesBookingCount = await salesBookingModel.countDocuments(addFieldsObj);
+        const salesBookingCount = await salesBookingModel.countDocuments();
 
         return response.returnTrueWithPagination(
             200,
@@ -355,10 +405,10 @@ exports.deleteSalesBooking = [upload, async (req, res) => {
         // Insert the data into the deletedSalesBookingModel
         const addNewDeletedData = await deleteSalesbookingModel.create(salesBookingCopy);
 
-        if (salesBookingData && salesBookingData.record_service_file) {
-            // Move the uploaded file to the 'DeletedSalesRecordService' directory
-            await moveImage("SalesBookingFiles", "DeletedSalesBookingService", salesBookingData.record_service_file);
-        }
+        // if (salesBookingData && salesBookingData.record_service_file) {
+        //     // Move the uploaded file to the 'DeletedSalesRecordService' directory
+        //     await moveImage("SalesBookingFiles", "DeletedSalesBookingService", salesBookingData.record_service_file);
+        // }
 
         // Delete the sales booking record
         await salesBookingModel.deleteOne({ _id: req.params.id });
@@ -367,7 +417,7 @@ exports.deleteSalesBooking = [upload, async (req, res) => {
             200,
             req,
             res,
-            "Page states deleted successfully!",
+            "Sale Booking deleted successfully!",
             addNewDeletedData,
         )
     } catch (error) {
@@ -380,7 +430,12 @@ exports.deleteSalesBooking = [upload, async (req, res) => {
  */
 exports.getDeletedSalesBookingList = async (req, res) => {
     try {
-        const newDeleteSalesBokingData = await deleteSalesbookingModel.find({});
+        //for match conditions
+        let matchQuery = {};
+        if (req.query?.userId) {
+            matchQuery["created_by"] = Number(req.query.userId);
+        }
+        const newDeleteSalesBokingData = await deleteSalesbookingModel.find(matchQuery);
 
         //if data not found
         if (!newDeleteSalesBokingData) {
@@ -552,9 +607,15 @@ exports.editCreditApprovalStatusChange = async (req, res) => {
 exports.getSalesBookingDetail = async (req, res) => {
     try {
         const { id } = req.params;
-        const salesBookingDetail = await salesBookingModel.find({
-            account_id: id,
-        });
+        //for match conditions
+        let matchQuery = {
+            account_id: Number(id),
+        };
+
+        if (req.query?.userId) {
+            matchQuery["created_by"] = Number(req.query.userId);
+        }
+        const salesBookingDetail = await salesBookingModel.find(matchQuery);
         if (!salesBookingDetail) {
             return response.returnFalse(200, req, res, `No Record Found`, {});
         }
@@ -580,84 +641,87 @@ exports.salesDataOfAccountOutstanding = async (req, res) => {
         if (gstStatus !== undefined) {
             matchStage = { gst_status: gstStatus };
         }
-        const accountWiseSaleBookingData = await salesBookingModel.aggregate([
-            {
-                $match: matchStage
-            }, {
-                $lookup: {
-                    from: "accountmastermodels",
-                    localField: "account_id",
-                    foreignField: "account_id",
-                    as: "accountMasterData",
-                }
-            }, {
-                $unwind: {
-                    path: "$accountMasterData",
-                    preserveNullAndEmptyArrays: true,
-                }
-            }, {
-                $lookup: {
-                    from: "usermodels",
-                    localField: "created_by",
-                    foreignField: "user_id",
-                    as: "user",
-                },
-            }, {
-                $unwind: {
-                    path: "$user",
-                    preserveNullAndEmptyArrays: true,
-                },
-            }, {
-                $group: {
-                    _id: "$account_id",
-                    sale_booking_date: { $first: "$sale_booking_date" },
-                    campaign_amount: { $first: "$campaign_amount" },
-                    description: { $first: "$description" },
-                    credit_approval_status: { $first: "$credit_approval_status" },
-                    reason_credit_approval: { $first: "$reason_credit_approval" },
-                    gst_status: { $first: "$gst_status" },
-                    balance_payment_ondate: { $first: "$balance_payment_ondate" },
-                    payment_credit_status: { $first: "$payment_credit_status" },
-                    booking_status: { $first: "$booking_status" },
-                    sale_booking_id: { $first: "$sale_booking_id" },
-                    account_id: { $first: "$accountMasterData.account_id" },
-                    account_name: { $first: "$accountMasterData.account_name" },
-                    registered_by: { $first: "$accountMasterData.created_by" },
-                    requested_amount: { $first: "$requested_amount" },
-                    registered_by_name: { $first: "$user.user_name" },
-                    createdAt: { $first: "$createdAt" },
-                    updatedAt: { $first: "$updatedAt" },
-                    total_purchase_amount: { $sum: "$campaign_amount" },
-                    total_sale_booking: { $sum: 1 },
-                    approved_amount: { $sum: "$approved_amount" },
-                }
-            }, {
-                $project: {
-                    _id: 1,
-                    sale_booking_date: 1,
-                    campaign_amount: 1,
-                    description: 1,
-                    credit_approval_status: 1,
-                    reason_credit_approval: 1,
-                    gst_status: 1,
-                    balance_payment_ondate: 1,
-                    payment_credit_status: 1,
-                    booking_status: 1,
-                    sale_booking_id: 1,
-                    account_id: 1,
-                    account_name: 1,
-                    registered_by: 1,
-                    registered_by_name: 1,
-                    createdAt: 1,
-                    updatedAt: 1,
-                    total_purchase_amount: 1,
-                    total_sale_booking: 1,
-                    approved_amount: 1,
-                    requested_amount: 1,
-                    approved_pending: { $subtract: ["$requested_amount", "$approved_amount"] }
-                }
+
+        if (req.query?.userId) {
+            matchStage["created_by"] = Number(req.query.userId);
+        }
+
+        const accountWiseSaleBookingData = await salesBookingModel.aggregate([{
+            $match: matchStage
+        }, {
+            $lookup: {
+                from: "accountmastermodels",
+                localField: "account_id",
+                foreignField: "account_id",
+                as: "accountMasterData",
             }
-        ]);
+        }, {
+            $unwind: {
+                path: "$accountMasterData",
+                preserveNullAndEmptyArrays: true,
+            }
+        }, {
+            $lookup: {
+                from: "usermodels",
+                localField: "created_by",
+                foreignField: "user_id",
+                as: "user",
+            },
+        }, {
+            $unwind: {
+                path: "$user",
+                preserveNullAndEmptyArrays: true,
+            },
+        }, {
+            $group: {
+                _id: "$account_id",
+                sale_booking_date: { $first: "$sale_booking_date" },
+                campaign_amount: { $first: "$campaign_amount" },
+                description: { $first: "$description" },
+                credit_approval_status: { $first: "$credit_approval_status" },
+                reason_credit_approval: { $first: "$reason_credit_approval" },
+                gst_status: { $first: "$gst_status" },
+                balance_payment_ondate: { $first: "$balance_payment_ondate" },
+                payment_credit_status: { $first: "$payment_credit_status" },
+                booking_status: { $first: "$booking_status" },
+                sale_booking_id: { $first: "$sale_booking_id" },
+                account_id: { $first: "$accountMasterData.account_id" },
+                account_name: { $first: "$accountMasterData.account_name" },
+                registered_by: { $first: "$accountMasterData.created_by" },
+                requested_amount: { $first: "$requested_amount" },
+                registered_by_name: { $first: "$user.user_name" },
+                createdAt: { $first: "$createdAt" },
+                updatedAt: { $first: "$updatedAt" },
+                total_purchase_amount: { $sum: "$campaign_amount" },
+                total_sale_booking: { $sum: 1 },
+                approved_amount: { $sum: "$approved_amount" },
+            }
+        }, {
+            $project: {
+                _id: 1,
+                sale_booking_date: 1,
+                campaign_amount: 1,
+                description: 1,
+                credit_approval_status: 1,
+                reason_credit_approval: 1,
+                gst_status: 1,
+                balance_payment_ondate: 1,
+                payment_credit_status: 1,
+                booking_status: 1,
+                sale_booking_id: 1,
+                account_id: 1,
+                account_name: 1,
+                registered_by: 1,
+                registered_by_name: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                total_purchase_amount: 1,
+                total_sale_booking: 1,
+                approved_amount: 1,
+                requested_amount: 1,
+                approved_pending: { $subtract: ["$requested_amount", "$approved_amount"] }
+            }
+        }]);
         if (!accountWiseSaleBookingData.length) {
             return response.returnFalse(200, req, res, "No Record Found...", []);
         }
@@ -677,6 +741,9 @@ exports.salesDataOfUserOutstanding = async (req, res) => {
         let matchStage = {};
         if (gstStatus !== undefined) {
             matchStage = { gst_status: gstStatus };
+        }
+        if (req.query?.userId) {
+            matchStage["created_by"] = Number(req.query.userId);
         }
         const userWiseSaleBookingData = await salesBookingModel.aggregate([
             {

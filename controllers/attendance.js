@@ -3204,3 +3204,15 @@ exports.getAllWFHDUsersWithBonus = async (req, res) => {
     });
   }
 };
+
+exports.getAllStatusOfAttendance = async (req, res) => {
+  try {
+    const data = await attendanceModel.find({}).select({ attendance_status_flow: 1 })
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error'
+    });
+  }
+}

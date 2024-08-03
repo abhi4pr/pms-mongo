@@ -3951,40 +3951,6 @@ exports.rejoinUser = async (req, res) => {
     }
 };
 
-// exports.getUserTimeLine = async (req, res) => {
-//     try {
-//         const userId = parseInt(req.params.id);
-//         const userData = await userModel.findOne({ user_id: userId });
-//         if (!userData) {
-//             return res.status(404).json({ error: "User not found!" });
-//         }
-//         const joiningDate = userData.joining_date;
-//         const joiningDate1 = userData.joining_date;
-//         const DOB = userData.DOB;
-//         if (!joiningDate) {
-//             return res.status(400).json({ error: "Joining date not found for the user" });
-//         }
-//         const probationEndDate = new Date(joiningDate);
-//         probationEndDate.setMonth(probationEndDate.getMonth() + 6);
-//         const today = new Date();
-//         const yearsOfWork = today.getFullYear() - joiningDate.getFullYear();
-//         return res.status(200).json({
-//             status: 200,
-//             message: "User timeline data fetched successfully!",
-//             joiningDate: joiningDate,
-//             DOB: DOB,
-//             probationEndDate: probationEndDate,
-//             probationMonthValue: "6 Months",
-//             workAnniversaryYears: {
-//                 Date: joiningDate,
-//                 Work_Anniversary_Years: yearsOfWork <= 1 ? "1 year" : `${yearsOfWork} years`
-//             }
-//         });
-//     } catch (err) {
-//         console.error("Error:", err.message);
-//         res.status(500).json({ error: "Internal Server Error" });
-//     }
-// };
 
 exports.getUserTimeLine = async (req, res) => {
     try {
@@ -4006,10 +3972,12 @@ exports.getUserTimeLine = async (req, res) => {
         const today = new Date();
         const yearsOfWork = today.getFullYear() - joiningDate.getFullYear();
 
-        const Date1 = new Date(today.getFullYear(), joiningDate.getMonth(), joiningDate.getDate());
+        let nextAnniversaryDate = new Date(today.getFullYear(), joiningDate.getMonth(), joiningDate.getDate());
+        if (today > nextAnniversaryDate) {
+            nextAnniversaryDate = new Date(today.getFullYear() + 1, joiningDate.getMonth(), joiningDate.getDate());
+        }
 
-        // const isAnniversaryToday = (today.getDate() === joiningDate.getDate()) && (today.getMonth() === joiningDate.getMonth());
-        // const nextAnniversaryDate = new Date(today.getFullYear() + 1, joiningDate.getMonth(), joiningDate.getDate());
+        const formattedJoiningDate = `${nextAnniversaryDate.getFullYear()}-${(joiningDate.getMonth() + 1).toString().padStart(2, '0')}-${joiningDate.getDate().toString().padStart(2, '0')}`;
 
         return res.status(200).json({
             status: 200,
@@ -4019,8 +3987,8 @@ exports.getUserTimeLine = async (req, res) => {
             probationEndDate: probationEndDate,
             probationMonthValue: "6 Months",
             workAnniversaryYears: {
-                Date: Date1,
-                Work_Anniversary_Years: yearsOfWork <= 1 ? "1 year" : `${yearsOfWork} years`
+                Date: formattedJoiningDate,
+                Work_Anniversary_Years: yearsOfWork < 1 ? "0 year" : `${yearsOfWork} years`
             }
         });
     } catch (err) {
@@ -4728,7 +4696,7 @@ exports.getBirthDaysForWFHDUsers = async (req, res) => {
 
 exports.getNewJoineeOfWFHDUsers = async (req, res) => {
     try {
-        const currentMonth = new Date().getMonth() + 1;
+        const currentMonth = new Date().getMonth();
         const currentYear = new Date().getFullYear();
 
         const users = await userModel.aggregate([
@@ -4752,13 +4720,15 @@ exports.getNewJoineeOfWFHDUsers = async (req, res) => {
             {
                 $addFields: {
                     joiningMonth: { $month: "$joining_date" },
-                    joiningYear: { $year: "$joining_date" }
+                    joiningYear: { $year: "$joining_date" },
+                    joiningDay: { $dayOfMonth: "$joining_date" }
                 }
             },
             {
                 $match: {
                     joiningMonth: currentMonth,
-                    joiningYear: currentYear
+                    joiningYear: currentYear,
+                    joiningDay: { $gte: 16 }
                 }
             },
             {

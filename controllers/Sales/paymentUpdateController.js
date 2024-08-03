@@ -195,12 +195,90 @@ exports.updatePaymentDeatil = [
 */
 exports.paymentUpdateList = async (req, res) => {
     try {
-        const page = (req.query?.page && parseInt(req.query.page)) || null;
-        const limit = (req.query?.limit && parseInt(req.query.limit)) || null;
+        const page = (req.query?.page && parseInt(req.query.page)) || 1;
+        const limit = (req.query?.limit && parseInt(req.query.limit)) || Number.MAX_SAFE_INTEGER;
         const skip = (page && limit) ? (page - 1) * limit : 0;
         const sort = { createdAt: -1 };
 
-        let addFieldsObj = {
+        //for match conditions
+        let matchQuery = {
+            status: {
+                $ne: constant.DELETED
+            }
+        };
+        if (req.query?.userId) {
+            matchQuery["created_by"] = Number(req.query.userId);
+        }
+        if (req.query?.status) {
+            matchQuery["payment_approval_status"] = req.query.status;
+        }
+        if (req.query?.sale_booking_id) {
+            matchQuery["sale_booking_id"] = Number(req.query.sale_booking_id);
+        }
+
+        const pipeline = [{
+            $match: matchQuery
+        }, {
+            $lookup: {
+                from: "usermodels",
+                localField: "created_by",
+                foreignField: "user_id",
+                as: "userData",
+            }
+        }, {
+            $unwind: {
+                path: "$userData",
+                preserveNullAndEmptyArrays: true,
+            }
+        }, {
+            $lookup: {
+                from: "salespaymentmodemodels",
+                localField: "payment_mode",
+                foreignField: "_id",
+                as: "paymentModeData",
+            }
+        }, {
+            $unwind: {
+                path: "$paymentModeData",
+                preserveNullAndEmptyArrays: true,
+            }
+        }, {
+            $lookup: {
+                from: "salespaymentdetailsmodels",
+                localField: "payment_detail_id",
+                foreignField: "_id",
+                as: "paymentDetailsData",
+            }
+        }, {
+            $unwind: {
+                path: "$paymentDetailsData",
+                preserveNullAndEmptyArrays: true,
+            }
+        }, {
+            $lookup: {
+                from: "salesbookingmodels",
+                localField: "sale_booking_id",
+                foreignField: "sale_booking_id",
+                as: "salesBookingData",
+            }
+        }, {
+            $unwind: {
+                path: "$salesBookingData",
+                preserveNullAndEmptyArrays: true,
+            }
+        }, {
+            $lookup: {
+                from: "accountmastermodels",
+                localField: "account_id",
+                foreignField: "account_id",
+                as: "accountData",
+            }
+        }, {
+            $unwind: {
+                path: "$accountData",
+                preserveNullAndEmptyArrays: true,
+            }
+        }, {
             $addFields: {
                 payment_screenshot_url: {
                     $cond: {
@@ -213,28 +291,55 @@ exports.paymentUpdateList = async (req, res) => {
                             ],
                         },
                         else: "$payment_screenshot",
-                    },
-                },
-            },
-        };
-        const pipeline = [addFieldsObj];
+                    }
+                }
+            }
+        }, {
+            $project: {
+                payment_date: 1,
+                sale_booking_id: 1,
+                sale_booking_date: "$salesBookingData.sale_booking_date",
+                campaign_amount: "$salesBookingData.campaign_amount",
+                base_amount: "$salesBookingData.base_amount",
+                gst_status: "$salesBookingData.gst_status",
+                balance_payment_ondate: "$salesBookingData.balance_payment_ondate",
+                account_id: 1,
+                account_name: "$accountData.account_name",
+                payment_amount: 1,
+                payment_mode: 1,
+                payment_mode_name: "$paymentModeData.payment_mode_name",
+                payment_detail: "$paymentDetailsData",
+                payment_ref_no: 1,
+                payment_approval_status: 1,
+                action_reason: 1,
+                remarks: 1,
+                payment_screenshot: 1,
+                payment_screenshot_url: 1,
+                created_by: 1,
+                created_by_name: "$userData.user_name",
+                updated_by: 1,
+                createdAt: 1,
+                updatedAt: 1,
+            }
+        }, {
+            $sort: sort
+        }];
 
         if (page && limit) {
             pipeline.push(
                 { $skip: skip },
                 { $limit: limit },
-                { $sort: sort }
             );
         }
 
-        paymentUpdateList = await paymentUpdateModel.aggregate(pipeline);
-        const paymentUpdateCount = await paymentUpdateModel.countDocuments(addFieldsObj);
+        const paymentUpdateList = await paymentUpdateModel.aggregate(pipeline);
+        const paymentUpdateCount = await paymentUpdateModel.countDocuments(matchQuery);
 
         return response.returnTrueWithPagination(
             200,
             req,
             res,
-            "Sales booking list retreive successfully!",
+            "Payment update list retreive successfully!",
             paymentUpdateList,
             {
                 start_record: skip + 1,
@@ -368,7 +473,7 @@ exports.updatePaymentAndSaleData = async (req, res) => {
 
         //get sale booking data
         let saleBookingData = await salesBookingModel.findOne({
-            sale_booking_id: editPaymentUpdatedDetail.sale_booking_id
+            sale_booking_id: editPaymentUpdatedDetail?.sale_booking_id
         });
 
         let approvedAmount = saleBookingData.approved_amount;
@@ -397,19 +502,20 @@ exports.updatePaymentAndSaleData = async (req, res) => {
                 updateObj["incentive_earning_status"] = "earned";
                 updateObj["earned_incentive_amount"] = saleBookingData.incentive_amount;
                 updateObj["unearned_incentive_amount"] = 0;
+                updateObj["booking_status"] = saleBookingStatus['05'].status;
             } else {
                 updateObj["unearned_incentive_amount"] = saleBookingData.incentive_amount;
             }
 
-            //campaign amount equal to approvaed amount then status update 
-            if (saleBookingData.campaign_amount == approvedAmount) {
-                updateObj["booking_status"] = saleBookingStatus['05'].status;
-            }
+            // //campaign amount equal to approvaed amount then status update 
+            // if (saleBookingData.campaign_amount == approvedAmount) {
+            //     updateObj["booking_status"] = saleBookingStatus['05'].status;
+            // }
         }
 
         //approved amount add in sale booking collection.
         await salesBookingModel.updateOne({
-            sale_booking_id: editPaymentUpdatedDetail.sale_booking_id
+            sale_booking_id: editPaymentUpdatedDetail?.sale_booking_id
         }, {
             $set: updateObj
         });
