@@ -3428,31 +3428,80 @@ exports.getUserGraphDataOfWFHD = async (req, res) => {
             ]).sort({ dept_id: 1 });
         }
         else if (req.body.caseType == 'year') {
-            result = await userModel.aggregate([
+            // result = await userModel.aggregate([
+            //     {
+            //         $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
+            //     },
+            //     {
+            //         $addFields: {
+            //             convertedDate: { $toDate: "$joining_date" },
+            //         },
+            //     },
+            //     {
+            //         $group: {
+            //             _id: {
+            //                 month: { $month: "$convertedDate" },
+            //             },
+            //             userjoined: { $sum: 1 },
+            //         },
+            //     },
+            //     {
+            //         $project: {
+            //             _id: 0,
+            //             month: "$_id.month",
+            //             userjoined: 1,
+            //         },
+            //     },
+            // ]).sort({ year: 1 });
+
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            const currentYear = new Date().getFullYear();
+
+            const result = await userModel.aggregate([
                 {
-                    $match: { job_type: "WFHD", user_status: "Active", att_status: "onboarded" }
+                    $match: {
+                        job_type: "WFHD",
+                        user_status: "Active",
+                        att_status: "onboarded"
+                    }
                 },
                 {
                     $addFields: {
                         convertedDate: { $toDate: "$joining_date" },
-                    },
+                        joiningYear: { $year: { $toDate: "$joining_date" } }
+                    }
+                },
+                {
+                    $match: {
+                        joiningYear: currentYear
+                    }
                 },
                 {
                     $group: {
                         _id: {
-                            year: { $year: "$convertedDate" },
+                            month: { $month: "$convertedDate" }
                         },
-                        userjoined: { $sum: 1 },
-                    },
+                        userjoined: { $sum: 1 }
+                    }
+                },
+                {
+                    $addFields: {
+                        monthName: { $arrayElemAt: [monthNames, { $subtract: ["$_id.month", 1] }] }
+                    }
                 },
                 {
                     $project: {
                         _id: 0,
-                        year: "$_id.year",
-                        userjoined: 1,
-                    },
+                        month: "$_id.month",
+                        monthName: 1,
+                        userjoined: 1
+                    }
                 },
-            ]).sort({ year: 1 });
+            ])
+                .sort({ month: 1 });
+
+            return res.send(result);
         }
         else if (req.body.caseType == 'age') {
             result = await userModel.aggregate([
@@ -3735,107 +3784,6 @@ function monthNameToNumber(monthName) {
     return monthIndex !== -1 ? monthIndex + 1 : null;
 }
 
-// exports.getAllUsersCountsWithJoiningDate = async (req, res) => {
-//     try {
-//         let month = req.body.month;
-//         let year = req.body.year;
-//         let deptId = req.body.dept_id;
-//         const monthNumber = monthNameToNumber(month);
-//         const joiningMonth = String(monthNumber).padStart(
-//             2,
-//             "0"
-//         );
-//         const bodyMonthYear = `${year}` + `${joiningMonth}`;
-//         const findData = await userModel.aggregate([
-//             {
-//                 $match: {
-//                     job_type: "WFHD",
-//                     dept_id: deptId,
-//                     att_status: "onboarded",
-//                     $expr: {
-//                         $lte: [
-//                             {
-//                                 $dateToString: {
-//                                     date: "$joining_date",
-//                                     format: "%Y%m"
-//                                 }
-//                             },
-//                             bodyMonthYear
-//                         ]
-//                     }
-//                 }
-//             },
-//             {
-//                 $group: {
-//                     _id: "$dept_id",
-//                     count: { $sum: 1 }
-//                 }
-//             }
-//         ]);
-//         return response.returnTrue(200, req, res, findData);
-//     } catch (err) {
-//         return response.returnFalse(500, req, res, err.message, {});
-//     }
-// };
-
-// exports.getAllUsersCountsWithJoiningDate = async (req, res) => {
-//     try {
-//         let month = req.body.month;
-//         let year = req.body.year;
-//         let deptId = req.body.dept_id;
-//         const monthNumber = monthNameToNumber(month);
-//         const joiningMonth = String(monthNumber).padStart(
-//             2,
-//             "0"
-//         );
-//         const bodyMonthYear = `${year}${joiningMonth}`;
-//         const findData = await userModel.aggregate([
-//             {
-//                 $match: {
-//                     job_type: "WFHD",
-//                     dept_id: deptId,
-//                     att_status: "onboarded",
-//                     $expr: {
-//                         $lte: [
-//                             {
-//                                 $dateToString: {
-//                                     date: "$joining_date",
-//                                     format: "%Y%m"
-//                                 }
-//                             },
-//                             bodyMonthYear
-//                         ]
-//                     }
-//                 }
-//             },
-//             {
-//                 $project: {
-//                     user_id: "$user_id",
-//                     user_name: "$user_name"
-//                 }
-//             }
-//         ]);
-
-//         const separationData = await separationModel.find({}).select({ user_id: 1, resignation_date: 1 });
-
-//         const filteredSeparationData = separationData.filter(data => {
-//             const resignationMonthYear = `${data.resignation_date.getFullYear()}${String(data.resignation_date.getMonth() + 1).padStart(2, "0")}`;
-//             return resignationMonthYear !== bodyMonthYear;
-//         });
-
-//         const separatedUserIds = filteredSeparationData.map(data => data.user_id);
-
-//         const filteredData = findData.filter(data => !separatedUserIds.includes(data.user_id));
-
-//         const count = filteredData.length;
-
-
-//         return response.returnTrue(200, req, res, count);
-//     } catch (err) {
-//         return response.returnFalse(500, req, res, err.message, {});
-//     }
-// };
-
 
 exports.getAllUsersCountsWithJoiningDate = async (req, res) => {
     try {
@@ -3843,29 +3791,21 @@ exports.getAllUsersCountsWithJoiningDate = async (req, res) => {
         let year = req.body.year;
         let deptId = req.body.dept_id;
 
-        // Convert month name to number
         const monthNumber = monthNameToNumber(month);
-
-        // Pad month number with zero if needed
         const joiningMonth = String(monthNumber).padStart(2, "0");
 
-        // Concatenate year and month for comparison
         const bodyMonthYear = `${year}${joiningMonth}`;
 
-        // Find users with joining date, active status, onboarded attendance status, and matching department ID
         const users = await userModel.find({
             dept_id: deptId,
             user_status: 'Active',
             att_status: 'onboarded'
         }, { joining_date: 1 });
-        // console.log("users", users)
 
-        // Filter users based on joining month and year
         const usersCount = users.filter(user => {
             const userJoiningDate = new Date(user.joining_date);
             const userMonthYear = userJoiningDate.getFullYear().toString() +
                 String(userJoiningDate.getMonth() + 1).padStart(2, '0');
-            // console.log("userMonthYear", userMonthYear)
             return userMonthYear <= bodyMonthYear;
         }).length;
 
@@ -4758,6 +4698,70 @@ exports.getNewJoineeOfWFHDUsers = async (req, res) => {
     }
 }
 
+exports.getNewExitOfWFHDUsers = async (req, res) => {
+    try {
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+
+        const users = await userModel.aggregate([
+            {
+                $match: { job_type: "WFHD", user_status: "Exit", att_status: "onboarded" }
+            },
+            {
+                $lookup: {
+                    from: 'departmentmodels',
+                    localField: 'dept_id',
+                    foreignField: 'dept_id',
+                    as: 'department'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$department",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    joiningMonth: { $month: "$releaving_date" },
+                    joiningYear: { $year: "$releaving_date" },
+                    joiningDay: { $dayOfMonth: "$releaving_date" }
+                }
+            },
+            {
+                $match: {
+                    joiningMonth: currentMonth,
+                    joiningYear: currentYear,
+                    joiningDay: { $gte: 16 }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    user_name: 1,
+                    releaving_date: 1,
+                    dept_name: "$department.dept_name"
+                }
+            }
+        ]);
+
+        users.forEach(user => {
+            user.releaving_date = formatDate(user.releaving_date);
+        });
+
+        res.status(200).json({
+            success: true,
+            data: users
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error'
+        });
+    }
+}
+
 exports.getAllExitUsersOfWFHD = async (req, res) => {
     try {
         const allUsers = await userModel.aggregate([
@@ -4802,6 +4806,7 @@ exports.getAllExitUsersOfWFHD = async (req, res) => {
                     Gender: 1,
                     DOB: 1,
                     dept_id: 1,
+                    releaving_date: 1,
                     user_designation: 1,
                     dept_name: "$department.dept_name",
                     desi_name: "$designation.desi_name"
