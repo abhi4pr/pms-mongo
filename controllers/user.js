@@ -4592,7 +4592,7 @@ exports.getBirthDaysForWFHDUsers = async (req, res) => {
             },
             {
                 $match: {
-                    joiningMonth: currentMonth
+                    joiningMonth: currentMonth,
                 }
             },
             {
@@ -4602,8 +4602,12 @@ exports.getBirthDaysForWFHDUsers = async (req, res) => {
                             { $year: currentDate },
                             { $year: "$DOB" }
                         ]
-                    }
+                    },
+                    dayOfMonth: { $dayOfMonth: "$DOB" }
                 }
+            },
+            {
+                $sort: { dayOfMonth: 1 }
             },
             {
                 $project: {
@@ -4827,6 +4831,25 @@ exports.getAllExitUsersOfWFHD = async (req, res) => {
             success: true,
             data: allUsers
         });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error'
+        });
+    }
+}
+
+exports.updateTraining = async (req, res) => {
+    try {
+        const editsim = await userModel.findOneAndUpdate({ user_id: req.body.user_id }, {
+            att_status: req.body.att_status
+        }, { new: true });
+
+        if (!editsim) {
+            return res.status(500).send({ success: false })
+        }
+        return res.status(200).send({ success: true, data: editsim })
     } catch (error) {
         console.error(error);
         res.status(500).json({

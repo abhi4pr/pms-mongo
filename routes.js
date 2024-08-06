@@ -943,6 +943,7 @@ router.get("/get_birth_days", user.getBirthDaysForWFHDUsers);
 router.get("/get_newjoinee_of_wfhd_users", user.getNewJoineeOfWFHDUsers);
 router.get("/get_exit_of_wfhd_users", user.getNewExitOfWFHDUsers);
 router.get("/get_all_exit_users_of_wfhd", user.getAllExitUsersOfWFHD);
+router.put("/update_training", user.updateTraining);
 
 //---------------------------------------------------------------------------All Routes OF User Module Ends Here ---------------------------------------------------------------------------------------------------//
 
