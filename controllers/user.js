@@ -4592,7 +4592,7 @@ exports.getBirthDaysForWFHDUsers = async (req, res) => {
             },
             {
                 $match: {
-                    joiningMonth: currentMonth
+                    joiningMonth: currentMonth,
                 }
             },
             {
@@ -4602,8 +4602,12 @@ exports.getBirthDaysForWFHDUsers = async (req, res) => {
                             { $year: currentDate },
                             { $year: "$DOB" }
                         ]
-                    }
+                    },
+                    dayOfMonth: { $dayOfMonth: "$DOB" }
                 }
+            },
+            {
+                $sort: { dayOfMonth: 1 }
             },
             {
                 $project: {
