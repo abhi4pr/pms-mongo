@@ -3913,9 +3913,9 @@ exports.getUserTimeLine = async (req, res) => {
         const yearsOfWork = today.getFullYear() - joiningDate.getFullYear();
 
         let nextAnniversaryDate = new Date(today.getFullYear(), joiningDate.getMonth(), joiningDate.getDate());
-        if (today > nextAnniversaryDate) {
-            nextAnniversaryDate = new Date(today.getFullYear() + 1, joiningDate.getMonth(), joiningDate.getDate());
-        }
+        // if (today > nextAnniversaryDate) {
+        //     nextAnniversaryDate = new Date(today.getFullYear() + 1, joiningDate.getMonth(), joiningDate.getDate());
+        // }
 
         const formattedJoiningDate = `${nextAnniversaryDate.getFullYear()}-${(joiningDate.getMonth() + 1).toString().padStart(2, '0')}-${joiningDate.getDate().toString().padStart(2, '0')}`;
 
@@ -4478,7 +4478,7 @@ exports.getAllWfhUsersWithDept = async (req, res) => {
                     _id: 0
                 }
             }
-        ]).exec();
+        ]).sort({ dept_id: 1 });
 
         if (simc.length === 0) {
             return res.status(500).send({ success: false, message: "No record found" });
