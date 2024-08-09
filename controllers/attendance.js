@@ -1031,13 +1031,13 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
           digital_signature_image: "$user.digital_signature_image",
         },
       },
-      {
-        $match: {
-          joining_date: {
-            $lte: new Date(req.body.year, monthNumeric - 1, 15),
-          },
-        },
-      },
+      // {
+      //   $match: {
+      //     joining_date: {
+      //       $lte: new Date(req.body.year, monthNumeric - 1, 15),
+      //     },
+      //   },
+      // },
       {
         $group: {
           _id: "$attendence_id",
