@@ -618,7 +618,7 @@ exports.addAttendance = async (req, res) => {
 
         let filteredUserData = check2.map(user => {
           const attendance = attendanceData.find(data => data.user_id === user.user_id);
-          console.log("attendance", attendance)
+          // console.log("attendance", attendance)
           if (attendance) {
             return { ...user.toObject(), ...attendance };
           } else {
@@ -698,13 +698,14 @@ exports.addAttendance = async (req, res) => {
 
                 const perdaysal = user.salary / lastDate;
 
-                const totalSalary = perdaysal * presentDays;
+                const totalSalary = (perdaysal * presentDays).toFixed(2);
+                console.log("ffffffffffffff", totalSalary);
 
                 const Bonus = bonus == undefined ? 0 : req.body.bonus;
 
                 const netSalary = totalSalary + Bonus;
 
-                const tdsDeduction = 0;
+                const tdsDeduction = (user.salary) * (user.tds_per) / 100;
 
                 const ToPay = netSalary - tdsDeduction;
                 const salary = user.salary;
@@ -812,15 +813,17 @@ exports.addAttendance = async (req, res) => {
 
         const presentDays = lastDate;
         // console.log("presentDays", presentDays);
-        const perdaysal = Math.round(results4[0].salary / lastDate);
+        // const perdaysal = Math.round(results4[0].salary / lastDate);
+        const perdaysal = (results4[0].salary / lastDate);
         // console.log("perdaysal", perdaysal);
         const Bonus = bonus == undefined ? 0 : req.body.bonus;
-        const totalSalary = (perdaysal * work_days) + Bonus;
+        const totalSalary = ((perdaysal * work_days) + Bonus).toFixed(2);
+        console.log("ddddd", totalSalary);
         // console.log("totalSalary", totalSalary);
         // console.log("Bonus", Bonus);
         const netSalary = totalSalary - salaryDeduction;
         // console.log("netSalary", netSalary);
-        const tdsDeduction = 0;
+        const tdsDeduction = (results4[0].salary) * (results4[0].tds_per) / 100;
         const ToPay = netSalary - tdsDeduction;
         // console.log("ToPay", ToPay);
         const salary = results4[0].salary;
@@ -907,8 +910,8 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
       {
         $lookup: {
           from: "billingheadermodels",
-          localField: "department.dept_id",
-          foreignField: "dept_id",
+          localField: "dept_id",
+          foreignField: "department.dept_id",
           as: "billingheadermodels",
         },
       },
@@ -969,10 +972,10 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
           present_days: 1,
           month_salary: 1,
           year: 1,
-          remark: 1,
+          // remark: 1,
           Creation_date: 1,
           Created_by: 1,
-          Last_updated_by: 1,
+          // Last_updated_by: 1,
           Last_updated_date: 1,
           month: 1,
           bonus: 1,
@@ -991,22 +994,23 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
           ifsc_code: "$user.ifsc_code",
           account_no: "$user.account_no",
           beneficiary_name: "$user.beneficiary",
-          billing_header_name: {
-            $cond: {
-              if: {
-                $and: [
-                  {
-                    $eq: [
-                      { $type: "$billingheadermodels.billing_header_name" },
-                      "missing",
-                    ],
-                  },
-                ],
-              },
-              then: "",
-              else: "$billingheadermodels.billing_header_name",
-            },
-          },
+          billing_header_name: "$billingheadermodels.billing_header_name",
+          // billing_header_name: {
+          //   $cond: {
+          //     if: {
+          //       $and: [
+          //         {
+          //           $eq: [
+          //             { $type: "$billingheadermodels.billing_header_name" },
+          //             "missing",
+          //           ],
+          //         },
+          //       ],
+          //     },
+          //     then: "",
+          //     else: "$billingheadermodels.billing_header_name",
+          //   },
+          // },
           toPay: 1,
           sendToFinance: 1,
           attendence_generated: 1,
@@ -1017,7 +1021,7 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
           salary: 1,
           dept_name: "$department.dept_name",
           pan_no: "$user.pan_no",
-          current_address: "$user.current_address",
+          // current_address: "$user.current_address",
           invoice_template_no: "$user.invoice_template_no",
           joining_date: "$user.joining_date",
           designation_name: "$designation.desi_name",
@@ -1028,7 +1032,7 @@ exports.getSalaryByDeptIdMonthYear = async (req, res) => {
           screenshot: {
             $concat: [imageUrl, "$finance.screenshot"],
           },
-          digital_signature_image: "$user.digital_signature_image",
+          // digital_signature_image: "$user.digital_signature_image",
         },
       },
       // {
