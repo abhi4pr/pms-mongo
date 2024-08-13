@@ -66,7 +66,7 @@ const upload = multer({
     { name: "bank_proof_image", maxCount: 5 },
 ]);
 
-exports.addUser = async (req, res) => {
+exports.addUser = [upload, async (req, res) => {
     try {
         const latestUser = await userModel.findOne({}).sort({ created_At: -1 });
         let latestInvoiceNo = latestUser ? latestUser.invoice_template_no + 1 : 1;
@@ -120,8 +120,10 @@ exports.addUser = async (req, res) => {
             att_status: req.body.att_status,
             alternate_contact: req.body?.alternate_contact,
             salary: req.body?.salary,
-            tds_applicable: req.body?.tds_applicable,
-            tds_per: req.body?.tds_per,
+            tds_applicable: (req.body.salary >= 25000 || req.body.ctc >= 100000) ? 'Yes' : req.body.tds_applicable,
+            tds_per: (req.body.salary >= 25000 || req.body.ctc >= 100000) ? 1 : req.body.tds_per,
+            // tds_applicable: req.body?.tds_applicable,
+            // tds_per: req.body?.tds_per,
             permanent_city: req.body?.permanent_city,
             permanent_state: req.body?.permanent_state,
             permanent_address: req.body?.permanent_address,
@@ -191,7 +193,7 @@ exports.addUser = async (req, res) => {
         console.error(err);
         res.status(500).send({ error: err.message, sms: 'This user cannot be created' });
     }
-};
+}];
 
 exports.addUserForGeneralInformation = [upload, async (req, res) => {
     try {
@@ -241,6 +243,7 @@ exports.addUserForGeneralInformation = [upload, async (req, res) => {
             salary: req.body.salary,
             // emp_id: empId,
             user_credit_limit: req.body.user_credit_limit,
+            user_available_limit: req.body.user_credit_limit,
             created_date_time: req.body.created_date_time,
         });
 
@@ -312,7 +315,14 @@ exports.updateUserForGeneralInformation = [upload, async (req, res) => {
             encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
         }
         //check user exist or not
-        const existingUser = await userModel.findOne({ user_id: req.params.user_id });
+        const existingUser = await userModel.findOne({
+            user_id: req.params.user_id
+        });
+
+        //new updated user credit limit
+        let newUserCreditLimit = Number(req.body?.user_credit_limit);
+        let limitDifference = newUserCreditLimit - existingUser.user_credit_limit;
+        let finalAvailableCreditLimit = existingUser.user_available_limit + limitDifference;
 
         //if user not exist then return error
         if (!existingUser) {
@@ -320,7 +330,9 @@ exports.updateUserForGeneralInformation = [upload, async (req, res) => {
         }
 
         //user details update in DB
-        const editsim = await userModel.findOneAndUpdate({ user_id: parseInt(req.params.user_id) }, {
+        const editsim = await userModel.findOneAndUpdate({
+            user_id: parseInt(req.params.user_id)
+        }, {
             //for personal information
             user_name: req.body.user_name,
             PersonalEmail: req.body.Personal_email,
@@ -344,18 +356,21 @@ exports.updateUserForGeneralInformation = [upload, async (req, res) => {
             role_id: req.body.role_id,
             user_email_id: req.body.user_email_id, //for offical
             user_contact_no: req.body.user_contact_no, //for offical
-            user_login_id: req.body.user_login_id.toLowerCase().trim(),
+            user_login_id: req.body?.user_login_id?.toLowerCase().trim(),
             user_login_password: encryptedPass,
             user_status: req.body.user_status,
             joining_date: req.body.joining_date,
             sitting_id: req.body.sitting_id,
             room_id: req.body.room_id,
             upi_Id: req.body.upi_Id,
-            user_credit_limit: req.body.user_credit_limit,
+            user_credit_limit: newUserCreditLimit,
+            user_available_limit: finalAvailableCreditLimit,
             ctc: req.body.ctc,
             salary: req.body.salary,
             emergency_contact_person_name2: req.body.emergency_contact_person_name2
-        }, { new: true });
+        }, {
+            new: true
+        });
 
         if (!editsim) {
             return res.status(500).send({ success: false })
@@ -553,11 +568,11 @@ exports.updateUser = [upload, async (req, res) => {
             role_id: req.body.role_id || existingUser.role_id,
             sitting_id: req.body.sitting_id || existingUser.sitting_id,
             job_type: req.body.job_type || existingUser.job_type,
-            personal_number: req.body.personal_number || existingUser?.personal_number,
+            personal_number: req.body.personal_number || existingUser.personal_number,
             Report_L1: req.body.report_L1 || existingUser.Report_L1,
             Report_L2: req.body?.report_L2 || existingUser.Report_L2,
             Report_L3: req.body?.report_L3 || existingUser.Report_L3,
-            Personal_email: req.body.Personal_email || existingUser?.Personal_email,
+            Personal_email: req.body.Personal_email || existingUser.Personal_email,
             joining_date: req.body.joining_date || existingUser.joining_date,
             // releaving_date: req.body.releaving_date,
             level: req.body.level || existingUser.level,
@@ -577,10 +592,10 @@ exports.updateUser = [upload, async (req, res) => {
             BloodGroup: req.body.BloodGroup || existingUser.BloodGroup,
             MartialStatus: req.body.MartialStatus || existingUser.MartialStatus,
             DateofMarriage: req.body.DateofMarriage || existingUser.DateOfMarriage,
-            tds_applicable: req.body?.tds_applicable || existingUser.tds_applicable,
-            tds_per: req.body?.tds_per || existingUser.tds_per,
-            // tds_applicable: (req.body.salary >= 30000 || req.body.ctc >= 100000) ? 'Yes' : req.body.tds_applicable,
-            // tds_per: (req.body.salary >= 30000 || req.body.ctc >= 100000) ? 1 : req.body.tds_per,
+            // tds_applicable: req.body?.tds_applicable || existingUser.tds_applicable,
+            // tds_per: req.body?.tds_per || existingUser.tds_per,
+            tds_applicable: (req.body.salary >= 25000 || req.body.ctc >= 100000) ? 'Yes' : req.body.tds_applicable,
+            tds_per: (req.body.salary >= 25000 || req.body.ctc >= 100000) ? 1 : req.body.tds_per,
             onboard_status: req.body.onboard_status || existingUser.onboard_status,
             image_remark: req.body.image_remark || existingUser.image_remark,
             image_validate: req.body.image_validate || existingUser.image_validate,
@@ -667,7 +682,7 @@ exports.updateUser = [upload, async (req, res) => {
             longitude: req.body.longitude,
             coc_flag: req.body.coc_flag,
             beneficiary: req.body.beneficiary,
-            alternate_contact: req.body.alternate_contact,
+            alternate_contact: req.body.alternate_contact || existingUser.alternate_contact,
             cast_type: req.body.cast_type,
             emergency_contact_person_name1: req.body.emergency_contact_person_name1,
             emergency_contact_person_name2: req.body.emergency_contact_person_name2,
@@ -686,9 +701,9 @@ exports.updateUser = [upload, async (req, res) => {
             return res.status(500).send({ success: false })
         }
         // Genreate a pdf file for offer later
-        if (editsim?.offer_later_status == true || (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== ""))) {
-            helper.generateOfferLaterPdf(editsim)
-        }
+        // if (editsim?.offer_later_status == true || (editsim?.joining_date_extend || (editsim?.digital_signature_image && editsim?.digital_signature_image !== ""))) {
+        //     helper.generateOfferLaterPdf(editsim)
+        // }
 
         if (req.files && req.files.image && req.files.image[0]?.originalname) {
             const bucketName = vari.BUCKET_NAME;
@@ -908,6 +923,7 @@ exports.getAllUsers = async (req, res) => {
                     user_id: 1,
                     user_name: 1,
                     user_credit_limit: 1,
+                    user_available_limit: 1,
                     account_type: 1,
                     branch_name: 1,
                     offer_later_status: 1,
@@ -1335,7 +1351,8 @@ exports.getSingleUser = async (req, res) => {
                     account_type: "$account_type",
                     branch_name: "$branch_name",
                     upi_Id: "$upi_Id",
-                    user_credit_limit: "$user_credit_limit"
+                    user_credit_limit: "$user_credit_limit",
+                    user_available_limit: "$user_available_limit"
                 }
             }
         ]).exec();
@@ -1832,7 +1849,10 @@ exports.getSingleUserAuthDetail = async (req, res) => {
                 }
             },
             {
-                $unwind: '$object'
+                $unwind: {
+                    path: "$object",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $group: {
@@ -2573,7 +2593,7 @@ exports.getAllWfhUsers = async (req, res) => {
                 $project: {
                     user_id: "$user_id",
                     user_name: "$user_name",
-                    offer_later_status: "$offer_later_status",
+                    // offer_later_status: "$offer_later_status",
                     user_designation: "$user_designation",
                     desi_name: "$designation.desi_name",
                     user_email_id: "$user_email_id",
@@ -2635,20 +2655,20 @@ exports.getAllWfhUsers = async (req, res) => {
                     sub_dept_id: "$sub_dept_id",
                     pan_no: "$pan_no",
                     uid_no: "$uid_no",
-                    spouse_name: "$spouse_name",
-                    current_address: "$current_address",
-                    current_city: "$current_city",
-                    current_state: "$current_state",
-                    current_pin_code: "$current_pin_code",
+                    // spouse_name: "$spouse_name",
+                    // current_address: "$current_address",
+                    // current_city: "$current_city",
+                    // current_state: "$current_state",
+                    // current_pin_code: "$current_pin_code",
                     permanent_address: "$permanent_address",
                     permanent_city: "$permanent_city",
                     permanent_state: "$permanent_state",
                     permanent_pin_code: "$permanent_pin_code",
-                    joining_date_extend: "$joining_date_extend",
-                    joining_date_extend_status: "$joining_date_extend_status",
-                    joining_date_extend_reason: "$joining_date_extend_reason",
-                    joining_date_reject_reason: "$joining_date_reject_reason",
-                    joining_extend_document: "$joining_extend_document",
+                    // joining_date_extend: "$joining_date_extend",
+                    // joining_date_extend_status: "$joining_date_extend_status",
+                    // joining_date_extend_reason: "$joining_date_extend_reason",
+                    // joining_date_reject_reason: "$joining_date_reject_reason",
+                    // joining_extend_document: "$joining_extend_document",
                     invoice_template_no: "$invoice_template_no",
                     userSalaryStatus: "$userSalaryStatus",
                     digital_signature_image: {
@@ -2672,18 +2692,18 @@ exports.getAllWfhUsers = async (req, res) => {
                     ctc: "$ctc",
                     // offer_letter_send: "$offer_letter_send",
                     // annexure_pdf: "$annexure_pdf",
-                    profileflag: "$profileflag",
-                    nick_name: "$nick_name",
-                    showOnboardingModal: "$showOnboardingModal",
+                    // profileflag: "$profileflag",
+                    // nick_name: "$nick_name",
+                    // showOnboardingModal: "$showOnboardingModal",
                     // coc_flag: "$coc_flag",
                     // latitude: "$latitude",
                     // longitude: "$longitude",
                     beneficiary: "$beneficiary",
                     emp_id: "$emp_id",
                     alternate_contact: "$alternate_contact",
-                    cast_type: "$cast_type",
+                    // cast_type: "$cast_type",
                     emergency_contact_person_name1: "$emergency_contact_person_name1",
-                    emergency_contact_person_name2: "$emergency_contact_person_name2",
+                    // emergency_contact_person_name2: "$emergency_contact_person_name2",
                     emergency_contact_relation1: "$emergency_contact_relation1",
                     // emergency_contact_relation2: "$emergency_contact_relation2",
                     // document_percentage_mandatory: "$document_percentage_mandatory",
@@ -3913,8 +3933,8 @@ exports.getUserTimeLine = async (req, res) => {
         const yearsOfWork = today.getFullYear() - joiningDate.getFullYear();
 
         let nextAnniversaryDate = new Date(today.getFullYear(), joiningDate.getMonth(), joiningDate.getDate());
-        // if (today > nextAnniversaryDate) {
-        //     nextAnniversaryDate = new Date(today.getFullYear() + 1, joiningDate.getMonth(), joiningDate.getDate());
+        // if (today.getFullYear() === nextAnniversaryDate.getFullYear()) {
+        //     nextAnniversaryDate = new Date(today.getFullYear(), joiningDate.getMonth(), joiningDate.getDate());
         // }
 
         const formattedJoiningDate = `${nextAnniversaryDate.getFullYear()}-${(joiningDate.getMonth() + 1).toString().padStart(2, '0')}-${joiningDate.getDate().toString().padStart(2, '0')}`;
@@ -4392,7 +4412,11 @@ exports.getAllSalesUsersByDepartment = async (req, res) => {
 
         //all sales users data get from the db collection
         const salesUsersDetails = await userModel.find({
-            dept_id: deptDetail.dept_id
+            $or: [{
+                dept_id: deptDetail.dept_id,
+            }, {
+                role_id: 1
+            }]
         }, {
             user_name: 1,
             user_id: 1,
