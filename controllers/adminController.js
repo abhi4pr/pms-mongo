@@ -124,7 +124,7 @@ exports.sendPassEmailToUsers = async (req, res) => {
             service: "gmail",
             auth: {
                 user: "onboarding@creativefuel.io",
-                pass: "zboiicwhuvakthth",
+                pass: "qtttmxappybgjbhp",
             },
         });
 
