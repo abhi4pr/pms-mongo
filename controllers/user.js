@@ -66,6 +66,13 @@ const upload = multer({
     { name: "bank_proof_image", maxCount: 5 },
 ]);
 
+function getDateInProperFormat(dateString) {
+    const date = new Date(dateString);
+    date.setUTCHours(0, 0, 0, 0);
+    return date.toISOString().replace('.000Z', '+00:00');
+}
+
+
 exports.addUser = [upload, async (req, res) => {
     try {
         const latestUser = await userModel.findOne({}).sort({ created_At: -1 });
@@ -79,16 +86,6 @@ exports.addUser = [upload, async (req, res) => {
             encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
         }
 
-
-        // if (req.body.DOB) {
-        //     var dob = new Date(req.body.DOB);
-        //     dob.setDate(dob.getDate() + 1);
-        // }
-
-        // if (req.body.joining_date) {
-        //     var doj = new Date(req.body.joining_date);
-        //     doj.setDate(doj.getDate() + 1);
-        // }
 
         const simc = new userModel({
             user_name: req.body.user_name,
@@ -105,7 +102,8 @@ exports.addUser = [upload, async (req, res) => {
             Gender: req.body.Gender,
             job_type: req.body.job_type,
             invoice_template_no: latestInvoiceNo,
-            DOB: req.body.DOB,
+            // DOB: req.body.DOB,
+            DOB: getDateInProperFormat(req.body.DOB),
             user_contact_no: req.body?.user_contact_no,
             PersonalNumber: req.body?.personal_number,
             user_email_id: req.body?.user_email_id,
@@ -114,14 +112,15 @@ exports.addUser = [upload, async (req, res) => {
             Report_L2: req.body.report_L2,
             Report_L3: req.body.report_L3,
             user_designation: req.body.user_designation,
-            joining_date: req.body.joining_date,
+            // joining_date: req.body.joining_date,
+            joining_date: getDateInProperFormat(req.body.joining_date),
             onboard_status: req.body.onboard_status,
             created_by: req.body.created_by,
             att_status: req.body.att_status,
             alternate_contact: req.body?.alternate_contact,
             salary: req.body?.salary,
-            tds_applicable: (req.body.salary >= 25000 || req.body.ctc >= 100000) ? 'Yes' : req.body.tds_applicable,
-            tds_per: (req.body.salary >= 25000 || req.body.ctc >= 100000) ? 1 : req.body.tds_per,
+            tds_applicable: (req.body.salary >= 30000) ? 'Yes' : req.body.tds_applicable,
+            tds_per: (req.body.salary >= 25000) ? 1 : req.body.tds_per,
             // tds_applicable: req.body?.tds_applicable,
             // tds_per: req.body?.tds_per,
             permanent_city: req.body?.permanent_city,
@@ -216,7 +215,8 @@ exports.addUserForGeneralInformation = [upload, async (req, res) => {
             PersonalNumber: req.body.personal_number,
             alternate_contact: req.body.alternate_contact,
             Gender: req.body.Gender,
-            DOB: req.body.DOB,
+            // DOB: req.body.DOB,
+            DOB: getDateInProperFormat(req.body.DOB),
             Age: req.body.Age,
             Nationality: req.body.Nationality,
             MartialStatus: req.body.MartialStatus,
@@ -235,7 +235,8 @@ exports.addUserForGeneralInformation = [upload, async (req, res) => {
             user_login_id: req.body.user_login_id.toLowerCase().trim(),
             user_login_password: encryptedPass,
             user_status: req.body.user_status,
-            joining_date: req.body.joining_date,
+            // joining_date: req.body.joining_date,
+            joining_date: getDateInProperFormat(req.body.joining_date),
             sitting_id: req.body.sitting_id,
             room_id: req.body.room_id,
             upi_Id: req.body.upi_Id,
@@ -310,6 +311,7 @@ exports.addUserForGeneralInformation = [upload, async (req, res) => {
 
 exports.updateUserForGeneralInformation = [upload, async (req, res) => {
     try {
+        console.log("ddddddd", req.body)
         let encryptedPass;
         if (req.body.user_login_password) {
             encryptedPass = await bcrypt.hash(req.body.user_login_password, 10);
@@ -320,7 +322,7 @@ exports.updateUserForGeneralInformation = [upload, async (req, res) => {
         });
 
         //new updated user credit limit
-        let newUserCreditLimit = Number(req.body?.user_credit_limit);
+        let newUserCreditLimit = req.body?.user_credit_limit;
         let limitDifference = newUserCreditLimit - existingUser.user_credit_limit;
         let finalAvailableCreditLimit = existingUser.user_available_limit + limitDifference;
 
@@ -363,7 +365,7 @@ exports.updateUserForGeneralInformation = [upload, async (req, res) => {
             sitting_id: req.body.sitting_id,
             room_id: req.body.room_id,
             upi_Id: req.body.upi_Id,
-            user_credit_limit: newUserCreditLimit,
+            user_credit_limit: Number(newUserCreditLimit),
             user_available_limit: finalAvailableCreditLimit,
             ctc: req.body.ctc,
             salary: req.body.salary,
@@ -835,7 +837,7 @@ exports.updateUser = [upload, async (req, res) => {
 
 exports.getWFHUsersByDept = async (req, res) => {
     try {
-        const simc = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFHD', att_status: "onboarded" }).lean();
+        const simc = await userModel.find({ dept_id: req.params.dept_id, job_type: 'WFHD', user_status: "Active", att_status: "onboarded" }).lean();
         if (!simc) {
             res.status(500).send({ success: false })
         }
@@ -1064,6 +1066,7 @@ exports.getAllUsers = async (req, res) => {
                     emergency_contact_relation1: 1,
                     emergency_contact_relation2: 1,
                     image_url: { $concat: [userImagesBaseUrl, "$image"] },
+                    joining_extend_document: { $concat: [userImagesBaseUrl, "$joining_extend_document"] },
                     // document_percentage_mandatory: 1,
                     // document_percentage_non_mandatory: 1,
                     // document_percentage: 1,
@@ -2055,7 +2058,7 @@ exports.sendUserMail = async (req, res) => {
             service: "gmail",
             auth: {
                 user: "onboarding@creativefuel.io",
-                pass: "zboiicwhuvakthth",
+                pass: "qtttmxappybgjbhp",
             },
         };
 
@@ -2521,7 +2524,7 @@ exports.sendMailAllWfoUser = async (req, res) => {
                 service: "gmail",
                 auth: {
                     user: "onboarding@creativefuel.io",
-                    pass: "zboiicwhuvakthth",
+                    pass: "qtttmxappybgjbhp",
                 },
             });
 
@@ -4312,7 +4315,7 @@ exports.sendOfferLetter = async (req, res) => {
                 service: "gmail",
                 auth: {
                     user: "onboarding@creativefuel.io",
-                    pass: "zboiicwhuvakthth",
+                    pass: "qtttmxappybgjbhp",
                 },
             });
 
@@ -4360,7 +4363,7 @@ exports.sendOfferLetterMail = async (req, res) => {
                 service: "gmail",
                 auth: {
                     user: "onboarding@creativefuel.io",
-                    pass: "zboiicwhuvakthth",
+                    pass: "qtttmxappybgjbhp",
                 },
             });
             const mailOptions = {
@@ -4473,6 +4476,20 @@ exports.getAllWfhUsersWithDept = async (req, res) => {
             },
             {
                 $lookup: {
+                    from: 'usermodels',
+                    localField: 'Report_L1',
+                    foreignField: 'user_id',
+                    as: 'userData'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$userData",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
                     from: 'departmentmodels',
                     localField: 'dept_id',
                     foreignField: 'dept_id',
@@ -4491,7 +4508,8 @@ exports.getAllWfhUsersWithDept = async (req, res) => {
                         dept_id: "$dept_id",
                         dept_name: "$department.dept_name"
                     },
-                    user_count: { $sum: 1 }
+                    user_count: { $sum: 1 },
+                    Report_L1N: { $first: "$userData.user_name" }
                 }
             },
             {
@@ -4499,6 +4517,7 @@ exports.getAllWfhUsersWithDept = async (req, res) => {
                     dept_id: "$_id.dept_id",
                     dept_name: "$_id.dept_name",
                     user_count: 1,
+                    Report_L1N: 1,
                     _id: 0
                 }
             }
