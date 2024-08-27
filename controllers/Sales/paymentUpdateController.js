@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const { ObjectId } = require('mongodb');
 const multer = require("multer");
 const vari = require("../../variables.js");
 const { message } = require("../../common/message.js")
@@ -56,31 +56,8 @@ exports.createPaymentUpdate = [
             let saleBookingData = await salesBookingModel.findOne({
                 sale_booking_id: sale_booking_id
             });
-            //temp code start
-            //get sale booking data
-            let accountData = await accountMasterModel.findOne({
-                account_id: account_id
-            }, {
-                account_name: 1
-            });
 
-            //get sale booking data
-            let userData = await userModel.findOne({
-                user_id: saleBookingData.created_by
-            }, {
-                user_id: 1,
-                user_name: 1
-            });
-
-            addSalesBookingPayment["sale_booking_date"] = saleBookingData.sale_booking_date;
-            addSalesBookingPayment["sales_executive_name"] = userData?.user_name || "";
-            addSalesBookingPayment["account_name"] = accountData.account_name;
-            addSalesBookingPayment["gst_status"] = saleBookingData.gst_status;
-            addSalesBookingPayment["campaign_amount"] = saleBookingData.campaign_amount;
-            addSalesBookingPayment["campaign_amount_without_gst"] = saleBookingData.base_amount;
-            addSalesBookingPayment["creation_date"] = new Date();
-            //temp code end
-
+            //data added in DB collection
             await addSalesBookingPayment.save();
 
             //requested amount add in previous pending data in sale booking collection.
@@ -112,16 +89,24 @@ exports.getPaymentUpdateDetail = async (req, res) => {
             _id: id,
             status: { $ne: constant.DELETED },
         });
+
         if (!paymentUpdateDetail) {
             return response.returnFalse(200, req, res, `No Record Found`, {});
         }
+
+        //convert to object
+        let paymentUpdateData = paymentUpdateDetail.toObject();
+
+        // concatenate the string to the payment_screenshot field
+        paymentUpdateData['payment_screenshot_url'] = `${constant.GCP_SALES_PAYMENT_UPDATE_FOLDER_URL}/${paymentUpdateDetail.payment_screenshot}`;
+
         // Return a success response with the updated record details
         return response.returnTrue(
             200,
             req,
             res,
             "Payment update details retrive successfully!",
-            paymentUpdateDetail
+            paymentUpdateData
         );
     } catch (error) {
         // Return an error response in case of any exceptions
@@ -148,12 +133,6 @@ exports.updatePaymentDeatil = [
                 action_reason: req.body.action_reason,
                 remarks: req.body.remarks,
                 updated_by: req.body.updated_by,
-                sale_booking_date: req.body.sale_booking_date,
-                sales_executive_name: req.body.sales_executive_name,
-                account_name: req.body.account_name,
-                gst_status: req.body.gst_status,
-                campaign_amount_without_gst: req.body.campaign_amount_without_gst,
-                creation_date: req.body.creation_date
             };
 
             // Fetch the old document and update it
@@ -214,6 +193,9 @@ exports.paymentUpdateList = async (req, res) => {
         }
         if (req.query?.sale_booking_id) {
             matchQuery["sale_booking_id"] = Number(req.query.sale_booking_id);
+        }
+        if (req.query?.payment_detail_id) {
+            matchQuery["payment_detail_id"] = ObjectId(req.query.payment_detail_id);
         }
 
         const pipeline = [{
@@ -423,14 +405,7 @@ exports.salesBookingPaymentStatusDetailsList = async (req, res) => {
                     ],
                 },
                 createdAt: 1,
-                updatedAt: 1,
-                sale_booking_date: 1,
-                sales_executive_name: 1,
-                account_name: 1,
-                gst_status: 1,
-                campaign_amount: 1,
-                campaign_amount_without_gst: 1,
-                creation_date: 1,
+                updatedAt: 1
             }
         }]);
         if (salesBookingPaymentListData.length === 0) {
@@ -511,6 +486,24 @@ exports.updatePaymentAndSaleData = async (req, res) => {
             // if (saleBookingData.campaign_amount == approvedAmount) {
             //     updateObj["booking_status"] = saleBookingStatus['05'].status;
             // }
+
+            //used credit limit increment on user.
+            if (saleBookingData.payment_credit_status == "self_credit_used") {
+                const result = await userModel.findOneAndUpdate({
+                    user_id: saleBookingData.created_by
+                }, {
+                    $inc: {
+                        user_available_limit: (paymentAmount)
+                    }
+                }, {
+                    projection: {
+                        user_id: 1,
+                        user_credit_limit: 1,
+                        user_available_limit: 1
+                    },
+                    new: true
+                });
+            }
         }
 
         //approved amount add in sale booking collection.

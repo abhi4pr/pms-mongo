@@ -13,6 +13,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const vendorGroupLinkModel = require('../models/PMS2/vendorGroupLinkModel.js')
+const companyDetailsSchema = require('../models/PMS2/companyDetailsModel.js')
 
 exports.changePassOfSelectedUsers = async (req, res) => {
     try {
@@ -506,5 +507,32 @@ exports.updateVendoridinGroupLink = async (req, res) => {
         return res.status(200).json({ message: 'Vendor IDs updated successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.copyHomeToCompAddress = async (req, res) => {
+    try {
+        const vendormodels = await vendorSchema.find({});
+
+        for (const vendor of vendormodels) {
+            const newVendorCompanyDetails = {
+                vendor_id: vendor._id,
+                company_name: '',
+                address: vendor.home_address || '',
+                city: vendor.home_city || '',
+                pincode: vendor.home_pincode || 0,
+                state: vendor.home_state || '',
+                threshold_limit: '100',
+                created_by: 229,
+                updated_by: 0,
+                status: 0,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+            await companyDetailsSchema.create(newVendorCompanyDetails);
+        }
+        res.status(200).json({ message: 'Data inserted from vendor company address' });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'Error while shifting data' });
     }
 };

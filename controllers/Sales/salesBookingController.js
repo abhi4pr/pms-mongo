@@ -1,12 +1,17 @@
 const response = require("../../common/response");
 const vari = require("../../variables");
+const fs = require("fs");
+const ejs = require('ejs');
+const nodemailer = require("nodemailer");
 const multer = require("multer");
 const salesBookingModel = require("../../models/Sales/salesBookingModel");
 const deleteSalesbookingModel = require("../../models/Sales/deletedSalesBookingModel.js");
 const recordServiceModel = require("../../models/Sales/recordServiceModel.js");
+const executionCampaignModel = require("../../models/executionCampaignModel.js");
+const userModel = require("../../models/userModel.js");
 const { uploadImage, deleteImage, moveImage } = require("../../common/uploadImage");
 const constant = require("../../common/constant.js");
-const { saleBookingStatus } = require("../../helper/status.js");
+const { saleBookingStatus, salesEmail } = require("../../helper/status.js");
 const { getIncentiveAmountRecordServiceWise } = require("../../helper/functions.js");
 const path = require('path');
 const moment = require('moment');
@@ -57,7 +62,7 @@ exports.addSalesBooking = [
                 no_badge_achivement: req.body.no_badge_achivement,
                 sale_booking_type: req.body.sale_booking_type,
                 // payment_type: req.body.payment_type,
-                final_invoice: req.body.final_invoice,
+                // final_invoice: req.body.final_invoice,
                 is_draft_save: req.body.is_draft_save,
                 created_by: req.body.created_by,
             })
@@ -86,6 +91,24 @@ exports.addSalesBooking = [
 
             //save data in the collection
             const saleBookingAdded = await createSaleBooking.save();
+
+            //user credit limit decrement on user limit.
+            if (saleBookingAdded.payment_credit_status == "self_credit_used") {
+                const result = await userModel.findOneAndUpdate({
+                    user_id: saleBookingAdded.created_by
+                }, {
+                    $inc: {
+                        user_available_limit: -(saleBookingAdded.campaign_amount)
+                    }
+                }, {
+                    projection: {
+                        user_id: 1,
+                        user_credit_limit: 1,
+                        user_available_limit: 1
+                    },
+                    new: true
+                });
+            }
 
             let recordServicesDataUpdatedArray = [];
             let recordServicesDetails = (req.body?.record_services && JSON.parse(req.body.record_services)) || [];
@@ -127,6 +150,66 @@ exports.addSalesBooking = [
                 }
             })
 
+            //exe campign collection sale booking true marked.
+            await executionCampaignModel.updateOne({
+                _id: createSaleBooking.campaign_id
+            }, {
+                $set: {
+                    is_sale_booking_created: true
+                }
+            });
+
+            //user data get for the name
+            const userData = await userModel.findOne({
+                user_id: saleBookingAdded.created_by
+            }, {
+                user_id: 1,
+                user_name: 1,
+            });
+
+            // Format a specific date
+            const formattedDate = moment(saleBookingAdded.sale_booking_date).format('MM/DD/YYYY HH:mm:ss');
+            //for email send process to admin
+            try {
+                const transporterOptions = {
+                    service: "gmail",
+                    auth: {
+                        user: "onboarding@creativefuel.io",
+                        pass: "qtttmxappybgjbhp",
+                    },
+                };
+
+                const createMailOptions = (html) => ({
+                    from: "onboarding@creativefuel.io",
+                    to: salesEmail,
+                    // to: "amanrathod197@gmail.com,vijayanttrivedi1500@gmail.com",
+                    subject: "Sale Booking Created",
+                    html: html,
+                });
+
+                const sendMail = async (mailOptions) => {
+                    const transporter = nodemailer.createTransport(transporterOptions);
+                    await transporter.sendMail(mailOptions);
+                };
+
+                const templatePath = path.join(__dirname, "template.ejs");
+                const template = await fs.promises.readFile(templatePath, "utf-8");
+                const html = ejs.render(template, {
+                    salesExecutiveName: userData.user_name,
+                    salesExecutiveID: saleBookingAdded.created_by,
+                    saleBookingId: saleBookingAdded.sale_booking_id,
+                    saleBookingDate: formattedDate,
+                    saleBookingAmount: saleBookingAdded.campaign_amount,
+                    headerText: "New Sale Booking is Created."
+                });
+                const mailOptions = createMailOptions(html);
+
+                //send email to admin
+                await sendMail(mailOptions);
+            } catch (err) {
+                console.log("Error in email send process", err);
+                return response.returnFalse(500, req, res, err.message, {});
+            }
             //success response send
             return response.returnTrue(200, req, res,
                 "Sales Booking Created Successfully",
@@ -169,7 +252,7 @@ exports.editSalesBooking = [
                 no_badge_achivement: req.body.no_badge_achivement,
                 sale_booking_type: req.body.sale_booking_type,
                 // payment_type: req.body.payment_type,
-                final_invoice: req.body.final_invoice,
+                // final_invoice: req.body.final_invoice,
                 is_draft_save: req.body.is_draft_save,
                 updated_by: req.body.updated_by,
             };
@@ -253,6 +336,29 @@ exports.getAllSalesBooking = async (req, res) => {
             }
         }, {
             $lookup: {
+                from: "salesbookingexecutionmodels",
+                let: {
+                    sale_booking_id: "$sale_booking_id"
+                },
+                pipeline: [{
+                    $match: {
+                        $expr: {
+                            $and: [
+                                { $eq: ["$$sale_booking_id", "$sale_booking_id"] },
+                            ]
+                        }
+                    }
+                }, {
+                    $project: {
+                        sale_booking_id: 1,
+                        record_service_id: 1,
+                        execution_token: 1,
+                    }
+                }],
+                as: "executionData"
+            }
+        }, {
+            $lookup: {
                 from: "salesinvoicerequestmodels",
                 localField: "sale_booking_id",
                 foreignField: "sale_booking_id",
@@ -289,6 +395,8 @@ exports.getAllSalesBooking = async (req, res) => {
                 requested_amount: 1,
                 record_service_amount: 1,
                 record_service_counts: 1,
+                is_execution_token_show: 1,
+                executionData: "$executionData",
                 brand_id: 1,
                 base_amount: 1,
                 gst_amount: 1,
@@ -315,7 +423,9 @@ exports.getAllSalesBooking = async (req, res) => {
                 updatedAt: 1,
                 sale_booking_id: 1,
                 record_service_file_url: 1,
-                url: 1
+                url: 1,
+                invoice_request_status: 1,
+                invoice_requested_amount: 1
             }
         }, {
             $sort: sort
@@ -831,6 +941,122 @@ exports.salesDataOfUserOutstanding = async (req, res) => {
             userWiseSaleBookingData
         );
     } catch (err) {
+        return response.returnFalse(500, req, res, err.message, {});
+    }
+}
+
+exports.testingDataApi = async (req, res) => {
+    try {
+        console.log("testing API CALLS");
+        const distinctSaleBookingIds = await salesBookingModel.distinct('sale_booking_id', {});
+        console.log("🚀 ~ exports.testingDataApi= ~ distinctSaleBookingIds:", distinctSaleBookingIds)
+
+        const paymentUpdateModel = require("../../models/Sales/paymentUpdateModel.js");
+        // const saleBookingIdsArray = [79];
+        const saleBookingIdsArray = distinctSaleBookingIds;
+        for (const element of saleBookingIdsArray) {
+            console.log("testing API inner loop sale booking");
+
+            const sale_booking_id = element;
+
+            //for salebooking related changes
+            const recordServicesDataArray = await recordServiceModel.find({
+                sale_booking_id: sale_booking_id
+            });
+
+            let totalIncentiveAmount = 0;
+            let totalRecordServiceAmount = 0;
+            const recordServiceCounts = (recordServicesDataArray && recordServicesDataArray.length) ? recordServicesDataArray.length : 0;
+            for (let index = 0; index < recordServicesDataArray.length; index++) {
+                const element = recordServicesDataArray[index];
+                totalRecordServiceAmount += element?.amount;
+                const incentiveAmount = await getIncentiveAmountRecordServiceWise(element.sales_service_master_id, element.amount);
+                //total incentive amount get from record service
+                totalIncentiveAmount += incentiveAmount;
+            }
+
+            //update incentive amount in sale booking collection
+            await salesBookingModel.updateOne({
+                sale_booking_id: sale_booking_id
+            }, {
+                $set: {
+                    incentive_amount: totalIncentiveAmount,
+                    record_service_amount: totalRecordServiceAmount,
+                    record_service_counts: recordServiceCounts,
+                    unearned_incentive_amount: totalIncentiveAmount
+                }
+            })
+
+            //for payment update related changes
+            let requestedAmount = 0;
+            let approvedAmount = 0;
+            let incentiveEarningStatus = "un-earned";
+            let earnedIncentiveAmount = 0;
+            let unearnedIncentiveAmount = 0;
+
+            //get sale booking data
+            const saleBookingData = await salesBookingModel.findOne({
+                sale_booking_id: sale_booking_id
+            });
+
+            const paymentUpdateDataArray = await paymentUpdateModel.find({
+                sale_booking_id: sale_booking_id
+            });
+
+            for (const element of paymentUpdateDataArray) {
+                const status = element.payment_approval_status;
+                const paymentAmount = element.payment_amount;
+                if (status == 'pending') {
+                    // updateObj["requested_amount"] = requestedAmount + parseInt(paymentAmount);
+                    requestedAmount = requestedAmount + parseInt(paymentAmount);
+                }
+                if (status == 'approval') {
+                    approvedAmount = approvedAmount + parseInt(paymentAmount);
+                    requestedAmount = requestedAmount + parseInt(paymentAmount);
+                    // updateObj["approved_amount"] = approvedAmount;
+                }
+            }
+
+            // incentive status set if 90% amount paid
+            let campaignPercentageAmount = (saleBookingData.campaign_amount * 90) / 100;
+            if (approvedAmount >= campaignPercentageAmount) {
+                incentiveEarningStatus = "earned";
+                earnedIncentiveAmount = saleBookingData.incentive_amount;
+                unearnedIncentiveAmount = 0;
+
+                // updateObj["incentive_earning_status"] = "earned";
+                // updateObj["earned_incentive_amount"] = saleBookingData.incentive_amount;
+                // updateObj["unearned_incentive_amount"] = 0;
+                // updateObj["booking_status"] = saleBookingStatus['05'].status;
+            } else {
+                unearnedIncentiveAmount = saleBookingData.incentive_amount;
+                // updateObj["unearned_incentive_amount"] = saleBookingData.incentive_amount;
+            }
+
+            let updateObj = {
+                approved_amount: approvedAmount,
+                requested_amount: requestedAmount,
+                incentive_earning_status: incentiveEarningStatus,
+                earned_incentive_amount: earnedIncentiveAmount,
+                unearned_incentive_amount: unearnedIncentiveAmount,
+            }
+
+            //approved amount add in sale booking collection.
+            await salesBookingModel.updateOne({
+                sale_booking_id: sale_booking_id
+            }, {
+                $set: updateObj
+            });
+        }
+        return response.returnTrue(
+            200,
+            req,
+            res,
+            "Sales booking Testing successfully!",
+            {}
+        );
+    } catch (err) {
+        console.log("🚀 ~ err:", err)
         return response.returnFalse(500, req, res, err.message, {});
     }
 }

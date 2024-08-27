@@ -41,7 +41,7 @@ module.exports = {
             discription: "Execution Paused By Sales Executive."
         },
         '11': {
-            status: "Execution Closed",
+            status: "Payment Closed",
             discription: "Full payment received and Execution is done."
         },
         '12': {
@@ -54,4 +54,7 @@ module.exports = {
         },
     },
     incentiveCalculationUserLimit: 50000,
+    //email for Sales booking and payment update
+    // salesEmail: "amanrathod197@gmail.com,naveen@creativefuel.io"
+    salesEmail: "nikhil@creativefuel.io,tushar@creativefuel.io,tiya@creativefuel.io"
 }

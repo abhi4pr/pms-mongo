@@ -5,7 +5,8 @@ const constant = require("../../common/constant.js");
 const { saleBookingStatus } = require("../../helper/status.js");
 const salesBookingModel = require("../../models/Sales/salesBookingModel");
 const salesBookingPayment = require('../../models/Sales/paymentUpdateModel.js')
-const phpFinanceModel = require("../../models/phpFinanceModel.js");
+const paymentDetailsModel = require('../../models/Sales/paymentDetailsModel.js')
+const userModel = require("../../models/userModel.js");
 const { uploadImage, deleteImage } = require("../../common/uploadImage.js");
 const upload = multer({
     storage: multer.memoryStorage()
@@ -113,6 +114,16 @@ exports.salesBalanceUpdate = [
                     updateData[field] = await uploadImage(req.files[field][0], "SalesPaymentUpdateFiles");
                 }
             }
+
+            //Payment Detail model data get from DB
+            const paymentDetailsData = await paymentDetailsModel.findOne({
+                _id: req.body.payment_detail_id
+            });
+
+            if (paymentDetailsData && paymentDetailsData?.payment_mode_id) {
+                updateData["payment_mode"] = paymentDetailsData?.payment_mode_id;
+            }
+
             //save image and data in DB collection data
             await updateData.save();
 
@@ -177,6 +188,24 @@ exports.salesBalanceUpdate = [
             // if (saleBookingData.campaign_amount == approvedAmount) {
             //     updateObj["booking_status"] = saleBookingStatus['05'].status;
             // }
+
+            //used credit limit increment on user.
+            if (saleBookingData.payment_credit_status == "self_credit_used") {
+                const result = await userModel.findOneAndUpdate({
+                    user_id: saleBookingData.created_by
+                }, {
+                    $inc: {
+                        user_available_limit: (req.body.payment_amount)
+                    }
+                }, {
+                    projection: {
+                        user_id: 1,
+                        user_credit_limit: 1,
+                        user_available_limit: 1
+                    },
+                    new: true
+                });
+            }
 
             //sales booking data updatein db collection
             await salesBookingModel.updateOne({
