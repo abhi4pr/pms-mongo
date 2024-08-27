@@ -43,7 +43,12 @@ exports.addExeCampaign = [
         exeCampaignAdded
       );
     } catch (err) {
-      return response.returnFalse(500, req, res, err.message, {});
+      if (err.code === 11000) {
+        // 11000 is the error code for duplicate key error
+        return response.returnFalse(500, req, res, `Campaign Name already exists!`, {});
+      } else {
+        return response.returnFalse(500, req, res, err.message, {});
+      }
     }
   }];
 
@@ -115,14 +120,18 @@ exports.getExeCampaigns = async (req, res) => {
 
 exports.getExeCampaignsNameWiseData = async (req, res) => {
   try {
-
-    // Retrieve the list of records with pagination applied
-    const exeCampaignList = await exeCampaignSchema.find({
+    const matchCondition = {
       status: {
         $ne: constant.DELETED
       }
-    }, {
-      exe_campaign_name: 1
+    }
+    if (req.query?.userId) {
+      matchCondition["user_id"] = Number(req.query.userId);
+    }
+    // Retrieve the list of records with pagination applied
+    const exeCampaignList = await exeCampaignSchema.find(matchCondition, {
+      exe_campaign_name: 1,
+      is_sale_booking_created: 1
     });
     // Return a success response with the list of records and pagination details
     return response.returnTrueWithPagination(
@@ -252,6 +261,7 @@ exports.getAllExeCampaignList = async (req, res) => {
         brand_id: 1,
         user_id: 1,
         agency_id: 1,
+        is_sale_booking_created: 1,
         created_by: 1,
         agencymastersData: {
           agencymastersData: "$agencymastersData.name"

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #FF6F61;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 18px;
+            color: #ffe0dc;
+        }
+        .banner {
+            text-align: center;
+            padding: 20px;
+            background-image: url('https://example.com/birthday-banner.jpg');
+            background-size: cover;
+            color: white;
+        }
+        .banner h2 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: bold;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .content .birthday-icon {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #FF6F61;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            color: #777;
+            border-top: 1px solid #ddd;
+        }
+        .footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Happy Birthday, <%= name %>!</h1>
+            <p>Your Special Day Has Arrived!</p>
+        </div>
+        <div class="banner">
+            <h2>🎉 Celebrate Your Day! 🎉</h2>
+        </div>
+        <div class="content">
+            <div class="birthday-icon">🎂</div>
+            <p>Dear <%= name %>,</p>
+            <p>Wishing you a day filled with happiness and a year filled with joy. We are so glad to have you as a part of the CreativeFuel family. Your hard work and dedication inspire us all.</p>
+            <p>May this birthday be just the beginning of a year full of happy memories and wonderful moments.</p>
+            <p>Enjoy every moment of your special day!</p>
+        </div>
+        <div class="footer">
+            <p>With Warmest Wishes,</p>
+            <p>The CreativeFuel Team</p>
+        </div>
+    </div>
+</body>
+</html>
+

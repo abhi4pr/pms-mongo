@@ -13,6 +13,11 @@ const recordServiceMaster = new Schema({
         required: true,
         ref: "salesServiceMasterModel"
     },
+    is_execution_request_sent: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
     // excel_upload: {
     //     type: String,
     //     required: false
@@ -45,7 +50,7 @@ const recordServiceMaster = new Schema({
         type: String,
         required: false
     },
-    individual_amount: {
+    individual_amount: {//old name per_hour_amount
         type: Number,
         required: false
     },
