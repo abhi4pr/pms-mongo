@@ -1964,7 +1964,7 @@ router.get('/change_primarypage_id_to_id', adminController.changePrimaryPageToId
 router.get('/shift_bank_details', adminController.shiftBankDetails)
 router.get('/get_vendor_details_with_ids', adminController.getVendorDetailsWithIds)
 router.get('/get_vendor_details_with_ids_by_id/:vendor_id', adminController.getVendorDetailsWithIdsById)
-// router.get('/generate_plural_payment_jwt_token', adminController.createJWTForPluralPayment)
+router.get('/generate_plural_payment_jwt_token', adminController.createJWTForPluralPayment);
 // router.get('/update_vid_in_grouplink', adminController.updateVendoridinGroupLink)
 
 /* expense api */
