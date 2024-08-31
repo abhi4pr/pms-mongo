@@ -107,13 +107,13 @@ exports.getSingleDesignation = async (req, res) => {
 
 exports.editDesignation = async (req, res) => {
   try {
-    const checkDuplicacy = await designationModel.findOne({ desi_name: req.body.desi_name })
-    if (checkDuplicacy) {
-      return res.status(409).send({
-        data: [],
-        message: "Designation name already exist",
-      });
-    }
+    // const checkDuplicacy = await designationModel.findOne({ desi_name: req.body.desi_name })
+    // if (checkDuplicacy) {
+    //   return res.status(409).send({
+    //     data: [],
+    //     message: "Designation name already exist",
+    //   });
+    // }
     const editsim = await designationModel.findOneAndUpdate(
       { desi_id: parseInt(req.body.desi_id) },
       {
