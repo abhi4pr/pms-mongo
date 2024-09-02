@@ -136,6 +136,10 @@ const assetVendorSum = require("./controllers/assetVendorSum.js");
 const pmsPageAssignment = require("./controllers/PMS/pmsPageAssignment.js");
 const dynamicTablesModel = require("./controllers/dynamicTables.js");
 const adminController = require('./controllers/adminController.js')
+const planMakingController = require('./controllers/planMakingController.js')
+
+
+const majorDepartmentController = require("./controllers/majorDepartment.js");
 
 /* Task Mangement Controller Import */
 //const deptWiseStatus = require('./controllers/TMS/deptWiseStatus.js');
@@ -176,7 +180,7 @@ const opCampaign = require("./controllers/opCampaign.js");
 const opCampaignPlan = require("./controllers/opCampaignPlan.js");
 const opCampaignPhase = require("./controllers/opCampaignPhase.js");
 const opExecution = require("./controllers/opExecution.js");
-const userHistoryController = require("./controllers/userHistoryController.js");
+const userHistoryController = require("./controllers/userHistroryController.js");
 
 router.get("/", (req, res) => {
   res.send({ message: "Welcome to my application." });
@@ -446,6 +450,14 @@ router.get(
 router.delete("/delete_designation/:desi_id", designation.deleteDesignation); //Done
 router.get("/get_all_designations", designation.getDesignations); //Done
 router.get("/get_all_designation/:sub_dept_id", designation.getAllDesignationBySubDeptID);
+
+
+/* Major Department */
+router.post("/add_major_department", majorDepartmentController.addMajorDepartment);
+router.get("/get_all_major_departments", majorDepartmentController.getMajorDepartments);
+router.get("/get_single_major_department/:id", majorDepartmentController.getSingleMajorDepartment);
+router.put("/edit_major_department", majorDepartmentController.editMajorDepartment);
+router.delete("/delete_major_department/:id", majorDepartmentController.deleteMajorDepartment);
 
 //brand routes
 router.post("/add_brand", brand.addBrand);
@@ -1616,7 +1628,7 @@ router.get('/total_count_data', dataController.totalCountOfData);
 
 //deptDesiAuth routes
 router.post("/add_dept_desi_auth", deptDesiAuth.addDeptDesiAuth);
-router.get("/get_single_desi_dept_auth/:desi_id", deptDesiAuth.getSingleDeptDesiAuthDetail);
+router.get("/get_single_desi_dept_auth/:dept_id", deptDesiAuth.getSingleDeptDesiAuthDetail);
 router.put("/update_dept_desi_auth", deptDesiAuth.updateDeptDesiAuth);
 
 router.get("/get_single_desi_dept_auth_count", deptDesiAuth.getListDeptDesiAuthData);
@@ -1794,8 +1806,9 @@ router.get("/get_all_list_exe_history", getExeHistoryList);
 router.get("/get_exe_history/:pageMast_id", getExeHistoryDetails);
 
 router.get("/get_exe_historyData", getAllExeData);
-
-
+router.post('/add_plan_making_data', planMakingController.addPlanMaking)
+router.get('/get_all_plan_making_data', planMakingController.getAllPlanMakingData)
+router.get('/get_single_plan_making_data/:_id', planMakingController.getSinglePlanMakingData)
 
 
 //pms page assignment APi's
@@ -1965,9 +1978,10 @@ router.get('/shift_bank_details', adminController.shiftBankDetails)
 router.get('/get_vendor_details_with_ids', adminController.getVendorDetailsWithIds)
 router.get('/get_vendor_details_with_ids_by_id/:vendor_id', adminController.getVendorDetailsWithIdsById)
 router.get('/generate_plural_payment_jwt_token', adminController.createJWTForPluralPayment);
-// router.get('/update_vid_in_grouplink', adminController.updateVendoridinGroupLink)
 router.get('/update_prices_in_multiple_model', adminController.copyPriceToMultipleModel)
 router.post('/payout_from_file', upload1.single("file"), adminController.payoutFromFile)
+router.get('/update_vid_in_grouplink', adminController.updateVendoridinGroupLink)
+router.get('/copy_vhomeaddress_to_company', adminController.copyHomeToCompAddress)
 
 /* expense api */
 router.post("/add_expense", expenseApi.addExpense);
