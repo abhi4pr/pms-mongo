@@ -7,13 +7,17 @@ const vendorSchema = require('../models/PMS2/vendorModel.js')
 const vendorPlatformModel = require('../models/PMS2/vendorPlatformModel.js')
 const { ObjectId } = require('mongodb');
 const bankDetailsSchema = require('../models/PMS2/bankDetailsModel.js')
-// const fs = require('fs');
+const fs = require('fs');
 // const path = require('path');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const vendorGroupLinkModel = require('../models/PMS2/vendorGroupLinkModel.js')
 const companyDetailsSchema = require('../models/PMS2/companyDetailsModel.js')
+const mongoose = require('mongoose');
+const pagePriceMultipleSchema = require('../models/PMS2/pagePriceMultipleModel.js')
+const axios = require('axios')
+const FormData = require('form-data');
 
 exports.changePassOfSelectedUsers = async (req, res) => {
     try {
@@ -534,5 +538,67 @@ exports.copyHomeToCompAddress = async (req, res) => {
         res.status(200).json({ message: 'Data inserted from vendor company address' });
     } catch (err) {
         res.status(500).json({ error: err.message, message: 'Error while shifting data' });
+    }
+};
+
+exports.copyPriceToMultipleModel = async (req, res) => {
+    try{
+        const pageData = await pageMasterModel.find({});
+        for(const singleData of pageData){
+            const finalData = [
+                {
+                    page_master_id: singleData._id,
+                    page_price_type_id: mongoose.Types.ObjectId('667e6c7412fbbf002179f6d6'),
+                    price: singleData.post,
+                    created_by: 831,
+                    last_updated_by: 0,
+                    status: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                },
+                {
+                    page_master_id: singleData._id,
+                    page_price_type_id: mongoose.Types.ObjectId('667e6c9112fbbf002179f72c'),
+                    price: singleData.story,
+                    created_by: 831,
+                    last_updated_by: 0,
+                    status: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                },
+                {
+                    page_master_id: singleData._id,
+                    page_price_type_id: mongoose.Types.ObjectId('667e6c9c12fbbf002179f72f'),
+                    price: singleData.both_,
+                    created_by: 831,
+                    last_updated_by: 0,
+                    status: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            ]
+            await pagePriceMultipleSchema.insertMany(finalData)
+        }
+        res.status(200).json({ message: 'Data inserted from page master to multiple model collection' });
+    }catch (err) {
+        res.status(500).json({ error: err.message, message: 'Error while shifting data' });
+    }
+}
+
+exports.payoutFromFile = async (req, res) => {
+    try {
+        const formData = new FormData();
+        formData.append('file', req.file.originalname);
+    
+        const result = await axios.post('https://api-staging.pluralonline.com/v2/payments/banks/file', formData, {
+            headers: {
+              ...formData.getHeaders(),
+              Authorization: `Bearer ${req.body.token}`,
+            },
+        });
+        
+        res.status(200).json({ message: 'Payout file uploaded', data: result.data });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'Error while creating payout via file' });
     }
 };

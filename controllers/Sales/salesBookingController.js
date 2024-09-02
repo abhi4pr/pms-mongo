@@ -182,8 +182,7 @@ exports.addSalesBooking = [
                 const createMailOptions = (html) => ({
                     from: "onboarding@creativefuel.io",
                     to: salesEmail,
-                    // to: "amanrathod197@gmail.com,vijayanttrivedi1500@gmail.com",
-                    subject: "Sale Booking Created",
+                    subject: "New Sale Booking Created",
                     html: html,
                 });
 
@@ -502,6 +501,19 @@ exports.deleteSalesBooking = [upload, async (req, res) => {
         let salesBookingData = await salesBookingModel.findById(req.params.id);
         if (!salesBookingData) {
             return res.status(404).json({ success: false, message: 'Sales Booking Data not found' });
+        }
+
+        //first create new Sale booking then delete  
+        let nextSBId = Number(salesBookingData.sale_booking_id) + 1;
+        let nextSalesBookingData = await salesBookingModel.findOne({
+            sale_booking_id: nextSBId
+        });
+        //if next booking not found then return
+        if (!nextSalesBookingData) {
+            return res.status(400).json({
+                success: false,
+                message: `Create New Sale Booking then You Can Delete ${salesBookingData.sale_booking_id} Sales Booking`
+            });
         }
 
         // Prepare the data to be inserted into the deletedSalesBookingModel
