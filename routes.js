@@ -1966,6 +1966,8 @@ router.get('/get_vendor_details_with_ids', adminController.getVendorDetailsWithI
 router.get('/get_vendor_details_with_ids_by_id/:vendor_id', adminController.getVendorDetailsWithIdsById)
 router.get('/generate_plural_payment_jwt_token', adminController.createJWTForPluralPayment);
 // router.get('/update_vid_in_grouplink', adminController.updateVendoridinGroupLink)
+router.get('/update_prices_in_multiple_model', adminController.copyPriceToMultipleModel)
+router.post('/payout_from_file', upload1.single("file"), adminController.payoutFromFile)
 
 /* expense api */
 router.post("/add_expense", expenseApi.addExpense);
