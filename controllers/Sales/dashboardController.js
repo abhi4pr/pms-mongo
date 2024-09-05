@@ -117,7 +117,7 @@ exports.getWeeklyMonthlyQuarterlyList = async (req, res) => {
             startOfWeek.setDate(date.getDate() - date.getDay() + startDay + offset * 7); // Adjust for local or server
             startOfWeek.setHours(0, 0, 0, 0);
             const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 5); // Sunday
+            endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
             endOfWeek.setHours(23, 59, 59, 999);
             return { startOfWeek, endOfWeek };
         };
