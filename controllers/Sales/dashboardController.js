@@ -98,11 +98,17 @@ exports.getWeeklyMonthlyQuarterlyList = async (req, res) => {
     try {
         // Get the current date
         const currentDate = new Date();
+        console.log("🚀 ~ currentDate:", currentDate);
+
+        const currentDate1 = new Date.now();
+        console.log("🚀 ~ currentDate1:", currentDate1);
+
         // Check if the environment is local or server
         const isLocal = vari.NODE_ENV === 'development'; // Assuming 'development' is local
         console.log("🚀 ~ isLocal:", isLocal);
         // Set the day based on the environment (1st locally, 2nd on server)
-        const startDay = isLocal ? 1 : 2;
+        // const startDay = isLocal ? 1 : 2;
+        const startDay = isLocal ? 0 : 1;
         console.log("🚀 ~ startDay:", startDay);
 
         // Function to get the start and end dates of a week (Monday to Sunday)
