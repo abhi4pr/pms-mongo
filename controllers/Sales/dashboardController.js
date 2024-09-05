@@ -100,7 +100,7 @@ exports.getWeeklyMonthlyQuarterlyList = async (req, res) => {
         const currentDate = new Date();
         console.log("🚀 ~ currentDate:", currentDate);
 
-        const currentDate1 = new Date.now();
+        const currentDate1 = Date.now();
         console.log("🚀 ~ currentDate1:", currentDate1);
 
         // Check if the environment is local or server
