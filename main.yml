@@ -18,14 +18,14 @@ jobs:
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@master
         with:
-          service_account_key: ${{ secrets.GCP_DEV_NODE_SEC }}  # Replace with your GCP service account key stored in GitHub Secrets
+          service_account_key: ${{ secrets.GCP_PROD_NODE_SEC }}  # Replace with your GCP service account key stored in GitHub Secrets
 
       # Step 3: Deploy your Node.js project to the Google Cloud VM
       - name: Deploy to GCP VM
         run: |
-          gcloud compute scp --recurse nodedevserver node-dev-server: --zone us-central1-b
+          gcloud compute scp --recurse migration node-prod-instance: --zone us-central1-a
 
       # Step 4: SSH into your instance and restart your Node.js application (e.g., using PM2)
       - name: Restart Node.js application
         run: |
-          gcloud compute ssh node-dev-server --zone "us-central1-b" --command="cd /home/reset/nodedevserver && pm2 restart all"
+          gcloud compute ssh --zone "us-central1-a" --command="cd /home/icreativefuel/migration && pm2 restart all"
