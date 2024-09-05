@@ -12,7 +12,7 @@ var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: "onboarding@creativefuel.io",
-    pass: "qtttmxappybgjbhp",
+    pass: "qtttmxappybgj",
 
     // user: "ankigupta1254@gmail.com",
     // pass: "ptxbqtjmcaghogcg",
