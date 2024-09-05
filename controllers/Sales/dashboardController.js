@@ -103,7 +103,7 @@ exports.getWeeklyMonthlyQuarterlyList = async (req, res) => {
         console.log("🚀 ~ isLocal:", isLocal);
         // Set the day based on the environment (1st locally, 2nd on server)
         const startDay = isLocal ? 1 : 2;
-        // console.log("🚀 ~ startDay:", startDay);
+        console.log("🚀 ~ startDay:", startDay);
 
         // Function to get the start and end dates of a week (Monday to Sunday)
         const getWeekRange = (date, offset = 0) => {
@@ -139,6 +139,13 @@ exports.getWeeklyMonthlyQuarterlyList = async (req, res) => {
         const { startOfWeek, endOfWeek } = getWeekRange(currentDate);
         const { startOfMonth, endOfMonth } = getMonthRange(currentDate);
         const { startOfQuarter, endOfQuarter } = getQuarterRange(currentDate);
+        console.log("🚀 ~ startOfWeek:", startOfWeek);
+        console.log("🚀 ~ endOfWeek:", endOfWeek);
+        console.log("🚀 ~ startOfMonth:", startOfMonth);
+        console.log("🚀 ~ endOfMonth:", endOfMonth);
+        console.log("🚀 ~ startOfQuarter:", startOfQuarter);
+        console.log("🚀 ~ endOfQuarter:", endOfQuarter);
+
 
         // Last week, month, and quarter
         const { startOfWeek: lastWeekStart, endOfWeek: lastWeekEnd } = getWeekRange(currentDate, -1);
