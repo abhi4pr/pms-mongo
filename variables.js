@@ -10,5 +10,7 @@ module.exports = {
     // IMAGE_URL: 'https://storage.googleapis.com/jarvis-dev-bucket/',
     IMAGE_URL: 'https://storage.googleapis.com/node-prod-bucket/',
     // ALLOWED_URL: 'http://34.70.225.161 ',
-    ALLOWED_URL: 'https://jarvis.work'
+    ALLOWED_URL: 'https://jarvis.work',
+    NODE_ENV: 'production',
+    // NODE_ENV: 'development',
 };
