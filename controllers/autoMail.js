@@ -13,10 +13,6 @@ var transporter = nodemailer.createTransport({
   auth: {
     user: "onboarding@creativefuel.io",
     pass: "qtttmxappybgj",
-
-    // user: "ankigupta1254@gmail.com",
-    // pass: "ptxbqtjmcaghogcg",
-
   },
 });
 

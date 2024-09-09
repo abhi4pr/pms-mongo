@@ -921,6 +921,7 @@ router.post(
   upload.single("attachment"),
   user.sendMailAllWfoUser
 );
+router.post("/send_mail_for_extend_joining_date", user.sendUserMailForJoiningDayExtension);
 router.get("/get_all_wfh_users", user.getAllWfhUsers);
 router.get("/get_all_login_history", user.getLoginHistory);
 router.post("/get_user_pre_sitting", user.getUserPresitting);
@@ -933,6 +934,7 @@ router.get("/get_all_percentage", user.getFilledPercentage);
 // router.get("/get_first_time_login_users", user.getAllFirstLoginUsers)
 router.post("/get_user_graph_data", user.getUserGraphData);
 router.post("/get_user_graph_data_of_wfhd", user.getUserGraphDataOfWFHD);
+router.post("/get_user_graph_data_of_wfo", user.getUserGraphDataOfWFO);
 router.get("/get_users_with_status", user.getUsersWithStatus);
 router.get("/get_all_sales_users", user.getAllSalesUsers);
 router.get("/get_all_sales_users_list", user.getAllSalesUsersByDepartment);
@@ -950,10 +952,15 @@ router.post("/send_offer_letter", user.sendOfferLetter);
 router.post("/offer_letter_send_in_mail", upload.single("attachment"), user.sendOfferLetterMail);
 router.put('/change_all_reportL1_by_sub_dept', user.changeAllReportL1BySubDept);
 router.get("/get_wfh_users_with_dept", user.getAllWfhUsersWithDept);
+router.get("/get_wfo_users_with_dept", user.getAllWfOUsersWithDept);
 router.get("/get_work_anniversary", user.getWorkAnniversarysForWFHDUsers);
+router.get("/get_wfo_users_work_anniversary", user.getWorkAnniversarysForWFOUsers);
 router.get("/get_birth_days", user.getBirthDaysForWFHDUsers);
+router.get("/get_wfo_users_birth_days", user.getBirthDaysForWFOUsers);
 router.get("/get_newjoinee_of_wfhd_users", user.getNewJoineeOfWFHDUsers);
+router.get("/get_newjoinee_of_wfo_users", user.getNewJoineeOfWFOUsers);
 router.get("/get_exit_of_wfhd_users", user.getNewExitOfWFHDUsers);
+router.get("/get_exit_of_wfo_users", user.getNewExitOfWFOUsers);
 router.get("/get_all_exit_users_of_wfhd", user.getAllExitUsersOfWFHD);
 router.put("/update_training", user.updateTraining);
 
@@ -1977,9 +1984,7 @@ router.get('/change_primarypage_id_to_id', adminController.changePrimaryPageToId
 router.get('/shift_bank_details', adminController.shiftBankDetails)
 router.get('/get_vendor_details_with_ids', adminController.getVendorDetailsWithIds)
 router.get('/get_vendor_details_with_ids_by_id/:vendor_id', adminController.getVendorDetailsWithIdsById)
-router.get('/generate_plural_payment_jwt_token', adminController.createJWTForPluralPayment);
-router.get('/update_prices_in_multiple_model', adminController.copyPriceToMultipleModel)
-router.post('/payout_from_file', upload1.single("file"), adminController.payoutFromFile)
+router.get('/generate_plural_payment_jwt_token', adminController.createJWTForPluralPayment)
 router.get('/update_vid_in_grouplink', adminController.updateVendoridinGroupLink)
 router.get('/copy_vhomeaddress_to_company', adminController.copyHomeToCompAddress)
 
